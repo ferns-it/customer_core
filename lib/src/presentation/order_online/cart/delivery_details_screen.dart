@@ -143,9 +143,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            const Icon(
+                            Icon(
                               FluentIcons.location_24_regular,
-                              color: Colors.white,
+                              color: Theme.of(context).iconTheme.color,
                             ),
                             horizontalSpaceSmall,
                             Expanded(
@@ -375,9 +375,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         FluentIcons.notepad_24_regular,
-                        color: AppColors.kWhite,
+                        color: Theme.of(context).iconTheme.color,
                       ),
                       horizontalSpaceSmall,
                       Expanded(
@@ -385,7 +385,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           name: 'notes',
                           key: cartListener.notesFieldKey,
                           style: context.customTextTheme.text14W600.copyWith(
-                            color: AppColors.kWhite,
+                            color:
+                                themeListener.isDarkMode ? Colors.white : null,
                           ),
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.zero,
@@ -436,7 +437,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   color: cartListener.selectedPaymentMethod ==
                                           PaymentMethod.cash
                                       ? Theme.of(context).colorScheme.primary
-                                      : AppColors.kWhite,
+                                      : Colors.grey,
                                   width: 1.0,
                                 ),
                                 borderRadius: BorderRadius.circular(8.0),
@@ -454,7 +455,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   color: cartListener.selectedPaymentMethod ==
                                           PaymentMethod.cash
                                       ? Theme.of(context).colorScheme.primary
-                                      : AppColors.kWhite,
+                                      : Colors.grey,
                                 ),
                               ),
                               value: PaymentMethod.cash,
@@ -484,7 +485,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   color: cartListener.selectedPaymentMethod ==
                                           PaymentMethod.card
                                       ? Theme.of(context).colorScheme.primary
-                                      : AppColors.kWhite,
+                                      : Colors.grey,
                                   width: 1.0,
                                 ),
                                 borderRadius: BorderRadius.circular(8.0),
@@ -502,7 +503,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   color: cartListener.selectedPaymentMethod ==
                                           PaymentMethod.card
                                       ? Theme.of(context).colorScheme.primary
-                                      : AppColors.kWhite,
+                                      : Colors.grey,
                                 ),
                               ),
                               value: PaymentMethod.card,
@@ -587,16 +588,38 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     _SummaryRow(
                         label: "Offer Discount",
                         value:
-                            "-${AppConfig.instance.country.symbol} ${cartListener.cartDetailsModel?.getOfferDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                            "- ${AppConfig.instance.country.symbol} ${cartListener.cartDetailsModel?.getOfferDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
                         style: context.customTextTheme.text16W600
                             .copyWith(color: context.customTextTheme.color)),
                     verticalSpaceTiny,
                     _SummaryRow(
                         label: "Discount",
                         value:
-                            "-${AppConfig.instance.country.symbol} ${cartListener.calculatedDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                            "- ${AppConfig.instance.country.symbol} ${cartListener.calculatedDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
                         style: context.customTextTheme.text16W600
                             .copyWith(color: context.customTextTheme.color)),
+                    verticalSpaceTiny,
+                    Column(
+                      children: cartListener.deliveryDetails?.taxDetailsGroup
+                              .map(
+                                (taxGroup) => Column(
+                                  children: [
+                                    _SummaryRow(
+                                        label: "${taxGroup.taxSlab}",
+                                        value: "${taxGroup.totalTax}",
+                                        style: context
+                                            .customTextTheme.text16W600
+                                            .copyWith(
+                                                color: context
+                                                    .customTextTheme.color)),
+                                    verticalSpaceTiny,
+                                  ],
+                                ),
+                              )
+                              .toList() ??
+                          [],
+                    ),
+
                     verticalSpaceTiny,
                     // _SummaryRow(
                     //   label: "Coupon Discount",
@@ -645,12 +668,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                 selectedTileColor:
                     cartListener.selectedOrderType == OrderType.delivery
                         ? null
-                        : AppColors.kWhite,
+                        : Theme.of(context).iconTheme.color,
                 shape: RoundedRectangleBorder(
                   side: BorderSide(
                     color: cartListener.selectedOrderType == OrderType.delivery
                         ? Theme.of(context).colorScheme.primary
-                        : AppColors.kWhite,
+                        : Colors.grey,
                     width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(8.0),
@@ -659,13 +682,13 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     height: 34.0,
                     color: cartListener.selectedOrderType == OrderType.delivery
                         ? Theme.of(context).colorScheme.primary
-                        : AppColors.kWhite),
+                        : Colors.grey),
                 title: Text(
                   "Delivery",
                   style: context.customTextTheme.text14W600.copyWith(
                     color: cartListener.selectedOrderType == OrderType.delivery
                         ? Theme.of(context).colorScheme.primary
-                        : AppColors.kWhite,
+                        : Colors.grey,
                   ),
                 ),
                 onTap: () {
@@ -689,12 +712,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                 selectedTileColor:
                     cartListener.selectedOrderType == OrderType.takeaway
                         ? null
-                        : AppColors.kWhite,
+                        : Colors.grey,
                 shape: RoundedRectangleBorder(
                   side: BorderSide(
                     color: cartListener.selectedOrderType == OrderType.takeaway
                         ? Theme.of(context).colorScheme.primary
-                        : AppColors.kWhite,
+                        : Colors.grey,
                     width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(8.0),
@@ -703,13 +726,13 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     height: 34.0,
                     color: cartListener.selectedOrderType == OrderType.takeaway
                         ? Theme.of(context).colorScheme.primary
-                        : AppColors.kWhite),
+                        : Colors.grey),
                 title: Text(
                   "Take Away",
                   style: context.customTextTheme.text14W600.copyWith(
                     color: cartListener.selectedOrderType == OrderType.takeaway
                         ? Theme.of(context).colorScheme.primary
-                        : AppColors.kWhite,
+                        : Colors.grey,
                   ),
                 ),
                 onTap: () {
@@ -880,7 +903,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         onTap: () async {
           TimeOfDay? pickUpTime;
 
-          if (Platform.isAndroid) {
+          if (!Platform.isAndroid) {
             pickUpTime = await showTimePicker(
               context: context,
               initialTime: cartListener.selectedPickUpTime != null
@@ -988,20 +1011,20 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(
+            Icon(
               FluentIcons.clock_24_regular,
-              color: AppColors.kWhite,
+              color: Theme.of(context).iconTheme.color,
             ),
             horizontalSpaceSmall,
             Expanded(
               child: Text(
                 cartListener.selectedPickUpTime == null
-                    ? "Select Pick Time"
+                    ? "Select Pick Up Time"
                     : "Pickup on ${DateTimeUtils.formatDateTimeToTime(
                         cartListener.selectedPickUpTime!,
                       )}",
                 style: context.customTextTheme.text16W600.copyWith(
-                  color: AppColors.kWhite,
+                  color: themeListener.isDarkMode ? Colors.white : null,
                 ),
               ),
             ),

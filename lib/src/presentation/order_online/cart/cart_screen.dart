@@ -452,9 +452,11 @@ class _CartScreenState extends State<CartScreen>
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        const Icon(
+                                         Icon(
                                           FluentIcons.cart_24_filled,
-                                          color: Colors.black,
+                                          color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface,
                                         ),
                                         horizontalSpaceSmall,
                                         Text("Checkout",

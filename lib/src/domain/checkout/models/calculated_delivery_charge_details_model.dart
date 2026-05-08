@@ -780,11 +780,11 @@ final String? cartGrossAmount;
 
 class DeliveryFeeTaxDetailsGroup {
   final String? taxSlab;
-  final String? totaltax;
+  final String? totalTax;
   final int? totalTaxPaisa;
   DeliveryFeeTaxDetailsGroup({
     this.taxSlab,
-    this.totaltax,
+    this.totalTax,
     this.totalTaxPaisa,
   });
 
@@ -792,12 +792,12 @@ class DeliveryFeeTaxDetailsGroup {
 
   DeliveryFeeTaxDetailsGroup copyWith({
     String? taxSlab,
-    String? totaltax,
+    String? totalTax,
     int? totalTaxPaisa,
   }) {
     return DeliveryFeeTaxDetailsGroup(
       taxSlab: taxSlab ?? this.taxSlab,
-      totaltax: totaltax ?? this.totaltax,
+      totalTax: totalTax ?? this.totalTax,
       totalTaxPaisa: totalTaxPaisa ?? this.totalTaxPaisa,
     );
   }
@@ -805,7 +805,7 @@ class DeliveryFeeTaxDetailsGroup {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'taxSlab': taxSlab,
-      'totaltax': totaltax,
+      'totalTax': totalTax,
       'totalTaxPaisa': totalTaxPaisa,
     };
   }
@@ -813,7 +813,7 @@ class DeliveryFeeTaxDetailsGroup {
   factory DeliveryFeeTaxDetailsGroup.fromMap(Map<String, dynamic> map) {
     return DeliveryFeeTaxDetailsGroup(
       taxSlab: map['taxSlab'] != null ? map['taxSlab'] as String : null,
-      totaltax: map['totaltax'] != null ? map['totaltax'] as String : null,
+      totalTax: map['totalTax'] != null ? map['totalTax'] as String : null,
       totalTaxPaisa: map['totalTaxPaisa'] != null ? map['totalTaxPaisa'] as int : null,
     );
   }
@@ -823,7 +823,7 @@ class DeliveryFeeTaxDetailsGroup {
   factory DeliveryFeeTaxDetailsGroup.fromJson(String source) => DeliveryFeeTaxDetailsGroup.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'DeliveryFeeTaxDetailsGroup(taxSlab: $taxSlab, totaltax: $totaltax, totalTaxPaisa: $totalTaxPaisa)';
+  String toString() => 'DeliveryFeeTaxDetailsGroup(taxSlab: $taxSlab, totalTax: $totalTax, totalTaxPaisa: $totalTaxPaisa)';
 
   @override
   bool operator ==(covariant DeliveryFeeTaxDetailsGroup other) {
@@ -831,10 +831,10 @@ class DeliveryFeeTaxDetailsGroup {
   
     return 
       other.taxSlab == taxSlab &&
-      other.totaltax == totaltax &&
+      other.totalTax == totalTax &&
       other.totalTaxPaisa == totalTaxPaisa;
   }
 
   @override
-  int get hashCode => taxSlab.hashCode ^ totaltax.hashCode ^ totalTaxPaisa.hashCode;
+  int get hashCode => taxSlab.hashCode ^ totalTax.hashCode ^ totalTaxPaisa.hashCode;
 }

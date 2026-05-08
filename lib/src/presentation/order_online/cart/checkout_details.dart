@@ -22,6 +22,9 @@ class CheckoutDetailsScreen extends StatelessWidget {
     final userListener = context.watch<UserProvider>();
     // final shopListener = context.watch<ShopProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final taxGroup = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.taxDetailsGroup
+        : cartListener.takeAwayDetails?.taxDetailsGroup;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -476,6 +479,26 @@ class CheckoutDetailsScreen extends StatelessWidget {
                       "-${AppConfig.instance.country.symbol} ${cartListener.calculatedDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
                 ),
 
+                verticalSpaceTiny,
+                Column(
+                  children: taxGroup
+                          ?.map(
+                            (taxGroup) => Column(
+                              children: [
+                                _SummaryRow(
+                                    label: "${taxGroup.taxSlab}",
+                                    value: "${taxGroup.totalTax}",
+                                    style: context.customTextTheme.text16W600
+                                        .copyWith(
+                                            color:
+                                                context.customTextTheme.color)),
+                                verticalSpaceTiny,
+                              ],
+                            ),
+                          )
+                          .toList() ??
+                      [],
+                ),
                 verticalSpaceTiny,
                 // _SummaryRow(
                 //   label: "Coupon Discount",

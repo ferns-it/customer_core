@@ -452,11 +452,11 @@ class _CartScreenState extends State<CartScreen>
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                         Icon(
+                                        Icon(
                                           FluentIcons.cart_24_filled,
                                           color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurface,
+                                              .colorScheme
+                                              .onSurface,
                                         ),
                                         horizontalSpaceSmall,
                                         Text("Checkout",
@@ -571,14 +571,33 @@ class _CartScreenState extends State<CartScreen>
                                             if (cartProvider
                                                     .selectedPaymentMethod ==
                                                 PaymentMethod.card) {
-                                              paymentProvider
-                                                  .createPaymentIntent(
-                                                      cartProvider
-                                                          .calculatedDiscount,
-                                                      cartProvider
-                                                          .calculatedDeliveryFee,
-                                                      onPaymentSuccess:
-                                                          (transactionId) {
+                                              paymentProvider.createPaymentIntent(
+                                                  deliveryType:
+                                                      cartProvider.selectedOrderType ==
+                                                              OrderType.delivery
+                                                          ? "door_delivery"
+                                                          : "store_pickup",
+                                                  postCode: cartProvider
+                                                              .selectedOrderType ==
+                                                          OrderType.delivery
+                                                      ? cartProvider
+                                                              .selectedAddress
+                                                              ?.postcode ??
+                                                          ""
+                                                      : "",
+                                                  pickupTime: cartProvider
+                                                              .selectedOrderType ==
+                                                          OrderType.takeaway
+                                                      ? cartProvider
+                                                              .selectedPickUpTime
+                                                              ?.toIso8601String() ??
+                                                          ''
+                                                      : '',
+                                                  cartProvider
+                                                      .calculatedDiscount,
+                                                  cartProvider.calculatedDeliveryFee,
+                                                  onPaymentSuccess:
+                                                      (transactionId) {
                                                 cartProvider
                                                     .createOrder(
                                                         tID: transactionId,

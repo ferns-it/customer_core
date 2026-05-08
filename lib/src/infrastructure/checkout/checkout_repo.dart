@@ -141,12 +141,20 @@ class CheckoutRepo implements ICheckoutRepo {
   Future<Either<AppExceptions, PaymentIntentDetails>> createPaymentIntent({
     required String discountAmount,
     required String deliveryCharges,
+    required String deliveryType,
+    required String postCode,
+    required String pickupTime,
   }) async {
     try {
       final data = {
-        "devliveryCharges": deliveryCharges,
-        "discountAmount": discountAmount,
+        // "devliveryCharges": deliveryCharges,
+        // "discountAmount": discountAmount,
         "shopID": AppIdentifiers.kShopId,
+        "userType": "Registered",
+        "deliveryType": deliveryType,
+        "postCode": postCode,
+        "pickupTime": pickupTime,
+
       };
 
       final response = await APIManager.post(

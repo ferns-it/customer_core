@@ -408,6 +408,9 @@ class CheckoutScreen extends GetProviderView<CartProvider> {
                       if (cartProvider.selectedPaymentMethod ==
                           PaymentMethod.card) {
                         paymentProvider.createPaymentIntent(
+                          deliveryType: cartProvider.selectedOrderType == OrderType.delivery ? "door_delivery" : "store_pickup",
+                          postCode:cartProvider.selectedOrderType == OrderType.delivery  ? cartProvider.selectedAddress?.postcode ?? "" : "",
+                          pickupTime:cartProvider.selectedOrderType == OrderType.takeaway ? cartProvider.selectedPickUpTime?.toIso8601String() ?? '' : '',
                             cartProvider.calculatedDiscount,
                             cartProvider.calculatedDeliveryFee,
                             onPaymentSuccess: (transactionId) {

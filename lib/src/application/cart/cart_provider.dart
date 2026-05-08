@@ -212,16 +212,22 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   double get calculatedDiscount => selectedOrderType == OrderType.delivery
       ? (double.tryParse(_deliveryDetails?.deliveryDiscount ?? '0.00') ?? 0.00)
-      : (_takeAwayDetails?.discountAmount ?? 0.00);
+      : (double.tryParse(_takeAwayDetails?.takeAwayDiscount ?? '0.00') ?? 0.00);
 
   double get totalCalculatedDiscount => calculatedDiscount + offerDiscount;
+
+  double get calculatedTax => selectedOrderType == OrderType.delivery ? 
+  (double.tryParse(_deliveryDetails?.taxTotalAmount ?? '0.00') ?? 0.00)
+  : (double.tryParse(_takeAwayDetails?.taxTotalAmount ?? '0.00') ?? 0.00);
+
 
   double get totalAmount => cartTotalPrice == null
       ? 0.00
       : cartTotalPrice! +
           calculatedDeliveryFee -
           offerDiscount -
-          calculatedDiscount;
+          calculatedDiscount +
+          calculatedTax;
 
   bool _addItemLoading = false;
 
@@ -329,7 +335,7 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   void clearDiscountValue() {
     _deliveryDetails = _deliveryDetails?.copyWith(deliveryDiscount: '0.00');
-    _takeAwayDetails = _takeAwayDetails?.copyWith(discountAmount: 0.00);
+    _takeAwayDetails = _takeAwayDetails?.copyWith(takeAwayDiscount: '0.00');
     notifyListeners();
   }
 

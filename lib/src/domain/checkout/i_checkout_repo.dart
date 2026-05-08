@@ -24,6 +24,10 @@ abstract class ICheckoutRepo {
   Future<Either<AppExceptions, PaymentIntentDetails>> createPaymentIntent({
     required String discountAmount,
     required String deliveryCharges,
+    required String deliveryType,
+    required String postCode,
+    required String pickupTime,
+
   });
 
   Future<Option> cancelPaymentIntent(String paymentID);

@@ -14,18 +14,20 @@ class CustomerApp extends StatefulWidget {
   final CustomerLightThemeOverride? lightThemeOverride;
   final CustomerDarkThemeOverride? darkThemeOverride;
 
-  const CustomerApp({
-    super.key,
-  
-    this.lightThemeOverride,
-    this.darkThemeOverride, required this.uiConfig, required this.appConfig, required this.keyConfig
-  });
+  const CustomerApp(
+      {super.key,
+      this.lightThemeOverride,
+      this.darkThemeOverride,
+      required this.uiConfig,
+      required this.appConfig,
+      required this.keyConfig});
 
   @override
   State<CustomerApp> createState() => _CustomerAppState();
 }
 
 class _CustomerAppState extends State<CustomerApp> {
+  var initialized = false;
   @override
   void initState() {
     super.initState();
@@ -36,6 +38,7 @@ class _CustomerAppState extends State<CustomerApp> {
     KeyConfig.instance = widget.keyConfig;
     AppEnvironment.current = widget.appConfig.env;
     Stripe.publishableKey = widget.keyConfig.stripeKey;
+    initialized = true;
   }
 
   @override
@@ -44,7 +47,9 @@ class _CustomerAppState extends State<CustomerApp> {
       providers: DependencyRegistrar.providers,
       child: Builder(
         builder: (context) {
-          DependencyRegistrar.initializeAllProviders(context);
+          if (!initialized) {
+            DependencyRegistrar.initializeAllProviders(context);
+          }
 
           return _buildMaterialApp(context);
         },

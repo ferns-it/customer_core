@@ -49,6 +49,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     );
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final taxGroup = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.taxDetailsGroup
+        : cartListener.takeAwayDetails?.taxDetailsGroup;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -600,8 +603,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                             .copyWith(color: context.customTextTheme.color)),
                     verticalSpaceTiny,
                     Column(
-                      children: cartListener.deliveryDetails?.taxDetailsGroup
-                              .map(
+                      children: taxGroup
+                              ?.map(
                                 (taxGroup) => Column(
                                   children: [
                                     _SummaryRow(
@@ -903,7 +906,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         onTap: () async {
           TimeOfDay? pickUpTime;
 
-          if (!Platform.isAndroid) {
+          if (Platform.isAndroid) {
             pickUpTime = await showTimePicker(
               context: context,
               initialTime: cartListener.selectedPickUpTime != null
@@ -972,7 +975,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
               builder: (context) {
                 return Container(
                   height: 250,
-                  color: AppColors.kCardBackground2,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   child: Column(
                     children: [
                       Align(

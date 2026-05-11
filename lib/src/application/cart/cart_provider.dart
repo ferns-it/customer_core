@@ -79,7 +79,8 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   double? get cartTotalPrice =>
       cartDetailsModel?.cartTotal?.cartTotalPrice != null
-          ? cartDetailsModel!.cartTotal!.cartTotalPrice! / AppConfig.instance.country.currencyDivisor
+          ? cartDetailsModel!.cartTotal!.cartTotalPrice! /
+              AppConfig.instance.country.currencyDivisor
           : null;
 
   int get totalCartItems => cartItems.length;
@@ -216,10 +217,9 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   double get totalCalculatedDiscount => calculatedDiscount + offerDiscount;
 
-  double get calculatedTax => selectedOrderType == OrderType.delivery ? 
-  (double.tryParse(_deliveryDetails?.taxTotalAmount ?? '0.00') ?? 0.00)
-  : (double.tryParse(_takeAwayDetails?.taxTotalAmount ?? '0.00') ?? 0.00);
-
+  double get calculatedTax => selectedOrderType == OrderType.delivery
+      ? (double.tryParse(_deliveryDetails?.taxTotalAmount ?? '0.00') ?? 0.00)
+      : (double.tryParse(_takeAwayDetails?.taxTotalAmount ?? '0.00') ?? 0.00);
 
   double get totalAmount => cartTotalPrice == null
       ? 0.00
@@ -709,7 +709,7 @@ class CartProvider extends ChangeNotifier with BaseController {
   Future<bool> incrementCartItemQty(int index) async {
     if (_cartDetailsModel == null || _cartDeleteLoading == true) return false;
     final locatedCartItem = cartItems.elementAt(index);
-    final newQty = locatedCartItem.quantity ?? 0 + 1;
+    final newQty = (locatedCartItem.quantity ?? 0) + 1;
 
     // _debounceTimer?.cancel();
     // _debounceTimer = Timer(
@@ -727,14 +727,16 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedAddons = appliedAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice =
-            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ?? "0.00";
+            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ??
+                "0.00";
 
         final price = double.tryParse(rawPrice) ?? 0.0;
 
         final updatedPrice = price * newQty;
 
         return option.copyWith(
-          price: "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+          price:
+              "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
         );
       }).toList();
 
@@ -744,14 +746,16 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedMasterAddons = appliedMasterAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice =
-            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ?? "0.00";
+            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ??
+                "0.00";
 
         final price = double.tryParse(rawPrice) ?? 0.0;
 
         final updatedPrice = price * newQty;
 
         return option.copyWith(
-          price: "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+          price:
+              "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
         );
       }).toList();
 
@@ -760,12 +764,16 @@ class CartProvider extends ChangeNotifier with BaseController {
     // newCartItems[index] = item.copyWith(
     //     master_addon_apllied: updatedAppliedMasterAddons,
     //     addon_apllied: updatedAppliedAddons);
-    final itemProductPrice = item.product_price?.replaceAll(_currencySymbol, "") ?? "0.00";
-    final itemProductPriceInPaisa = double.parse(itemProductPrice) * AppConfig.instance.country.currencyDivisor;
+    final itemProductPrice =
+        item.product_price?.replaceAll(_currencySymbol, "") ?? "0.00";
+    final itemProductPriceInPaisa = double.parse(itemProductPrice) *
+        AppConfig.instance.country.currencyDivisor;
     final itemModifiersTotal = item.getModifiersTotal; //* newQty;
-    final itemModifiersTotalInPaisa = itemModifiersTotal *  AppConfig.instance.country.currencyDivisor;
+    final itemModifiersTotalInPaisa =
+        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final totalItemPrice = newQty * itemProductPriceInPaisa;
-    final productTotalPriceFormatted = (totalItemPrice) /  AppConfig.instance.country.currencyDivisor;
+    final productTotalPriceFormatted =
+        (totalItemPrice) / AppConfig.instance.country.currencyDivisor;
 
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
@@ -773,7 +781,8 @@ class CartProvider extends ChangeNotifier with BaseController {
       // master_addon_apllied: updatedAppliedMasterAddons,
       // addon_apllied: updatedAppliedAddons,
       total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
-      product_total_price: "$_currencySymbol${productTotalPriceFormatted.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+      product_total_price:
+          "$_currencySymbol${productTotalPriceFormatted.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
     );
 
     final totalAmountInPaisa = newCartItems.fold<int>(
@@ -787,7 +796,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     _cartDetailsModel = _cartDetailsModel!.copyWith(
       cartItems: newCartItems,
       cartTotal: _cartDetailsModel!.cartTotal!.copyWith(
-        cartTotalPriceDisplay: Utils.format(totalAmountInPaisa /  AppConfig.instance.country.currencyDivisor),
+        cartTotalPriceDisplay: Utils.format(
+            totalAmountInPaisa / AppConfig.instance.country.currencyDivisor),
         cartTotalPrice: totalAmountInPaisa,
       ),
     );
@@ -822,14 +832,16 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedAddons = appliedAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice =
-            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ?? "0.00";
+            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ??
+                "0.00";
 
         final price = double.tryParse(rawPrice) ?? 0.0;
 
         final updatedPrice = price * newQty;
 
         return option.copyWith(
-          price: "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+          price:
+              "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
         );
       }).toList();
 
@@ -839,14 +851,16 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedMasterAddons = appliedMasterAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice =
-            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ?? "0.00";
+            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ??
+                "0.00";
 
         final price = double.tryParse(rawPrice) ?? 0.0;
 
         final updatedPrice = price * newQty;
 
         return option.copyWith(
-          price: "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+          price:
+              "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
         );
       }).toList();
 
@@ -856,12 +870,16 @@ class CartProvider extends ChangeNotifier with BaseController {
     // newCartItems[index] = item.copyWith(
     //     master_addon_apllied: updatedAppliedMasterAddons,
     //     addon_apllied: updatedAppliedAddons);
-    final itemProductPrice = item.product_price?.replaceAll(_currencySymbol, "") ?? "0.00";
-    final itemProductPriceInPaisa = double.parse(itemProductPrice) *  AppConfig.instance.country.currencyDivisor;
+    final itemProductPrice =
+        item.product_price?.replaceAll(_currencySymbol, "") ?? "0.00";
+    final itemProductPriceInPaisa = double.parse(itemProductPrice) *
+        AppConfig.instance.country.currencyDivisor;
     final itemModifiersTotal = item.getModifiersTotal * newQty;
-    final itemModifiersTotalInPaisa = itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
+    final itemModifiersTotalInPaisa =
+        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final totalItemPrice = newQty * itemProductPriceInPaisa;
-    final productTotalPriceFormatted = (totalItemPrice) /  AppConfig.instance.country.currencyDivisor;
+    final productTotalPriceFormatted =
+        (totalItemPrice) / AppConfig.instance.country.currencyDivisor;
 
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
@@ -869,7 +887,8 @@ class CartProvider extends ChangeNotifier with BaseController {
       // master_addon_apllied: updatedAppliedMasterAddons,
       // addon_apllied: updatedAppliedAddons,
       total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
-      product_total_price: "$_currencySymbol ${productTotalPriceFormatted.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+      product_total_price:
+          "$_currencySymbol ${productTotalPriceFormatted.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
     );
 
     final totalAmountInPaisa = newCartItems.fold<int>(
@@ -880,7 +899,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     _cartDetailsModel = _cartDetailsModel!.copyWith(
       cartItems: newCartItems,
       cartTotal: _cartDetailsModel!.cartTotal!.copyWith(
-        cartTotalPriceDisplay: Utils.format(totalAmountInPaisa /  AppConfig.instance.country.currencyDivisor),
+        cartTotalPriceDisplay: Utils.format(
+            totalAmountInPaisa / AppConfig.instance.country.currencyDivisor),
         cartTotalPrice: totalAmountInPaisa,
       ),
     );
@@ -1087,6 +1107,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     required String deliveryDate,
     required String deliverySlot,
   }) async {
+    UserLoginResponse? userData;
     try {
       if (cartTotalPrice == null) return false;
       _createOrderPending = true;
@@ -1100,41 +1121,51 @@ class CartProvider extends ChangeNotifier with BaseController {
         town: selectedAddress?.town,
         postcode: selectedAddress?.postcode,
         landmark: selectedAddress?.landmark,
+        email: userData!.user.userEmail,
+        phone: userData.user.userMobile,
       );
 
       final data = CheckOutDataModel(
-        shopID: AppIdentifiers.kShopId,
-        discount: totalCalculatedDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces),
-        amount: (totalAmount *  AppConfig.instance.country.currencyDivisor).toStringAsFixed(AppConfig.instance.country.decimalPlaces),
-        couponAmount: validatedCouponDetails?.coupenData == null
-            ? ''
-            : offerDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces),
-        couponCode: validatedCouponDetails?.coupenCode ?? '',
-        couponType: validatedCouponDetails?.coupenData?.coupenType ?? '',
-        couponValue: validatedCouponDetails?.coupenData?.coupenAmount ?? '',
-        source: 'Flutter',
-        deliveryType: selectedOrderType == OrderType.delivery
-            ? 'door_delivery'
-            : 'store_pickup',
-        approxDeliveryTime: minWaitingTime ?? '',
-        deliveryCharge: selectedOrderType == OrderType.delivery
-            ? (calculatedDeliveryFee *  AppConfig.instance.country.currencyDivisor).toStringAsFixed(AppConfig.instance.country.decimalPlaces)
-            : '',
-        takeawayTime: selectedOrderType == OrderType.takeaway
-            ? DateTimeUtils.convertDateTime12HrTo24Hr(selectedPickUpTime!)
-            : '',
-        paymentGatway:
-            selectedPaymentMethod == PaymentMethod.cash ? 'COD' : 'STRIPE',
-        transactionID: selectedPaymentMethod == PaymentMethod.cash ? '' : tID,
-        paymentStatus: selectedPaymentMethod == PaymentMethod.cash ? '0' : '1',
-        deliveryNotes: notesFieldKey.currentState?.value ?? '',
-        deliveryLocation: selectedAddress?.addressTitle,
-        deliveryDate: deliveryDate,
-        deliverySlot: deliverySlot,
-        customer: customerAddress,
-        projectID: AppIdentifiers.kProjectID,
-        isSingleVendor: 'Yes',
-      );
+          shopID: AppIdentifiers.kShopId,
+          discount: totalCalculatedDiscount
+              .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
+          amount: (totalAmount * AppConfig.instance.country.currencyDivisor)
+              .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
+          couponAmount: validatedCouponDetails?.coupenData == null
+              ? ''
+              : offerDiscount
+                  .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
+          couponCode: validatedCouponDetails?.coupenCode ?? '',
+          couponType: validatedCouponDetails?.coupenData?.coupenType ?? '',
+          couponValue: validatedCouponDetails?.coupenData?.coupenAmount ?? '',
+          source: 'Flutter',
+          deliveryType: selectedOrderType == OrderType.delivery
+              ? 'door_delivery'
+              : 'store_pickup',
+          approxDeliveryTime: minWaitingTime ?? '',
+          deliveryCharge: selectedOrderType == OrderType.delivery
+              ? (calculatedDeliveryFee *
+                      AppConfig.instance.country.currencyDivisor)
+                  .toStringAsFixed(AppConfig.instance.country.decimalPlaces)
+              : '',
+          takeawayTime: selectedOrderType == OrderType.takeaway
+              ? DateTimeUtils.convertDateTime12HrTo24Hr(selectedPickUpTime!)
+              : '',
+          paymentGatway:
+              selectedPaymentMethod == PaymentMethod.cash ? 'COD' : 'STRIPE',
+          transactionID: selectedPaymentMethod == PaymentMethod.cash ? '' : tID,
+          paymentStatus:
+              selectedPaymentMethod == PaymentMethod.cash ? '0' : '1',
+          deliveryNotes: notesFieldKey.currentState?.value ?? '',
+          deliveryLocation: selectedAddress?.addressTitle,
+          deliveryDate: deliveryDate,
+          deliverySlot: deliverySlot,
+          customer: customerAddress,
+          projectID: AppIdentifiers.kProjectID,
+          isSingleVendor: 'Yes',
+          postCode: selectedOrderType == OrderType.delivery
+              ? selectedAddress?.postcode
+              : '');
 
       log(data.toJson());
       // pi_3SdTp2HeVTRCojcj0CF7yKFk

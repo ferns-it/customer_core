@@ -23,6 +23,7 @@ class CheckOutDataModel {
   final String? source;
   final String? isSingleVendor;
   final String? projectID;
+  final String? postCode;
 
   final CheckOutCustomerDataModel? customer;
   CheckOutDataModel({
@@ -48,6 +49,7 @@ class CheckOutDataModel {
     this.customer,
     this.isSingleVendor,
     this.projectID,
+    this.postCode,
   });
 
   CheckOutDataModel copyWith(
@@ -70,6 +72,7 @@ class CheckOutDataModel {
       String? deliverySlot,
       String? takeawayTime,
       String? source,
+      String? postCode,
       CheckOutCustomerDataModel? customer,
       String? isSingleVendor,
       String? projectID}) {
@@ -93,6 +96,7 @@ class CheckOutDataModel {
         deliverySlot: deliverySlot ?? this.deliverySlot,
         takeawayTime: takeawayTime ?? this.takeawayTime,
         source: source ?? this.source,
+        postCode: postCode ?? this.postCode,
         customer: customer ?? this.customer,
         isSingleVendor: isSingleVendor ?? this.isSingleVendor,
         projectID: projectID ?? this.projectID);
@@ -119,6 +123,7 @@ class CheckOutDataModel {
       'deliverySlot': deliverySlot,
       'takeawayTime': takeawayTime,
       'source': source,
+      'postCode': postCode,
       'customer': customer?.toMap(),
       'isSingleVendor': isSingleVendor,
       'projectID': projectID
@@ -168,6 +173,7 @@ class CheckOutDataModel {
         takeawayTime:
             map['takeawayTime'] != null ? map['takeawayTime'] as String : null,
         source: map['source'] != null ? map['source'] as String : null,
+        postCode: map['postCode'] != null ? map['postCode'] as String : null,
         customer: map['customer'] != null
             ? CheckOutCustomerDataModel.fromMap(
                 map['customer'] as Map<String, dynamic>)
@@ -186,7 +192,7 @@ class CheckOutDataModel {
 
   @override
   String toString() {
-    return 'CheckOutDataModel(shopID: $shopID, discount: $discount, amount: $amount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, paymentStatus: $paymentStatus, paymentGatway: $paymentGatway, transactionID: $transactionID, approxDeliveryTime: $approxDeliveryTime, deliveryNotes: $deliveryNotes, deliveryLocation: $deliveryLocation,deliveryDate : $deliveryDate,deliverySlot: $deliverySlot  takeawayTime: $takeawayTime, source: $source, customer: $customer, isSingleVendor: $isSingleVendor, projectID: $projectID)';
+    return 'CheckOutDataModel(shopID: $shopID, discount: $discount, amount: $amount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, paymentStatus: $paymentStatus, paymentGatway: $paymentGatway, transactionID: $transactionID, approxDeliveryTime: $approxDeliveryTime, deliveryNotes: $deliveryNotes, deliveryLocation: $deliveryLocation,deliveryDate : $deliveryDate,deliverySlot: $deliverySlot  takeawayTime: $takeawayTime, source: $source,postCode:$postCode, customer: $customer, isSingleVendor: $isSingleVendor, projectID: $projectID)';
   }
 
   @override
@@ -212,6 +218,7 @@ class CheckOutDataModel {
         other.deliverySlot == deliverySlot &&
         other.takeawayTime == takeawayTime &&
         other.source == source &&
+        other.postCode == postCode &&
         other.customer == customer &&
         other.isSingleVendor == isSingleVendor &&
         other.projectID == projectID;
@@ -238,6 +245,7 @@ class CheckOutDataModel {
         deliverySlot.hashCode ^
         takeawayTime.hashCode ^
         source.hashCode ^
+        postCode.hashCode ^
         customer.hashCode ^
         isSingleVendor.hashCode ^
         projectID.hashCode;
@@ -252,6 +260,8 @@ class CheckOutCustomerDataModel {
   final String? postcode;
   final String? county;
   final String? landmark;
+  final String? email;
+  final String? phone;
   CheckOutCustomerDataModel({
     this.customerName,
     this.line1,
@@ -260,6 +270,8 @@ class CheckOutCustomerDataModel {
     this.postcode,
     this.county,
     this.landmark,
+    this.email,
+    this.phone,
   });
 
   CheckOutCustomerDataModel copyWith({
@@ -270,6 +282,8 @@ class CheckOutCustomerDataModel {
     String? postcode,
     String? county,
     String? landmark,
+    String? email,
+    String? phone,
   }) {
     return CheckOutCustomerDataModel(
       customerName: customerName ?? this.customerName,
@@ -279,6 +293,8 @@ class CheckOutCustomerDataModel {
       postcode: postcode ?? this.postcode,
       county: county ?? this.county,
       landmark: landmark ?? this.landmark,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
     );
   }
 
@@ -291,6 +307,8 @@ class CheckOutCustomerDataModel {
       'postcode': postcode,
       'county': county,
       'landmark': landmark,
+      'email': email,
+      'phone': phone,
     };
   }
 
@@ -304,6 +322,8 @@ class CheckOutCustomerDataModel {
       postcode: map['postcode'] != null ? map['postcode'] as String : null,
       county: map['county'] != null ? map['county'] as String : null,
       landmark: map['landmark'] != null ? map['landmark'] as String : null,
+      email: map['email'] != null ? map['email'] as String : null,
+      phone: map['phone'] != null ? map['phone'] as String : null,
     );
   }
 
@@ -315,7 +335,7 @@ class CheckOutCustomerDataModel {
 
   @override
   String toString() {
-    return 'CheckOutCustomerDataModel(customerName: $customerName, line1: $line1, line2: $line2, town: $town, postcode: $postcode, county: $county, landmark: $landmark)';
+    return 'CheckOutCustomerDataModel(customerName: $customerName, line1: $line1, line2: $line2, town: $town, postcode: $postcode, county: $county, landmark: $landmark, email: $email, phone: $phone)';
   }
 
   @override
@@ -328,7 +348,9 @@ class CheckOutCustomerDataModel {
         other.town == town &&
         other.postcode == postcode &&
         other.county == county &&
-        other.landmark == landmark;
+        other.landmark == landmark &&
+        other.email == email &&
+        other.phone == phone;
   }
 
   @override
@@ -339,6 +361,8 @@ class CheckOutCustomerDataModel {
         town.hashCode ^
         postcode.hashCode ^
         county.hashCode ^
-        landmark.hashCode;
+        landmark.hashCode ^
+        email.hashCode ^
+        phone.hashCode;
   }
 }

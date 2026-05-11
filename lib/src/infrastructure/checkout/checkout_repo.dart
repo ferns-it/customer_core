@@ -31,7 +31,7 @@ class CheckoutRepo implements ICheckoutRepo {
       final response = await APIManager.post(
         api: Endpoints.kGuestDeliveryCalculator,
         data: {
-          "shopID": shopID,
+          "shopID": shopID, 
           "postCode": destinationPostCode,
         },
         needAuth: true,

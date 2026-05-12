@@ -1,7 +1,9 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:customer_core/customer_core.dart';
 import 'package:flutter/foundation.dart';
+
+import 'package:customer_core/customer_core.dart';
 
 class OrderHistoryDataModel {
   final List<OrderDetailsModel> history;
@@ -58,9 +60,7 @@ class OrderDetailsModel {
   final String? orderID;
   final String? customerOrderID;
   final String? phone;
-  final String? amount;
   final String? formattedAmount;
-  final String? discount;
   final String? couponCode;
   final String? couponType;
   final String? couponValue;
@@ -81,6 +81,20 @@ class OrderDetailsModel {
   final String? shopMobile;
   final String? shopAddress1;
   final String? shopAddress2;
+
+  final String? deliveryDiscountLabel;
+  final String? isTaxApplicable;
+  final String? taxLabel;
+  final String? grossAmount;
+  final String? productDiscountAmount;
+  final String? totalAmount;
+  final String? deliveryDiscount;
+  final String? TotalNetAmount_ExcludingTax;
+  final String? taxTotalAmount;
+  final String? netAmountExcludingDeliveryCharge;
+  final String? netAmount;
+  final String? totalDiscount;
+
   final List<OrderHistoryDishesDataModel>? orderDishes;
   final OrderHistoryDeliveryAddressDataModel? deliveryAddress;
 
@@ -88,9 +102,7 @@ class OrderDetailsModel {
     this.orderID,
     this.customerOrderID,
     this.phone,
-    this.amount,
     this.formattedAmount,
-    this.discount,
     this.couponCode,
     this.couponType,
     this.couponValue,
@@ -113,6 +125,18 @@ class OrderDetailsModel {
     this.shopAddress2,
     this.orderDishes,
     this.deliveryAddress,
+    this.deliveryDiscountLabel,
+    this.isTaxApplicable,
+    this.taxLabel,
+    this.grossAmount,
+    this.productDiscountAmount,
+    this.totalAmount,
+    this.deliveryDiscount,
+    this.TotalNetAmount_ExcludingTax,
+    this.taxTotalAmount,
+    this.netAmountExcludingDeliveryCharge,
+    this.netAmount,
+    this.totalDiscount,
   });
 
   OrderDetailsModel copyWith({
@@ -142,6 +166,18 @@ class OrderDetailsModel {
     String? shopMobile,
     String? shopAddress1,
     String? shopAddress2,
+    String? deliveryDiscountLabel,
+    String? isTaxApplicable,
+    String? taxLabel,
+    String? grossAmount,
+    String? productDiscountAmount,
+    String? totalAmount,
+    String? deliveryDiscount,
+    String? TotalNetAmount_ExcludingTax,
+    String? taxTotalAmount,
+    String? netAmountExcludingDeliveryCharge,
+    String? netAmount,
+    String? totalDiscount,
     List<OrderHistoryDishesDataModel>? orderDishes,
     OrderHistoryDeliveryAddressDataModel? deliveryAddress,
   }) {
@@ -149,9 +185,7 @@ class OrderDetailsModel {
       orderID: orderID ?? this.orderID,
       customerOrderID: customerOrderID ?? this.customerOrderID,
       phone: phone ?? this.phone,
-      amount: amount ?? this.amount,
       formattedAmount: formattedAmount ?? this.formattedAmount,
-      discount: discount ?? this.discount,
       couponCode: couponCode ?? this.couponCode,
       couponType: couponType ?? this.couponType,
       couponValue: couponValue ?? this.couponValue,
@@ -175,6 +209,22 @@ class OrderDetailsModel {
       shopAddress2: shopAddress2 ?? this.shopAddress2,
       orderDishes: orderDishes ?? this.orderDishes,
       deliveryAddress: deliveryAddress ?? this.deliveryAddress,
+      deliveryDiscountLabel:
+          deliveryDiscountLabel ?? this.deliveryDiscountLabel,
+      isTaxApplicable: isTaxApplicable ?? this.isTaxApplicable,
+      taxLabel: taxLabel ?? this.taxLabel,
+      grossAmount: grossAmount ?? this.grossAmount,
+      productDiscountAmount:
+          productDiscountAmount ?? this.productDiscountAmount,
+      totalAmount: totalAmount ?? this.totalAmount,
+      deliveryDiscount: deliveryDiscount ?? this.deliveryDiscount,
+      TotalNetAmount_ExcludingTax:
+          TotalNetAmount_ExcludingTax ?? this.TotalNetAmount_ExcludingTax,
+      taxTotalAmount: taxTotalAmount ?? this.taxTotalAmount,
+      netAmountExcludingDeliveryCharge: netAmountExcludingDeliveryCharge ??
+          this.netAmountExcludingDeliveryCharge,
+      netAmount: netAmount ?? this.netAmount,
+      totalDiscount: totalDiscount ?? this.totalDiscount,
     );
   }
 
@@ -183,9 +233,7 @@ class OrderDetailsModel {
       'orderID': orderID,
       'customerOrderID': customerOrderID,
       'phone': phone,
-      'amount': amount,
       'formattedAmount': formattedAmount,
-      'discount': discount,
       'couponCode': couponCode,
       'couponType': couponType,
       'couponValue': couponValue,
@@ -208,6 +256,18 @@ class OrderDetailsModel {
       'shopAddress2': shopAddress2,
       'orderDishes': orderDishes?.map((x) => x.toMap()).toList(),
       'deliveryAddress': deliveryAddress?.toMap(),
+      'deliveryDiscountLabel': deliveryDiscountLabel,
+      'isTaxApplicable': isTaxApplicable,
+      'taxLabel': taxLabel,
+      'grossAmount': grossAmount,
+      'productDiscountAmount': productDiscountAmount,
+      'totalAmount': totalAmount,
+      'deliveryDiscount': deliveryDiscount,
+      'TotalNetAmount_ExcludingTax': TotalNetAmount_ExcludingTax,
+      'taxTotalAmount': taxTotalAmount,
+      'netAmountExcludingDeliveryCharge': netAmountExcludingDeliveryCharge,
+      'netAmount': netAmount,
+      'totalDiscount': totalDiscount,
     };
   }
 
@@ -224,11 +284,9 @@ class OrderDetailsModel {
           ? map['customerOrderID'] as String
           : null,
       phone: map['phone'] != null ? map['phone'] as String : null,
-      amount: map['amount'] != null ? map['amount'] as String : null,
       formattedAmount: map['formattedAmount'] != null
           ? map['formattedAmount'] as String
           : null,
-      discount: map['discount'] != null ? map['discount'] as String : null,
       couponCode:
           map['couponCode'] != null ? map['couponCode'] as String : null,
       couponType:
@@ -280,6 +338,36 @@ class OrderDetailsModel {
           ? OrderHistoryDeliveryAddressDataModel.fromMap(
               map['deliveryAddress'] as Map<String, dynamic>)
           : null,
+      deliveryDiscountLabel: map['deliveryDiscountLabel'] != null
+          ? map['deliveryDiscountLabel'] as String
+          : null,
+      isTaxApplicable: map['isTaxApplicable'] != null
+          ? map['isTaxApplicable'] as String
+          : null,
+      taxLabel: map['taxLabel'] != null ? map['taxLabel'] as String : null,
+      grossAmount:
+          map['grossAmount'] != null ? map['grossAmount'] as String : null,
+      productDiscountAmount: map['productDiscountAmount'] != null
+          ? map['productDiscountAmount'] as String
+          : null,
+      totalAmount:
+          map['totalAmount'] != null ? map['totalAmount'] as String : null,
+      deliveryDiscount: map['deliveryDiscount'] != null
+          ? map['deliveryDiscount'] as String
+          : null,
+      TotalNetAmount_ExcludingTax: map['TotalNetAmount_ExcludingTax'] != null
+          ? map['TotalNetAmount_ExcludingTax'] as String
+          : null,
+      taxTotalAmount: map['taxTotalAmount'] != null
+          ? map['taxTotalAmount'] as String
+          : null,
+      netAmountExcludingDeliveryCharge:
+          map['netAmountExcludingDeliveryCharge'] != null
+              ? map['netAmountExcludingDeliveryCharge'] as String
+              : null,
+      netAmount: map['netAmount'] != null ? map['netAmount'] as String : null,
+      totalDiscount:
+          map['totalDiscount'] != null ? map['totalDiscount'] as String : null,
     );
   }
 
@@ -290,7 +378,7 @@ class OrderDetailsModel {
 
   @override
   String toString() {
-    return 'OrderHistorySubDataModel(orderID: $orderID, customerOrderID: $customerOrderID, phone: $phone, amount: $amount, formattedAmount: $formattedAmount, discount: $discount, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, takeawayTime: $takeawayTime, formattedDeliveryCharge: $formattedDeliveryCharge, paymentGatway: $paymentGatway, paymentStatus: $paymentStatus, transactionID: $transactionID, orderedAt: $orderedAt, status: $status, dispatchMessage: $dispatchMessage, shopID: $shopID, shopName: $shopName, shopEmail: $shopEmail, shopMobile: $shopMobile, shopAddress1: $shopAddress1, shopAddress2: $shopAddress2, orderDishes: $orderDishes, deliveryAddress: $deliveryAddress)';
+    return 'OrderHistorySubDataModel(orderID: $orderID, customerOrderID: $customerOrderID, phone: $phone, , formattedAmount: $formattedAmount, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, takeawayTime: $takeawayTime, formattedDeliveryCharge: $formattedDeliveryCharge, paymentGatway: $paymentGatway, paymentStatus: $paymentStatus, transactionID: $transactionID, orderedAt: $orderedAt, status: $status, dispatchMessage: $dispatchMessage, shopID: $shopID, shopName: $shopName, shopEmail: $shopEmail, shopMobile: $shopMobile, shopAddress1: $shopAddress1, shopAddress2: $shopAddress2, orderDishes: $orderDishes, deliveryAddress: $deliveryAddress, deliveryDiscountLabel: $deliveryDiscountLabel, isTaxApplicable: $isTaxApplicable, taxLabel: $taxLabel, grossAmount: $grossAmount, productDiscountAmount: $productDiscountAmount, totalAmount: $totalAmount, deliveryDiscount: $deliveryDiscount, TotalNetAmount_ExcludingTax: $TotalNetAmount_ExcludingTax, taxTotalAmount: $taxTotalAmount, netAmountExcludingDeliveryCharge: $netAmountExcludingDeliveryCharge, netAmount: $netAmount, totalDiscount: $totalDiscount)';
   }
 
   @override
@@ -300,9 +388,6 @@ class OrderDetailsModel {
     return other.orderID == orderID &&
         other.customerOrderID == customerOrderID &&
         other.phone == phone &&
-        other.amount == amount &&
-        other.formattedAmount == formattedAmount &&
-        other.discount == discount &&
         other.couponCode == couponCode &&
         other.couponType == couponType &&
         other.couponValue == couponValue &&
@@ -324,7 +409,20 @@ class OrderDetailsModel {
         other.shopAddress1 == shopAddress1 &&
         other.shopAddress2 == shopAddress2 &&
         listEquals(other.orderDishes, orderDishes) &&
-        other.deliveryAddress == deliveryAddress;
+        other.deliveryAddress == deliveryAddress &&
+        other.deliveryDiscountLabel == deliveryDiscountLabel &&
+        other.isTaxApplicable == isTaxApplicable &&
+        other.taxLabel == taxLabel &&
+        other.grossAmount == grossAmount &&
+        other.productDiscountAmount == productDiscountAmount &&
+        other.totalAmount == totalAmount &&
+        other.deliveryDiscount == deliveryDiscount &&
+        other.TotalNetAmount_ExcludingTax == TotalNetAmount_ExcludingTax &&
+        other.taxTotalAmount == taxTotalAmount &&
+        other.netAmountExcludingDeliveryCharge ==
+            netAmountExcludingDeliveryCharge &&
+        other.netAmount == netAmount &&
+        other.totalDiscount == totalDiscount;
   }
 
   @override
@@ -332,9 +430,7 @@ class OrderDetailsModel {
     return orderID.hashCode ^
         customerOrderID.hashCode ^
         phone.hashCode ^
-        amount.hashCode ^
         formattedAmount.hashCode ^
-        discount.hashCode ^
         couponCode.hashCode ^
         couponType.hashCode ^
         couponValue.hashCode ^
@@ -356,13 +452,26 @@ class OrderDetailsModel {
         shopAddress1.hashCode ^
         shopAddress2.hashCode ^
         orderDishes.hashCode ^
-        deliveryAddress.hashCode;
+        deliveryAddress.hashCode ^
+        deliveryDiscountLabel.hashCode ^
+        isTaxApplicable.hashCode ^
+        taxLabel.hashCode ^
+        grossAmount.hashCode ^
+        productDiscountAmount.hashCode ^
+        totalAmount.hashCode ^
+        deliveryDiscount.hashCode ^
+        TotalNetAmount_ExcludingTax.hashCode ^
+        taxTotalAmount.hashCode ^
+        netAmountExcludingDeliveryCharge.hashCode ^
+        netAmount.hashCode ^
+        totalDiscount.hashCode;
   }
 
   double get formatDeliveryChargeToDouble {
     var deliveryCharge = formattedDeliveryCharge;
     if (deliveryCharge == null || deliveryCharge.isEmpty) return 0.00;
-    final amtFormatted = deliveryCharge.replaceAll(AppConfig.instance.country.symbol, '');
+    final amtFormatted =
+        deliveryCharge.replaceAll(AppConfig.instance.country.symbol, '');
     final amt = double.parse(amtFormatted);
     return amt;
   }
@@ -380,11 +489,13 @@ class OrderDetailsModel {
 
   String get shopFullAddress => '$shopAddress1, $shopAddress2';
 
-  String get formatDiscount => discount != null ? '${AppConfig.instance.country.symbol}$discount' : '${AppConfig.instance.country.symbol}0.00';
+  String get formatDiscount => deliveryDiscount != null
+      ? '${AppConfig.instance.country.symbol}$deliveryDiscount'
+      : '${AppConfig.instance.country.symbol}0.00';
 
   String get formattedDiscount {
-    if (discount != null) {
-      var val = double.parse(discount!);
+    if (deliveryDiscount != null) {
+      var val = double.parse(deliveryDiscount!);
       var couponAmountVal = double.parse(couponAmount!);
       var result = val - couponAmountVal;
       return result.toStringAsFixed(AppConfig.instance.country.decimalPlaces);
@@ -399,12 +510,13 @@ class OrderDetailsModel {
     if (orderDishes == null) return 0.00;
     for (var i = 0; i < orderDishes!.length; i++) {
       for (var j = 0; j < orderDishes![i].addons!.length; j++) {
-        var addonPrice = double.parse(orderDishes![i].addons![j].price);
-        var parsedAddonPrice = addonPrice /  AppConfig.instance.country.currencyDivisor;
+        var addonPrice = double.parse(orderDishes![i].addons![j].price!);
+        var parsedAddonPrice =
+            addonPrice / AppConfig.instance.country.currencyDivisor;
         addonSubTotal = addonSubTotal + parsedAddonPrice;
       }
       var val = double.parse(orderDishes![i].price!);
-      var parsedVal = val /  AppConfig.instance.country.currencyDivisor;
+      var parsedVal = val / AppConfig.instance.country.currencyDivisor;
       var qty = double.parse(orderDishes![i].quantity!);
       var finalVal = parsedVal * qty;
       itemSubTotal = itemSubTotal + finalVal;
@@ -436,6 +548,15 @@ class OrderDetailsModel {
     const dispatchMessage = "Order dispatched";
 
     if (status?.toLowerCase() == dispatchMessage.toLowerCase()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool get orderRejected {
+    const rejectedMessage = "order rejected";
+    if (status?.toLowerCase().contains(rejectedMessage) == true) {
       return true;
     } else {
       return false;
@@ -665,16 +786,19 @@ class OrderHistoryDishesDataModel {
       ? ''
       : addons!
           .map((aPrice) {
-            final itemPrice = double.parse(aPrice.price);
-            final parsedItemPrice = itemPrice /  AppConfig.instance.country.currencyDivisor;
-            return parsedItemPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces);
+            final itemPrice = double.parse(aPrice.itemPrice);
+            final parsedItemPrice =
+                itemPrice / AppConfig.instance.country.currencyDivisor;
+            return parsedItemPrice
+                .toStringAsFixed(AppConfig.instance.country.decimalPlaces);
           })
           .toList()
           .join('\n+ ${AppConfig.instance.country.symbol} ');
 
   double get formatItemTotal {
     final itemPrice = double.parse(price!);
-    final parsedItemPrice = itemPrice / AppConfig.instance.country.currencyDivisor;
+    final parsedItemPrice =
+        itemPrice / AppConfig.instance.country.currencyDivisor;
     final itemQuantity = double.parse(quantity!);
     final itemTotal = parsedItemPrice * itemQuantity;
     return itemTotal;
@@ -682,47 +806,56 @@ class OrderHistoryDishesDataModel {
 }
 
 class OrderHistoryAddonsDataModel {
-  final String opaID;
-  final String opID;
-  final String name;
-  final String price;
+  final String? name;
+  final String? price;
+  final String groupName;
+  final String itemPrice;
+  final AddonsAmountInPaisaDataModel? addonsAmountInPaisa;
 
   OrderHistoryAddonsDataModel({
-    required this.opaID,
-    required this.opID,
-    required this.name,
     required this.price,
+    required this.name,
+    required this.groupName,
+    required this.itemPrice,
+    this.addonsAmountInPaisa,
   });
 
   OrderHistoryAddonsDataModel copyWith({
-    String? opaID,
-    String? opID,
     String? name,
     String? price,
+    String? groupName,
+    String? itemPrice,
+    AddonsAmountInPaisaDataModel? addonsAmountInPaisa,
   }) {
     return OrderHistoryAddonsDataModel(
-      opaID: opaID ?? this.opaID,
-      opID: opID ?? this.opID,
       name: name ?? this.name,
       price: price ?? this.price,
+      groupName: groupName ?? this.groupName,
+      itemPrice: itemPrice ?? this.itemPrice,
+      addonsAmountInPaisa: addonsAmountInPaisa ?? this.addonsAmountInPaisa,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'opaID': opaID,
-      'opID': opID,
       'name': name,
       'price': price,
+      'groupName': groupName,
+      'itemPrice': itemPrice,
+      'addonsAmountInPaisa': addonsAmountInPaisa?.toMap(),
     };
   }
 
   factory OrderHistoryAddonsDataModel.fromMap(Map<String, dynamic> map) {
     return OrderHistoryAddonsDataModel(
-      opaID: map['opaID'] as String,
-      opID: map['opID'] as String,
-      name: map['name'] as String,
-      price: map['price'] as String,
+      name: map['name'] != null ? map['name'] as String : null,
+      price: map['price'] != null ? map['price'] as String : null,
+      groupName: map['groupName'] as String,
+      itemPrice: map['itemPrice'] as String,
+      addonsAmountInPaisa: map['addonsAmountInPaisa'] != null
+          ? AddonsAmountInPaisaDataModel.fromMap(
+              map['addonsAmountInPaisa'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -734,23 +867,81 @@ class OrderHistoryAddonsDataModel {
 
   @override
   String toString() {
-    return 'OrderHistoryAddonsDataModel(opaID: $opaID, opID: $opID, name: $name, price: $price)';
+    return 'OrderHistoryAddonsDataModel(name: $name, price: $price, groupName: $groupName, itemPrice: $itemPrice, addonsAmountInPaisa: $addonsAmountInPaisa)';
   }
 
   @override
   bool operator ==(covariant OrderHistoryAddonsDataModel other) {
     if (identical(this, other)) return true;
 
-    return other.opaID == opaID &&
-        other.opID == opID &&
-        other.name == name &&
-        other.price == price;
+    return other.name == name &&
+        other.price == price &&
+        other.groupName == groupName &&
+        other.itemPrice == itemPrice &&
+        other.addonsAmountInPaisa == addonsAmountInPaisa;
   }
 
   @override
   int get hashCode {
-    return opaID.hashCode ^ opID.hashCode ^ name.hashCode ^ price.hashCode;
+    return name.hashCode ^
+        price.hashCode ^
+        groupName.hashCode ^
+        itemPrice.hashCode ^
+        addonsAmountInPaisa.hashCode;
   }
+}
+
+class AddonsAmountInPaisaDataModel {
+  final String? price;
+  final String? itemPrice;
+  AddonsAmountInPaisaDataModel({
+    required this.price,
+    required this.itemPrice,
+  });
+
+  AddonsAmountInPaisaDataModel copyWith({
+    String? price,
+    String? itemPrice,
+  }) {
+    return AddonsAmountInPaisaDataModel(
+      price: price ?? this.price,
+      itemPrice: itemPrice ?? this.itemPrice,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'price': price,
+      'itemPrice': itemPrice,
+    };
+  }
+
+  factory AddonsAmountInPaisaDataModel.fromMap(Map<String, dynamic> map) {
+    return AddonsAmountInPaisaDataModel(
+      price: map['price'] != null ? map['price'] as String : null,
+      itemPrice: map['itemPrice'] != null ? map['itemPrice'] as String : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory AddonsAmountInPaisaDataModel.fromJson(String source) =>
+      AddonsAmountInPaisaDataModel.fromMap(
+          json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() =>
+      'AddonsAmountInPaisaDataModel(price: $price, itemPrice: $itemPrice)';
+
+  @override
+  bool operator ==(covariant AddonsAmountInPaisaDataModel other) {
+    if (identical(this, other)) return true;
+
+    return other.price == price && other.itemPrice == itemPrice;
+  }
+
+  @override
+  int get hashCode => price.hashCode ^ itemPrice.hashCode;
 }
 
 class OrderHistoryDeliveryAddressDataModel {

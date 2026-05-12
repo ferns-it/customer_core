@@ -139,8 +139,9 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                       Theme.of(context).colorScheme.primary)),
               completed: (_) {
                 final data = orderListener.orders;
-                final orderHistory =
-                    data.where((e) => e.orderDispatched).toList();
+                final orderHistory = data
+                    .where((e) => e.orderDispatched || e.orderRejected)
+                    .toList();
                 // if (data.isEmpty) {
                 //   return SafeArea(
                 //     child: Column(
@@ -256,7 +257,8 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                                                       .elementAt(index);
                                                   return InkWell(
                                                     onTap: () {
-                                                      if (order.orderID == null) {
+                                                      if (order.orderID ==
+                                                          null) {
                                                         return;
                                                       }
                                                       orderProvider
@@ -483,9 +485,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                             .copyWith(color: Colors.grey.shade600),
                       ),
                       Text(
-                        order.formattedAmount != null
-                            ? ' • ${order.formattedAmount}'
-                            : '',
+                        order.netAmount != null ? ' • ${order.netAmount}' : '',
                         style: context.customTextTheme.text14W700
                             .copyWith(color: Colors.grey.shade600),
                       ),
@@ -494,11 +494,29 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                 ],
               ),
               const Spacer(),
-              // IconButton(
-              //     onPressed: () {},
-              //     icon: const Icon(
-              //       FluentIcons.share_24_regular,
-              //     ))
+              Text(
+                order.orderAccepted
+                    ? "Accepted"
+                    : order.orderPending
+                        ? "Pending"
+                        : order.orderDispatched
+                            ? "Dispatched"
+                            : order.orderRejected
+                                ? "Rejected"
+                                : "N/A",
+                style: context.customTextTheme.text14W600
+                    .copyWith(color: Colors.red
+                        // color: order.orderAccepted
+                        //     ? Colors.green
+                        //     : order.orderPending
+                        //         ? Colors.orange
+                        //         : order.orderDispatched
+                        //             ? Colors.red
+                        //             : order.orderRejected
+                        //                 ? Colors.amber
+                        //                 : Colors.grey,
+                        ),
+              )
             ],
           ),
           Divider(
@@ -540,12 +558,12 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
               "Order Placed On: ${DateTimeUtils.formatDateTimeToDate(order.orderedAt)}, ${DateTimeUtils.formatTimeMinimal(order.orderedAt)}",
               style: context.customTextTheme.text14W400
                   .copyWith(color: context.customTextTheme.color)),
-          Divider(
-              color: themeListener.isDarkMode
-                  ? Theme.of(context).scaffoldBackgroundColor
-                  : Colors.grey.shade200),
-          verticalSpaceSmall,
-          buildFooterDetails(order, context),
+          // Divider(
+          //     color: themeListener.isDarkMode
+          //         ? Theme.of(context).scaffoldBackgroundColor
+          //         : Colors.grey.shade200),
+          // verticalSpaceSmall,
+          // buildFooterDetails(order, context),
         ],
       ),
     );

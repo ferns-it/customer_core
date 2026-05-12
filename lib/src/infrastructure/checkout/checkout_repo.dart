@@ -56,8 +56,10 @@ class CheckoutRepo implements ICheckoutRepo {
   }) async {
     try {
       final response = await APIManager.post(
-        api: Endpoints.kCompleteOrder,
+        api: Endpoints.kCompleteOrderWeb,
         data: data.toJson(),
+        authDataKey: "user",
+        dataKeyChecking: true,
         needAuth: true,
       );
       if (response == null) return Left(InternalServerErrorException());

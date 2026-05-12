@@ -1107,9 +1107,11 @@ class CartProvider extends ChangeNotifier with BaseController {
     required String deliveryDate,
     required String deliverySlot,
   }) async {
-    UserLoginResponse? userData;
-    try {
-      if (cartTotalPrice == null) return false;
+   
+    try {   
+      final userData = await getUserData();
+      
+      if (cartTotalPrice == null ||userData == null) return false;
       _createOrderPending = true;
       notifyListeners();
 
@@ -1121,7 +1123,7 @@ class CartProvider extends ChangeNotifier with BaseController {
         town: selectedAddress?.town,
         postcode: selectedAddress?.postcode,
         landmark: selectedAddress?.landmark,
-        email: userData!.user.userEmail,
+        email: userData.user.userEmail,
         phone: userData.user.userMobile,
       );
 

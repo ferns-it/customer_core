@@ -199,7 +199,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                                   maxLines: 1,
                                   softWrap: true,
                                   overflow: TextOverflow.ellipsis,
-                                  "${AppConfig.instance.country.symbol}${dish.formatItemTotal.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                                  "${dish.totalPrice}",
                                   style: context.customTextTheme.text16W700
                                       .copyWith(
                                     color: context.customTextTheme.color,
@@ -265,7 +265,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
             verticalSpaceSmall,
             _SummaryRow(
               label: "Sub Total",
-              value: "${AppConfig.instance.country.symbol}${orderDetails.formatSubTotal.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+              value: "${orderDetails.grossAmount}",
               style: context.customTextTheme.text16W600
                   .copyWith(color: context.customTextTheme.color),
             ),
@@ -284,7 +284,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
             verticalSpaceTiny,
             _SummaryRow(
               label: "Discount",
-              value: "${AppConfig.instance.country.symbol} ${orderDetails.formattedDiscount}",
+              value: " ${orderDetails.totalDiscount}",
               style: context.customTextTheme.text14W600
                   .copyWith(color: context.customTextTheme.color),
             ),
@@ -292,7 +292,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
             const Divider(height: 20.0),
             _SummaryRow(
               label: "Total",
-              value: orderDetails.formattedAmount ?? "${AppConfig.instance.country.symbol}0.00",
+              value: orderDetails.netAmount ??
+                  "${AppConfig.instance.country.symbol}0.00",
               style: context.customTextTheme.text18W600
                   .copyWith(color: context.customTextTheme.color),
             ),

@@ -436,8 +436,8 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                   : Colors.grey.shade200,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(CupertinoIcons.slider_horizontal_3,
-                color: Colors.white),
+            child:  Icon(CupertinoIcons.slider_horizontal_3,
+                color: Theme.of(context).iconTheme.color),
           ),
         )
       ],

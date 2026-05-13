@@ -493,37 +493,37 @@ class OrderDetailsModel {
       ? '${AppConfig.instance.country.symbol}$deliveryDiscount'
       : '${AppConfig.instance.country.symbol}0.00';
 
-  String get formattedDiscount {
-    if (deliveryDiscount != null) {
-      var val = double.parse(deliveryDiscount!);
-      var couponAmountVal = double.parse(couponAmount!);
-      var result = val - couponAmountVal;
-      return result.toStringAsFixed(AppConfig.instance.country.decimalPlaces);
-    }
-    return "0.00";
-  }
+  // String get formattedDiscount {
+  //   if (deliveryDiscount != null) {
+  //     var val = double.parse(deliveryDiscount!);
+  //     var couponAmountVal = double.parse(couponAmount!);
+  //     var result = val - couponAmountVal;
+  //     return result.toStringAsFixed(AppConfig.instance.country.decimalPlaces);
+  //   }
+  //   return "0.00";
+  // }
 
-  double get formatSubTotal {
-    var subTotal = 0.0;
-    var itemSubTotal = 0.0;
-    var addonSubTotal = 0.0;
-    if (orderDishes == null) return 0.00;
-    for (var i = 0; i < orderDishes!.length; i++) {
-      for (var j = 0; j < orderDishes![i].addons!.length; j++) {
-        var addonPrice = double.parse(orderDishes![i].addons![j].price!);
-        var parsedAddonPrice =
-            addonPrice / AppConfig.instance.country.currencyDivisor;
-        addonSubTotal = addonSubTotal + parsedAddonPrice;
-      }
-      var val = double.parse(orderDishes![i].price!);
-      var parsedVal = val / AppConfig.instance.country.currencyDivisor;
-      var qty = double.parse(orderDishes![i].quantity!);
-      var finalVal = parsedVal * qty;
-      itemSubTotal = itemSubTotal + finalVal;
-    }
-    subTotal = itemSubTotal + addonSubTotal;
-    return subTotal;
-  }
+  // double get formatSubTotal {
+  //   var subTotal = 0.0;
+  //   var itemSubTotal = 0.0;
+  //   var addonSubTotal = 0.0;
+  //   if (orderDishes == null) return 0.00;
+  //   for (var i = 0; i < orderDishes!.length; i++) {
+  //     for (var j = 0; j < orderDishes![i].addons!.length; j++) {
+  //       var addonPrice = double.parse(orderDishes![i].addons![j].price!);
+  //       var parsedAddonPrice =
+  //           addonPrice / AppConfig.instance.country.currencyDivisor;
+  //       addonSubTotal = addonSubTotal + parsedAddonPrice;
+  //     }
+  //     var val = double.parse(orderDishes![i].price!);
+  //     var parsedVal = val / AppConfig.instance.country.currencyDivisor;
+  //     var qty = double.parse(orderDishes![i].quantity!);
+  //     var finalVal = parsedVal * qty;
+  //     itemSubTotal = itemSubTotal + finalVal;
+  //   }
+  //   subTotal = itemSubTotal + addonSubTotal;
+  //   return subTotal;
+  // }
 
   bool get orderPending {
     const pendingMessage = "Waiting for seller to accept the order";
@@ -580,6 +580,21 @@ class OrderHistoryDishesDataModel {
   final String? totalPrice;
   final String? formattedPrice;
   final String? formattedTotalPrice;
+
+  final String? orderItemId;
+  final String? normalPrice;
+  final String? totalNormalPrice;
+  final String? totalPriceWithAddonNormal;
+  final String? totalDiscount;
+  final String? totalPriceWithAddon;
+  final String? isTaxApplied;
+  final String? taxLabel;
+  final String? deliveryDiscount;
+  final String? taxAmount;
+  final String? netAmount;
+  final OrderDishesAmountInPaisaDataModel? amountInPaisa;
+  final OrderDishesWaiterDataModel? waiter;
+
   final List<OrderHistoryAddonsDataModel>? addons;
 
   OrderHistoryDishesDataModel({
@@ -598,6 +613,19 @@ class OrderHistoryDishesDataModel {
     this.totalPrice,
     this.formattedPrice,
     this.formattedTotalPrice,
+    this.orderItemId,
+    this.normalPrice,
+    this.totalNormalPrice,
+    this.totalPriceWithAddonNormal,
+    this.totalDiscount,
+    this.totalPriceWithAddon,
+    this.isTaxApplied,
+    this.taxLabel,
+    this.deliveryDiscount,
+    this.taxAmount,
+    this.netAmount,
+    required this.amountInPaisa,
+    this.waiter,
     this.addons,
   });
 
@@ -617,6 +645,19 @@ class OrderHistoryDishesDataModel {
     String? totalPrice,
     String? formattedPrice,
     String? formattedTotalPrice,
+    String? orderItemId,
+    String? normalPrice,
+    String? totalNormalPrice,
+    String? totalPriceWithAddonNormal,
+    String? totalDiscount,
+    String? totalPriceWithAddon,
+    String? isTaxApplied,
+    String? taxLabel,
+    String? deliveryDiscount,
+    String? taxAmount,
+    String? netAmount,
+    OrderDishesAmountInPaisaDataModel? amountInPaisa,
+    OrderDishesWaiterDataModel? waiter,
     List<OrderHistoryAddonsDataModel>? addons,
   }) {
     return OrderHistoryDishesDataModel(
@@ -635,6 +676,20 @@ class OrderHistoryDishesDataModel {
       totalPrice: totalPrice ?? this.totalPrice,
       formattedPrice: formattedPrice ?? this.formattedPrice,
       formattedTotalPrice: formattedTotalPrice ?? this.formattedTotalPrice,
+      orderItemId: orderItemId ?? this.orderItemId,
+      normalPrice: normalPrice ?? this.normalPrice,
+      totalNormalPrice: totalNormalPrice ?? this.totalNormalPrice,
+      totalPriceWithAddonNormal:
+          totalPriceWithAddonNormal ?? this.totalPriceWithAddonNormal,
+      totalDiscount: totalDiscount ?? this.totalDiscount,
+      totalPriceWithAddon: totalPriceWithAddon ?? this.totalPriceWithAddon,
+      isTaxApplied: isTaxApplied ?? this.isTaxApplied,
+      taxLabel: taxLabel ?? this.taxLabel,
+      deliveryDiscount: deliveryDiscount ?? this.deliveryDiscount,
+      taxAmount: taxAmount ?? this.taxAmount,
+      netAmount: netAmount ?? this.netAmount,
+      amountInPaisa: amountInPaisa ?? this.amountInPaisa,
+      waiter: waiter ?? this.waiter,
       addons: addons ?? this.addons,
     );
   }
@@ -656,6 +711,19 @@ class OrderHistoryDishesDataModel {
       'totalPrice': totalPrice,
       'formattedPrice': formattedPrice,
       'formattedTotalPrice': formattedTotalPrice,
+      'orderItemId': orderItemId,
+      'normalPrice': normalPrice,
+      'totalNormalPrice': totalNormalPrice,
+      'totalPriceWithAddonNormal': totalPriceWithAddonNormal,
+      'totalDiscount': totalDiscount,
+      'totalPriceWithAddon': totalPriceWithAddon,
+      'isTaxApplied': isTaxApplied,
+      'taxLabel': taxLabel,
+      'deliveryDiscount': deliveryDiscount,
+      'taxAmount': taxAmount,
+      'netAmount': netAmount,
+      'amountInPaisa': amountInPaisa?.toMap(),
+      'waiter': waiter?.toMap(),
       'addons': addons?.map((x) => x.toMap()).toList(),
     };
   }
@@ -687,6 +755,37 @@ class OrderHistoryDishesDataModel {
           : null,
       formattedTotalPrice: map['formattedTotalPrice'] != null
           ? map['formattedTotalPrice'] as String
+          : null,
+      orderItemId:
+          map['orderItemId'] != null ? map['orderItemId'] as String : null,
+      normalPrice:
+          map['normalPrice'] != null ? map['normalPrice'] as String : null,
+      totalNormalPrice: map['totalNormalPrice'] != null
+          ? map['totalNormalPrice'] as String
+          : null,
+      totalPriceWithAddonNormal: map['totalPriceWithAddonNormal'] != null
+          ? map['totalPriceWithAddonNormal'] as String
+          : null,
+      totalDiscount:
+          map['totalDiscount'] != null ? map['totalDiscount'] as String : null,
+      totalPriceWithAddon: map['totalPriceWithAddon'] != null
+          ? map['totalPriceWithAddon'] as String
+          : null,
+      isTaxApplied:
+          map['isTaxApplied'] != null ? map['isTaxApplied'] as String : null,
+      taxLabel: map['taxLabel'] != null ? map['taxLabel'] as String : null,
+      deliveryDiscount: map['deliveryDiscount'] != null
+          ? map['deliveryDiscount'] as String
+          : null,
+      taxAmount: map['taxAmount'] != null ? map['taxAmount'] as String : null,
+      netAmount: map['netAmount'] != null ? map['netAmount'] as String : null,
+      amountInPaisa: map['amountInPaisa'] != null
+          ? OrderDishesAmountInPaisaDataModel.fromMap(
+              map['amountInPaisa'] as Map<String, dynamic>)
+          : null,
+      waiter: map['waiter'] != null
+          ? OrderDishesWaiterDataModel.fromMap(
+              map['waiter'] as Map<String, dynamic>)
           : null,
       addons: map['addons'] != null
           ? List<OrderHistoryAddonsDataModel>.from(
@@ -722,7 +821,7 @@ class OrderHistoryDishesDataModel {
 
   @override
   String toString() {
-    return 'OrderHistoryDishesDataModel(opID: $opID, orderID: $orderID, identifierName: $identifierName, name: $name, description: $description, photo: $photo, productType: $productType, variationName: $variationName, ingredients: $ingredients, price: $price, quantity: $quantity, waiterID: $waiterID, totalPrice: $totalPrice, formattedPrice: $formattedPrice, formattedTotalPrice: $formattedTotalPrice, addons: $addons)';
+    return 'OrderHistoryDishesDataModel(opID: $opID, orderID: $orderID, identifierName: $identifierName, name: $name, description: $description, photo: $photo, productType: $productType, variationName: $variationName, ingredients: $ingredients, price: $price, quantity: $quantity, waiterID: $waiterID, totalPrice: $totalPrice, formattedPrice: $formattedPrice, formattedTotalPrice: $formattedTotalPrice, orderItemId: $orderItemId, normalPrice: $normalPrice, totalNormalPrice: $totalNormalPrice, totalPriceWithAddonNormal: $totalPriceWithAddonNormal, totalDiscount: $totalDiscount, totalPriceWithAddon: $totalPriceWithAddon, isTaxApplied: $isTaxApplied, taxLabel: $taxLabel, deliveryDiscount: $deliveryDiscount, taxAmount: $taxAmount, netAmount: $netAmount, amountInPaisa: $amountInPaisa, waiter: $waiter, addons: $addons)';
   }
 
   @override
@@ -744,6 +843,19 @@ class OrderHistoryDishesDataModel {
         other.totalPrice == totalPrice &&
         other.formattedPrice == formattedPrice &&
         other.formattedTotalPrice == formattedTotalPrice &&
+        other.orderItemId == orderItemId &&
+        other.normalPrice == normalPrice &&
+        other.totalNormalPrice == totalNormalPrice &&
+        other.totalPriceWithAddonNormal == totalPriceWithAddonNormal &&
+        other.totalDiscount == totalDiscount &&
+        other.totalPriceWithAddon == totalPriceWithAddon &&
+        other.isTaxApplied == isTaxApplied &&
+        other.taxLabel == taxLabel &&
+        other.deliveryDiscount == deliveryDiscount &&
+        other.taxAmount == taxAmount &&
+        other.netAmount == netAmount &&
+        other.amountInPaisa == amountInPaisa &&
+        other.waiter == waiter &&
         listEquals(other.addons, addons);
   }
 
@@ -764,6 +876,19 @@ class OrderHistoryDishesDataModel {
         totalPrice.hashCode ^
         formattedPrice.hashCode ^
         formattedTotalPrice.hashCode ^
+        orderItemId.hashCode ^
+        normalPrice.hashCode ^
+        totalNormalPrice.hashCode ^
+        totalPriceWithAddonNormal.hashCode ^
+        totalDiscount.hashCode ^
+        totalPriceWithAddon.hashCode ^
+        isTaxApplied.hashCode ^
+        taxLabel.hashCode ^
+        deliveryDiscount.hashCode ^
+        taxAmount.hashCode ^
+        netAmount.hashCode ^
+        amountInPaisa.hashCode ^
+        waiter.hashCode ^
         addons.hashCode;
   }
 
@@ -795,13 +920,200 @@ class OrderHistoryDishesDataModel {
           .toList()
           .join('\n+ ${AppConfig.instance.country.symbol} ');
 
-  double get formatItemTotal {
-    final itemPrice = double.parse(price!);
-    final parsedItemPrice =
-        itemPrice / AppConfig.instance.country.currencyDivisor;
-    final itemQuantity = double.parse(quantity!);
-    final itemTotal = parsedItemPrice * itemQuantity;
-    return itemTotal;
+  // double get formatItemTotal {
+  //   final itemPrice = double.parse(price!);
+  //   final parsedItemPrice =
+  //       itemPrice / AppConfig.instance.country.currencyDivisor;
+  //   final itemQuantity = double.parse(quantity!);
+  //   final itemTotal = parsedItemPrice * itemQuantity;
+  //   return itemTotal;
+  // }
+}
+
+class OrderDishesWaiterDataModel {
+  final String? waiterID;
+  final String? waiterName;
+  OrderDishesWaiterDataModel({
+    this.waiterID,
+    this.waiterName,
+  });
+
+  OrderDishesWaiterDataModel copyWith({
+    String? waiterID,
+    String? waiterName,
+  }) {
+    return OrderDishesWaiterDataModel(
+      waiterID: waiterID ?? this.waiterID,
+      waiterName: waiterName ?? this.waiterName,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'waiterID': waiterID,
+      'waiterName': waiterName,
+    };
+  }
+
+  factory OrderDishesWaiterDataModel.fromMap(Map<String, dynamic> map) {
+    return OrderDishesWaiterDataModel(
+      waiterID: map['waiterID'] != null ? map['waiterID'] as String : null,
+      waiterName:
+          map['waiterName'] != null ? map['waiterName'] as String : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory OrderDishesWaiterDataModel.fromJson(String source) =>
+      OrderDishesWaiterDataModel.fromMap(
+          json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() =>
+      'OrderDishesWaiterDataModel(waiterID: $waiterID, waiterName: $waiterName)';
+
+  @override
+  bool operator ==(covariant OrderDishesWaiterDataModel other) {
+    if (identical(this, other)) return true;
+
+    return other.waiterID == waiterID && other.waiterName == waiterName;
+  }
+
+  @override
+  int get hashCode => waiterID.hashCode ^ waiterName.hashCode;
+}
+
+class OrderDishesAmountInPaisaDataModel {
+  final int? normalPrice;
+  final int? price;
+  final int? totalNormalPrice;
+  final int? totalPrice;
+  final int? totalPriceWithAddonNormal;
+  final int? totalDiscount;
+  final int? totalPriceWithAddon;
+  final int? deliveryDiscount;
+  final int? taxAmount;
+  final int? netAmount;
+  OrderDishesAmountInPaisaDataModel({
+    this.normalPrice,
+    this.price,
+    this.totalNormalPrice,
+    this.totalPrice,
+    this.totalPriceWithAddonNormal,
+    this.totalDiscount,
+    this.totalPriceWithAddon,
+    this.deliveryDiscount,
+    this.taxAmount,
+    this.netAmount,
+  });
+
+  OrderDishesAmountInPaisaDataModel copyWith({
+    int? normalPrice,
+    int? price,
+    int? totalNormalPrice,
+    int? totalPrice,
+    int? totalPriceWithAddonNormal,
+    int? totalDiscount,
+    int? totalPriceWithAddon,
+    int? deliveryDiscount,
+    int? taxAmount,
+    int? netAmount,
+  }) {
+    return OrderDishesAmountInPaisaDataModel(
+      normalPrice: normalPrice ?? this.normalPrice,
+      price: price ?? this.price,
+      totalNormalPrice: totalNormalPrice ?? this.totalNormalPrice,
+      totalPrice: totalPrice ?? this.totalPrice,
+      totalPriceWithAddonNormal:
+          totalPriceWithAddonNormal ?? this.totalPriceWithAddonNormal,
+      totalDiscount: totalDiscount ?? this.totalDiscount,
+      totalPriceWithAddon: totalPriceWithAddon ?? this.totalPriceWithAddon,
+      deliveryDiscount: deliveryDiscount ?? this.deliveryDiscount,
+      taxAmount: taxAmount ?? this.taxAmount,
+      netAmount: netAmount ?? this.netAmount,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'normalPrice': normalPrice,
+      'price': price,
+      'totalNormalPrice': totalNormalPrice,
+      'totalPrice': totalPrice,
+      'totalPriceWithAddonNormal': totalPriceWithAddonNormal,
+      'totalDiscount': totalDiscount,
+      'totalPriceWithAddon': totalPriceWithAddon,
+      'deliveryDiscount': deliveryDiscount,
+      'taxAmount': taxAmount,
+      'netAmount': netAmount,
+    };
+  }
+
+  factory OrderDishesAmountInPaisaDataModel.fromMap(Map<String, dynamic> map) {
+    return OrderDishesAmountInPaisaDataModel(
+      normalPrice:
+          map['normalPrice'] != null ? map['normalPrice'] as int : null,
+      price: map['price'] != null ? map['price'] as int : null,
+      totalNormalPrice: map['totalNormalPrice'] != null
+          ? map['totalNormalPrice'] as int
+          : null,
+      totalPrice: map['totalPrice'] != null ? map['totalPrice'] as int : null,
+      totalPriceWithAddonNormal: map['totalPriceWithAddonNormal'] != null
+          ? map['totalPriceWithAddonNormal'] as int
+          : null,
+      totalDiscount:
+          map['totalDiscount'] != null ? map['totalDiscount'] as int : null,
+      totalPriceWithAddon: map['totalPriceWithAddon'] != null
+          ? map['totalPriceWithAddon'] as int
+          : null,
+      deliveryDiscount: map['deliveryDiscount'] != null
+          ? map['deliveryDiscount'] as int
+          : null,
+      taxAmount: map['taxAmount'] != null ? map['taxAmount'] as int : null,
+      netAmount: map['netAmount'] != null ? map['netAmount'] as int : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory OrderDishesAmountInPaisaDataModel.fromJson(String source) =>
+      OrderDishesAmountInPaisaDataModel.fromMap(
+          json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'OrderDishesAmountInPaisaDataModel(normalPrice: $normalPrice, price: $price, totalNormalPrice: $totalNormalPrice, totalPrice: $totalPrice, totalPriceWithAddonNormal: $totalPriceWithAddonNormal, totalDiscount: $totalDiscount, totalPriceWithAddon: $totalPriceWithAddon, deliveryDiscount: $deliveryDiscount, taxAmount: $taxAmount, netAmount: $netAmount)';
+  }
+
+  @override
+  bool operator ==(covariant OrderDishesAmountInPaisaDataModel other) {
+    if (identical(this, other)) return true;
+
+    return other.normalPrice == normalPrice &&
+        other.price == price &&
+        other.totalNormalPrice == totalNormalPrice &&
+        other.totalPrice == totalPrice &&
+        other.totalPriceWithAddonNormal == totalPriceWithAddonNormal &&
+        other.totalDiscount == totalDiscount &&
+        other.totalPriceWithAddon == totalPriceWithAddon &&
+        other.deliveryDiscount == deliveryDiscount &&
+        other.taxAmount == taxAmount &&
+        other.netAmount == netAmount;
+  }
+
+  @override
+  int get hashCode {
+    return normalPrice.hashCode ^
+        price.hashCode ^
+        totalNormalPrice.hashCode ^
+        totalPrice.hashCode ^
+        totalPriceWithAddonNormal.hashCode ^
+        totalDiscount.hashCode ^
+        totalPriceWithAddon.hashCode ^
+        deliveryDiscount.hashCode ^
+        taxAmount.hashCode ^
+        netAmount.hashCode;
   }
 }
 

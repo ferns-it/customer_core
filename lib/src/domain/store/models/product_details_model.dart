@@ -373,7 +373,7 @@ class ProductVariationDataModel {
   final List<dynamic>? selectedallergens;
   final List<dynamic>? allergensMaster;
   final List<ProductMasterAddonDataModel>? variationmasteraddons;
-  final String? offerPriceEnabled;
+  final bool? offerPriceEnabled;
   final ProductOfferPriceDetailsDataModel? offerPriceDetails;
 
   ProductVariationDataModel({
@@ -404,7 +404,7 @@ class ProductVariationDataModel {
     List<dynamic>? selectedallergens,
     List<dynamic>? allergensMaster,
     List<ProductMasterAddonDataModel>? variationmasteraddons,
-    String? offerPriceEnabled,
+    bool? offerPriceEnabled,
     ProductOfferPriceDetailsDataModel? offerPriceDetails,
   }) {
     return ProductVariationDataModel(
@@ -480,7 +480,7 @@ class ProductVariationDataModel {
             )
           : null,
       offerPriceEnabled: map['offerPriceEnabled'] != null
-          ? map['offerPriceEnabled'] as String
+          ? map['offerPriceEnabled'] as bool
           : null,
       offerPriceDetails: map['offerPriceDetails'] != null
           ? ProductOfferPriceDetailsDataModel.fromMap(

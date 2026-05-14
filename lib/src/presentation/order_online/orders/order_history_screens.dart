@@ -326,9 +326,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                 children: [
                   Icon(
                     FluentIcons.search_20_regular,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey.shade600
-                        : Colors.grey.shade700,
+                    color: Theme.of(context).iconTheme.color,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -341,7 +339,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                         contentPadding: const EdgeInsets.all(10),
                         hintText: 'Search for orders',
                         hintStyle: TextStyle(
-                          color: Colors.grey.shade700,
+                          color: context.customTextTheme.color,
                           fontSize: 14,
                         ),
                         border: InputBorder.none,
@@ -367,8 +365,8 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
               showCupertinoModalPopup(
                 context: context,
                 builder: (_) => CupertinoActionSheet(
-                  title: const Text("Select Year",
-                      style: TextStyle(color: Colors.white)),
+                  title: Text("Select Year",
+                      style: TextStyle(color: context.customTextTheme.color)),
                   actions: years
                       .map(
                         (year) => CupertinoActionSheetAction(
@@ -377,7 +375,10 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
 
                             orderProvider.fetchAllOrders(year: year.toString());
                           },
-                          child: Text(year.toString()),
+                          child: Text(
+                            year.toString(),
+                           
+                          ),
                         ),
                       )
                       .toList(),
@@ -398,14 +399,14 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                 builder: (_) => ListView(
                   shrinkWrap: true,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.all(16),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
                       child: Align(
                         alignment: Alignment.center,
                         child: Text(
                           "Select Year",
                           style: TextStyle(
-                              color: Colors.white,
+                              color: context.customTextTheme.color,
                               fontSize: 16,
                               fontWeight: FontWeight.bold),
                         ),
@@ -414,7 +415,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                     ...years.map(
                       (year) => ListTile(
                         title: Center(
-                          child: Text(year.toString()),
+                          child: Text(year.toString(),style: TextStyle(color: context.customTextTheme.color),),
                         ),
                         onTap: () {
                           Navigator.pop(context);
@@ -436,7 +437,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                   : Colors.grey.shade200,
               borderRadius: BorderRadius.circular(14),
             ),
-            child:  Icon(CupertinoIcons.slider_horizontal_3,
+            child: Icon(CupertinoIcons.slider_horizontal_3,
                 color: Theme.of(context).iconTheme.color),
           ),
         )
@@ -495,27 +496,19 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
               ),
               const Spacer(),
               Text(
-                order.orderAccepted
-                    ? "Accepted"
-                    : order.orderPending
-                        ? "Pending"
-                        : order.orderDispatched
-                            ? "Dispatched"
-                            : order.orderRejected
-                                ? "Rejected"
-                                : "N/A",
-                style: context.customTextTheme.text14W600
-                    .copyWith(color: Colors.red
-                        // color: order.orderAccepted
-                        //     ? Colors.green
-                        //     : order.orderPending
-                        //         ? Colors.orange
-                        //         : order.orderDispatched
-                        //             ? Colors.red
-                        //             : order.orderRejected
-                        //                 ? Colors.amber
-                        //                 : Colors.grey,
-                        ),
+                order.orderStatus?.label ?? '',
+                style: context.customTextTheme.text14W600.copyWith(
+                  color: getColor(order.orderStatus ?? OrderStatus.pending),
+                  // color: order.orderAccepted
+                  //     ? Colors.green
+                  //     : order.orderPending
+                  //         ? Colors.orange
+                  //         : order.orderDispatched
+                  //             ? Colors.red
+                  //             : order.orderRejected
+                  //                 ? Colors.amber
+                  //                 : Colors.grey,
+                ),
               )
             ],
           ),
@@ -567,6 +560,21 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
         ],
       ),
     );
+  }
+
+  Color getColor(OrderStatus status) {
+    switch (status) {
+      case OrderStatus.pending:
+        return Colors.orange;
+      case OrderStatus.accepted:
+        return Colors.green;
+      case OrderStatus.dispatched:
+        return Colors.green;
+      case OrderStatus.rejected:
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 
   Widget historyOrderCard(OrderDetailsModel order, BuildContext context,

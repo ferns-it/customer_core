@@ -761,14 +761,14 @@ class CartProvider extends ChangeNotifier with BaseController {
 
       return e.copyWith(choosedOption: updatedOptions);
     }).toList();
-    // newCartItems[index] = item.copyWith(
-    //     master_addon_apllied: updatedAppliedMasterAddons,
-    //     addon_apllied: updatedAppliedAddons);
+    newCartItems[index] = item.copyWith(
+        master_addon_apllied: updatedAppliedMasterAddons,
+        addon_apllied: updatedAppliedAddons);
     final itemProductPrice =
         item.product_price?.replaceAll(_currencySymbol, "") ?? "0.00";
     final itemProductPriceInPaisa = double.parse(itemProductPrice) *
         AppConfig.instance.country.currencyDivisor;
-    final itemModifiersTotal = item.getModifiersTotal; //* newQty;
+    final itemModifiersTotal = item.getModifiersTotal * newQty;
     final itemModifiersTotalInPaisa =
         itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final totalItemPrice = newQty * itemProductPriceInPaisa;
@@ -778,8 +778,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
       quantity: newQty,
-      // master_addon_apllied: updatedAppliedMasterAddons,
-      // addon_apllied: updatedAppliedAddons,
+      master_addon_apllied: updatedAppliedMasterAddons,
+      addon_apllied: updatedAppliedAddons,
       total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
       product_total_price:
           "$_currencySymbol${productTotalPriceFormatted.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
@@ -867,9 +867,9 @@ class CartProvider extends ChangeNotifier with BaseController {
       return e.copyWith(choosedOption: updatedOptions);
     }).toList();
 
-    // newCartItems[index] = item.copyWith(
-    //     master_addon_apllied: updatedAppliedMasterAddons,
-    //     addon_apllied: updatedAppliedAddons);
+    newCartItems[index] = item.copyWith(
+        master_addon_apllied: updatedAppliedMasterAddons,
+        addon_apllied: updatedAppliedAddons);
     final itemProductPrice =
         item.product_price?.replaceAll(_currencySymbol, "") ?? "0.00";
     final itemProductPriceInPaisa = double.parse(itemProductPrice) *
@@ -884,8 +884,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
       quantity: newQty,
-      // master_addon_apllied: updatedAppliedMasterAddons,
-      // addon_apllied: updatedAppliedAddons,
+      master_addon_apllied: updatedAppliedMasterAddons,
+      addon_apllied: updatedAppliedAddons,
       total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
       product_total_price:
           "$_currencySymbol ${productTotalPriceFormatted.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
@@ -1107,11 +1107,10 @@ class CartProvider extends ChangeNotifier with BaseController {
     required String deliveryDate,
     required String deliverySlot,
   }) async {
-   
-    try {   
+    try {
       final userData = await getUserData();
-      
-      if (cartTotalPrice == null ||userData == null) return false;
+
+      if (cartTotalPrice == null || userData == null) return false;
       _createOrderPending = true;
       notifyListeners();
 

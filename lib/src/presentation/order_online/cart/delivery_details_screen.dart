@@ -1185,6 +1185,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                     : null,
                                                 horizontalTitleGap: 8.0,
                                                 child: RadioListTile(
+                                                  activeColor: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
                                                   value: address,
                                                   groupValue: cartListener
                                                       .selectedAddress,
@@ -1454,10 +1457,11 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                     userListener.userAddressList.isNotEmpty,
                                 child: Expanded(
                                   child: FilledButton(
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
+                                    style: ButtonStyle(
+                                        backgroundColor: WidgetStatePropertyAll(
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .primary)),
                                     onPressed: cartListener
                                             .deliveryOrTakeAwayChargeCalculating
                                         ? null

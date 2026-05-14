@@ -1,4 +1,3 @@
-
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -1236,8 +1235,15 @@ class ProductSearchDelegate extends SearchDelegate {
           itemBuilder: (context, index) {
             final suggestion = suggestions[index];
             return ListTile(
-              title: Text(suggestion),
-              leading: const Icon(Icons.history),
+              title: Text(
+                suggestion,
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.titleMedium?.color),
+              ),
+              leading: Icon(
+                Icons.history,
+                color: Theme.of(context).iconTheme.color,
+              ),
               onTap: () {
                 query = suggestion;
                 showResults(context); // Trigger search

@@ -47,9 +47,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
         child: Row(
           children: [
             Icon(FluentIcons.search_20_regular,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey.shade600
-                    : null),
+                color: Theme.of(context).iconTheme.color),
             const SizedBox(width: 10),
 
             // Rotating placeholder text
@@ -61,7 +59,11 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                 child: Text(
                   'Search for "${widget.words[index]}"',
                   key: ValueKey(widget.words[index]),
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                  style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.grey.shade600,
+                      fontSize: 14),
                 ),
               ),
             ),

@@ -1,12 +1,16 @@
 import 'package:auto_route/annotations.dart';
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
+import 'package:customer_core/src/application/cart/cart_provider.dart';
+import 'package:customer_core/src/application/core/dependency_registrar.dart';
+import 'package:customer_core/src/domain/cart/models/cart_details_model.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/order/order_provider.dart';
 import 'package:customer_core/src/core/theme/app_theme.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:customer_core/src/presentation/widgets/custom_painer_shape.dart';
 import 'package:customer_core/src/presentation/widgets/get_provider_view.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/ui_utils.dart';
@@ -22,6 +26,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
     final orderListener = listener(context);
     final orderDetails = orderListener.viewOrderDetails;
     // final customerDetails = listener2<UserProvider>(context).userData;
+    // final cartListener = context.watch<CartProvider>();
 
     return Theme(
       data: quickSandTextTheme(context),
@@ -46,11 +51,47 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: builderOrderStatusDetails(
-                        orderDetails,
-                        context,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0)
+                          .copyWith(top: 20),
+                      child: orderDetails.orderRejected == true
+                          ? Container(
+                              width: double.infinity,
+                              // padding: EdgeInsets.symmetric(horizontal: 10)
+                              //     .copyWith(top: 5, bottom: 5),
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  color: Colors.red.shade400.withOpacity(0.2)),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.error,
+                                        size: 18,
+                                        color: Colors.red.shade400,
+                                      ),
+                                      Text(
+                                        " Rejected ",
+                                        style: TextStyle(
+                                            color: Colors.red.shade500,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    orderDetails.status ?? '',
+                                    style: TextStyle(
+                                        color: context.customTextTheme.color),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : builderOrderStatusDetails(
+                              orderDetails,
+                              context,
+                            ),
                     ),
                     verticalSpaceRegular,
                     buildOrderSummaryContainer(context, orderDetails),
@@ -208,22 +249,66 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                               ),
                             ],
                           ),
-                          Row(
-                            children: <Widget>[
-                              Flexible(
-                                child: SizedBox(
-                                  width: constraints.maxWidth * 0.7,
-                                  child: Text(
-                                    dish.dishVariationAndModifiers,
-                                    style: context.customTextTheme.text14W500
-                                        .copyWith(
-                                            color:
-                                                context.customTextTheme.color),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (dish.variationName != null)
+                                Text(
+                                  "(${dish.variationName})",
+                                  style: context.customTextTheme.text14W500
+                                      .copyWith(
+                                    color: context.customTextTheme.color,
                                   ),
                                 ),
-                              ),
+                              if (dish.addons != null)
+                                ...dish.addons!.map(
+                                  (addon) => Padding(
+                                    padding: const EdgeInsets.only(top: 2),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            "+ ${addon.name}",
+                                            style: context
+                                                .customTextTheme.text14W500
+                                                .copyWith(
+                                              color:
+                                                  context.customTextTheme.color,
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          " ${addon.price}",
+                                          style: context
+                                              .customTextTheme.text14W500
+                                              .copyWith(
+                                            color:
+                                                context.customTextTheme.color,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                             ],
-                          ),
+                          )
+                          // Row(
+                          //   children: <Widget>[
+                          //     Flexible(
+                          //       child: SizedBox(
+                          //         width: constraints.maxWidth * 0.7,
+                          //         child: Text(
+                          //           maxLines: 3,
+                          //           dish.dishVariationAndModifiers,
+                          //           style: context.customTextTheme.text14W500
+                          //               .copyWith(
+                          //                   color:
+                          //                       context.customTextTheme.color),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
                         ],
                       );
                     }),
@@ -289,6 +374,12 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                   .copyWith(color: context.customTextTheme.color),
             ),
             verticalSpaceTiny,
+            _SummaryRow(
+              label: orderDetails.taxLabel ?? 'TAX',
+              value: orderDetails.taxTotalAmount ?? '0.00',
+              style: context.customTextTheme.text14W600
+                  .copyWith(color: context.customTextTheme.color),
+            ),
             const Divider(height: 20.0),
             _SummaryRow(
               label: "Total",

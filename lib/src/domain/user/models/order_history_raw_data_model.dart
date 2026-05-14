@@ -5,6 +5,20 @@ import 'package:flutter/foundation.dart';
 
 import 'package:customer_core/customer_core.dart';
 
+enum OrderStatus {
+  pending("Pending"),
+  accepted("Accepted"),
+  dispatched("Dispatched"),
+  rejected("Rejected");
+
+  const OrderStatus(this.label);
+
+  final String label;
+
+  static OrderStatus fromName(String name) =>
+      OrderStatus.values.firstWhere((e) => e.name == name.toLowerCase());
+}
+
 class OrderHistoryDataModel {
   final List<OrderDetailsModel> history;
 
@@ -97,6 +111,7 @@ class OrderDetailsModel {
 
   final List<OrderHistoryDishesDataModel>? orderDishes;
   final OrderHistoryDeliveryAddressDataModel? deliveryAddress;
+  final OrderStatus? orderStatus;
 
   OrderDetailsModel({
     this.orderID,
@@ -137,6 +152,7 @@ class OrderDetailsModel {
     this.netAmountExcludingDeliveryCharge,
     this.netAmount,
     this.totalDiscount,
+    this.orderStatus,
   });
 
   OrderDetailsModel copyWith({
@@ -180,6 +196,7 @@ class OrderDetailsModel {
     String? totalDiscount,
     List<OrderHistoryDishesDataModel>? orderDishes,
     OrderHistoryDeliveryAddressDataModel? deliveryAddress,
+    OrderStatus? orderStatus,
   }) {
     return OrderDetailsModel(
       orderID: orderID ?? this.orderID,
@@ -225,6 +242,7 @@ class OrderDetailsModel {
           this.netAmountExcludingDeliveryCharge,
       netAmount: netAmount ?? this.netAmount,
       totalDiscount: totalDiscount ?? this.totalDiscount,
+      orderStatus: orderStatus ?? this.orderStatus,
     );
   }
 
@@ -268,6 +286,7 @@ class OrderDetailsModel {
       'netAmountExcludingDeliveryCharge': netAmountExcludingDeliveryCharge,
       'netAmount': netAmount,
       'totalDiscount': totalDiscount,
+      'orderStatus': orderStatus,
     };
   }
 
@@ -368,6 +387,9 @@ class OrderDetailsModel {
       netAmount: map['netAmount'] != null ? map['netAmount'] as String : null,
       totalDiscount:
           map['totalDiscount'] != null ? map['totalDiscount'] as String : null,
+      orderStatus: map['orderStatus'] != null
+          ? OrderStatus.fromName(map['orderStatus'])
+          : null,
     );
   }
 
@@ -378,7 +400,7 @@ class OrderDetailsModel {
 
   @override
   String toString() {
-    return 'OrderHistorySubDataModel(orderID: $orderID, customerOrderID: $customerOrderID, phone: $phone, , formattedAmount: $formattedAmount, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, takeawayTime: $takeawayTime, formattedDeliveryCharge: $formattedDeliveryCharge, paymentGatway: $paymentGatway, paymentStatus: $paymentStatus, transactionID: $transactionID, orderedAt: $orderedAt, status: $status, dispatchMessage: $dispatchMessage, shopID: $shopID, shopName: $shopName, shopEmail: $shopEmail, shopMobile: $shopMobile, shopAddress1: $shopAddress1, shopAddress2: $shopAddress2, orderDishes: $orderDishes, deliveryAddress: $deliveryAddress, deliveryDiscountLabel: $deliveryDiscountLabel, isTaxApplicable: $isTaxApplicable, taxLabel: $taxLabel, grossAmount: $grossAmount, productDiscountAmount: $productDiscountAmount, totalAmount: $totalAmount, deliveryDiscount: $deliveryDiscount, TotalNetAmount_ExcludingTax: $TotalNetAmount_ExcludingTax, taxTotalAmount: $taxTotalAmount, netAmountExcludingDeliveryCharge: $netAmountExcludingDeliveryCharge, netAmount: $netAmount, totalDiscount: $totalDiscount)';
+    return 'OrderHistorySubDataModel(orderID: $orderID, customerOrderID: $customerOrderID, phone: $phone, , formattedAmount: $formattedAmount, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, takeawayTime: $takeawayTime, formattedDeliveryCharge: $formattedDeliveryCharge, paymentGatway: $paymentGatway, paymentStatus: $paymentStatus, transactionID: $transactionID, orderedAt: $orderedAt, status: $status, dispatchMessage: $dispatchMessage, shopID: $shopID, shopName: $shopName, shopEmail: $shopEmail, shopMobile: $shopMobile, shopAddress1: $shopAddress1, shopAddress2: $shopAddress2, orderDishes: $orderDishes, deliveryAddress: $deliveryAddress, deliveryDiscountLabel: $deliveryDiscountLabel, isTaxApplicable: $isTaxApplicable, taxLabel: $taxLabel, grossAmount: $grossAmount, productDiscountAmount: $productDiscountAmount, totalAmount: $totalAmount, deliveryDiscount: $deliveryDiscount, TotalNetAmount_ExcludingTax: $TotalNetAmount_ExcludingTax, taxTotalAmount: $taxTotalAmount, netAmountExcludingDeliveryCharge: $netAmountExcludingDeliveryCharge, netAmount: $netAmount, totalDiscount: $totalDiscount, orderStatus: $orderStatus)';
   }
 
   @override
@@ -422,7 +444,8 @@ class OrderDetailsModel {
         other.netAmountExcludingDeliveryCharge ==
             netAmountExcludingDeliveryCharge &&
         other.netAmount == netAmount &&
-        other.totalDiscount == totalDiscount;
+        other.totalDiscount == totalDiscount &&
+        other.orderStatus == orderStatus;
   }
 
   @override
@@ -464,7 +487,8 @@ class OrderDetailsModel {
         taxTotalAmount.hashCode ^
         netAmountExcludingDeliveryCharge.hashCode ^
         netAmount.hashCode ^
-        totalDiscount.hashCode;
+        totalDiscount.hashCode ^
+        orderStatus.hashCode;
   }
 
   double get formatDeliveryChargeToDouble {
@@ -802,13 +826,15 @@ class OrderHistoryDishesDataModel {
   String get dishVariationAndModifiers {
     final hasVariation = variationName != null;
     final hasAddons = addons != null && addons!.isNotEmpty;
-
+    final addonText = hasAddons
+        ? addons!.map((e) => "+ ${e.name}  ${e.price}").toList().join('\n')
+        : '';
     if (hasVariation && hasAddons) {
-      return "($variationName), ${addons!.map((e) => e.name).join(', ')}";
+      return "($variationName)\n $addonText";
     } else if (hasVariation) {
       return "($variationName)";
     } else if (hasAddons) {
-      return addons!.map((e) => e.name).join(', ');
+      return addonText;
     }
     return '';
   }

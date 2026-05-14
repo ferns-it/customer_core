@@ -365,7 +365,7 @@ class _OrderSectionWidget extends StatelessWidget {
                 child: Text(
                   product.isAvailable == false ? 'Not Available' : 'Order Now',
                   style: context.customTextTheme.text14W600
-                      .copyWith(color: Colors.black),
+                      .copyWith(color: AppColors.kWhite),
                 ),
               ),
             ),

@@ -273,10 +273,10 @@ class ProductDetailsTile extends StatelessWidget {
                     ? SizedBox(
                         height: 50, child: Center(child: secondaryWidget))
                     : FilledButton(
-                      
                         style: FilledButton.styleFrom(
-                          disabledBackgroundColor: Colors.transparent,
-                          disabledForegroundColor:Theme.of(context).disabledColor,
+                            disabledBackgroundColor: Colors.transparent,
+                            disabledForegroundColor:
+                                Theme.of(context).disabledColor,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5.0)),
                             fixedSize: const Size(double.infinity, 30),
@@ -311,8 +311,8 @@ class ProductDetailsTile extends StatelessWidget {
               child: IconButton(
                 onPressed: onPressFavouriteBtn,
                 style: IconButton.styleFrom(
-                  backgroundColor: AppColors.kWhite,
-                ),
+                    backgroundColor: AppColors.kWhite,
+                    foregroundColor: AppColors.kBlack2),
                 icon: Icon(
                   product.isFavourite
                       ? FluentIcons.heart_24_filled

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -240,8 +241,10 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         exception: error,
       );
       notifyListeners();
-    }, (result) {
+    }, (result) async {
+      await getFavouriteProductList();
       final list = result.featuredProducts ?? [];
+      final popularList = result.popularProducts ?? [];
       final favouriteList =
           favouriteProductResponse.data?.favouriteList?.productList ?? [];
       final favIdMap = {
@@ -254,8 +257,15 @@ class ProductsProvider extends ChangeNotifier with BaseController {
           favouriteID: favId ?? "",
         );
       }).toList();
-
-      final newResult = result.copyWith(featuredProducts: updatedList);
+      final updatedPopularList = popularList.map((product) {
+        final favId = favIdMap[product.pID];
+        return product.copyWith(
+          isFavourite: favId != null,
+          favouriteID: favId ?? "",
+        );
+      }).toList();
+      final newResult = result.copyWith(
+          featuredProducts: updatedList, popularProducts: updatedPopularList);
 
       _featuredPopularProductsAPIResponse = APIResponse.completed(newResult);
       notifyListeners();
@@ -397,6 +407,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         return true;
       });
     } catch (e) {
+      inspect(e);
       // Revert on error
       _updateFavouriteLocally(productID, false, "");
       notifyListeners();

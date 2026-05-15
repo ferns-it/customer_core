@@ -225,12 +225,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
 
                   // Body content (the same buildContent)
                   SliverToBoxAdapter(
-                    child: buildContent(
-                      promotionListner,
-                      productListener,
-                      productProvider,
-                      cartProvider,
-                    ),
+                    child: buildContent(context),
                   ),
                 ],
               ),
@@ -239,13 +234,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         ));
   }
 
-  Widget buildContent(
-    PromotionsProvider promotionListener,
-    ProductsProvider productListener,
-    ProductsProvider productProvider,
-    CartProvider cartProvider,
-  ) {
+  Widget buildContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cartProvider = context.read<CartProvider>();
+    final productProvider = context.read<ProductsProvider>();
+    final productListener = context.read<ProductsProvider>();
 
     return SingleChildScrollView(
       controller: _scrollController,
@@ -289,8 +282,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
             if (productListener.featuredPopularProductsAPIResponse.data
                     ?.popularProducts?.isNotEmpty ==
                 true)
-              buildPopularProducts(
-                  productListener, cartProvider, productProvider),
+              buildPopularProducts(context),
           ],
           Visibility(
             visible: !productProvider.isFetchingProductsFromPagination,
@@ -669,10 +661,12 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     );
   }
 
-  Widget buildPopularProducts(ProductsProvider productListner,
-      CartProvider cartProvider, ProductsProvider productProvider) {
+  Widget buildPopularProducts(BuildContext context) {
     final cartListener = context.watch<CartProvider>();
-    final products = productProvider
+    final cartProvider = context.read<CartProvider>();
+    final productListner = context.watch<ProductsProvider>();
+
+    final products = productListner
             .featuredPopularProductsAPIResponse.data?.popularProducts ??
         [];
     final showFavIcon = cartListener.isUserLoggedIn;

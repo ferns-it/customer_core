@@ -266,8 +266,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       }).toList();
       final newResult = result.copyWith(
           featuredProducts: updatedList, popularProducts: updatedPopularList);
-
-      _featuredPopularProductsAPIResponse = APIResponse.completed(newResult);
+          _featuredPopularProductsAPIResponse = APIResponse.completed(newResult);
       notifyListeners();
     });
   }

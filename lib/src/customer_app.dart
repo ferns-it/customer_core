@@ -28,10 +28,20 @@ class CustomerApp extends StatefulWidget {
 
 class _CustomerAppState extends State<CustomerApp> {
   var initialized = false;
+  late final AppRouter appRouter;
   @override
   void initState() {
     super.initState();
+    appRouter = AppRouter();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!initialized) {
+        DependencyRegistrar.initializeAllProviders(context);
 
+        setState(() {
+          initialized = true;
+        });
+      }
+    });
     // initialize once
     AppConfig.instance = widget.appConfig;
     UiConfig.instance = widget.uiConfig;
@@ -45,15 +55,7 @@ class _CustomerAppState extends State<CustomerApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: DependencyRegistrar.providers,
-      child: Builder(
-        builder: (context) {
-          if (!initialized) {
-            DependencyRegistrar.initializeAllProviders(context);
-          }
-
-          return _buildMaterialApp(context);
-        },
-      ),
+      child: _buildMaterialApp(context),
     );
   }
 
@@ -69,8 +71,6 @@ class _CustomerAppState extends State<CustomerApp> {
   }
 
   Widget _buildMaterialApp(BuildContext context) {
-    final appRouter = AppRouter();
-
     final baseLight = appLightTheme(context);
     final baseDark = appDarkTheme(context);
 

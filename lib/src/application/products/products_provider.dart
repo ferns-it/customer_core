@@ -266,7 +266,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       }).toList();
       final newResult = result.copyWith(
           featuredProducts: updatedList, popularProducts: updatedPopularList);
-          _featuredPopularProductsAPIResponse = APIResponse.completed(newResult);
+      _featuredPopularProductsAPIResponse = APIResponse.completed(newResult);
       notifyListeners();
     });
   }
@@ -358,7 +358,10 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       );
       notifyListeners();
     }, (result) async {
-      final filteredCategories = result.items?.toList();
+      final list = result.items?.toList();
+      final filteredCategories = list
+          ?.where((category) => category.productsCount?.online != 0)
+          .toList();
 
       // final filteredCategoriesChildren = result.items
       //     ?.expand((category) => category.childrens ?? [])

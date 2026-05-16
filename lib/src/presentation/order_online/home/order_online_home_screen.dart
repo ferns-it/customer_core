@@ -598,6 +598,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                         crossAxisCount: 2,
                         crossAxisSpacing: 0.0,
                         mainAxisSpacing: 0.0,
+                        
                         itemCount: products.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {

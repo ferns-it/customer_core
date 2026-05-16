@@ -151,9 +151,11 @@ class UserAddressScreen extends GetProviderView<UserProvider> {
                                     ],
                                   ),
                                   trailing: PopupMenuButton<_AddressMenuAction>(
-                                    color: Colors.grey.shade800,
-                                    icon: const Icon(
+                                    color: Theme.of(context).cardColor,
+                                    icon: Icon(
                                         FluentIcons.more_vertical_24_regular,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
                                         size: 20),
                                     onSelected: (value) async {
                                       switch (value) {
@@ -202,15 +204,26 @@ class UserAddressScreen extends GetProviderView<UserProvider> {
                                       PopupMenuItem(
                                         value: _AddressMenuAction.setDefault,
                                         enabled: address.dDefault == "0",
-                                        child: const Text('Set as default'),
+                                        child: Text(
+                                          'Set as default',
+                                          style: TextStyle(
+                                              color: context
+                                                  .customTextTheme.color),
+                                        ),
                                       ),
-                                      const PopupMenuItem(
+                                      PopupMenuItem(
                                         value: _AddressMenuAction.edit,
-                                        child: Text('Edit'),
+                                        child: Text('Edit',
+                                            style: TextStyle(
+                                                color: context
+                                                    .customTextTheme.color)),
                                       ),
-                                      const PopupMenuItem(
+                                      PopupMenuItem(
                                         value: _AddressMenuAction.delete,
-                                        child: Text('Delete'),
+                                        child: Text('Delete',
+                                            style: TextStyle(
+                                                color: context
+                                                    .customTextTheme.color)),
                                       ),
                                     ],
                                   ),

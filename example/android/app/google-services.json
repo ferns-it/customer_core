@@ -26,6 +26,25 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:953062921789:android:34152aa1952aee5bf17c54",
+        "android_client_info": {
+          "package_name": "co.uk.learabia.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdi9vNxXlakPmXwrHKoxlay1eXgZtUENY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:953062921789:android:1a6df4847edb1ae7f17c54",
         "android_client_info": {
           "package_name": "co.uk.silverspoon.app"

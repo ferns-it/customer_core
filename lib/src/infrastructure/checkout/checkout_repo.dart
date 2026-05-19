@@ -34,6 +34,7 @@ class CheckoutRepo implements ICheckoutRepo {
         data: {
           "shopID": shopID,
           "postCode": destinationPostCode,
+          "postCodeValidation": postCodeValidation
         },
         needAuth: true,
         authDataKey: "user",

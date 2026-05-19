@@ -1026,7 +1026,8 @@ class CartProvider extends ChangeNotifier with BaseController {
       if (selectedAddress?.postcode == null) return false;
       final destinationPostCode = selectedAddress!.postcode!;
       final response = await checkRepo.calculateDeliveryFee(
-        postCodeValidation: AppConfig.instance.country == Country.bh? false: true ,
+        postCodeValidation:
+            AppConfig.instance.country == Country.bh ? false : true,
         shopID: AppIdentifiers.kShopId,
         destinationPostCode: destinationPostCode,
       );

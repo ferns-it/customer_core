@@ -603,7 +603,7 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
                 verticalSpaceSmall,
                 ...modifier.options.map((option) {
                   return CheckboxListTile(
-                    checkColor: Colors.black,
+                    checkColor: Theme.of(context).colorScheme.onSurface,
                     value: cartProvider.checkMasterOptionsIsSelected(
                         modifier, option),
                     title: Text(

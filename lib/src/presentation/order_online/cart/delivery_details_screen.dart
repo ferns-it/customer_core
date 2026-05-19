@@ -921,47 +921,52 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     textTheme: poppinsTextTheme(context).textTheme.copyWith(
                         bodySmall: const TextStyle(color: Colors.white)),
                     timePickerTheme: TimePickerThemeData(
-                        helpTextStyle: const TextStyle(color: AppColors.kWhite),
+                        helpTextStyle:
+                            TextStyle(color: context.customTextTheme.color),
+                        entryModeIconColor:
+                            Theme.of(context).colorScheme.primary,
                         dialTextColor: WidgetStateColor.resolveWith(
                           (states) {
                             if (states.contains(WidgetState.selected)) {
-                              return AppColors.kBlack;
+                              return Theme.of(context).colorScheme.onSurface;
                             }
-                            return AppColors.kWhite;
+                            return context.customTextTheme.color!;
                           },
                         ),
-                        backgroundColor: themeListener.isDarkMode
-                            ? AppColors.kCardBackground2
-                            : AppColors.kLightWhite2,
-                        dialBackgroundColor: AppColors.kBlack,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.brightness ==
+                                    Brightness.dark
+                                ? AppColors.kCardBackground2
+                                : AppColors.kOffWhite,
+                        dialBackgroundColor: Theme.of(context).cardColor,
                         dayPeriodColor: WidgetStateColor.resolveWith(
                           (states) {
                             if (states.contains(WidgetState.selected)) {
                               return Theme.of(context).colorScheme.primary;
                             }
-                            return AppColors.kBlack;
+                            return Theme.of(context).cardColor;
                           },
                         ),
                         hourMinuteColor: WidgetStateColor.resolveWith((states) {
                           if (states.contains(WidgetState.selected)) {
                             return Theme.of(context).colorScheme.primary;
                           }
-                          return AppColors.kBlack;
+                          return Theme.of(context).cardColor;
                         }),
                         hourMinuteTextColor: WidgetStateColor.resolveWith(
                           (states) {
                             if (states.contains(WidgetState.selected)) {
-                              return AppColors.kBlack;
+                              return Theme.of(context).colorScheme.surface;
                             }
-                            return AppColors.kWhite;
+                            return Theme.of(context).colorScheme.primary;
                           },
                         ),
                         dayPeriodTextColor: WidgetStateColor.resolveWith(
                           (states) {
                             if (states.contains(WidgetState.selected)) {
-                              return AppColors.kBlack;
+                              return Theme.of(context).colorScheme.surface;
                             }
-                            return AppColors.kWhite;
+                            return Theme.of(context).colorScheme.secondary;
                           },
                         )),
                   ),
@@ -1337,7 +1342,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                                                   Theme.of(context).colorScheme.primary,
                                                                                 ),
                                                                                 foregroundColor: WidgetStatePropertyAll(
-                                                                                  AppColors.kBlack,
+                                                                                  Theme.of(context).colorScheme.onSurface,
                                                                                 ),
                                                                               ),
                                                                               onPressed: isLoading
@@ -1358,7 +1363,6 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                                                     },
                                                                               child: const Text(
                                                                                 'Delete',
-                                                                                style: TextStyle(color: AppColors.kBlack),
                                                                               ),
                                                                             ),
                                                                           ],
@@ -1478,7 +1482,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                           },
                                     child: cartListener
                                             .deliveryOrTakeAwayChargeCalculating
-                                        ? showButtonProgress(Colors.black)
+                                        ? showButtonProgress(AppColors.kWhite)
                                         : Text('Apply',
                                             style: context
                                                 .customTextTheme.text14W600

@@ -9,6 +9,7 @@ import 'models/payment_intent_details.dart';
 abstract class ICheckoutRepo {
   Future<Either<AppExceptions, CalculatedDeliveryChargeDetailsModel>>
       calculateDeliveryFee({
+    required bool postCodeValidation,
     required String shopID,
     required String destinationPostCode,
   });
@@ -27,7 +28,6 @@ abstract class ICheckoutRepo {
     required String deliveryType,
     required String postCode,
     required String pickupTime,
-
   });
 
   Future<Option> cancelPaymentIntent(String paymentID);

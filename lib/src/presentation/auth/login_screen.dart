@@ -285,9 +285,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ? Text(
                                   "Log In",
                                   style: context.customTextTheme.text16W400
-                                      .copyWith(color: AppColors.kBlack),
+                                      .copyWith(color: Colors.white),
                                 )
-                              : showButtonProgress(Colors.black),
+                              : showButtonProgress(Colors.white),
                         ),
                       ),
                     ),

@@ -24,6 +24,7 @@ class CheckoutRepo implements ICheckoutRepo {
   @override
   Future<Either<AppExceptions, CalculatedDeliveryChargeDetailsModel>>
       calculateDeliveryFee({
+    required bool postCodeValidation,
     required String shopID,
     required String destinationPostCode,
   }) async {
@@ -31,7 +32,7 @@ class CheckoutRepo implements ICheckoutRepo {
       final response = await APIManager.post(
         api: Endpoints.kGuestDeliveryCalculator,
         data: {
-          "shopID": shopID, 
+          "shopID": shopID,
           "postCode": destinationPostCode,
         },
         needAuth: true,
@@ -156,7 +157,6 @@ class CheckoutRepo implements ICheckoutRepo {
         "deliveryType": deliveryType,
         "postCode": postCode,
         "pickupTime": pickupTime,
-
       };
 
       final response = await APIManager.post(

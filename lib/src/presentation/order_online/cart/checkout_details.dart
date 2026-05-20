@@ -475,7 +475,7 @@ class CheckoutDetailsScreen extends StatelessWidget {
                   style: context.customTextTheme.text16W600
                       .copyWith(color: context.customTextTheme.color)),
               if (isTaxApplied == true) ...[
-                horizontalSpaceTiny,
+                verticalSpaceTiny,
                 _SummaryRow(
                     label: "Tax",
                     value:
@@ -549,6 +549,7 @@ class _SummaryRow extends StatelessWidget {
           label,
           style: style ?? context.customTextTheme.text14W500,
         ),
+        horizontalSpaceTiny,
         Visibility(
           visible: infoWidget != null,
           child: infoWidget ?? SizedBox.shrink(),

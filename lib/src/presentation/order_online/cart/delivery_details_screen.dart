@@ -590,8 +590,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     _SummaryRow(
                       label: "Sub Total",
                       value:
-                          "${AppConfig.instance.country.symbol} ${cartListener.cartGrossAmount}" ??
-                              "${AppConfig.instance.country.symbol}0.00",
+                          "${AppConfig.instance.country.symbol} ${cartListener.cartGrossAmount}",
                       style: context.customTextTheme.text16W600
                           .copyWith(color: context.customTextTheme.color),
                     ),
@@ -620,7 +619,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                         style: context.customTextTheme.text16W600
                             .copyWith(color: context.customTextTheme.color)),
                     if (isTaxApplied == true) ...[
-                      horizontalSpaceTiny,
+                      verticalSpaceTiny,
                       _SummaryRow(
                           label: "Tax",
                           value: taxAmount ??

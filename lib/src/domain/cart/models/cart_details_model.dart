@@ -83,9 +83,8 @@ class CartDetailsModel {
           ? CartItemPaymentDetails.fromMap(
               map['paymentOptions'] as Map<String, dynamic>)
           : null,
-      shopCurrency: map['shopCurrency'] != null
-          ? map['shopCurrency'] as String
-          : null,
+      shopCurrency:
+          map['shopCurrency'] != null ? map['shopCurrency'] as String : null,
       shopCurrencyIcon: map['shopCurrencyIcon'] != null
           ? map['shopCurrencyIcon'] as String
           : null,
@@ -137,7 +136,8 @@ class CartDetailsModel {
         total += discount.toDouble();
       }
     }
-    final double totalDiscount = total /  AppConfig.instance.country.currencyDivisor;
+    final double totalDiscount =
+        total / AppConfig.instance.country.currencyDivisor;
     return totalDiscount;
   }
 }
@@ -223,7 +223,6 @@ class CartItemDataModel {
       cOption: cOption ?? this.cOption,
       productPhoto: productPhoto ?? this.productPhoto,
       amountDetails: amountDetails ?? this.amountDetails,
-
       type: type ?? this.type,
       identifierName: identifierName ?? this.identifierName,
       description: description ?? this.description,
@@ -314,15 +313,17 @@ class CartItemDataModel {
   double get getModifiersTotal {
     final total = addon_apllied.isNotEmpty
         ? addon_apllied
-            .expand((e) => e.choosedOption.map((e) =>
-                double.parse((e.priceSingle ?? "0.00").replaceAll(AppConfig.instance.country.symbol, ""))))
+            .expand((e) => e.choosedOption.map((e) => double.parse(
+                (e.priceSingle ?? "0.00")
+                    .replaceAll(AppConfig.instance.country.symbol, ""))))
             .reduce((a, b) => a + b)
         : 0.0;
 
     final totalMasterAddons = master_addon_apllied.isNotEmpty
         ? master_addon_apllied
-            .expand((e) => e.choosedOption.map((e) =>
-                double.parse((e.priceSingle ?? "0.00").replaceAll(AppConfig.instance.country.symbol, ""))))
+            .expand((e) => e.choosedOption.map((e) => double.parse(
+                (e.priceSingle ?? "0.00")
+                    .replaceAll(AppConfig.instance.country.symbol, ""))))
             .reduce((a, b) => a + b)
         : 0.0;
 
@@ -476,8 +477,7 @@ class ChoosedModifierOption {
     return ChoosedModifierOption(
       text: map['text'] != null ? map['text'] as String : null,
       price: map['price'] != null ? map['price'] as String : null,
-      priceSingle:
-          map['itemPrice'] != null ? map['itemPrice'] as String : null,
+      priceSingle: map['itemPrice'] != null ? map['itemPrice'] as String : null,
     );
   }
 
@@ -515,7 +515,6 @@ class CartItemTotalSummary {
     this.cartTotalPriceDisplay,
     this.cartDiscountTotal,
     this.cartDiscountTotalDisplay,
-   
   });
 
   CartItemTotalSummary copyWith({
@@ -550,10 +549,10 @@ class CartItemTotalSummary {
       cartTotalPriceDisplay: map['cartTotalPriceDisplay'] != null
           ? map['cartTotalPriceDisplay'] as String
           : null,
-      cartDiscountTotal:
-          map['cartDiscountTotal'] != null ? map['cartDiscountTotal'] as int : null,
-      cartDiscountTotalDisplay:
-          map['cartDiscountTotalDisplay'] != null
+      cartDiscountTotal: map['cartDiscountTotal'] != null
+          ? map['cartDiscountTotal'] as int
+          : null,
+      cartDiscountTotalDisplay: map['cartDiscountTotalDisplay'] != null
           ? map['cartDiscountTotalDisplay'] as String
           : null,
     );
@@ -573,11 +572,17 @@ class CartItemTotalSummary {
     if (identical(this, other)) return true;
 
     return other.cartTotalPrice == cartTotalPrice &&
-        other.cartTotalPriceDisplay == cartTotalPriceDisplay&&other.cartDiscountTotal==cartDiscountTotal&&other.cartDiscountTotalDisplay==cartDiscountTotalDisplay;
+        other.cartTotalPriceDisplay == cartTotalPriceDisplay &&
+        other.cartDiscountTotal == cartDiscountTotal &&
+        other.cartDiscountTotalDisplay == cartDiscountTotalDisplay;
   }
 
   @override
-  int get hashCode => cartTotalPrice.hashCode ^ cartTotalPriceDisplay.hashCode^cartDiscountTotal.hashCode^cartDiscountTotalDisplay.hashCode;
+  int get hashCode =>
+      cartTotalPrice.hashCode ^
+      cartTotalPriceDisplay.hashCode ^
+      cartDiscountTotal.hashCode ^
+      cartDiscountTotalDisplay.hashCode;
 }
 
 class CartItemPaymentDetails {
@@ -586,7 +591,6 @@ class CartItemPaymentDetails {
   final String? shopStatus;
   final String? QrUPI;
   final String? QrUPI_Image;
-
 
   CartItemPaymentDetails({
     this.cod,
@@ -629,7 +633,8 @@ class CartItemPaymentDetails {
       shopStatus:
           map['shopStatus'] != null ? map['shopStatus'] as String : null,
       QrUPI: map['QrUPI'] != null ? map['QrUPI'] as String : null,
-      QrUPI_Image: map['QrUPI_Image'] != null ? map['QrUPI_Image'] as String : null,
+      QrUPI_Image:
+          map['QrUPI_Image'] != null ? map['QrUPI_Image'] as String : null,
     );
   }
 
@@ -655,7 +660,15 @@ class CartItemPaymentDetails {
   }
 
   @override
-  int get hashCode => cod.hashCode ^ stripe.hashCode ^ shopStatus.hashCode ^ QrUPI.hashCode ^ QrUPI_Image.hashCode;
+  int get hashCode =>
+      cod.hashCode ^
+      stripe.hashCode ^
+      shopStatus.hashCode ^
+      QrUPI.hashCode ^
+      QrUPI_Image.hashCode;
+
+  bool get isStripeEnabled => stripe == 'Enabled';
+  bool get isCODEnabled => cod == 'Enabled';
 }
 
 class CartAmountDetailsDataModel {
@@ -975,6 +988,7 @@ class CartAmountItemDetailsDisplayDataModel {
   final String? totalAmountNormal;
   final String? discount;
   final String? totalDiscount;
+  final String? totalAmountWithAddon;
 
   CartAmountItemDetailsDisplayDataModel({
     this.amount,
@@ -983,6 +997,7 @@ class CartAmountItemDetailsDisplayDataModel {
     this.totalAmountNormal,
     this.discount,
     this.totalDiscount,
+    this.totalAmountWithAddon,
   });
 
   CartAmountItemDetailsDisplayDataModel copyWith({
@@ -992,15 +1007,17 @@ class CartAmountItemDetailsDisplayDataModel {
     String? totalAmountNormal,
     String? discount,
     String? totalDiscount,
+    String? totalAmountWithAddon,
   }) {
     return CartAmountItemDetailsDisplayDataModel(
-      amount: amount ?? this.amount,
-      totalAmount: totalAmount ?? this.totalAmount,
-      amountNormal: amountNormal ?? this.amountNormal,
-      totalAmountNormal: totalAmountNormal ?? this.totalAmountNormal,
-      discount: discount ?? this.discount,
-      totalDiscount: totalDiscount ?? this.totalDiscount,
-    );
+        amount: amount ?? this.amount,
+        totalAmount: totalAmount ?? this.totalAmount,
+        amountNormal: amountNormal ?? this.amountNormal,
+        totalAmountNormal: totalAmountNormal ?? this.totalAmountNormal,
+        discount: discount ?? this.discount,
+        totalDiscount: totalDiscount ?? this.totalDiscount,
+        totalAmountWithAddon:
+            totalAmountWithAddon ?? this.totalAmountWithAddon);
   }
 
   Map<String, dynamic> toMap() {
@@ -1011,6 +1028,7 @@ class CartAmountItemDetailsDisplayDataModel {
       'totalAmount_normal': totalAmountNormal,
       'discount': discount,
       'totalDiscount': totalDiscount,
+      'totalAmountWithAddon': totalAmountWithAddon,
     };
   }
 
@@ -1028,6 +1046,9 @@ class CartAmountItemDetailsDisplayDataModel {
       discount: map['discount'] != null ? map['discount'] as String : null,
       totalDiscount:
           map['totalDiscount'] != null ? map['totalDiscount'] as String : null,
+      totalAmountWithAddon: map['discoutotalAmountWithAddonnt'] != null
+          ? map['totalAmountWithAddon'] as String
+          : null,
     );
   }
 
@@ -1039,7 +1060,7 @@ class CartAmountItemDetailsDisplayDataModel {
 
   @override
   String toString() =>
-      'CartAmountItemDetailsDisplayDataModel(amount: $amount, totalAmount: $totalAmount, amountNormal: $amountNormal, totalAmountNormal: $totalAmountNormal, discount: $discount, totalDiscount: $totalDiscount)';
+      'CartAmountItemDetailsDisplayDataModel(amount: $amount, totalAmount: $totalAmount, amountNormal: $amountNormal, totalAmountNormal: $totalAmountNormal, discount: $discount, totalDiscount: $totalDiscount,totalAmountWithAddon : $totalAmountWithAddon)';
 
   @override
   bool operator ==(covariant CartAmountItemDetailsDisplayDataModel other) {
@@ -1050,6 +1071,7 @@ class CartAmountItemDetailsDisplayDataModel {
         other.amountNormal == amountNormal &&
         other.totalAmountNormal == totalAmountNormal &&
         other.discount == discount &&
+        other.totalAmountWithAddon == totalAmountWithAddon &&
         other.totalDiscount == totalDiscount;
   }
 
@@ -1060,12 +1082,13 @@ class CartAmountItemDetailsDisplayDataModel {
       amountNormal.hashCode ^
       totalAmountNormal.hashCode ^
       discount.hashCode ^
+      totalAmountWithAddon.hashCode ^
       totalDiscount.hashCode;
 }
 
 class CartAmountTaxConfigDataModel {
   final String? appliedSlab;
-  final String? appliedSlabLabel; 
+  final String? appliedSlabLabel;
   CartAmountTaxConfigDataModel({
     this.appliedSlab,
     this.appliedSlabLabel,
@@ -1090,25 +1113,30 @@ class CartAmountTaxConfigDataModel {
 
   factory CartAmountTaxConfigDataModel.fromMap(Map<String, dynamic> map) {
     return CartAmountTaxConfigDataModel(
-      appliedSlab: map['appliedSlab'] != null ? map['appliedSlab'] as String : null,
-      appliedSlabLabel: map['appliedSlabLabel'] != null ? map['appliedSlabLabel'] as String : null,
+      appliedSlab:
+          map['appliedSlab'] != null ? map['appliedSlab'] as String : null,
+      appliedSlabLabel: map['appliedSlabLabel'] != null
+          ? map['appliedSlabLabel'] as String
+          : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory CartAmountTaxConfigDataModel.fromJson(String source) => CartAmountTaxConfigDataModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CartAmountTaxConfigDataModel.fromJson(String source) =>
+      CartAmountTaxConfigDataModel.fromMap(
+          json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'CartAmountTaxConfigDataModel(appliedSlab: $appliedSlab, appliedSlabLabel: $appliedSlabLabel)';
+  String toString() =>
+      'CartAmountTaxConfigDataModel(appliedSlab: $appliedSlab, appliedSlabLabel: $appliedSlabLabel)';
 
   @override
   bool operator ==(covariant CartAmountTaxConfigDataModel other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.appliedSlab == appliedSlab &&
-      other.appliedSlabLabel == appliedSlabLabel;
+
+    return other.appliedSlab == appliedSlab &&
+        other.appliedSlabLabel == appliedSlabLabel;
   }
 
   @override

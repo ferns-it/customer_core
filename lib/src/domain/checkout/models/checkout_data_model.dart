@@ -24,33 +24,34 @@ class CheckOutDataModel {
   final String? isSingleVendor;
   final String? projectID;
   final String? postCode;
+  final String? postCodeValidation;
 
   final CheckOutCustomerDataModel? customer;
-  CheckOutDataModel({
-    this.shopID,
-    this.discount,
-    this.amount,
-    this.deliveryType,
-    this.deliveryCharge,
-    this.couponCode,
-    this.couponType,
-    this.couponValue,
-    this.couponAmount,
-    this.paymentStatus,
-    this.paymentGatway,
-    this.transactionID,
-    this.approxDeliveryTime,
-    this.deliveryNotes,
-    this.deliveryLocation,
-    this.deliveryDate,
-    this.deliverySlot,
-    this.takeawayTime,
-    this.source,
-    this.customer,
-    this.isSingleVendor,
-    this.projectID,
-    this.postCode,
-  });
+  CheckOutDataModel(
+      {this.shopID,
+      this.discount,
+      this.amount,
+      this.deliveryType,
+      this.deliveryCharge,
+      this.couponCode,
+      this.couponType,
+      this.couponValue,
+      this.couponAmount,
+      this.paymentStatus,
+      this.paymentGatway,
+      this.transactionID,
+      this.approxDeliveryTime,
+      this.deliveryNotes,
+      this.deliveryLocation,
+      this.deliveryDate,
+      this.deliverySlot,
+      this.takeawayTime,
+      this.source,
+      this.customer,
+      this.isSingleVendor,
+      this.projectID,
+      this.postCode,
+      this.postCodeValidation});
 
   CheckOutDataModel copyWith(
       {String? shopID,
@@ -73,6 +74,7 @@ class CheckOutDataModel {
       String? takeawayTime,
       String? source,
       String? postCode,
+      String? postCodeValidation,
       CheckOutCustomerDataModel? customer,
       String? isSingleVendor,
       String? projectID}) {
@@ -97,6 +99,7 @@ class CheckOutDataModel {
         takeawayTime: takeawayTime ?? this.takeawayTime,
         source: source ?? this.source,
         postCode: postCode ?? this.postCode,
+        postCodeValidation: postCodeValidation ?? this.postCodeValidation,
         customer: customer ?? this.customer,
         isSingleVendor: isSingleVendor ?? this.isSingleVendor,
         projectID: projectID ?? this.projectID);
@@ -124,6 +127,7 @@ class CheckOutDataModel {
       'takeawayTime': takeawayTime,
       'source': source,
       'postCode': postCode,
+      'postCodeValidation': postCodeValidation,
       'customer': customer?.toMap(),
       'isSingleVendor': isSingleVendor,
       'projectID': projectID
@@ -174,6 +178,9 @@ class CheckOutDataModel {
             map['takeawayTime'] != null ? map['takeawayTime'] as String : null,
         source: map['source'] != null ? map['source'] as String : null,
         postCode: map['postCode'] != null ? map['postCode'] as String : null,
+        postCodeValidation: map['postCodeValidation'] != null
+            ? map['postCodeValidation'] as String
+            : null,
         customer: map['customer'] != null
             ? CheckOutCustomerDataModel.fromMap(
                 map['customer'] as Map<String, dynamic>)
@@ -192,7 +199,7 @@ class CheckOutDataModel {
 
   @override
   String toString() {
-    return 'CheckOutDataModel(shopID: $shopID, discount: $discount, amount: $amount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, paymentStatus: $paymentStatus, paymentGatway: $paymentGatway, transactionID: $transactionID, approxDeliveryTime: $approxDeliveryTime, deliveryNotes: $deliveryNotes, deliveryLocation: $deliveryLocation,deliveryDate : $deliveryDate,deliverySlot: $deliverySlot  takeawayTime: $takeawayTime, source: $source,postCode:$postCode, customer: $customer, isSingleVendor: $isSingleVendor, projectID: $projectID)';
+    return 'CheckOutDataModel(shopID: $shopID, discount: $discount, amount: $amount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, paymentStatus: $paymentStatus, paymentGatway: $paymentGatway, transactionID: $transactionID, approxDeliveryTime: $approxDeliveryTime, deliveryNotes: $deliveryNotes, deliveryLocation: $deliveryLocation,deliveryDate : $deliveryDate,deliverySlot: $deliverySlot  takeawayTime: $takeawayTime, source: $source,postCode:$postCode,postCodeValidation:$postCodeValidation, customer: $customer, isSingleVendor: $isSingleVendor, projectID: $projectID)';
   }
 
   @override
@@ -219,6 +226,7 @@ class CheckOutDataModel {
         other.takeawayTime == takeawayTime &&
         other.source == source &&
         other.postCode == postCode &&
+        other.postCodeValidation == postCodeValidation &&
         other.customer == customer &&
         other.isSingleVendor == isSingleVendor &&
         other.projectID == projectID;
@@ -246,10 +254,13 @@ class CheckOutDataModel {
         takeawayTime.hashCode ^
         source.hashCode ^
         postCode.hashCode ^
+        postCodeValidation.hashCode ^
         customer.hashCode ^
         isSingleVendor.hashCode ^
         projectID.hashCode;
   }
+
+  bool get isPostCodeValidationbool => postCodeValidation == 'true';
 }
 
 class CheckOutCustomerDataModel {

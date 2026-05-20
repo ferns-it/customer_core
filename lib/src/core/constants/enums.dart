@@ -17,7 +17,7 @@ enum Country {
     decimalPlaces: 3,
     currencyDivisor: 1000,
     currencyCode: 'BHD',
-    symbol: 'BH',
+    symbol: 'BHD',
     countryName: 'Bahrain',
   );
 
@@ -36,4 +36,4 @@ enum Country {
   });
 }
 
-enum AppThemeMode {light, dark, system}
+enum AppThemeMode { light, dark, system }

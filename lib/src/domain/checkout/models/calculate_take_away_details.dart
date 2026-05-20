@@ -186,6 +186,8 @@ class CalculateTakeAwayDetails {
       taxDetailsGroup.hashCode ^
       cartData.hashCode;
   }
+
+  bool get isTaxAppliedBool => isTaxApplied == 'Yes';
 }
 
 class GeneralData {

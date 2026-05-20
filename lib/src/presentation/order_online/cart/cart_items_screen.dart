@@ -130,7 +130,7 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                                 .amountDetails
                                                                 ?.itemDetails
                                                                 ?.display
-                                                                ?.amount ??
+                                                                ?.totalAmountWithAddon ??
                                                             'N/A',
                                                         style: context
                                                             .customTextTheme
@@ -206,7 +206,7 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                         product
                                                                 .amountDetails
                                                                 ?.display
-                                                                ?.totalAmountWithAddon ??
+                                                                ?.totalAmountWithAddonNormal ??
                                                             'N/A',
                                                         style: context
                                                             .customTextTheme

@@ -52,6 +52,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final taxGroup = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.taxDetailsGroup
         : cartListener.takeAwayDetails?.taxDetailsGroup;
+    final isTaxApplied = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.isTaxAppliedBool
+        : cartListener.takeAwayDetails?.isTaxAppliedBool;
+    final taxAmount = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.amountFormatted?.taxTotalAmount
+        : cartListener.takeAwayDetails?.amountFormatted?.taxTotalAmount;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -466,6 +472,11 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                               activeColor:
                                   Theme.of(context).colorScheme.primary,
                               onChanged: (_) {
+                                if (!cartListener.isCODEnabled) {
+                                  AlertDialogs.showInfo(
+                                      'Cash payment not available');
+                                  return;
+                                }
                                 cartListener
                                     .onChangePaymentMethod(PaymentMethod.cash);
                               },
@@ -516,6 +527,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   Theme.of(context).colorScheme.primary,
 
                               onChanged: (_) {
+                                if (!cartListener.isStripeEnabled) {
+                                  AlertDialogs.showInfo(
+                                      'Card payment not available');
+                                  return;
+                                }
+
                                 cartListener
                                     .onChangePaymentMethod(PaymentMethod.card);
                               },
@@ -572,8 +589,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     verticalSpaceSmall,
                     _SummaryRow(
                       label: "Sub Total",
-                      value: cartListener.cartTotalPriceDisplay ??
-                          "${AppConfig.instance.country.symbol}0.00",
+                      value:
+                          "${AppConfig.instance.country.symbol} ${cartListener.cartGrossAmount}" ??
+                              "${AppConfig.instance.country.symbol}0.00",
                       style: context.customTextTheme.text16W600
                           .copyWith(color: context.customTextTheme.color),
                     ),
@@ -601,27 +619,51 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                             "- ${AppConfig.instance.country.symbol} ${cartListener.calculatedDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
                         style: context.customTextTheme.text16W600
                             .copyWith(color: context.customTextTheme.color)),
-                    verticalSpaceTiny,
-                    Column(
-                      children: taxGroup
-                              ?.map(
-                                (taxGroup) => Column(
-                                  children: [
-                                    _SummaryRow(
-                                        label: "${taxGroup.taxSlab}",
-                                        value: "${taxGroup.totalTax}",
-                                        style: context
-                                            .customTextTheme.text16W600
-                                            .copyWith(
-                                                color: context
-                                                    .customTextTheme.color)),
-                                    verticalSpaceTiny,
+                    if (isTaxApplied == true) ...[
+                      horizontalSpaceTiny,
+                      _SummaryRow(
+                          label: "Tax",
+                          value: taxAmount ??
+                              '${AppConfig.instance.country.symbol}0.00',
+                          style: context.customTextTheme.text16W600
+                              .copyWith(color: context.customTextTheme.color),
+                          infoWidget: Tooltip(
+                            triggerMode: TooltipTriggerMode.tap,
+                            richMessage: TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'Tax Breakdown\n\n',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                ...?taxGroup?.expand(
+                                  (tax) => [
+                                    TextSpan(
+                                      text: '${tax.taxSlab} : ',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: '${tax.totalTax}\n',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ],
                                 ),
-                              )
-                              .toList() ??
-                          [],
-                    ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.info_outline,
+                              size: 18,
+                            ),
+                          )),
+                    ],
 
                     verticalSpaceTiny,
                     // _SummaryRow(
@@ -1594,22 +1636,30 @@ class _SummaryRow extends StatelessWidget {
   final String label;
   final String value;
   final TextStyle? style;
+  final Widget? infoWidget;
 
   const _SummaryRow({
     required this.label,
     required this.value,
+    this.infoWidget,
     this.style,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: style ?? context.customTextTheme.text14W500,
         ),
+        horizontalSpaceTiny,
+        Visibility(
+          visible: infoWidget != null,
+          child: infoWidget ?? SizedBox.shrink(),
+        ),
+        Spacer(),
         Text(
           value,
           style: style ?? context.customTextTheme.text14W500,

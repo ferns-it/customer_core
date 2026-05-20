@@ -83,6 +83,10 @@ class CartProvider extends ChangeNotifier with BaseController {
               AppConfig.instance.country.currencyDivisor
           : null;
 
+  String? get cartGrossAmount => selectedOrderType == OrderType.delivery
+      ? deliveryDetails?.cartGrossAmount
+      : takeAwayDetails?.cartGrossAmount;
+
   int get totalCartItems => cartItems.length;
 
   bool get isCartEmpty => cartItems.isEmpty;
@@ -207,6 +211,14 @@ class CartProvider extends ChangeNotifier with BaseController {
                   100
               : double.parse(
                   _validatedCouponDetails!.coupenData!.coupenAmount!);
+
+  bool get isStripeEnabled => selectedOrderType == OrderType.delivery
+      ? deliveryDetails?.cartData?.paymentOptions?.isStripeEnabled ?? false
+      : takeAwayDetails?.cartData?.paymentOptions?.isStripeEnabled ?? false;
+
+  bool get isCODEnabled => selectedOrderType == OrderType.delivery
+      ? deliveryDetails?.cartData?.paymentOptions?.isCODEnabled ?? false
+      : takeAwayDetails?.cartData?.paymentOptions?.isCODEnabled ?? false;
 
   double get discountAfterCouponApplied =>
       cartTotalPrice == null ? 0.00 : cartTotalPrice! - offerDiscount;
@@ -1129,46 +1141,47 @@ class CartProvider extends ChangeNotifier with BaseController {
       );
 
       final data = CheckOutDataModel(
-          shopID: AppIdentifiers.kShopId,
-          discount: totalCalculatedDiscount
-              .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
-          amount: (totalAmount * AppConfig.instance.country.currencyDivisor)
-              .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
-          couponAmount: validatedCouponDetails?.coupenData == null
-              ? ''
-              : offerDiscount
-                  .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
-          couponCode: validatedCouponDetails?.coupenCode ?? '',
-          couponType: validatedCouponDetails?.coupenData?.coupenType ?? '',
-          couponValue: validatedCouponDetails?.coupenData?.coupenAmount ?? '',
-          source: 'Flutter',
-          deliveryType: selectedOrderType == OrderType.delivery
-              ? 'door_delivery'
-              : 'store_pickup',
-          approxDeliveryTime: minWaitingTime ?? '',
-          deliveryCharge: selectedOrderType == OrderType.delivery
-              ? (calculatedDeliveryFee *
-                      AppConfig.instance.country.currencyDivisor)
-                  .toStringAsFixed(AppConfig.instance.country.decimalPlaces)
-              : '',
-          takeawayTime: selectedOrderType == OrderType.takeaway
-              ? DateTimeUtils.convertDateTime12HrTo24Hr(selectedPickUpTime!)
-              : '',
-          paymentGatway:
-              selectedPaymentMethod == PaymentMethod.cash ? 'COD' : 'STRIPE',
-          transactionID: selectedPaymentMethod == PaymentMethod.cash ? '' : tID,
-          paymentStatus:
-              selectedPaymentMethod == PaymentMethod.cash ? '0' : '1',
-          deliveryNotes: notesFieldKey.currentState?.value ?? '',
-          deliveryLocation: selectedAddress?.addressTitle,
-          deliveryDate: deliveryDate,
-          deliverySlot: deliverySlot,
-          customer: customerAddress,
-          projectID: AppIdentifiers.kProjectID,
-          isSingleVendor: 'Yes',
-          postCode: selectedOrderType == OrderType.delivery
-              ? selectedAddress?.postcode
-              : '');
+        shopID: AppIdentifiers.kShopId,
+        discount: totalCalculatedDiscount
+            .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
+        amount: (totalAmount * AppConfig.instance.country.currencyDivisor)
+            .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
+        couponAmount: validatedCouponDetails?.coupenData == null
+            ? ''
+            : offerDiscount
+                .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
+        couponCode: validatedCouponDetails?.coupenCode ?? '',
+        couponType: validatedCouponDetails?.coupenData?.coupenType ?? '',
+        couponValue: validatedCouponDetails?.coupenData?.coupenAmount ?? '',
+        source: 'Flutter',
+        deliveryType: selectedOrderType == OrderType.delivery
+            ? 'door_delivery'
+            : 'store_pickup',
+        approxDeliveryTime: minWaitingTime ?? '',
+        deliveryCharge: selectedOrderType == OrderType.delivery
+            ? (calculatedDeliveryFee *
+                    AppConfig.instance.country.currencyDivisor)
+                .toStringAsFixed(AppConfig.instance.country.decimalPlaces)
+            : '',
+        takeawayTime: selectedOrderType == OrderType.takeaway
+            ? DateTimeUtils.convertDateTime12HrTo24Hr(selectedPickUpTime!)
+            : '',
+        paymentGatway:
+            selectedPaymentMethod == PaymentMethod.cash ? 'COD' : 'STRIPE',
+        transactionID: selectedPaymentMethod == PaymentMethod.cash ? '' : tID,
+        paymentStatus: selectedPaymentMethod == PaymentMethod.cash ? '0' : '1',
+        deliveryNotes: notesFieldKey.currentState?.value ?? '',
+        deliveryLocation: selectedAddress?.addressTitle,
+        deliveryDate: deliveryDate,
+        deliverySlot: deliverySlot,
+        customer: customerAddress,
+        projectID: AppIdentifiers.kProjectID,
+        isSingleVendor: 'Yes',
+        postCode: selectedOrderType == OrderType.delivery
+            ? selectedAddress?.postcode
+            : '',
+        postCodeValidation: 'false',
+      );
 
       log(data.toJson());
       // pi_3SdTp2HeVTRCojcj0CF7yKFk

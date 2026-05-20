@@ -57,8 +57,7 @@ class ProductDetailsTile extends StatelessWidget {
   }
 
   Widget buildTileView2(BuildContext context, bool isPlaceHolderUrl) {
-    final p = product.pID == '448' ? product.isFavourite : null;
-    log(p.toString(), name: product.name ?? '');
+    inspect(product);
     return Card(
       // color: Colors.black12,
       shape: RoundedRectangleBorder(

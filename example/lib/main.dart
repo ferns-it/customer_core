@@ -19,11 +19,11 @@ void main() async {
       uiConfig: uiConfig,
       keyConfig: keyConfig,
       lightThemeOverride: const CustomerLightThemeOverride(
-          primary: Colors.red,
+          primary:Color(0xFF7A0017),
           onSurface: Colors.white,
           disabledColor: Colors.grey),
       darkThemeOverride: const CustomerDarkThemeOverride(
-          primary: Colors.red,
+          primary:Color(0xFF7A0017),
           onSurface: Colors.white,
           disabledColor: Colors.grey),
     ),

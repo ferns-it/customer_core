@@ -128,9 +128,15 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                       Text(
                                                         product
                                                                 .amountDetails
+                                                                ?.display
+                                                                ?.totalAmountWithAddon ??
+                                                            product
+                                                                .amountDetails
                                                                 ?.itemDetails
                                                                 ?.display
-                                                                ?.amount ??
+                                                                ?.totalAmount ??
+                                                            product
+                                                                .product_total_price ??
                                                             'N/A',
                                                         style: context
                                                             .customTextTheme
@@ -206,7 +212,14 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                         product
                                                                 .amountDetails
                                                                 ?.display
-                                                                ?.totalAmountWithAddonNormal ??
+                                                                ?.totalAmountWithAddon ??
+                                                            product
+                                                                .amountDetails
+                                                                ?.itemDetails
+                                                                ?.display
+                                                                ?.totalAmount ??
+                                                            product
+                                                                .product_total_price ??
                                                             'N/A',
                                                         style: context
                                                             .customTextTheme

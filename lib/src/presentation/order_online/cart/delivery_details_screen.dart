@@ -58,6 +58,11 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final taxAmount = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.amountFormatted?.taxTotalAmount
         : cartListener.takeAwayDetails?.amountFormatted?.taxTotalAmount;
+    final cartDiscount = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.totalCartDiscount
+        : cartListener.selectedOrderType == OrderType.takeaway
+            ? 0.00
+            : 0.0;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -590,7 +595,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     _SummaryRow(
                       label: "Sub Total",
                       value:
-                          "${AppConfig.instance.country.symbol} ${cartListener.cartGrossAmount}",
+                          "${AppConfig.instance.country.symbol} ${cartListener.cartGrossAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
                       style: context.customTextTheme.text16W600
                           .copyWith(color: context.customTextTheme.color),
                     ),
@@ -606,18 +611,48 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                         : const SizedBox.shrink(),
                     verticalSpaceTiny,
                     _SummaryRow(
-                        label: "Offer Discount",
-                        value:
-                            "- ${AppConfig.instance.country.symbol} ${cartListener.cartDetailsModel?.getOfferDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
-                        style: context.customTextTheme.text16W600
-                            .copyWith(color: context.customTextTheme.color)),
-                    verticalSpaceTiny,
-                    _SummaryRow(
                         label: "Discount",
                         value:
-                            "- ${AppConfig.instance.country.symbol} ${cartListener.calculatedDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                            '- ${AppConfig.instance.country.symbol} ${cartListener.totalCartDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
                         style: context.customTextTheme.text16W600
-                            .copyWith(color: context.customTextTheme.color)),
+                            .copyWith(color: context.customTextTheme.color),
+                        infoWidget: Tooltip(
+                          showDuration: Duration(seconds: 8),
+                          triggerMode: TooltipTriggerMode.tap,
+                          richMessage: TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: 'Discount Breakdown\n\n',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    'Cart Discount :  ${cartListener.cartTotalPriceDisplay}\n',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    'Delivery Discount : ${AppConfig.instance.country.symbol} ${cartDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.info_outline,
+                            size: 18,
+                          ),
+                        )),
+
                     if (isTaxApplied == true) ...[
                       verticalSpaceTiny,
                       _SummaryRow(
@@ -627,6 +662,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           style: context.customTextTheme.text16W600
                               .copyWith(color: context.customTextTheme.color),
                           infoWidget: Tooltip(
+                            showDuration: Duration(seconds: 8),
                             triggerMode: TooltipTriggerMode.tap,
                             richMessage: TextSpan(
                               children: [

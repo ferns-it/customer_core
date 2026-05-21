@@ -83,10 +83,13 @@ class CartProvider extends ChangeNotifier with BaseController {
               AppConfig.instance.country.currencyDivisor
           : null;
 
-  String? get cartGrossAmount => selectedOrderType == OrderType.delivery
-      ? deliveryDetails?.cartGrossAmount
-      : takeAwayDetails?.cartGrossAmount;
-
+  double get cartGrossAmount =>
+      double.tryParse(
+        selectedOrderType == OrderType.delivery
+            ? deliveryDetails?.cartGrossAmount ?? '0.0'
+            : takeAwayDetails?.cartGrossAmount ?? '0.0',
+      ) ??
+      0.0;
   int get totalCartItems => cartItems.length;
 
   bool get isCartEmpty => cartItems.isEmpty;
@@ -228,6 +231,13 @@ class CartProvider extends ChangeNotifier with BaseController {
       : (double.tryParse(_takeAwayDetails?.takeAwayDiscount ?? '0.00') ?? 0.00);
 
   double get totalCalculatedDiscount => calculatedDiscount + offerDiscount;
+  double get cartDiscount => selectedOrderType == OrderType.delivery
+      ? (double.tryParse(_deliveryDetails?.cartDiscountAmount ?? '0.00') ??
+          0.00)
+      : (double.tryParse(_takeAwayDetails?.cartDiscountAmount ?? '0.00') ??
+          0.00);
+
+  double get totalCartDiscount => totalCalculatedDiscount + cartDiscount;
 
   double get calculatedTax => selectedOrderType == OrderType.delivery
       ? (double.tryParse(_deliveryDetails?.taxTotalAmount ?? '0.00') ?? 0.00)
@@ -804,6 +814,10 @@ class CartProvider extends ChangeNotifier with BaseController {
         return sum + (item.total ?? 0);
       },
     );
+    final totalDiscountInPaisa = newCartItems.fold<int>(
+      0,
+      (sum, item) => sum + (item.amountDetails?.totalDiscount ?? 0),
+    );
 
     _cartDetailsModel = _cartDetailsModel!.copyWith(
       cartItems: newCartItems,
@@ -811,6 +825,9 @@ class CartProvider extends ChangeNotifier with BaseController {
         cartTotalPriceDisplay: Utils.format(
             totalAmountInPaisa / AppConfig.instance.country.currencyDivisor),
         cartTotalPrice: totalAmountInPaisa,
+        cartDiscountTotal: totalDiscountInPaisa,
+        cartDiscountTotalDisplay: Utils.format(
+            totalDiscountInPaisa / AppConfig.instance.country.currencyDivisor),
       ),
     );
     inspect(_cartDetailsModel);
@@ -907,6 +924,10 @@ class CartProvider extends ChangeNotifier with BaseController {
       0,
       (sum, item) => sum + (item.total ?? 0),
     );
+    final totalDiscountInPaisa = newCartItems.fold<int>(
+      0,
+      (sum, item) => sum + (item.amountDetails?.totalDiscount ?? 0),
+    );
 
     _cartDetailsModel = _cartDetailsModel!.copyWith(
       cartItems: newCartItems,
@@ -914,6 +935,9 @@ class CartProvider extends ChangeNotifier with BaseController {
         cartTotalPriceDisplay: Utils.format(
             totalAmountInPaisa / AppConfig.instance.country.currencyDivisor),
         cartTotalPrice: totalAmountInPaisa,
+        cartDiscountTotal: totalDiscountInPaisa,
+        cartDiscountTotalDisplay: Utils.format(
+            totalDiscountInPaisa / AppConfig.instance.country.currencyDivisor),
       ),
     );
     //new cart value => totalAmountInPaisa /  AppConfig.instance.country.currencyDivisor

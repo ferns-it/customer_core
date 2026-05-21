@@ -2,16 +2,15 @@ import 'package:customer_core/customer_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final appConfig = AppConfig(
-  applicationName: 'Le Arabia Customer',
-  shopName: 'Le Arabia',
-  shopId: '1',
-  themeMode: AppThemeMode.system,
-  country: Country.uk,
-  shopIdentifier: 'le-arabia',
-  shopInfoEmail: 'info@learabia.co.uk',
-  shopInfoPhone: ['+44 01245939257'],
-  shopInfoAddress: '63 New Writtle Street, Chelmsford, CM2 0LF',
-  buildIdentifier: 'co.uk.learabia.app',
+  applicationName: 'Silver Spoon Bahrain',
+  shopName: 'Silver Spoon Bahrain',
+  shopId: '44',
+  shopIdentifier: 'silver-spoons',
+  shopInfoEmail: 'silverspoonstest@gmail.com',
+  shopInfoPhone: ['+973 37774567'],
+  shopInfoAddress: 'Building Nr 52, Road 38, Bahrain, 3121',
+  buildIdentifier: 'co.uk.silverspoon.app',
+  country: Country.bh,
   fireBaseProjectId: 'customerapp-6d5f7',
   env: AppEnv.dev,
 );

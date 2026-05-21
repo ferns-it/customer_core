@@ -148,17 +148,72 @@ class CheckoutDetailsScreen extends StatelessWidget {
                                                           ),
                                                   ],
                                                 ),
-                                                Text(
-                                                  product.product_total_price ??
-                                                      'N/A',
-                                                  style: context.customTextTheme
-                                                      .text16W700
-                                                      .copyWith(
-                                                          fontSize: 14,
-                                                          color: isDark
-                                                              ? Colors.white
-                                                              : null),
-                                                ),
+                                                product.amountDetails
+                                                            ?.isOfferApplied ==
+                                                        true
+                                                    ? Row(children: [
+                                                        Text(
+                                                          product
+                                                                  .amountDetails
+                                                                  ?.display
+                                                                  ?.totalAmountWithAddon ??
+                                                              product
+                                                                  .amountDetails
+                                                                  ?.itemDetails
+                                                                  ?.display
+                                                                  ?.totalAmount ??
+                                                              product
+                                                                  .product_total_price ??
+                                                              'N/A',
+                                                          style: context
+                                                              .customTextTheme
+                                                              .text14W600
+                                                              .copyWith(
+                                                                  color: context
+                                                                      .customTextTheme
+                                                                      .color),
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 4),
+                                                        Text(
+                                                          product
+                                                                  .amountDetails
+                                                                  ?.itemDetails
+                                                                  ?.display
+                                                                  ?.totalAmountNormal ??
+                                                              product
+                                                                  .amountDetails
+                                                                  ?.itemDetails
+                                                                  ?.display
+                                                                  ?.amountNormal ??
+                                                              'N/A',
+                                                          style: context
+                                                              .customTextTheme
+                                                              .text14W600
+                                                              .copyWith(
+                                                                  decoration:
+                                                                      TextDecoration
+                                                                          .lineThrough,
+                                                                  decorationColor:
+                                                                      Colors
+                                                                          .grey,
+                                                                  color: Colors
+                                                                      .grey),
+                                                        ),
+                                                      ])
+                                                    : Text(
+                                                        product.product_total_price ??
+                                                            'N/A',
+                                                        style: context
+                                                            .customTextTheme
+                                                            .text16W700
+                                                            .copyWith(
+                                                                fontSize: 14,
+                                                                color: isDark
+                                                                    ? Colors
+                                                                        .white
+                                                                    : null),
+                                                      ),
                                                 product.master_addon_apllied
                                                             .isNotEmpty ==
                                                         true
@@ -462,18 +517,48 @@ class CheckoutDetailsScreen extends StatelessWidget {
                     ),
               verticalSpaceTiny,
               _SummaryRow(
-                  label: "Offer Discount",
-                  value:
-                      "- ${AppConfig.instance.country.symbol} ${cartListener.cartDetailsModel?.getOfferDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
-                  style: context.customTextTheme.text16W600
-                      .copyWith(color: context.customTextTheme.color)),
-              verticalSpaceTiny,
-              _SummaryRow(
                   label: "Discount",
                   value:
-                      "- ${AppConfig.instance.country.symbol} ${cartListener.calculatedDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                      '- ${AppConfig.instance.country.symbol} ${cartListener.totalCartDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
                   style: context.customTextTheme.text16W600
-                      .copyWith(color: context.customTextTheme.color)),
+                      .copyWith(color: context.customTextTheme.color),
+                  infoWidget: Tooltip(
+                    showDuration: Duration(seconds: 8),
+                    triggerMode: TooltipTriggerMode.tap,
+                    richMessage: TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: 'Discount Breakdown\n\n',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              'Cart Discount :  ${cartListener.cartTotalPriceDisplay}\n',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              'Delivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.calculatedDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.info_outline,
+                      size: 18,
+                    ),
+                  )),
+
               if (isTaxApplied == true) ...[
                 verticalSpaceTiny,
                 _SummaryRow(
@@ -483,6 +568,7 @@ class CheckoutDetailsScreen extends StatelessWidget {
                     style: context.customTextTheme.text16W600
                         .copyWith(color: context.customTextTheme.color),
                     infoWidget: Tooltip(
+                      showDuration: Duration(seconds: 8),
                       triggerMode: TooltipTriggerMode.tap,
                       richMessage: TextSpan(
                         children: [

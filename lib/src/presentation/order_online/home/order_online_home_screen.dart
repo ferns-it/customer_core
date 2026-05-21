@@ -119,8 +119,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
   Widget build(BuildContext context) {
     final productProvider = context.read<ProductsProvider>();
     final productListener = context.watch<ProductsProvider>();
-    final cartProvider = context.read<CartProvider>();
-    // final cartListener = context.watch<CartProvider>();
+    final cartProvider = context.watch<CartProvider>();
     final promotionListner = context.watch<PromotionsProvider>();
 
     // final shopProvider = context.read<ShopProvider>();
@@ -236,7 +235,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
 
   Widget buildContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cartProvider = context.read<CartProvider>();
+    final cartProvider = context.watch<CartProvider>();
     final productProvider = context.read<ProductsProvider>();
     final productListener = context.read<ProductsProvider>();
 
@@ -548,7 +547,9 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       }
                                       cartProvider
                                           .updateSelectedItemId(product.pID!);
-                                      // cartProvider.addItemToCart().then((added) {
+                                      // cartProvider
+                                      //     .addItemToCart()
+                                      //     .then((added) {
                                       //   if (added) {
                                       //     cartProvider.resetValues();
                                       //   }
@@ -598,7 +599,6 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                         crossAxisCount: 2,
                         crossAxisSpacing: 0.0,
                         mainAxisSpacing: 0.0,
-                        
                         itemCount: products.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
@@ -625,17 +625,18 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               }
                             },
                             secondaryWidget: QtyCounterButton2(
-                                qty: productQtyUpdated,
-                                onDecrementQty: () {
-                                  cartProvider.decrementCartItemQty(cartIndex);
-                                  cartProvider.clearSelectedAddressSecondary();
-                                  cartProvider.clearSelectedAddress();
-                                },
-                                onIncrementQty: () {
-                                  cartProvider.incrementCartItemQty(cartIndex);
-                                  cartProvider.clearSelectedAddressSecondary();
-                                  cartProvider.clearSelectedAddress();
-                                }),
+                                                              qty: cartProvider
+                                                                  .getProductQuantity(product.pID),
+                                                              onDecrementQty: () {
+                                                                cartProvider.decrementCartItemQty(cartIndex);
+                                                                cartProvider.clearSelectedAddressSecondary();
+                                                                cartProvider.clearSelectedAddress();
+                                                              },
+                                                              onIncrementQty: () {
+                                                                cartProvider.incrementCartItemQty(cartIndex);
+                                                                cartProvider.clearSelectedAddressSecondary();
+                                                                cartProvider.clearSelectedAddress();
+                                                              }),
                             useSecondaryWidget: isExist,
                             onPressed: () {
                               showItemDetailsBottomSheet(product);
@@ -663,14 +664,13 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
   }
 
   Widget buildPopularProducts(BuildContext context) {
-    final cartListener = context.watch<CartProvider>();
-    final cartProvider = context.read<CartProvider>();
+    final cartProvider = context.watch<CartProvider>();
     final productListner = context.watch<ProductsProvider>();
 
     final products = productListner
             .featuredPopularProductsAPIResponse.data?.popularProducts ??
         [];
-    final showFavIcon = cartListener.isUserLoggedIn;
+    final showFavIcon = cartProvider.isUserLoggedIn;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,

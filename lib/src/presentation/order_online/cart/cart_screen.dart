@@ -364,7 +364,7 @@ class _CartScreenState extends State<CartScreen>
                           children: [
                             Expanded(
                                 child: _buildTotalAmountWidget(
-                                    "${cartListener.cartTotalPriceDisplay}")),
+                                    "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
                             Expanded(
                               child: InkWell(
                                 onTap: () async {
@@ -559,10 +559,8 @@ class _CartScreenState extends State<CartScreen>
                           : Row(
                               children: [
                                 Expanded(
-                                    child: _buildTotalAmountWidget(cartListener
-                                        .totalAmount
-                                        .toStringAsFixed(AppConfig
-                                            .instance.country.decimalPlaces))),
+                                    child: _buildTotalAmountWidget(
+                                        "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
                                 Expanded(
                                   child: InkWell(
                                     onTap: cartListener.createOrderPending

@@ -195,10 +195,12 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                                     Expanded(
                                       child: orderListener
                                               .getActiveOrders.isEmpty
-                                          ? const Center(
+                                          ? Center(
                                               child: Text("No orders found",
                                                   style: TextStyle(
-                                                      color: AppColors.kWhite)),
+                                                      color: context
+                                                          .customTextTheme
+                                                          .color)),
                                             )
                                           : ListView.builder(
                                               itemCount: orderListener
@@ -241,11 +243,12 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                                       buildSearchFilterWidget(context),
                                       Expanded(
                                         child: orderHistory.isEmpty
-                                            ? const Center(
+                                            ? Center(
                                                 child: Text("No orders found",
                                                     style: TextStyle(
-                                                        color:
-                                                            AppColors.kWhite)),
+                                                        color: context
+                                                            .customTextTheme
+                                                            .color)),
                                               )
                                             : ListView.builder(
                                                 itemCount: orderHistory.length,
@@ -347,7 +350,8 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                         enabledBorder: InputBorder.none,
                         isDense: true,
                       ),
-                      style: const TextStyle(fontSize: 14, color: Colors.white),
+                      style: TextStyle(
+                          fontSize: 14, color: context.customTextTheme.color),
                     ),
                   ),
                 ],
@@ -377,7 +381,6 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                           },
                           child: Text(
                             year.toString(),
-                           
                           ),
                         ),
                       )
@@ -415,7 +418,11 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                     ...years.map(
                       (year) => ListTile(
                         title: Center(
-                          child: Text(year.toString(),style: TextStyle(color: context.customTextTheme.color),),
+                          child: Text(
+                            year.toString(),
+                            style:
+                                TextStyle(color: context.customTextTheme.color),
+                          ),
                         ),
                         onTap: () {
                           Navigator.pop(context);

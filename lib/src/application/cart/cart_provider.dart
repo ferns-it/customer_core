@@ -73,6 +73,17 @@ class CartProvider extends ChangeNotifier with BaseController {
   CartDetailsModel? get cartDetailsModel => _cartDetailsModel;
 
   List<CartItemDataModel> get cartItems => _cartDetailsModel?.cartItems ?? [];
+  String get carttTotalAmountNormalFormatted {
+    String totalAmount = "0.000";
+
+    for (var item in cartItems) {
+      totalAmount =
+          item.amountDetails?.itemDetails?.display?.totalAmountNormal ??
+              "0.000";
+    }
+
+    return totalAmount;
+  }
 
   String? get cartTotalPriceDisplay =>
       cartDetailsModel?.cartTotal?.cartTotalPriceDisplay;
@@ -80,6 +91,12 @@ class CartProvider extends ChangeNotifier with BaseController {
   double? get cartTotalPrice =>
       cartDetailsModel?.cartTotal?.cartTotalPrice != null
           ? cartDetailsModel!.cartTotal!.cartTotalPrice! /
+              AppConfig.instance.country.currencyDivisor
+          : null;
+
+  double? get cartDiscountTotalDisplay =>
+      cartDetailsModel?.cartTotal?.cartDiscountTotal != null
+          ? cartDetailsModel!.cartTotal!.cartDiscountTotal! /
               AppConfig.instance.country.currencyDivisor
           : null;
 
@@ -199,6 +216,30 @@ class CartProvider extends ChangeNotifier with BaseController {
   double get calculatedDeliveryFee =>
       _deliveryDetails?.deliveryFeeAmount?.toDouble() ?? 0.00;
 
+  double get cartDiscountAmount {
+    final value = _deliveryDetails?.amountFormatted?.cartDiscountAmount ?? "0";
+
+    final cleanedValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
+
+    return double.tryParse(cleanedValue) ?? 0.0;
+  }
+
+  double get deliveryDiscountAmount {
+    final value = _deliveryDetails?.amountFormatted?.deliveryDiscount ?? "0";
+
+    final cleanedValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
+
+    return double.tryParse(cleanedValue) ?? 0.0;
+  }
+
+  double get totalDiscountAmount {
+    final value = _deliveryDetails?.amountFormatted?.totalDiscount ?? "0";
+
+    final cleanedValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
+
+    return double.tryParse(cleanedValue) ?? 0.0;
+  }
+
   CalculateTakeAwayDetails? _takeAwayDetails;
 
   CalculateTakeAwayDetails? get takeAwayDetails => _takeAwayDetails;
@@ -293,7 +334,20 @@ class CartProvider extends ChangeNotifier with BaseController {
   bool _isUserLoggedIn = false;
   bool get isUserLoggedIn => _isUserLoggedIn;
 
-  final _currencySymbol = AppConfig.instance.country.symbol;
+  String get _activeCurrencySymbol =>
+      (_cartDetailsModel?.shopCurrencyIcon?.trim().isNotEmpty ?? false)
+          ? _cartDetailsModel!.shopCurrencyIcon!.trim()
+          : AppConfig.instance.country.symbol;
+
+  double _parseCurrencyToDouble(String? value) {
+    if (value == null) return 0.0;
+    final raw = value.replaceAll(RegExp(r'[^0-9.]'), '');
+    return double.tryParse(raw) ?? 0.0;
+  }
+
+  String _formatDynamicCurrency(double value) {
+    return "$_activeCurrencySymbol ${value.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}";
+  }
 
   @override
   Future<void> init() async {
@@ -743,22 +797,20 @@ class CartProvider extends ChangeNotifier with BaseController {
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
+    final prevQty = item.quantity ?? 1;
     final appliedMasterAddons = item.master_addon_apllied;
     final appliedAddons = item.addon_apllied;
 
     final updatedAppliedAddons = appliedAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
-        final rawPrice =
-            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ??
-                "0.00";
+        final rawPrice = option.priceSingle;
 
-        final price = double.tryParse(rawPrice) ?? 0.0;
+        final price = _parseCurrencyToDouble(rawPrice);
 
         final updatedPrice = price * newQty;
 
         return option.copyWith(
-          price:
-              "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+          price: _formatDynamicCurrency(updatedPrice),
         );
       }).toList();
 
@@ -767,35 +819,38 @@ class CartProvider extends ChangeNotifier with BaseController {
 
     final updatedAppliedMasterAddons = appliedMasterAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
-        final rawPrice =
-            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ??
-                "0.00";
+        final rawPrice = option.priceSingle;
 
-        final price = double.tryParse(rawPrice) ?? 0.0;
+        final price = _parseCurrencyToDouble(rawPrice);
 
         final updatedPrice = price * newQty;
 
         return option.copyWith(
-          price:
-              "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+          price: _formatDynamicCurrency(updatedPrice),
         );
       }).toList();
 
       return e.copyWith(choosedOption: updatedOptions);
     }).toList();
+
     newCartItems[index] = item.copyWith(
-        master_addon_apllied: updatedAppliedMasterAddons,
-        addon_apllied: updatedAppliedAddons);
-    final itemProductPrice =
-        item.product_price?.replaceAll(_currencySymbol, "") ?? "0.00";
-    final itemProductPriceInPaisa = double.parse(itemProductPrice) *
-        AppConfig.instance.country.currencyDivisor;
+      master_addon_apllied: updatedAppliedMasterAddons,
+      addon_apllied: updatedAppliedAddons,
+    );
+    final itemProductPrice = _parseCurrencyToDouble(item.product_price);
+    final itemProductPriceInPaisa =
+        itemProductPrice * AppConfig.instance.country.currencyDivisor;
     final itemModifiersTotal = item.getModifiersTotal * newQty;
     final itemModifiersTotalInPaisa =
         itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final totalItemPrice = newQty * itemProductPriceInPaisa;
     final productTotalPriceFormatted =
         (totalItemPrice) / AppConfig.instance.country.currencyDivisor;
+    final updatedAmountDetails = _scaleAmountDetailsForQty(
+      amountDetails: item.amountDetails,
+      previousQty: prevQty,
+      newQty: newQty,
+    );
 
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
@@ -803,8 +858,8 @@ class CartProvider extends ChangeNotifier with BaseController {
       master_addon_apllied: updatedAppliedMasterAddons,
       addon_apllied: updatedAppliedAddons,
       total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
-      product_total_price:
-          "$_currencySymbol${productTotalPriceFormatted.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+      amountDetails: updatedAmountDetails,
+      product_total_price: _formatDynamicCurrency(productTotalPriceFormatted),
     );
 
     final totalAmountInPaisa = newCartItems.fold<int>(
@@ -818,15 +873,24 @@ class CartProvider extends ChangeNotifier with BaseController {
       0,
       (sum, item) => sum + (item.amountDetails?.totalDiscount ?? 0),
     );
+    final totalNormalAmountInPaisa = newCartItems.fold<int>(
+      0,
+      (sum, item) =>
+          sum +
+          (item.amountDetails?.totalAmountWithAddonNormal ?? (item.total ?? 0)),
+    );
 
     _cartDetailsModel = _cartDetailsModel!.copyWith(
       cartItems: newCartItems,
       cartTotal: _cartDetailsModel!.cartTotal!.copyWith(
-        cartTotalPriceDisplay: Utils.format(
+        cartTotalPriceDisplay: _formatDynamicCurrency(
             totalAmountInPaisa / AppConfig.instance.country.currencyDivisor),
         cartTotalPrice: totalAmountInPaisa,
         cartDiscountTotal: totalDiscountInPaisa,
-        cartDiscountTotalDisplay: Utils.format(
+        cartTotalPrice_NormalDisplay: _formatDynamicCurrency(
+            totalNormalAmountInPaisa /
+                AppConfig.instance.country.currencyDivisor),
+        cartDiscountTotalDisplay: _formatDynamicCurrency(
             totalDiscountInPaisa / AppConfig.instance.country.currencyDivisor),
       ),
     );
@@ -855,22 +919,20 @@ class CartProvider extends ChangeNotifier with BaseController {
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
+    final prevQty1 = item.quantity ?? 1;
     final appliedMasterAddons = item.master_addon_apllied;
     final appliedAddons = item.addon_apllied;
 
     final updatedAppliedAddons = appliedAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
-        final rawPrice =
-            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ??
-                "0.00";
+        final rawPrice = option.priceSingle;
 
-        final price = double.tryParse(rawPrice) ?? 0.0;
+        final price = _parseCurrencyToDouble(rawPrice);
 
         final updatedPrice = price * newQty;
 
         return option.copyWith(
-          price:
-              "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+          price: _formatDynamicCurrency(updatedPrice),
         );
       }).toList();
 
@@ -879,17 +941,14 @@ class CartProvider extends ChangeNotifier with BaseController {
 
     final updatedAppliedMasterAddons = appliedMasterAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
-        final rawPrice =
-            option.priceSingle?.replaceAll(_currencySymbol, "").trim() ??
-                "0.00";
+        final rawPrice = option.priceSingle;
 
-        final price = double.tryParse(rawPrice) ?? 0.0;
+        final price = _parseCurrencyToDouble(rawPrice);
 
         final updatedPrice = price * newQty;
 
         return option.copyWith(
-          price:
-              "$_currencySymbol ${updatedPrice.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+          price: _formatDynamicCurrency(updatedPrice),
         );
       }).toList();
 
@@ -899,16 +958,20 @@ class CartProvider extends ChangeNotifier with BaseController {
     newCartItems[index] = item.copyWith(
         master_addon_apllied: updatedAppliedMasterAddons,
         addon_apllied: updatedAppliedAddons);
-    final itemProductPrice =
-        item.product_price?.replaceAll(_currencySymbol, "") ?? "0.00";
-    final itemProductPriceInPaisa = double.parse(itemProductPrice) *
-        AppConfig.instance.country.currencyDivisor;
+    final itemProductPrice = _parseCurrencyToDouble(item.product_price);
+    final itemProductPriceInPaisa =
+        itemProductPrice * AppConfig.instance.country.currencyDivisor;
     final itemModifiersTotal = item.getModifiersTotal * newQty;
     final itemModifiersTotalInPaisa =
         itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final totalItemPrice = newQty * itemProductPriceInPaisa;
     final productTotalPriceFormatted =
         (totalItemPrice) / AppConfig.instance.country.currencyDivisor;
+    final updatedAmountDetails = _scaleAmountDetailsForQty(
+      amountDetails: item.amountDetails,
+      previousQty: prevQty1,
+      newQty: newQty,
+    );
 
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
@@ -916,8 +979,8 @@ class CartProvider extends ChangeNotifier with BaseController {
       master_addon_apllied: updatedAppliedMasterAddons,
       addon_apllied: updatedAppliedAddons,
       total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
-      product_total_price:
-          "$_currencySymbol ${productTotalPriceFormatted.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+      amountDetails: updatedAmountDetails,
+      product_total_price: _formatDynamicCurrency(productTotalPriceFormatted),
     );
 
     final totalAmountInPaisa = newCartItems.fold<int>(
@@ -928,15 +991,24 @@ class CartProvider extends ChangeNotifier with BaseController {
       0,
       (sum, item) => sum + (item.amountDetails?.totalDiscount ?? 0),
     );
+    final totalNormalAmountInPaisa = newCartItems.fold<int>(
+      0,
+      (sum, item) =>
+          sum +
+          (item.amountDetails?.totalAmountWithAddonNormal ?? (item.total ?? 0)),
+    );
 
     _cartDetailsModel = _cartDetailsModel!.copyWith(
       cartItems: newCartItems,
       cartTotal: _cartDetailsModel!.cartTotal!.copyWith(
-        cartTotalPriceDisplay: Utils.format(
+        cartTotalPriceDisplay: _formatDynamicCurrency(
             totalAmountInPaisa / AppConfig.instance.country.currencyDivisor),
         cartTotalPrice: totalAmountInPaisa,
         cartDiscountTotal: totalDiscountInPaisa,
-        cartDiscountTotalDisplay: Utils.format(
+        cartTotalPrice_NormalDisplay: _formatDynamicCurrency(
+            totalNormalAmountInPaisa /
+                AppConfig.instance.country.currencyDivisor),
+        cartDiscountTotalDisplay: _formatDynamicCurrency(
             totalDiscountInPaisa / AppConfig.instance.country.currencyDivisor),
       ),
     );
@@ -949,6 +1021,60 @@ class CartProvider extends ChangeNotifier with BaseController {
 
     notifyListeners();
     return true;
+  }
+
+  CartAmountDetailsDataModel? _scaleAmountDetailsForQty({
+    required CartAmountDetailsDataModel? amountDetails,
+    required int previousQty,
+    required int newQty,
+  }) {
+    if (amountDetails == null) return null;
+    final safePrevQty = previousQty <= 0 ? 1 : previousQty;
+
+    int scaleInt(int? value) {
+      if (value == null) return 0;
+      return ((value / safePrevQty) * newQty).round();
+    }
+
+    String? scaleCurrencyString(String? value) {
+      if (value == null) return null;
+      final raw = value.replaceAll(RegExp(r'[^0-9.]'), '');
+      final parsed = double.tryParse(raw);
+      if (parsed == null) return value;
+      final scaled = (parsed / safePrevQty) * newQty;
+      return _formatDynamicCurrency(scaled);
+    }
+
+    final display = amountDetails.display;
+    final itemDetails = amountDetails.itemDetails;
+    final itemDisplay = itemDetails?.display;
+
+    return amountDetails.copyWith(
+      totalAmountWithAddon: scaleInt(amountDetails.totalAmountWithAddon),
+      totalAmountWithAddonExcTax:
+          scaleInt(amountDetails.totalAmountWithAddonExcTax),
+      totalAmountWithAddonNormal:
+          scaleInt(amountDetails.totalAmountWithAddonNormal),
+      totalDiscount: scaleInt(amountDetails.totalDiscount),
+      display: display?.copyWith(
+        totalAmountWithAddon: scaleCurrencyString(display.totalAmountWithAddon),
+        totalAmountWithAddonNormal:
+            scaleCurrencyString(display.totalAmountWithAddonNormal),
+        totalDiscount: scaleCurrencyString(display.totalDiscount),
+      ),
+      itemDetails: itemDetails?.copyWith(
+        totalAmount: scaleInt(itemDetails.totalAmount),
+        totalAmountNormal: scaleInt(itemDetails.totalAmountNormal),
+        totalDiscount: scaleInt(itemDetails.totalDiscount),
+        display: itemDisplay?.copyWith(
+          totalAmount: scaleCurrencyString(itemDisplay.totalAmount),
+          totalAmountNormal: scaleCurrencyString(itemDisplay.totalAmountNormal),
+          totalDiscount: scaleCurrencyString(itemDisplay.totalDiscount),
+          totalAmountWithAddon:
+              scaleCurrencyString(itemDisplay.totalAmountWithAddon),
+        ),
+      ),
+    );
   }
 
   void _updateQty(CartItemDataModel cartItem, int newQty) async {

@@ -364,7 +364,7 @@ class _CartScreenState extends State<CartScreen>
                           children: [
                             Expanded(
                                 child: _buildTotalAmountWidget(
-                                    "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
+                                    " ${cartListener.cartDetailsModel?.cartTotal?.cartTotalPrice_NormalDisplay ?? 0.0}")),
                             Expanded(
                               child: InkWell(
                                 onTap: () async {

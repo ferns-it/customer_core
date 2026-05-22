@@ -132,11 +132,8 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                                 ?.totalAmountWithAddon ??
                                                             product
                                                                 .amountDetails
-                                                                ?.itemDetails
                                                                 ?.display
-                                                                ?.totalAmount ??
-                                                            product
-                                                                .product_total_price ??
+                                                                ?.totalAmountWithAddon ??
                                                             'N/A',
                                                         style: context
                                                             .customTextTheme
@@ -150,9 +147,8 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                       Text(
                                                         product
                                                                 .amountDetails
-                                                                ?.itemDetails
                                                                 ?.display
-                                                                ?.amountNormal ??
+                                                                ?.totalAmountWithAddonNormal ??
                                                             'N/A',
                                                         style: context
                                                             .customTextTheme
@@ -418,6 +414,7 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                               cartProvider.clearDiscountValue();
 
                               await cartProvider.incrementCartItemQty(index);
+                              if (mounted) setState(() {});
                             }),
                         horizontalSpaceRegular
                       ],

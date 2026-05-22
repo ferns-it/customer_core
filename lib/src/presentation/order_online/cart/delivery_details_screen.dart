@@ -40,7 +40,6 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final cartListener = context.watch<CartProvider>();
-
     final userListener = context.watch<UserProvider>();
     final userProvider = context.read<UserProvider>();
     final themeListener = context.watch<ThemeProvider>();
@@ -613,7 +612,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     _SummaryRow(
                         label: "Discount",
                         value:
-                            '- ${AppConfig.instance.country.symbol} ${cartListener.totalCartDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
+                            '${AppConfig.instance.country.symbol} ${cartListener.totalDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
                         style: context.customTextTheme.text16W600
                             .copyWith(color: context.customTextTheme.color),
                         infoWidget: Tooltip(
@@ -622,26 +621,23 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           richMessage: TextSpan(
                             children: [
                               const TextSpan(
-                                text: 'Discount Breakdown\n\n',
+                                text: '\nDiscount Breakdown\n\n',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
                                   fontSize: 14,
                                 ),
                               ),
                               TextSpan(
                                 text:
-                                    'Cart Discount :  ${cartListener.cartTotalPriceDisplay}\n',
+                                    "Cart Discount : ${AppConfig.instance.country.symbol} ${cartListener.cartDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
                                 style: const TextStyle(
-                                  color: Colors.white,
                                   fontSize: 13,
                                 ),
                               ),
                               TextSpan(
                                 text:
-                                    'Delivery Discount : ${AppConfig.instance.country.symbol} ${cartDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n',
+                                    "\nDelivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.deliveryDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n",
                                 style: const TextStyle(
-                                  color: Colors.white,
                                   fontSize: 13,
                                 ),
                               ),
@@ -667,10 +663,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                             richMessage: TextSpan(
                               children: [
                                 const TextSpan(
-                                  text: 'Tax Breakdown\n\n',
+                                  text: '\nTax Breakdown\n\n',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
                                     fontSize: 14,
                                   ),
                                 ),
@@ -680,14 +675,11 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                       text: '${tax.taxSlab} : ',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w600,
-                                        color: Colors.white,
                                       ),
                                     ),
                                     TextSpan(
                                       text: '${tax.totalTax}\n',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                      ),
+                                      style: const TextStyle(),
                                     ),
                                   ],
                                 ),

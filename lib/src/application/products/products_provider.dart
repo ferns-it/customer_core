@@ -438,6 +438,49 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     }
   }
 
+  /// Exposes internal lists for external providers to sync favourite state
+  void syncSearchFavourite(Map<String, bool> favMap, Map<String, String> favIdMap) {
+    // Featured products
+    final featuredList =
+        _featuredPopularProductsAPIResponse.data?.featuredProducts ?? [];
+    for (int i = 0; i < featuredList.length; i++) {
+      final pid = featuredList[i].pID;
+      if (pid != null && favMap.containsKey(pid)) {
+        featuredList[i] = featuredList[i].copyWith(
+          isFavourite: favMap[pid]!,
+          favouriteID: favIdMap[pid] ?? "",
+        );
+      }
+    }
+
+    // Popular products
+    final popularList =
+        _featuredPopularProductsAPIResponse.data?.popularProducts ?? [];
+    for (int i = 0; i < popularList.length; i++) {
+      final pid = popularList[i].pID;
+      if (pid != null && favMap.containsKey(pid)) {
+        popularList[i] = popularList[i].copyWith(
+          isFavourite: favMap[pid]!,
+          favouriteID: favIdMap[pid] ?? "",
+        );
+      }
+    }
+
+    // Products list
+    final productList = _productsListAPIResponse.data ?? [];
+    for (int i = 0; i < productList.length; i++) {
+      final pid = productList[i].pID;
+      if (pid != null && favMap.containsKey(pid)) {
+        productList[i] = productList[i].copyWith(
+          isFavourite: favMap[pid]!,
+          favouriteID: favIdMap[pid] ?? "",
+        );
+      }
+    }
+
+    notifyListeners();
+  }
+
   void _updateFavouriteLocally(String productID, bool isFav, String favouriteId,
       {bool isByFavID = false}) {
     bool updateCondition(ProductDataModel p) =>

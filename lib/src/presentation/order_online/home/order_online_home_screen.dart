@@ -1273,10 +1273,12 @@ class __SearchResultsState extends State<_SearchResults> {
             .getAllSearchProducts(widget.query);
       });
     }
+    
   }
 
   @override
   Widget build(
+
     BuildContext context,
   ) {
     final cartListener = context.watch<CartProvider>();

@@ -180,6 +180,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
     BuildContext context,
     OrderDetailsModel orderDetails,
   ) {
+    final isTaxApplicable = orderDetails.isTaxApplicablebool;
     return ClipPath(
       clipper: RPSCustomClipper(),
       child: Container(
@@ -203,72 +204,83 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
           ],
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Order Summary',
-              style: context.customTextTheme.text16W700.copyWith(
-                  decoration: TextDecoration.underline,
-                  color: context.customTextTheme.color),
-            ),
-            verticalSpaceTiny,
-            ...orderDetails.orderDishes?.map((dish) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: LayoutBuilder(builder: (context, constraints) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Flexible(
-                                child: Text(
-                                  maxLines: 2,
-                                  "${dish.quantity} x ${dish.name}",
-                                  style: context.customTextTheme.text16W700
-                                      .copyWith(
-                                          color: context.customTextTheme.color),
-                                  softWrap: true,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Flexible(
-                                child: Text(
-                                  maxLines: 1,
-                                  softWrap: true,
-                                  overflow: TextOverflow.ellipsis,
-                                  "${dish.totalPrice}",
-                                  style: context.customTextTheme.text16W700
-                                      .copyWith(
-                                    color: context.customTextTheme.color,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Order Summary',
+                style: context.customTextTheme.text16W700.copyWith(
+                    decoration: TextDecoration.underline,
+                    color: context.customTextTheme.color),
+              ),
+              verticalSpaceTiny,
+              ...orderDetails.orderDishes?.map((dish) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: LayoutBuilder(builder: (context, constraints) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Flexible(
+                                  child: Text(
+                                    maxLines: 2,
+                                    "${dish.quantity} x ${dish.name}",
+                                    style: context.customTextTheme.text16W700
+                                        .copyWith(
+                                            color:
+                                                context.customTextTheme.color),
+                                    softWrap: true,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (dish.variationName != null)
-                                Text(
-                                  "(${dish.variationName})",
-                                  style: context.customTextTheme.text14W500
-                                      .copyWith(
-                                    color: context.customTextTheme.color,
+                                Flexible(
+                                  child: Text(
+                                    maxLines: 1,
+                                    softWrap: true,
+                                    overflow: TextOverflow.ellipsis,
+                                    "${orderDetails.grossAmount}",
+                                    style: context.customTextTheme.text16W700
+                                        .copyWith(
+                                      color: context.customTextTheme.color,
+                                    ),
                                   ),
                                 ),
-                              if (dish.addons != null)
-                                ...dish.addons!.map(
-                                  (addon) => Padding(
-                                    padding: const EdgeInsets.only(top: 2),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            "+ ${addon.name}",
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (dish.variationName != null)
+                                  Text(
+                                    "(${dish.variationName})",
+                                    style: context.customTextTheme.text14W500
+                                        .copyWith(
+                                      color: context.customTextTheme.color,
+                                    ),
+                                  ),
+                                if (dish.addons != null)
+                                  ...dish.addons!.map(
+                                    (addon) => Padding(
+                                      padding: const EdgeInsets.only(top: 2),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              "+ ${addon.name}",
+                                              style: context
+                                                  .customTextTheme.text14W500
+                                                  .copyWith(
+                                                color: context
+                                                    .customTextTheme.color,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            " ${addon.price}",
                                             style: context
                                                 .customTextTheme.text14W500
                                                 .copyWith(
@@ -276,120 +288,175 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                                                   context.customTextTheme.color,
                                             ),
                                           ),
-                                        ),
-                                        Text(
-                                          " ${addon.price}",
-                                          style: context
-                                              .customTextTheme.text14W500
-                                              .copyWith(
-                                            color:
-                                                context.customTextTheme.color,
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                            ],
-                          )
-                          // Row(
-                          //   children: <Widget>[
-                          //     Flexible(
-                          //       child: SizedBox(
-                          //         width: constraints.maxWidth * 0.7,
-                          //         child: Text(
-                          //           maxLines: 3,
-                          //           dish.dishVariationAndModifiers,
-                          //           style: context.customTextTheme.text14W500
-                          //               .copyWith(
-                          //                   color:
-                          //                       context.customTextTheme.color),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
+                              ],
+                            )
+                            // Row(
+                            //   children: <Widget>[
+                            //     Flexible(
+                            //       child: SizedBox(
+                            //         width: constraints.maxWidth * 0.7,
+                            //         child: Text(
+                            //           maxLines: 3,
+                            //           dish.dishVariationAndModifiers,
+                            //           style: context.customTextTheme.text14W500
+                            //               .copyWith(
+                            //                   color:
+                            //                       context.customTextTheme.color),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                          ],
+                        );
+                      }),
+                    );
+                  }).toList() ??
+                  [],
+              verticalSpaceRegular,
+              Assets.lib.assets.icons.zigzag.svg(),
+              verticalSpaceLarge,
+              _SummaryRow(
+                label: "Order Type",
+                value: orderDetails.formattedDeliveryType,
+                style: context.customTextTheme.text14W600
+                    .copyWith(color: context.customTextTheme.color),
+              ),
+              if (orderDetails.isTakeaway) ...[
+                verticalSpaceTiny,
+                _SummaryRow(
+                  label: "Pickup Time",
+                  value: orderDetails.takeawayTime ?? "",
+                  style: context.customTextTheme.text14W600
+                      .copyWith(color: context.customTextTheme.color),
+                ),
+              ],
+              verticalSpaceTiny,
+              _SummaryRow(
+                label: "Payment",
+                value: orderDetails.paymentGatway ?? "",
+                style: context.customTextTheme.text14W600
+                    .copyWith(color: context.customTextTheme.color),
+              ),
+              verticalSpaceRegular,
+              Text(
+                "Bill Details",
+                style: context.customTextTheme.text16W600.copyWith(
+                    decoration: TextDecoration.underline,
+                    color: context.customTextTheme.color),
+              ),
+              verticalSpaceSmall,
+              _SummaryRow(
+                label: "Sub Total",
+                value: "${orderDetails.grossAmount}",
+                style: context.customTextTheme.text16W600
+                    .copyWith(color: context.customTextTheme.color),
+              ),
+              if (!orderDetails.isTakeaway) ...[
+                verticalSpaceTiny,
+                _SummaryRow(
+                  label: "Delivery Charge",
+                  value: orderDetails.formatDeliveryChargeToDouble == 0.00
+                      ? 'Free'
+                      : orderDetails.formattedDeliveryCharge ?? "0.00",
+                  // value:orderDetails.formattedDeliveryCharge ?? "0.00",
+                  style: context.customTextTheme.text14W600
+                      .copyWith(color: context.customTextTheme.color),
+                ),
+              ],
+              verticalSpaceTiny,
+              _SummaryRow(
+                  label: "Discount",
+                  value: " ${orderDetails.totalDiscount}",
+                  style: context.customTextTheme.text16W600
+                      .copyWith(color: context.customTextTheme.color),
+                  infoWidget: Tooltip(
+                    showDuration: Duration(seconds: 8),
+                    triggerMode: TooltipTriggerMode.tap,
+                    richMessage: TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: '\nDiscount Breakdown\n\n',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              'Cart Discount :  ${orderDetails.productDiscountAmount}\n',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              'Delivery Discount : ${orderDetails.deliveryDiscount}\n',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.info_outline,
+                      size: 18,
+                    ),
+                  )),
+              if (isTaxApplicable) ...[
+                verticalSpaceTiny,
+                _SummaryRow(
+                    label: orderDetails.taxLabel ?? 'TAX',
+                    value: orderDetails.taxTotalAmount ?? '0.00',
+                    style: context.customTextTheme.text16W600
+                        .copyWith(color: context.customTextTheme.color),
+                    infoWidget: Tooltip(
+                      showDuration: Duration(seconds: 8),
+                      triggerMode: TooltipTriggerMode.tap,
+                      richMessage: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: '\nTax Breakdown\n\n',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                          TextSpan(
+                            text: orderDetails.orderDishes
+                                ?.map((dish) =>
+                                    '${dish.taxLabel} : ${dish.taxAmount}\n')
+                                .join('\n'),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
-                      );
-                    }),
-                  );
-                }).toList() ??
-                [],
-            verticalSpaceRegular,
-            Assets.lib.assets.icons.zigzag.svg(),
-            verticalSpaceLarge,
-            _SummaryRow(
-              label: "Order Type",
-              value: orderDetails.formattedDeliveryType,
-              style: context.customTextTheme.text14W600
-                  .copyWith(color: context.customTextTheme.color),
-            ),
-            if (orderDetails.isTakeaway) ...[
-              verticalSpaceTiny,
-              _SummaryRow(
-                label: "Pickup Time",
-                value: orderDetails.takeawayTime ?? "",
-                style: context.customTextTheme.text14W600
-                    .copyWith(color: context.customTextTheme.color),
-              ),
-            ],
-            verticalSpaceTiny,
-            _SummaryRow(
-              label: "Payment",
-              value: orderDetails.paymentGatway ?? "",
-              style: context.customTextTheme.text14W600
-                  .copyWith(color: context.customTextTheme.color),
-            ),
-            verticalSpaceRegular,
-            Text(
-              "Bill Details",
-              style: context.customTextTheme.text16W600.copyWith(
-                  decoration: TextDecoration.underline,
-                  color: context.customTextTheme.color),
-            ),
-            verticalSpaceSmall,
-            _SummaryRow(
-              label: "Sub Total",
-              value: "${orderDetails.grossAmount}",
-              style: context.customTextTheme.text16W600
-                  .copyWith(color: context.customTextTheme.color),
-            ),
-            if (!orderDetails.isTakeaway) ...[
-              verticalSpaceTiny,
-              _SummaryRow(
-                label: "Delivery Charge",
-                value: orderDetails.formatDeliveryChargeToDouble == 0.00
-                    ? 'Free'
-                    : orderDetails.formattedDeliveryCharge ?? "0.00",
-                // value:orderDetails.formattedDeliveryCharge ?? "0.00",
-                style: context.customTextTheme.text14W600
-                    .copyWith(color: context.customTextTheme.color),
-              ),
-            ],
-            verticalSpaceTiny,
-            _SummaryRow(
-              label: "Discount",
-              value: " ${orderDetails.totalDiscount}",
-              style: context.customTextTheme.text14W600
-                  .copyWith(color: context.customTextTheme.color),
-            ),
-            verticalSpaceTiny,
-            _SummaryRow(
-              label: orderDetails.taxLabel ?? 'TAX',
-              value: orderDetails.taxTotalAmount ?? '0.00',
-              style: context.customTextTheme.text14W600
-                  .copyWith(color: context.customTextTheme.color),
-            ),
-            const Divider(height: 20.0),
-            _SummaryRow(
-              label: "Total",
-              value: orderDetails.netAmount ??
-                  "${AppConfig.instance.country.symbol}0.00",
-              style: context.customTextTheme.text18W600
-                  .copyWith(color: context.customTextTheme.color),
-            ),
-          ],
-        ),
+                      ),
+                      child: const Icon(
+                        Icons.info_outline,
+                        size: 18,
+                      ),
+                    )),
+                const Divider(height: 20.0),
+                _SummaryRow(
+                  label: "Total",
+                  value: orderDetails.netAmount ??
+                      "${AppConfig.instance.country.symbol}0.00",
+                  style: context.customTextTheme.text18W600
+                      .copyWith(color: context.customTextTheme.color),
+                ),
+              ],
+            ]),
       ),
     );
   }
@@ -469,10 +536,12 @@ class _SummaryRow extends StatelessWidget {
   final String label;
   final String value;
   final TextStyle? style;
+  final Widget? infoWidget;
 
   const _SummaryRow({
     required this.label,
     required this.value,
+    this.infoWidget,
     this.style,
   });
 
@@ -485,6 +554,12 @@ class _SummaryRow extends StatelessWidget {
           label,
           style: style ?? context.customTextTheme.text14W500,
         ),
+        horizontalSpaceTiny,
+        Visibility(
+          visible: infoWidget != null,
+          child: infoWidget ?? SizedBox.shrink(),
+        ),
+        Spacer(),
         Text(
           value,
           style: style ?? context.customTextTheme.text14W500,

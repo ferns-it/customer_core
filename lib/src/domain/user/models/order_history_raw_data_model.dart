@@ -517,6 +517,7 @@ class OrderDetailsModel {
       ? '${AppConfig.instance.country.symbol}$deliveryDiscount'
       : '${AppConfig.instance.country.symbol}0.00';
 
+  bool get isTaxApplicablebool => isTaxApplicable == 'Yes';
   // String get formattedDiscount {
   //   if (deliveryDiscount != null) {
   //     var val = double.parse(deliveryDiscount!);

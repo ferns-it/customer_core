@@ -509,12 +509,14 @@ class CartItemTotalSummary {
   final String? cartTotalPriceDisplay;
   final int? cartDiscountTotal;
   final String? cartDiscountTotalDisplay;
+  final String? cartTotalPrice_NormalDisplay;
 
   CartItemTotalSummary({
     this.cartTotalPrice,
     this.cartTotalPriceDisplay,
     this.cartDiscountTotal,
     this.cartDiscountTotalDisplay,
+    this.cartTotalPrice_NormalDisplay,
   });
 
   CartItemTotalSummary copyWith({
@@ -522,6 +524,7 @@ class CartItemTotalSummary {
     String? cartTotalPriceDisplay,
     int? cartDiscountTotal,
     String? cartDiscountTotalDisplay,
+    String? cartTotalPrice_NormalDisplay,
   }) {
     return CartItemTotalSummary(
       cartTotalPrice: cartTotalPrice ?? this.cartTotalPrice,
@@ -530,6 +533,8 @@ class CartItemTotalSummary {
       cartDiscountTotal: cartDiscountTotal ?? this.cartDiscountTotal,
       cartDiscountTotalDisplay:
           cartDiscountTotalDisplay ?? this.cartDiscountTotalDisplay,
+           cartTotalPrice_NormalDisplay:
+          cartTotalPrice_NormalDisplay ?? this.cartTotalPrice_NormalDisplay,
     );
   }
 
@@ -539,6 +544,7 @@ class CartItemTotalSummary {
       'cartTotalPriceDisplay': cartTotalPriceDisplay,
       'cartDiscountTotal': cartDiscountTotal,
       'cartDiscountTotalDisplay': cartDiscountTotalDisplay,
+      'cartTotalPrice_NormalDisplay': cartTotalPrice_NormalDisplay,
     };
   }
 
@@ -555,6 +561,9 @@ class CartItemTotalSummary {
       cartDiscountTotalDisplay: map['cartDiscountTotalDisplay'] != null
           ? map['cartDiscountTotalDisplay'] as String
           : null,
+          cartTotalPrice_NormalDisplay: map['cartTotalPrice_NormalDisplay'] != null
+          ? map['cartTotalPrice_NormalDisplay'] as String
+          : null,
     );
   }
 
@@ -565,7 +574,7 @@ class CartItemTotalSummary {
 
   @override
   String toString() =>
-      'CartItemTotalSummary(cartTotalPrice: $cartTotalPrice, cartTotalPriceDisplay: $cartTotalPriceDisplay, cartDiscountTotal: $cartDiscountTotal, cartDiscountTotalDisplay: $cartDiscountTotalDisplay)';
+      'CartItemTotalSummary(cartTotalPrice: $cartTotalPrice, cartTotalPriceDisplay: $cartTotalPriceDisplay, cartDiscountTotal: $cartDiscountTotal, cartDiscountTotalDisplay: $cartDiscountTotalDisplay,cartTotalPrice_NormalDisplay: $cartTotalPrice_NormalDisplay)';
 
   @override
   bool operator ==(covariant CartItemTotalSummary other) {
@@ -574,7 +583,9 @@ class CartItemTotalSummary {
     return other.cartTotalPrice == cartTotalPrice &&
         other.cartTotalPriceDisplay == cartTotalPriceDisplay &&
         other.cartDiscountTotal == cartDiscountTotal &&
-        other.cartDiscountTotalDisplay == cartDiscountTotalDisplay;
+        other.cartTotalPrice_NormalDisplay == cartTotalPrice_NormalDisplay &&
+        other.cartDiscountTotalDisplay == cartDiscountTotalDisplay
+        ;
   }
 
   @override
@@ -582,6 +593,7 @@ class CartItemTotalSummary {
       cartTotalPrice.hashCode ^
       cartTotalPriceDisplay.hashCode ^
       cartDiscountTotal.hashCode ^
+      cartTotalPrice_NormalDisplay.hashCode ^
       cartDiscountTotalDisplay.hashCode;
 }
 

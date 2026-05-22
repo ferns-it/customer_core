@@ -178,14 +178,8 @@ class CheckoutDetailsScreen extends StatelessWidget {
                                                         Text(
                                                           product
                                                                   .amountDetails
-                                                                  ?.itemDetails
                                                                   ?.display
-                                                                  ?.totalAmountNormal ??
-                                                              product
-                                                                  .amountDetails
-                                                                  ?.itemDetails
-                                                                  ?.display
-                                                                  ?.amountNormal ??
+                                                                  ?.totalAmountWithAddonNormal ??
                                                               'N/A',
                                                           style: context
                                                               .customTextTheme
@@ -197,8 +191,7 @@ class CheckoutDetailsScreen extends StatelessWidget {
                                                                   decorationColor:
                                                                       Colors
                                                                           .grey,
-                                                                  color: Colors
-                                                                      .grey),
+                                                                  color: Colors.grey),
                                                         ),
                                                       ])
                                                     : Text(
@@ -206,13 +199,11 @@ class CheckoutDetailsScreen extends StatelessWidget {
                                                             'N/A',
                                                         style: context
                                                             .customTextTheme
-                                                            .text16W700
+                                                            .text14W600
                                                             .copyWith(
-                                                                fontSize: 14,
-                                                                color: isDark
-                                                                    ? Colors
-                                                                        .white
-                                                                    : null),
+                                                                color: context
+                                                                    .customTextTheme
+                                                                    .color),
                                                       ),
                                                 product.master_addon_apllied
                                                             .isNotEmpty ==
@@ -497,7 +488,8 @@ class CheckoutDetailsScreen extends StatelessWidget {
               verticalSpaceSmall,
               _SummaryRow(
                 label: "Sub Total",
-                value: cartListener.cartTotalPriceDisplay ??
+                value: cartListener
+                        .deliveryDetails?.amountFormatted?.cartGrossAmount ??
                     "${AppConfig.instance.country.symbol}0.00",
                 style: context.customTextTheme.text16W600.copyWith(
                   color: isDark ? Colors.white : null,
@@ -516,55 +508,13 @@ class CheckoutDetailsScreen extends StatelessWidget {
                           : "${AppConfig.instance.country.symbol} ${cartListener.calculatedDeliveryFee.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
                     ),
               verticalSpaceTiny,
-              _SummaryRow(
-                  label: "Discount",
-                  value:
-                      '- ${AppConfig.instance.country.symbol} ${cartListener.totalCartDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
-                  style: context.customTextTheme.text16W600
-                      .copyWith(color: context.customTextTheme.color),
-                  infoWidget: Tooltip(
-                    showDuration: Duration(seconds: 8),
-                    triggerMode: TooltipTriggerMode.tap,
-                    richMessage: TextSpan(
-                      children: [
-                        const TextSpan(
-                          text: 'Discount Breakdown\n\n',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                        TextSpan(
-                          text:
-                              'Cart Discount :  ${cartListener.cartTotalPriceDisplay}\n',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                          ),
-                        ),
-                        TextSpan(
-                          text:
-                              'Delivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.calculatedDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.info_outline,
-                      size: 18,
-                    ),
-                  )),
 
               if (isTaxApplied == true) ...[
                 verticalSpaceTiny,
                 _SummaryRow(
-                    label: "Tax",
+                    label: "Discount",
                     value:
-                        taxAmount ?? '${AppConfig.instance.country.symbol}0.00',
+                        '${AppConfig.instance.country.symbol} ${cartListener.totalDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
                     style: context.customTextTheme.text16W600
                         .copyWith(color: context.customTextTheme.color),
                     infoWidget: Tooltip(
@@ -573,29 +523,25 @@ class CheckoutDetailsScreen extends StatelessWidget {
                       richMessage: TextSpan(
                         children: [
                           const TextSpan(
-                            text: 'Tax Breakdown\n\n',
+                            text: '\nDiscount Breakdown\n\n',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
                               fontSize: 14,
                             ),
                           ),
-                          ...?taxGroup?.expand(
-                            (tax) => [
-                              TextSpan(
-                                text: '${tax.taxSlab} : ',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '${tax.totalTax}\n',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
+                          TextSpan(
+                            text:
+                                "Cart Discount : ${AppConfig.instance.country.symbol} ${cartListener.cartDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                            style: const TextStyle(
+                              fontSize: 13,
+                            ),
+                          ),
+                          TextSpan(
+                            text:
+                                "\nDelivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.deliveryDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n",
+                            style: const TextStyle(
+                              fontSize: 13,
+                            ),
                           ),
                         ],
                       ),
@@ -604,7 +550,49 @@ class CheckoutDetailsScreen extends StatelessWidget {
                         size: 18,
                       ),
                     )),
-              ],
+                if (isTaxApplied == true) ...[
+                  verticalSpaceTiny,
+                  _SummaryRow(
+                      label: "Tax",
+                      value: taxAmount ??
+                          '${AppConfig.instance.country.symbol}0.00',
+                      style: context.customTextTheme.text16W600
+                          .copyWith(color: context.customTextTheme.color),
+                      infoWidget: Tooltip(
+                        showDuration: Duration(seconds: 8),
+                        triggerMode: TooltipTriggerMode.tap,
+                        richMessage: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: '\nTax Breakdown\n\n',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            ...?taxGroup?.expand(
+                              (tax) => [
+                                TextSpan(
+                                  text: '${tax.taxSlab} : ',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '${tax.totalTax}\n',
+                                  style: const TextStyle(),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.info_outline,
+                          size: 18,
+                        ),
+                      )),
+                ],
+              ]
             ]),
           ),
         ),

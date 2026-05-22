@@ -207,7 +207,7 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
         width: context.screenWidth,
         height: 45,
         child: ElevatedButton(
-          style:  ButtonStyle(
+          style: ButtonStyle(
               backgroundColor: WidgetStatePropertyAll(
                   Theme.of(context).colorScheme.primary)),
           onPressed: () async {
@@ -289,13 +289,21 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                   .copyWith(color: AppColors.kGray),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                borderSide: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.1)
+                      : Colors.black.withOpacity(0.15),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.2)
+                      : Colors.black.withOpacity(0.3),
+                ),
               ),
             ),
             autovalidateMode: AutovalidateMode.onUserInteraction,

@@ -360,11 +360,11 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                 verticalSpaceTiny,
                 _SummaryRow(
                   label: "Delivery Charge",
-                  value: orderDetails.formatDeliveryChargeToDouble == 0.00
+                  value: orderDetails.deliveryDiscount == 0.00
                       ? 'Free'
-                      : orderDetails.formattedDeliveryCharge ?? "0.00",
+                      : orderDetails.deliveryDiscount ?? "0.00",
                   // value:orderDetails.formattedDeliveryCharge ?? "0.00",
-                  style: context.customTextTheme.text14W600
+                  style: context.customTextTheme.text16W600
                       .copyWith(color: context.customTextTheme.color),
                 ),
               ],

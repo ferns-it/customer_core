@@ -109,8 +109,6 @@ extension GetItInjectableX on _i174.GetIt {
         ));
     gh.lazySingleton<_i412.PaymentProvider>(
         () => _i412.PaymentProvider(checkoutRepo: gh<_i706.ICheckoutRepo>()));
-    gh.lazySingleton<_i553.SearchProvider>(
-        () => _i553.SearchProvider(searchRepo: gh<_i71.ISearchRepo>()));
     gh.lazySingleton<_i663.ShopProvider>(
         () => _i663.ShopProvider(gh<_i333.IStoreRepo>()));
     gh.lazySingleton<_i993.AuthProvider>(() => _i993.AuthProvider(
@@ -119,6 +117,10 @@ extension GetItInjectableX on _i174.GetIt {
         ));
     gh.factory<_i184.PromotionsProvider>(
         () => _i184.PromotionsProvider(gh<_i304.IPromotionRepo>()));
+    gh.lazySingleton<_i553.SearchProvider>(() => _i553.SearchProvider(
+          searchRepo: gh<_i71.ISearchRepo>(),
+          productsProvider: gh<_i805.ProductsProvider>(),
+        ));
     return this;
   }
 }

@@ -241,9 +241,8 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                                         .lineThrough,
                                                                 decorationColor:
                                                                     Colors.grey,
-                                                                color: context
-                                                                    .customTextTheme
-                                                                    .color),
+                                                                color: Colors
+                                                                    .grey),
                                                       ),
                                                     ])
                                                   : Text(

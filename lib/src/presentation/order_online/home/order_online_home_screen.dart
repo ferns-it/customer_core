@@ -625,18 +625,18 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               }
                             },
                             secondaryWidget: QtyCounterButton2(
-                                                              qty: cartProvider
-                                                                  .getProductQuantity(product.pID),
-                                                              onDecrementQty: () {
-                                                                cartProvider.decrementCartItemQty(cartIndex);
-                                                                cartProvider.clearSelectedAddressSecondary();
-                                                                cartProvider.clearSelectedAddress();
-                                                              },
-                                                              onIncrementQty: () {
-                                                                cartProvider.incrementCartItemQty(cartIndex);
-                                                                cartProvider.clearSelectedAddressSecondary();
-                                                                cartProvider.clearSelectedAddress();
-                                                              }),
+                                qty: cartProvider
+                                    .getProductQuantity(product.pID),
+                                onDecrementQty: () {
+                                  cartProvider.decrementCartItemQty(cartIndex);
+                                  cartProvider.clearSelectedAddressSecondary();
+                                  cartProvider.clearSelectedAddress();
+                                },
+                                onIncrementQty: () {
+                                  cartProvider.incrementCartItemQty(cartIndex);
+                                  cartProvider.clearSelectedAddressSecondary();
+                                  cartProvider.clearSelectedAddress();
+                                }),
                             useSecondaryWidget: isExist,
                             onPressed: () {
                               showItemDetailsBottomSheet(product);
@@ -1273,12 +1273,10 @@ class __SearchResultsState extends State<_SearchResults> {
             .getAllSearchProducts(widget.query);
       });
     }
-    
   }
 
   @override
   Widget build(
-
     BuildContext context,
   ) {
     final cartListener = context.watch<CartProvider>();
@@ -1320,11 +1318,11 @@ class __SearchResultsState extends State<_SearchResults> {
                         onPressFavouriteBtn: () async {
                           if (product.isFavourite) {
                             await context
-                                .read<ProductsProvider>()
+                                .read<SearchProvider>()
                                 .removeFavourite(product.favouriteID!);
                           } else {
                             await context
-                                .read<ProductsProvider>()
+                                .read<SearchProvider>()
                                 .addFavourite(product.pID!);
                           }
                         },

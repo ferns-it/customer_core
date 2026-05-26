@@ -383,7 +383,6 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                           text: '\nDiscount Breakdown\n\n',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
                             fontSize: 14,
                           ),
                         ),
@@ -391,7 +390,6 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                           text:
                               'Cart Discount :  ${orderDetails.productDiscountAmount}\n',
                           style: const TextStyle(
-                            color: Colors.white,
                             fontSize: 13,
                           ),
                         ),
@@ -399,7 +397,6 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                           text:
                               'Delivery Discount : ${orderDetails.deliveryDiscount}\n',
                           style: const TextStyle(
-                            color: Colors.white,
                             fontSize: 13,
                           ),
                         ),
@@ -413,7 +410,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
               if (isTaxApplicable) ...[
                 verticalSpaceTiny,
                 _SummaryRow(
-                    label: orderDetails.taxLabel ?? 'TAX',
+                    label: 'VAT',
                     value: orderDetails.taxTotalAmount ?? '0.00',
                     style: context.customTextTheme.text16W600
                         .copyWith(color: context.customTextTheme.color),
@@ -426,7 +423,6 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                             text: '\nTax Breakdown\n\n',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
                               fontSize: 14,
                             ),
                           ),
@@ -434,7 +430,6 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                             text:
                                 '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}\n',
                             style: const TextStyle(
-                              color: Colors.white,
                               fontSize: 13,
                             ),
                           ),

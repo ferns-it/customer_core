@@ -652,7 +652,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     if (isTaxApplied == true) ...[
                       verticalSpaceTiny,
                       _SummaryRow(
-                          label: "Tax",
+                          label: "VAT",
                           value: taxAmount ??
                               '${AppConfig.instance.country.symbol}0.00',
                           style: context.customTextTheme.text16W600

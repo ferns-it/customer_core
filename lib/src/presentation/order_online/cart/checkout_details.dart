@@ -191,7 +191,8 @@ class CheckoutDetailsScreen extends StatelessWidget {
                                                                   decorationColor:
                                                                       Colors
                                                                           .grey,
-                                                                  color: Colors.grey),
+                                                                  color: Colors
+                                                                      .grey),
                                                         ),
                                                       ])
                                                     : Text(
@@ -553,7 +554,7 @@ class CheckoutDetailsScreen extends StatelessWidget {
                 if (isTaxApplied == true) ...[
                   verticalSpaceTiny,
                   _SummaryRow(
-                      label: "Tax",
+                      label: "VAT",
                       value: taxAmount ??
                           '${AppConfig.instance.country.symbol}0.00',
                       style: context.customTextTheme.text16W600

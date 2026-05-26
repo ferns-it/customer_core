@@ -651,14 +651,16 @@ class _CartScreenState extends State<CartScreen>
                                           borderRadius:
                                               BorderRadius.circular(10.0)),
                                       child: cartListener.createOrderPending
-                                          ? const Center(
+                                          ? Center(
                                               child: SizedBox(
                                                 height: 20,
                                                 width: 20,
                                                 child:
                                                     CircularProgressIndicator(
                                                   strokeWidth: 2,
-                                                  color: AppColors.kBlack,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
                                                 ),
                                               ),
                                             )

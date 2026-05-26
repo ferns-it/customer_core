@@ -394,8 +394,9 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                           ),
                         ),
                         TextSpan(
-                          text:
-                              'Delivery Discount : ${orderDetails.deliveryDiscount}\n',
+                          text: orderDetails?.deliveryType == "door_delivery"
+                              ? 'Delivery Discount : ${orderDetails.deliveryDiscount}\n'
+                              : 'Takeaway Discount : ${orderDetails.deliveryDiscount}\n',
                           style: const TextStyle(
                             fontSize: 13,
                           ),

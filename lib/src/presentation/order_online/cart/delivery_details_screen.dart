@@ -591,6 +591,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           .copyWith(color: context.customTextTheme.color),
                     ),
                     verticalSpaceSmall,
+
                     _SummaryRow(
                       label: "Sub Total",
                       value:
@@ -609,45 +610,86 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                 .copyWith(color: context.customTextTheme.color))
                         : const SizedBox.shrink(),
                     verticalSpaceTiny,
-                    _SummaryRow(
-                        label: "Discount",
-                        value:
-                            '${AppConfig.instance.country.symbol} ${cartListener.totalDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
-                        style: context.customTextTheme.text16W600
-                            .copyWith(color: context.customTextTheme.color),
-                        infoWidget: Tooltip(
-                          showDuration: Duration(seconds: 8),
-                          triggerMode: TooltipTriggerMode.tap,
-                          richMessage: TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: '\nDiscount Breakdown\n\n',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
+                    cartListener.selectedOrderType == OrderType.delivery
+                        ? _SummaryRow(
+                            label: "Discount",
+                            value:
+                                '${AppConfig.instance.country.symbol} ${cartListener.totalDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
+                            style: context.customTextTheme.text16W600
+                                .copyWith(color: context.customTextTheme.color),
+                            infoWidget: Tooltip(
+                              showDuration: Duration(seconds: 8),
+                              triggerMode: TooltipTriggerMode.tap,
+                              richMessage: TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: '\nDiscount Breakdown\n\n',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        "Cart Discount : ${AppConfig.instance.country.symbol} ${cartListener.cartDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        "\nDelivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.deliveryDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n",
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              TextSpan(
-                                text:
-                                    "Cart Discount : ${AppConfig.instance.country.symbol} ${cartListener.cartDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
+                              child: const Icon(
+                                Icons.info_outline,
+                                size: 18,
                               ),
-                              TextSpan(
-                                text:
-                                    "\nDelivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.deliveryDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n",
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
+                            ))
+                        : _SummaryRow(
+                            label: "Discount",
+                            value: cartListener.takeAwayDetails?.amountFormatted
+                                    ?.totalDiscount ??
+                                '0.00',
+                            style: context.customTextTheme.text16W600
+                                .copyWith(color: context.customTextTheme.color),
+                            infoWidget: Tooltip(
+                              showDuration: Duration(seconds: 8),
+                              triggerMode: TooltipTriggerMode.tap,
+                              richMessage: TextSpan(
+                                children: [
+                                  const TextSpan(
+                                    text: '\nDiscount Breakdown\n\n',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        "Cart Discount : ${cartListener.takeAwayDetails?.amountFormatted?.cartDiscountAmount ?? '0.00'}",
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        "\nTakeAway Discount : ${cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount}\n",
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.info_outline,
-                            size: 18,
-                          ),
-                        )),
+                              child: const Icon(
+                                Icons.info_outline,
+                                size: 18,
+                              ),
+                            )),
 
                     if (isTaxApplied == true) ...[
                       verticalSpaceTiny,

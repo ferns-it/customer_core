@@ -487,15 +487,25 @@ class CheckoutDetailsScreen extends StatelessWidget {
                 ),
               ),
               verticalSpaceSmall,
-              _SummaryRow(
-                label: "Sub Total",
-                value: cartListener
-                        .deliveryDetails?.amountFormatted?.cartGrossAmount ??
-                    "${AppConfig.instance.country.symbol}0.00",
-                style: context.customTextTheme.text16W600.copyWith(
-                  color: isDark ? Colors.white : null,
-                ),
-              ),
+              cartListener.selectedOrderType == OrderType.delivery
+                  ? _SummaryRow(
+                      label: "Sub Total",
+                      value: cartListener.deliveryDetails?.amountFormatted
+                              ?.cartGrossAmount ??
+                          "${AppConfig.instance.country.symbol}0.00",
+                      style: context.customTextTheme.text16W600.copyWith(
+                        color: isDark ? Colors.white : null,
+                      ),
+                    )
+                  : _SummaryRow(
+                      label: "Sub Total",
+                      value: cartListener.takeAwayDetails?.amountFormatted
+                              ?.cartGrossAmount ??
+                          '0.00',
+                      style: context.customTextTheme.text16W600.copyWith(
+                        color: isDark ? Colors.white : null,
+                      ),
+                    ),
               verticalSpaceTiny,
               cartListener.selectedOrderType == OrderType.takeaway
                   ? const SizedBox.shrink()
@@ -512,45 +522,86 @@ class CheckoutDetailsScreen extends StatelessWidget {
 
               if (isTaxApplied == true) ...[
                 verticalSpaceTiny,
-                _SummaryRow(
-                    label: "Discount",
-                    value:
-                        '${AppConfig.instance.country.symbol} ${cartListener.totalDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
-                    style: context.customTextTheme.text16W600
-                        .copyWith(color: context.customTextTheme.color),
-                    infoWidget: Tooltip(
-                      showDuration: Duration(seconds: 8),
-                      triggerMode: TooltipTriggerMode.tap,
-                      richMessage: TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: '\nDiscount Breakdown\n\n',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+                cartListener.selectedOrderType == OrderType.delivery
+                    ? _SummaryRow(
+                        label: "Discount",
+                        value:
+                            '${AppConfig.instance.country.symbol} ${cartListener.totalDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
+                        style: context.customTextTheme.text16W600
+                            .copyWith(color: context.customTextTheme.color),
+                        infoWidget: Tooltip(
+                          showDuration: Duration(seconds: 8),
+                          triggerMode: TooltipTriggerMode.tap,
+                          richMessage: TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: '\nDiscount Breakdown\n\n',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    "Cart Discount : ${AppConfig.instance.country.symbol} ${cartListener.cartDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    "\nDelivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.deliveryDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
                           ),
-                          TextSpan(
-                            text:
-                                "Cart Discount : ${AppConfig.instance.country.symbol} ${cartListener.cartDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
-                            style: const TextStyle(
-                              fontSize: 13,
-                            ),
+                          child: const Icon(
+                            Icons.info_outline,
+                            size: 18,
                           ),
-                          TextSpan(
-                            text:
-                                "\nDelivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.deliveryDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n",
-                            style: const TextStyle(
-                              fontSize: 13,
-                            ),
+                        ))
+                    : _SummaryRow(
+                        label: "Discount",
+                        value: cartListener.takeAwayDetails?.amountFormatted
+                                ?.totalDiscount ??
+                            '0.00',
+                        style: context.customTextTheme.text16W600
+                            .copyWith(color: context.customTextTheme.color),
+                        infoWidget: Tooltip(
+                          showDuration: Duration(seconds: 8),
+                          triggerMode: TooltipTriggerMode.tap,
+                          richMessage: TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: '\nDiscount Breakdown\n\n',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    "Cart Discount : ${cartListener.takeAwayDetails?.amountFormatted?.cartDiscountAmount ?? '0.00'}",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    "\nTakeAway Discount : ${cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount}\n",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.info_outline,
-                        size: 18,
-                      ),
-                    )),
+                          child: const Icon(
+                            Icons.info_outline,
+                            size: 18,
+                          ),
+                        )),
                 if (isTaxApplied == true) ...[
                   verticalSpaceTiny,
                   _SummaryRow(

@@ -125,6 +125,8 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   List<ProductMasterAddonDataModel> _selectedMasterAddons = [];
 
+ 
+
   List<ProductMasterAddonDataModel> get selectedMasterAddons =>
       _selectedMasterAddons;
 

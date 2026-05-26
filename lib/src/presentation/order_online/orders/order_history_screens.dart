@@ -507,7 +507,8 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
               Text(
                 order.orderStatus?.label ?? '',
                 style: context.customTextTheme.text14W600.copyWith(
-                  color: getColor(order.orderStatus ?? OrderStatus.pending),
+                  color: getColor(
+                      order.orderStatus ?? OrderStatus.pending, context),
                   // color: order.orderAccepted
                   //     ? Colors.green
                   //     : order.orderPending
@@ -571,10 +572,10 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
     );
   }
 
-  Color getColor(OrderStatus status) {
+  Color getColor(OrderStatus status, BuildContext context) {
     switch (status) {
       case OrderStatus.pending:
-        return Colors.orange;
+        return Theme.of(context).colorScheme.primary;
       case OrderStatus.accepted:
         return Colors.green;
       case OrderStatus.dispatched:

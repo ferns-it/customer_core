@@ -243,7 +243,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                                     maxLines: 1,
                                     softWrap: true,
                                     overflow: TextOverflow.ellipsis,
-                                    "${dish.normalPrice}",
+                                    "${dish.totalNormalPrice}",
                                     style: context.customTextTheme.text16W700
                                         .copyWith(
                                       color: context.customTextTheme.color,

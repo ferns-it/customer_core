@@ -108,6 +108,7 @@ class OrderDetailsModel {
   final String? netAmountExcludingDeliveryCharge;
   final String? netAmount;
   final String? totalDiscount;
+  final String? netAmount_IncludingDelivery;
 
   final List<OrderHistoryDishesDataModel>? orderDishes;
   final OrderHistoryDeliveryAddressDataModel? deliveryAddress;
@@ -153,6 +154,7 @@ class OrderDetailsModel {
     this.netAmount,
     this.totalDiscount,
     this.orderStatus,
+    this.netAmount_IncludingDelivery,
   });
 
   OrderDetailsModel copyWith({
@@ -194,6 +196,7 @@ class OrderDetailsModel {
     String? netAmountExcludingDeliveryCharge,
     String? netAmount,
     String? totalDiscount,
+    String? netAmount_IncludingDelivery,
     List<OrderHistoryDishesDataModel>? orderDishes,
     OrderHistoryDeliveryAddressDataModel? deliveryAddress,
     OrderStatus? orderStatus,
@@ -241,6 +244,8 @@ class OrderDetailsModel {
       netAmountExcludingDeliveryCharge: netAmountExcludingDeliveryCharge ??
           this.netAmountExcludingDeliveryCharge,
       netAmount: netAmount ?? this.netAmount,
+      netAmount_IncludingDelivery:
+          netAmount_IncludingDelivery ?? this.netAmount_IncludingDelivery,
       totalDiscount: totalDiscount ?? this.totalDiscount,
       orderStatus: orderStatus ?? this.orderStatus,
     );
@@ -287,6 +292,7 @@ class OrderDetailsModel {
       'netAmount': netAmount,
       'totalDiscount': totalDiscount,
       'orderStatus': orderStatus,
+      'ordenetAmount_IncludingDeliveryrStatus': netAmount_IncludingDelivery,
     };
   }
 
@@ -385,6 +391,9 @@ class OrderDetailsModel {
               ? map['netAmountExcludingDeliveryCharge'] as String
               : null,
       netAmount: map['netAmount'] != null ? map['netAmount'] as String : null,
+      netAmount_IncludingDelivery: map['netAmount_IncludingDelivery'] != null
+          ? map['netAmount_IncludingDelivery'] as String
+          : null,
       totalDiscount:
           map['totalDiscount'] != null ? map['totalDiscount'] as String : null,
       orderStatus: map['orderStatus'] != null
@@ -400,7 +409,7 @@ class OrderDetailsModel {
 
   @override
   String toString() {
-    return 'OrderHistorySubDataModel(orderID: $orderID, customerOrderID: $customerOrderID, phone: $phone, , formattedAmount: $formattedAmount, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, takeawayTime: $takeawayTime, formattedDeliveryCharge: $formattedDeliveryCharge, paymentGatway: $paymentGatway, paymentStatus: $paymentStatus, transactionID: $transactionID, orderedAt: $orderedAt, status: $status, dispatchMessage: $dispatchMessage, shopID: $shopID, shopName: $shopName, shopEmail: $shopEmail, shopMobile: $shopMobile, shopAddress1: $shopAddress1, shopAddress2: $shopAddress2, orderDishes: $orderDishes, deliveryAddress: $deliveryAddress, deliveryDiscountLabel: $deliveryDiscountLabel, isTaxApplicable: $isTaxApplicable, taxLabel: $taxLabel, grossAmount: $grossAmount, productDiscountAmount: $productDiscountAmount, totalAmount: $totalAmount, deliveryDiscount: $deliveryDiscount, TotalNetAmount_ExcludingTax: $TotalNetAmount_ExcludingTax, taxTotalAmount: $taxTotalAmount, netAmountExcludingDeliveryCharge: $netAmountExcludingDeliveryCharge, netAmount: $netAmount, totalDiscount: $totalDiscount, orderStatus: $orderStatus)';
+    return 'OrderHistorySubDataModel(orderID: $orderID, customerOrderID: $customerOrderID, phone: $phone, , formattedAmount: $formattedAmount, couponCode: $couponCode, couponType: $couponType, couponValue: $couponValue, couponAmount: $couponAmount, deliveryType: $deliveryType, deliveryCharge: $deliveryCharge, takeawayTime: $takeawayTime, formattedDeliveryCharge: $formattedDeliveryCharge, paymentGatway: $paymentGatway, paymentStatus: $paymentStatus, transactionID: $transactionID, orderedAt: $orderedAt, status: $status, dispatchMessage: $dispatchMessage, shopID: $shopID, shopName: $shopName, shopEmail: $shopEmail, shopMobile: $shopMobile, shopAddress1: $shopAddress1, shopAddress2: $shopAddress2, orderDishes: $orderDishes, deliveryAddress: $deliveryAddress, deliveryDiscountLabel: $deliveryDiscountLabel, isTaxApplicable: $isTaxApplicable, taxLabel: $taxLabel, grossAmount: $grossAmount, productDiscountAmount: $productDiscountAmount, totalAmount: $totalAmount, deliveryDiscount: $deliveryDiscount, TotalNetAmount_ExcludingTax: $TotalNetAmount_ExcludingTax, taxTotalAmount: $taxTotalAmount, netAmountExcludingDeliveryCharge: $netAmountExcludingDeliveryCharge, netAmount: $netAmount,netAmount_IncludingDelivery: $netAmount_IncludingDelivery, totalDiscount: $totalDiscount, orderStatus: $orderStatus)';
   }
 
   @override
@@ -443,6 +452,7 @@ class OrderDetailsModel {
         other.taxTotalAmount == taxTotalAmount &&
         other.netAmountExcludingDeliveryCharge ==
             netAmountExcludingDeliveryCharge &&
+        other.netAmount_IncludingDelivery == netAmount_IncludingDelivery &&
         other.netAmount == netAmount &&
         other.totalDiscount == totalDiscount &&
         other.orderStatus == orderStatus;
@@ -487,6 +497,7 @@ class OrderDetailsModel {
         taxTotalAmount.hashCode ^
         netAmountExcludingDeliveryCharge.hashCode ^
         netAmount.hashCode ^
+        netAmount_IncludingDelivery.hashCode ^
         totalDiscount.hashCode ^
         orderStatus.hashCode;
   }
@@ -518,6 +529,7 @@ class OrderDetailsModel {
       : '${AppConfig.instance.country.symbol}0.00';
 
   bool get isTaxApplicablebool => isTaxApplicable == 'Yes';
+
   // String get formattedDiscount {
   //   if (deliveryDiscount != null) {
   //     var val = double.parse(deliveryDiscount!);

@@ -181,6 +181,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
     OrderDetailsModel orderDetails,
   ) {
     final isTaxApplicable = orderDetails.isTaxApplicablebool;
+
     return ClipPath(
       clipper: RPSCustomClipper(),
       child: Container(
@@ -242,7 +243,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                                     maxLines: 1,
                                     softWrap: true,
                                     overflow: TextOverflow.ellipsis,
-                                    "${orderDetails.grossAmount}",
+                                    "${dish.normalPrice}",
                                     style: context.customTextTheme.text16W700
                                         .copyWith(
                                       color: context.customTextTheme.color,
@@ -360,10 +361,9 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                 verticalSpaceTiny,
                 _SummaryRow(
                   label: "Delivery Charge",
-                  value: orderDetails.deliveryDiscount == 0.00
+                  value: orderDetails.deliveryCharge == 0.00
                       ? 'Free'
-                      : orderDetails.deliveryDiscount ?? "0.00",
-                  // value:orderDetails.formattedDeliveryCharge ?? "0.00",
+                      : orderDetails.deliveryCharge ?? "0.00",
                   style: context.customTextTheme.text16W600
                       .copyWith(color: context.customTextTheme.color),
                 ),
@@ -431,10 +431,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                             ),
                           ),
                           TextSpan(
-                            text: orderDetails.orderDishes
-                                ?.map((dish) =>
-                                    '${dish.taxLabel} : ${dish.taxAmount}\n')
-                                .join('\n'),
+                            text:
+                                '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}\n',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 13,
@@ -450,7 +448,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                 const Divider(height: 20.0),
                 _SummaryRow(
                   label: "Total",
-                  value: orderDetails.netAmount ??
+                  value: orderDetails.netAmount_IncludingDelivery ??
                       "${AppConfig.instance.country.symbol}0.00",
                   style: context.customTextTheme.text18W600
                       .copyWith(color: context.customTextTheme.color),

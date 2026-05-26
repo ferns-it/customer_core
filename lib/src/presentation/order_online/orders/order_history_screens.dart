@@ -74,7 +74,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                     Text(
                       !isLogged ? "Please log in to continue" : "No Orders",
                       style: context.customTextTheme.text16W400
-                          .copyWith(color: AppColors.kWhite),
+                          .copyWith(color: context.customTextTheme.color),
                     ),
                     verticalSpaceSmall,
                     Visibility(
@@ -125,7 +125,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                           Text(
                             'No orders found..',
                             style: context.customTextTheme.text16W700.copyWith(
-                              color: AppColors.kWhite,
+                              color: context.customTextTheme.color,
                             ),
                           ),
                         ],
@@ -493,7 +493,9 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                             .copyWith(color: Colors.grey.shade600),
                       ),
                       Text(
-                        order.netAmount != null ? ' • ${order.netAmount}' : '',
+                        order.netAmount != null
+                            ? ' • ${order.netAmount_IncludingDelivery}'
+                            : '',
                         style: context.customTextTheme.text14W700
                             .copyWith(color: Colors.grey.shade600),
                       ),

@@ -1141,6 +1141,7 @@ class ProductSearchDelegate extends SearchDelegate {
           query = '';
           searchProvider.clearSearchData();
           showSuggestions(context);
+          close(context, null);
         },
       )
     ];

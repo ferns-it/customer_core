@@ -1,4 +1,3 @@
-
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
 import 'package:flutter/cupertino.dart';
@@ -163,7 +162,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
                                 .copyWith(color: context.customTextTheme.color),
                           ),
                           verticalSpaceSmall,
-                          TextButton(
+                          FilledButton(
                             onPressed: () async {
                               // context.router.replace(LoginScreenRoute());
                               final result = await Navigator.push(
@@ -183,15 +182,19 @@ class ProfileScreen extends GetProviderView<UserProvider> {
                                 }
                               }
                             },
-                            style: TextButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                            style: FilledButton.styleFrom(
+                                disabledBackgroundColor: Colors.transparent,
+                                disabledForegroundColor:
+                                    Theme.of(context).disabledColor,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0)),
+                                fixedSize: const Size(double.infinity, 30),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary),
+                            child: const Text(
+                              'LOGIN',
+                              style: TextStyle(color: AppColors.kWhite),
                             ),
-                            child: const Text('LOGIN'),
                           )
                         ],
                       )),
@@ -1131,7 +1134,9 @@ class ProfileScreen extends GetProviderView<UserProvider> {
             data,
             style: context.customTextTheme.text12W400.copyWith(
               color: completed
-                  ? Theme.of(context).colorScheme.primary
+                  ? Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Theme.of(context).colorScheme.primary
                   : AppColors.kGray7,
             ),
           )

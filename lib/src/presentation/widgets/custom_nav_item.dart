@@ -9,6 +9,8 @@ class CustomNavItem extends StatelessWidget {
   final VoidCallback onTap;
   final Color activeColor;
   final Color inactiveColor;
+  final Color? activeTextColor;
+  final Color? inactiveTextColor;
 
   const CustomNavItem({
     super.key,
@@ -18,10 +20,15 @@ class CustomNavItem extends StatelessWidget {
     required this.onTap,
     required this.activeColor,
     required this.inactiveColor,
+    this.activeTextColor,
+    this.inactiveTextColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final currentTextColor = selected
+        ? (activeTextColor ?? activeColor)
+        : (inactiveTextColor ?? inactiveColor);
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -57,7 +64,7 @@ class CustomNavItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: selected ? activeColor : inactiveColor,
+                color: currentTextColor,
               ),
             ),
           ],

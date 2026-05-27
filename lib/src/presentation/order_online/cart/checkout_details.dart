@@ -534,13 +534,13 @@ class CheckoutDetailsScreen extends StatelessWidget {
                           triggerMode: TooltipTriggerMode.tap,
                           richMessage: TextSpan(
                             children: [
-                              const TextSpan(
-                                text: '\nDiscount Breakdown\n\n',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
+                              // const TextSpan(
+                              //   text: '\nDiscount Breakdown\n\n',
+                              //   style: TextStyle(
+                              //     fontWeight: FontWeight.bold,
+                              //     fontSize: 14,
+                              //   ),
+                              // ),
                               TextSpan(
                                 text:
                                     "Cart Discount : ${AppConfig.instance.country.symbol} ${cartListener.cartDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
@@ -574,13 +574,13 @@ class CheckoutDetailsScreen extends StatelessWidget {
                           triggerMode: TooltipTriggerMode.tap,
                           richMessage: TextSpan(
                             children: [
-                              const TextSpan(
-                                text: '\nDiscount Breakdown\n\n',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
+                              // const TextSpan(
+                              //   text: '\nDiscount Breakdown\n\n',
+                              //   style: TextStyle(
+                              //     fontWeight: FontWeight.bold,
+                              //     fontSize: 14,
+                              //   ),
+                              // ),
                               TextSpan(
                                 text:
                                     "Cart Discount : ${cartListener.takeAwayDetails?.amountFormatted?.cartDiscountAmount ?? '0.00'}",
@@ -615,13 +615,13 @@ class CheckoutDetailsScreen extends StatelessWidget {
                         triggerMode: TooltipTriggerMode.tap,
                         richMessage: TextSpan(
                           children: [
-                            const TextSpan(
-                              text: '\nTax Breakdown\n\n',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
+                            // const TextSpan(
+                            //   text: '\nTax Breakdown\n\n',
+                            //   style: TextStyle(
+                            //     fontWeight: FontWeight.bold,
+                            //     fontSize: 14,
+                            //   ),
+                            // ),
                             ...?taxGroup?.expand(
                               (tax) => [
                                 TextSpan(

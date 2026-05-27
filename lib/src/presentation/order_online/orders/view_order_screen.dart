@@ -379,13 +379,13 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                     triggerMode: TooltipTriggerMode.tap,
                     richMessage: TextSpan(
                       children: [
-                        const TextSpan(
-                          text: '\nDiscount Breakdown\n\n',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
+                        // const TextSpan(
+                        //   text: '\nDiscount Breakdown\n\n',
+                        //   style: TextStyle(
+                        //     fontWeight: FontWeight.bold,
+                        //     fontSize: 14,
+                        //   ),
+                        // ),
                         TextSpan(
                           text:
                               'Cart Discount :  ${orderDetails.productDiscountAmount}\n',
@@ -420,13 +420,13 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                       triggerMode: TooltipTriggerMode.tap,
                       richMessage: TextSpan(
                         children: [
-                          const TextSpan(
-                            text: '\nTax Breakdown\n\n',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
+                          // const TextSpan(
+                          //   text: '\nTax Breakdown\n\n',
+                          //   style: TextStyle(
+                          //     fontWeight: FontWeight.bold,
+                          //     fontSize: 14,
+                          //   ),
+                          // ),
                           TextSpan(
                             text:
                                 '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}\n',
@@ -516,7 +516,9 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
             data,
             style: context.customTextTheme.text12W400.copyWith(
               color: completed
-                  ? Theme.of(context).colorScheme.primary
+                  ? Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Theme.of(context).colorScheme.primary
                   : AppColors.kGray7,
             ),
           )

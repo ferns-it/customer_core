@@ -79,7 +79,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                     verticalSpaceSmall,
                     Visibility(
                       visible: !isLogged,
-                      child: TextButton(
+                      child: FilledButton(
                         onPressed: () async {
                           // context.router.replace(LoginScreenRoute());
                           final result = await Navigator.push(
@@ -101,14 +101,19 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                             ]);
                           }
                         },
-                        style: TextButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                                color: Theme.of(context).colorScheme.primary),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                        style: FilledButton.styleFrom(
+                            disabledBackgroundColor: Colors.transparent,
+                            disabledForegroundColor:
+                                Theme.of(context).disabledColor,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0)),
+                            fixedSize: const Size(double.infinity, 30),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary),
+                        child: const Text(
+                          'LOGIN',
+                          style: TextStyle(color: AppColors.kWhite),
                         ),
-                        child: const Text('LOGIN'),
                       ),
                     )
                   ],
@@ -177,7 +182,10 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                               Tab(text: "History"),
                             ],
                             dividerColor: Colors.transparent,
-                            labelColor: Theme.of(context).colorScheme.primary,
+                            labelColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Theme.of(context).colorScheme.primary,
                             unselectedLabelColor:
                                 Theme.of(context).disabledColor,
                           ),

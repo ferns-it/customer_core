@@ -431,7 +431,7 @@ class _CartScreenState extends State<CartScreen>
                                         cartProvider.onChangeOrderType(
                                             OrderType.delivery);
 
-                                        // cartProvider.calculateDeliveryCharge();
+                                        cartProvider.calculateDeliveryCharge();
                                         cartProvider.jumpToPage(1);
                                         return;
                                       }

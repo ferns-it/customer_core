@@ -110,6 +110,10 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                     selected: currentPage == 0,
                     icon: Icons.home,
                     label: "Home",
+                    activeTextColor:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey
+                            : Theme.of(context).colorScheme.primary,
                     activeColor: Theme.of(context).colorScheme.primary,
                     inactiveColor: Colors.grey,
                     onTap: () => provider.onChangeCurrentPage(0),
@@ -118,6 +122,10 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                     selected: currentPage == 1,
                     icon: Icons.category,
                     label: "Categories",
+                    activeTextColor:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey
+                            : Theme.of(context).colorScheme.primary,
                     activeColor: Theme.of(context).colorScheme.primary,
                     inactiveColor: Colors.grey,
                     onTap: () async {
@@ -150,6 +158,10 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                     selected: currentPage == 2,
                     icon: Icons.history,
                     label: "Orders",
+                    activeTextColor:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey
+                            : Theme.of(context).colorScheme.primary,
                     activeColor: Theme.of(context).colorScheme.primary,
                     inactiveColor: Colors.grey,
                     onTap: () => provider.onChangeCurrentPage(2),
@@ -158,6 +170,10 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                     selected: currentPage == 3,
                     icon: Icons.person,
                     label: "Profile",
+                    activeTextColor:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey
+                            : Theme.of(context).colorScheme.primary,
                     activeColor: Theme.of(context).colorScheme.primary,
                     inactiveColor: Colors.grey,
                     onTap: () => provider.onChangeCurrentPage(3),

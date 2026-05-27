@@ -550,7 +550,7 @@ class CheckoutDetailsScreen extends StatelessWidget {
                               ),
                               TextSpan(
                                 text:
-                                    "\nDelivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.deliveryDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}\n",
+                                    "\nDelivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.deliveryDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
                                 style: const TextStyle(
                                   fontSize: 13,
                                 ),
@@ -590,7 +590,7 @@ class CheckoutDetailsScreen extends StatelessWidget {
                               ),
                               TextSpan(
                                 text:
-                                    "\nTakeAway Discount : ${cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount}\n",
+                                    "\nTakeAway Discount : ${cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount}",
                                 style: const TextStyle(
                                   fontSize: 13,
                                 ),
@@ -631,7 +631,7 @@ class CheckoutDetailsScreen extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: '${tax.totalTax}\n',
+                                  text: '${tax.totalTax}',
                                   style: const TextStyle(),
                                 ),
                               ],

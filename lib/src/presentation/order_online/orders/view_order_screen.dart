@@ -395,8 +395,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                         ),
                         TextSpan(
                           text: orderDetails?.deliveryType == "door_delivery"
-                              ? 'Delivery Discount : ${orderDetails.deliveryDiscount}\n'
-                              : 'Takeaway Discount : ${orderDetails.deliveryDiscount}\n',
+                              ? 'Delivery Discount : ${orderDetails.deliveryDiscount}'
+                              : 'Takeaway Discount : ${orderDetails.deliveryDiscount}',
                           style: const TextStyle(
                             fontSize: 13,
                           ),
@@ -429,7 +429,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                           // ),
                           TextSpan(
                             text:
-                                '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}\n',
+                                '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}',
                             style: const TextStyle(
                               fontSize: 13,
                             ),

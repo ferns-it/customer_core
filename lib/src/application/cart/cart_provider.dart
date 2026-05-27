@@ -75,7 +75,6 @@ class CartProvider extends ChangeNotifier with BaseController {
   List<CartItemDataModel> get cartItems => _cartDetailsModel?.cartItems ?? [];
   String get carttTotalAmountNormalFormatted {
     String totalAmount = "0.000";
-
     for (var item in cartItems) {
       totalAmount =
           item.amountDetails?.itemDetails?.display?.totalAmountNormal ??
@@ -99,14 +98,29 @@ class CartProvider extends ChangeNotifier with BaseController {
           ? cartDetailsModel!.cartTotal!.cartDiscountTotal! /
               AppConfig.instance.country.currencyDivisor
           : null;
+  String get subTotal {
+    double total = 0;
 
-  double get cartGrossAmount =>
-      double.tryParse(
-        selectedOrderType == OrderType.delivery
-            ? deliveryDetails?.cartGrossAmount ?? '0.0'
-            : takeAwayDetails?.cartGrossAmount ?? '0.0',
-      ) ??
-      0.0;
+    for (final item in cartItems) {
+      total += double.tryParse(
+            item.amountDetails?.itemDetails?.display?.totalAmountNormal
+                    ?.replaceAll('BHD', '')
+                    .trim() ??
+                '0',
+          ) ??
+          0;
+    }
+
+    return 'BHD ${total.toStringAsFixed(3)}';
+  }
+  // double get cartGrossAmount =>
+  //     double.tryParse(
+  //       selectedOrderType == OrderType.delivery
+  //           ? deliveryDetails?.cartGrossAmount ?? '0.0'
+  //           : takeAwayDetails?.cartGrossAmount ?? '0.0',
+  //     ) ??
+  //     0.0;
+
   int get totalCartItems => cartItems.length;
 
   bool get isCartEmpty => cartItems.isEmpty;
@@ -124,8 +138,6 @@ class CartProvider extends ChangeNotifier with BaseController {
       _selectedRegularAddons;
 
   List<ProductMasterAddonDataModel> _selectedMasterAddons = [];
-
- 
 
   List<ProductMasterAddonDataModel> get selectedMasterAddons =>
       _selectedMasterAddons;

@@ -595,7 +595,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     _SummaryRow(
                       label: "Sub Total",
                       value:
-                          "${AppConfig.instance.country.symbol} ${cartListener.cartGrossAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                          " ${cartListener.cartDetailsModel?.cartTotal?.cartTotalPrice_NormalDisplay}",
                       style: context.customTextTheme.text16W600
                           .copyWith(color: context.customTextTheme.color),
                     ),
@@ -613,8 +613,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     cartListener.selectedOrderType == OrderType.delivery
                         ? _SummaryRow(
                             label: "Discount",
-                            value:
-                                '${AppConfig.instance.country.symbol} ${cartListener.totalDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
+                            value: cartListener.deliveryDetails?.amountFormatted
+                                    ?.totalDiscount ??
+                                'BHD 0.000',
                             style: context.customTextTheme.text16W600
                                 .copyWith(color: context.customTextTheme.color),
                             infoWidget: Tooltip(
@@ -631,7 +632,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   // ),
                                   TextSpan(
                                     text:
-                                        "Cart Discount : ${AppConfig.instance.country.symbol} ${cartListener.cartDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                                        "Cart Discount : ${cartListener.cartDetailsModel?.cartTotal?.cartDiscountTotalDisplay}",
                                     style: const TextStyle(
                                       fontSize: 13,
                                     ),
@@ -654,7 +655,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                             label: "Discount",
                             value: cartListener.takeAwayDetails?.amountFormatted
                                     ?.totalDiscount ??
-                                '0.00',
+                                'BHD 0.000',
                             style: context.customTextTheme.text16W600
                                 .copyWith(color: context.customTextTheme.color),
                             infoWidget: Tooltip(
@@ -671,14 +672,14 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   // ),
                                   TextSpan(
                                     text:
-                                        "Cart Discount : ${cartListener.takeAwayDetails?.amountFormatted?.cartDiscountAmount ?? '0.00'}",
+                                        "Cart Discount : ${cartListener.cartDetailsModel?.cartTotal?.cartDiscountTotalDisplay}",
                                     style: const TextStyle(
                                       fontSize: 13,
                                     ),
                                   ),
                                   TextSpan(
                                     text:
-                                        "\nTakeAway Discount : ${cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount}",
+                                        "\nTakeAway Discount : ${cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount ?? 'BHD 0.000'}",
                                     style: const TextStyle(
                                       fontSize: 13,
                                     ),

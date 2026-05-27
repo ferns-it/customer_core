@@ -364,7 +364,7 @@ class _CartScreenState extends State<CartScreen>
                           children: [
                             Expanded(
                                 child: _buildTotalAmountWidget(
-                                    " ${cartListener.cartDetailsModel?.cartTotal?.cartTotalPrice_NormalDisplay ?? 0.0}")),
+                                    "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
                             Expanded(
                               child: InkWell(
                                 onTap: () async {
@@ -398,8 +398,8 @@ class _CartScreenState extends State<CartScreen>
                                             cartProvider.onChangeOrderType(
                                                 OrderType.delivery);
 
-                                            cartProvider
-                                                .calculateDeliveryCharge();
+                                            // cartProvider
+                                            //     .calculateDeliveryCharge();
                                             cartProvider.jumpToPage(1);
                                             return;
                                           }
@@ -430,8 +430,6 @@ class _CartScreenState extends State<CartScreen>
                                         cartProvider.onChangeAddress(address);
                                         cartProvider.onChangeOrderType(
                                             OrderType.delivery);
-
-                                        cartProvider.calculateDeliveryCharge();
                                         cartProvider.jumpToPage(1);
                                         return;
                                       }

@@ -468,9 +468,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
       margin: const EdgeInsets.all(10.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: themeListener.isDarkMode
-            ? AppColors.kCardBackground2
-            : AppColors.kWhite,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(10.0),
         boxShadow: [
           BoxShadow(
@@ -531,9 +529,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
             ],
           ),
           Divider(
-              color: themeListener.isDarkMode
-                  ? Theme.of(context).scaffoldBackgroundColor
-                  : Colors.grey.shade200),
+              color:Theme.of(context).dividerColor),
           Column(
             children: listOfProducts
                 .take(3)
@@ -562,9 +558,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
             ],
           ),
           Divider(
-              color: themeListener.isDarkMode
-                  ? Theme.of(context).scaffoldBackgroundColor
-                  : Colors.grey.shade200),
+               color:Theme.of(context).dividerColor),
           Text(
               "Order Placed On: ${DateTimeUtils.formatDateTimeToDate(order.orderedAt)}, ${DateTimeUtils.formatTimeMinimal(order.orderedAt)}",
               style: context.customTextTheme.text14W400
@@ -616,18 +610,14 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
           children: <Widget>[
             buildTitleCard(order, context),
             Divider(
-                color: themeListener.isDarkMode
-                    ? Theme.of(context).scaffoldBackgroundColor
-                    : Colors.grey.shade200),
+                color:Theme.of(context).dividerColor),
             verticalSpaceSmall,
             buildOrderDetails(order, context),
             verticalSpaceRegular,
             buildOrderFooter(order, context),
             verticalSpaceSmall,
             Divider(
-                color: themeListener.isDarkMode
-                    ? Theme.of(context).scaffoldBackgroundColor
-                    : Colors.grey.shade200),
+                color:Theme.of(context).dividerColor),
             buildFooterDetails(order, context),
           ],
         ),

@@ -365,9 +365,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
       margin: const EdgeInsets.all(10.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: themeListener.isDarkMode
-            ? AppColors.kCardBackground2
-            : AppColors.kWhite,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(10.0),
         boxShadow: [
           BoxShadow(
@@ -417,9 +415,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
             ],
           ),
           Divider(
-              color: themeListener.isDarkMode
-                  ? Theme.of(context).scaffoldBackgroundColor
-                  : Colors.grey.shade200),
+               color:Theme.of(context).dividerColor),
           Column(
             children: listOfProducts
                 .take(3)
@@ -448,17 +444,13 @@ class ProfileScreen extends GetProviderView<UserProvider> {
             ],
           ),
           Divider(
-              color: themeListener.isDarkMode
-                  ? Theme.of(context).scaffoldBackgroundColor
-                  : Colors.grey.shade200),
+              color:Theme.of(context).dividerColor),
           Text(
               "Order Placed On: ${DateTimeUtils.formatDateTimeToDate(order.orderedAt)}, ${DateTimeUtils.formatTimeMinimal(order.orderedAt)}",
               style: context.customTextTheme.text14W400
                   .copyWith(color: context.customTextTheme.color)),
           Divider(
-              color: themeListener.isDarkMode
-                  ? Theme.of(context).scaffoldBackgroundColor
-                  : Colors.grey.shade200),
+               color:Theme.of(context).dividerColor),
           verticalSpaceSmall,
           buildFooterDetails(order, context),
         ],

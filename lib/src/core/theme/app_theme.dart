@@ -80,6 +80,7 @@ ThemeData appLightTheme(BuildContext context) {
   );
 
   return ThemeData(
+    dividerColor: Colors.grey.shade200,
     cardColor: AppColors.kWhite,
     useMaterial3: true,
     brightness: Brightness.light,
@@ -154,6 +155,7 @@ ThemeData appDarkTheme(BuildContext context) {
   );
 
   return ThemeData(
+    dividerColor: AppColors.kDarkBg,
     cardColor: const Color(0xFF1E1E1E),
     useMaterial3: true,
     brightness: Brightness.dark,
@@ -172,7 +174,7 @@ ThemeData appDarkTheme(BuildContext context) {
     ),
     drawerTheme: const DrawerThemeData(backgroundColor: AppColors.kDarkBg),
     iconTheme: const IconThemeData(
-      color: AppColors.kWhite, // light mode
+      color: AppColors.kGray, // light mode
     ),
     colorScheme: ColorScheme.dark(
       primary: Theme.of(context).colorScheme.primary,

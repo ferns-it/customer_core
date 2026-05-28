@@ -113,9 +113,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                             children: [
                               Icon(
                                 FluentIcons.location_24_regular,
-                                color: themeListener.isDarkMode
-                                    ? Colors.white
-                                    : null,
+                                color: Theme.of(context).iconTheme.color,
                               ),
                               const SizedBox(width: 8.0),
                               // Add space between icon and text
@@ -1142,7 +1140,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                         cartListener.selectedPickUpTime!,
                       )}",
                 style: context.customTextTheme.text16W600.copyWith(
-                  color: themeListener.isDarkMode ? Colors.white : null,
+                  color: context.customTextTheme.color,
                 ),
               ),
             ),
@@ -1212,11 +1210,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           verticalSpaceRegular,
                           // Search TextField
                           TextFormField(
-                            style: TextStyle(
-                              color: themeListener.isDarkMode
-                                  ? Colors.white
-                                  : null,
-                            ),
+                            style:
+                                TextStyle(color: context.customTextTheme.color),
                             controller: userListener.searchAddressTxtController,
                             onChanged: (value) =>
                                 userListener.searchAddressByPostCode(value),
@@ -1234,9 +1229,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                 ),
                               ),
                               isDense: true,
-                              fillColor: themeListener.isDarkMode
-                                  ? AppColors.kCardBackground2
-                                  : AppColors.kLightBlue2,
+                              fillColor: Theme.of(context).cardColor,
                               filled: true,
                               hintText: 'Look for a Postcode...',
                               hintStyle:
@@ -1327,8 +1320,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                         .customTextTheme
                                                         .text18W600
                                                         .copyWith(
-                                                     color: context.customTextTheme.color
-                                                    ),
+                                                            color: context
+                                                                .customTextTheme
+                                                                .color),
                                                   ),
                                                   subtitle: Text(
                                                     Utils.removeExtraSpaces(
@@ -1338,8 +1332,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                         .customTextTheme
                                                         .text16W400
                                                         .copyWith(
-                                                     color: context.customTextTheme.color
-                                                    ),
+                                                            color: context
+                                                                .customTextTheme
+                                                                .color),
                                                   ),
                                                 ),
                                               ),
@@ -1498,9 +1493,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                               },
                                               icon: Icon(
                                                 Icons.remove_circle_outline,
-                                                color: themeListener.isDarkMode
-                                                    ? Colors.white
-                                                    : AppColors.kGray,
+                                                color: Theme.of(context)
+                                                    .iconTheme
+                                                    .color,
                                               ),
                                             )
                                           ],

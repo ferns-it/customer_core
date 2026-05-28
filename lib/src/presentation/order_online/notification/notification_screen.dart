@@ -51,23 +51,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 return ListTile(
                   leading: Icon(
                     FluentIcons.alert_20_regular,
-                    color:
-                        themeListener.isDarkMode ? Colors.white : Colors.black,
+                           color:  context.customTextTheme.color
+
                   ),
                   title: Text(notification.title ?? ''),
                   titleTextStyle: TextStyle(
-                      color: themeListener.isDarkMode
-                          ? Colors.white
-                          : Colors.black),
+                            color:  context.customTextTheme.color
+),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         notification.body ?? '',
                         style: TextStyle(
-                            color: themeListener.isDarkMode
-                                ? Colors.white
-                                : Colors.black),
+                                   color:  context.customTextTheme.color
+),
                       ),
                       notification.dateTime != null
                           ? Text(

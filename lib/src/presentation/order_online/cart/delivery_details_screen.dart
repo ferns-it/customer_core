@@ -397,10 +397,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                         child: FormBuilderTextField(
                           name: 'notes',
                           key: cartListener.notesFieldKey,
-                          style: context.customTextTheme.text14W600.copyWith(
-                            color:
-                                themeListener.isDarkMode ? Colors.white : null,
-                          ),
+                          style: context.customTextTheme.text14W600
+                              .copyWith(color: context.customTextTheme.color),
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.zero,
                             enabledBorder: outlinedBorder,
@@ -1329,10 +1327,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                         .customTextTheme
                                                         .text18W600
                                                         .copyWith(
-                                                      color: themeListener
-                                                              .isDarkMode
-                                                          ? Colors.white
-                                                          : Colors.black,
+                                                     color: context.customTextTheme.color
                                                     ),
                                                   ),
                                                   subtitle: Text(
@@ -1343,10 +1338,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                         .customTextTheme
                                                         .text16W400
                                                         .copyWith(
-                                                      color: themeListener
-                                                              .isDarkMode
-                                                          ? Colors.white
-                                                          : Colors.black,
+                                                     color: context.customTextTheme.color
                                                     ),
                                                   ),
                                                 ),
@@ -1528,9 +1520,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                           : 'The address is not found',
                                       style: context.customTextTheme.text14W400
                                           .copyWith(
-                                        color: themeListener.isDarkMode
-                                            ? Colors.white
-                                            : null,
+                                       color: context.customTextTheme.color,
                                       ),
                                     ),
                                   ),

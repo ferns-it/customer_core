@@ -600,9 +600,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
     return Container(
       margin: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
-        color: themeListener.isDarkMode
-            ? AppColors.kCardBackground2
-            : AppColors.kWhite,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(10.0),
         boxShadow: [
           BoxShadow(

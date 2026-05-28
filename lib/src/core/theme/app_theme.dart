@@ -80,6 +80,7 @@ ThemeData appLightTheme(BuildContext context) {
   );
 
   return ThemeData(
+    cardColor: AppColors.kWhite,
     useMaterial3: true,
     brightness: Brightness.light,
     extensions: [lightCustomTextStyle],
@@ -153,6 +154,7 @@ ThemeData appDarkTheme(BuildContext context) {
   );
 
   return ThemeData(
+    cardColor: const Color(0xFF1E1E1E),
     useMaterial3: true,
     brightness: Brightness.dark,
     extensions: [darkCustomTextStyle],

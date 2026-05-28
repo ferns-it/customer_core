@@ -304,9 +304,8 @@ class ProfileScreen extends GetProviderView<UserProvider> {
       ),
       title: Text(
         'Delete Account',
-        style: context.customTextTheme.text14W500.copyWith(
-          color: themeListener.isDarkMode ? Colors.white : Colors.black,
-        ),
+        style: context.customTextTheme.text14W500
+            .copyWith(color: context.customTextTheme.color),
       ),
     );
   }
@@ -349,9 +348,8 @@ class ProfileScreen extends GetProviderView<UserProvider> {
       ),
       title: Text(
         'Active Orders',
-        style: context.customTextTheme.text14W500.copyWith(
-          color: themeListener.isDarkMode ? Colors.white : Colors.black,
-        ),
+        style: context.customTextTheme.text14W500
+            .copyWith(color: context.customTextTheme.color),
       ),
     );
   }
@@ -481,9 +479,8 @@ class ProfileScreen extends GetProviderView<UserProvider> {
         ),
         title: Text(
           'Dark Mode',
-          style: context.customTextTheme.text14W500.copyWith(
-            color: themeListener.isDarkMode ? Colors.white : Colors.black,
-          ),
+          style: context.customTextTheme.text14W500
+              .copyWith(color: context.customTextTheme.color),
         ),
         trailing: CupertinoSwitch(
           activeColor: Theme.of(context).colorScheme.primary,
@@ -512,9 +509,8 @@ class ProfileScreen extends GetProviderView<UserProvider> {
       ),
       title: Text(
         'Update Address',
-        style: context.customTextTheme.text14W500.copyWith(
-          color: themeListener.isDarkMode ? Colors.white : Colors.black,
-        ),
+        style: context.customTextTheme.text14W500
+            .copyWith(color: context.customTextTheme.color),
       ),
     );
   }
@@ -555,9 +551,8 @@ class ProfileScreen extends GetProviderView<UserProvider> {
       ),
       title: Text(
         'Notification Preferences',
-        style: context.customTextTheme.text14W500.copyWith(
-          color: themeListener.isDarkMode ? Colors.white : Colors.black,
-        ),
+        style: context.customTextTheme.text14W500
+            .copyWith(color: context.customTextTheme.color),
       ),
     );
   }
@@ -578,9 +573,8 @@ class ProfileScreen extends GetProviderView<UserProvider> {
       ),
       title: Text(
         'Favourite Products',
-        style: context.customTextTheme.text14W500.copyWith(
-          color: themeListener.isDarkMode ? Colors.white : Colors.black,
-        ),
+        style: context.customTextTheme.text14W500
+            .copyWith(color: context.customTextTheme.color),
       ),
     );
   }
@@ -669,9 +663,8 @@ class ProfileScreen extends GetProviderView<UserProvider> {
           ),
           title: Text(
             'Change Password',
-            style: context.customTextTheme.text14W500.copyWith(
-              color: themeListener.isDarkMode ? Colors.white : Colors.black,
-            ),
+            style: context.customTextTheme.text14W500
+                .copyWith(color: context.customTextTheme.color),
           ),
         ),
         Divider(

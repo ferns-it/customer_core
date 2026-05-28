@@ -156,7 +156,7 @@ ThemeData appDarkTheme(BuildContext context) {
 
   return ThemeData(
     dividerColor: AppColors.kDarkBg,
-    cardColor: const Color(0xFF1E1E1E),
+    cardColor: AppColors.kCardBackground2,
     useMaterial3: true,
     brightness: Brightness.dark,
     extensions: [darkCustomTextStyle],

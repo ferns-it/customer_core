@@ -457,9 +457,7 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
                 child: Text(
                   "REQUIRED",
                   style: context.customTextTheme.text12W600.copyWith(
-                    color: themeListener.isDarkMode
-                        ? Colors.white
-                        : AppColors.kBlack2,
+                    color: context.customTextTheme.color,
                   ),
                 ),
               ),
@@ -473,8 +471,7 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
             title: Text(
               (variation.name ?? "").capitalize(),
               style: context.customTextTheme.text14W600.copyWith(
-                color:
-                    themeListener.isDarkMode ? Colors.white : AppColors.kBlack,
+                color: context.customTextTheme.color,
               ),
             ),
             subtitle: variation.offerPriceEnabled == 'Yes' &&
@@ -484,10 +481,7 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
                       text:
                           "${variation.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
                       style: TextStyle(
-                          color: themeListener.isDarkMode
-                              ? Colors.white
-                              : AppColors.kBlack,
-                          fontSize: 15),
+                          color: context.customTextTheme.color, fontSize: 15),
                       children: [
                         TextSpan(
                           text: variation.displayPrice ?? '',
@@ -569,11 +563,8 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
                         children: <Widget>[
                           Text(
                             "${modifier.minimumRequired == "0" ? '' : 'Min ${modifier.minimumRequired}'}${modifier.minimumRequired != "0" && modifier.maximumRequired != "0" ? ', ' : ''}${modifier.maximumRequired == "0" ? '' : 'Max ${modifier.maximumRequired}'}",
-                            style: textTheme.labelSmall!.copyWith(
-                              color: themeListener.isDarkMode
-                                  ? Colors.white
-                                  : AppColors.kBlack2,
-                            ),
+                            style: textTheme.labelSmall!
+                                .copyWith(color: context.customTextTheme.color),
                           ),
                           Visibility(
                             child: Container(
@@ -590,9 +581,7 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
                                   "REQUIRED",
                                   style: context.customTextTheme.text12W600
                                       .copyWith(
-                                    color: themeListener.isDarkMode
-                                        ? Colors.white
-                                        : AppColors.kBlack2,
+                                    color: context.customTextTheme.color,
                                   ),
                                 ),
                               ),
@@ -608,18 +597,13 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
                         modifier, option),
                     title: Text(
                       (option.text ?? "").capitalize(),
-                      style: context.customTextTheme.text14W600.copyWith(
-                        color: themeListener.isDarkMode
-                            ? Colors.white
-                            : AppColors.kBlack,
-                      ),
+                      style: context.customTextTheme.text14W600
+                          .copyWith(color: context.customTextTheme.color),
                     ),
                     subtitle: Text(
                       '${AppConfig.instance.country.symbol} ${option.price}',
                       style: context.customTextTheme.text14W500.copyWith(
-                        color: themeListener.isDarkMode
-                            ? Colors.white
-                            : AppColors.kBlack,
+                        color: context.customTextTheme.color,
                       ),
                     ),
                     side: const BorderSide(color: Colors.grey),
@@ -649,17 +633,13 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
                     title: Text(
                       (option.text ?? "").capitalize(),
                       style: context.customTextTheme.text14W600.copyWith(
-                        color: themeListener.isDarkMode
-                            ? Colors.white
-                            : AppColors.kBlack,
+                        color: context.customTextTheme.color,
                       ),
                     ),
                     subtitle: Text(
                       '${AppConfig.instance.country.symbol} ${option.price}',
                       style: context.customTextTheme.text14W500.copyWith(
-                        color: themeListener.isDarkMode
-                            ? Colors.white
-                            : AppColors.kBlack,
+                        color: context.customTextTheme.color,
                       ),
                     ),
                     side: const BorderSide(color: Colors.grey),

@@ -404,7 +404,7 @@ class DeliveryFeeDeliverySettings {
   final double? maxDeliveryRadius;
   final int? ratePerMile;
   final String? deliveryChargeType;
-  final double? freeDeliveryMinOrder;
+  final int? freeDeliveryMinOrder;
   final String? calculateNormalDeliveryFee;
 
   DeliveryFeeDeliverySettings({
@@ -427,7 +427,7 @@ class DeliveryFeeDeliverySettings {
     double? maxDeliveryRadius,
     int? ratePerMile,
     String? deliveryChargeType,
-    double? freeDeliveryMinOrder,
+    int? freeDeliveryMinOrder,
     String? calculateNormalDeliveryFee,
   }) {
     return DeliveryFeeDeliverySettings(
@@ -482,7 +482,7 @@ class DeliveryFeeDeliverySettings {
           ? map['deliveryChargeType'] as String
           : null,
       freeDeliveryMinOrder: map['freeDeliveryMinOrder'] != null
-          ? map['freeDeliveryMinOrder'] as double
+          ? map['freeDeliveryMinOrder'] as int
           : null,
       calculateNormalDeliveryFee: map['calculateNormalDeliveryFee'] != null
           ? map['calculateNormalDeliveryFee'] as String

@@ -1128,7 +1128,12 @@ class CartProvider extends ChangeNotifier with BaseController {
       return;
     }
 
-    calculateTakeAwayCharge();
+    // Pass a temporary pickup time to fetch takeaway billing details
+    // without setting the user-visible selectedPickUpTime.
+    // selectedPickUpTime stays null so the UI still shows "Select Pick Up Time".
+    calculateTakeAwayCharge(
+      pickupTime: _selectedPickUpTime ?? DateTime.now().add(const Duration(minutes: 15)),
+    );
   }
 
   void onChangePaymentMethod(PaymentMethod method) {
@@ -1184,7 +1189,7 @@ class CartProvider extends ChangeNotifier with BaseController {
         AlertDialogs.showInfo("Pick a time for takeaway");
         return false;
       }
-      if (_takeAwayDetails == null) {
+      if (takeAwayDetails == null) {
         calculateTakeAwayCharge();
         return false;
       }
@@ -1227,18 +1232,24 @@ class CartProvider extends ChangeNotifier with BaseController {
     }
   }
 
-  Future<void> calculateTakeAwayCharge() async {
+  Future<void> calculateTakeAwayCharge({DateTime? pickupTime}) async {
     try {
-      if (selectedPickUpTime == null) return;
+      final effectivePickupTime = pickupTime ?? _selectedPickUpTime;
+      if (effectivePickupTime == null) return;
       _takeAwayDetails = null;
+      notifyListeners();
       _deliveryOrTakeAwayChargeCalculating = true;
       notifyListeners();
       final response = await checkRepo.calculateTakeAwayFee(
-        selectedPickUpTime!,
+        effectivePickupTime,
       );
 
       response.fold((error) {
-        _selectedPickUpTime = null;
+        // Only clear the user-facing pickup time if it was a user-selected one
+        // that caused the error (i.e. pickupTime param was not provided)
+        if (pickupTime == null) {
+          _selectedPickUpTime = null;
+        }
         notifyListeners();
         AlertDialogs.showError(error.message);
       }, (details) {

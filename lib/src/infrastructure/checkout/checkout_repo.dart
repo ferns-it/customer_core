@@ -87,8 +87,8 @@ class CheckoutRepo implements ICheckoutRepo {
         authDataKey: "user",
         dataKeyChecking: true,
         data: {
+          "pickupTime": DateTimeUtils.format(pickupTime),
           "shopID": AppIdentifiers.kShopId,
-          "pickupTime": DateTimeUtils.format(pickupTime)
         },
         needAuth: true,
       );

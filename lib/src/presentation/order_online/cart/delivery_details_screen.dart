@@ -57,11 +57,22 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final taxAmount = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.amountFormatted?.taxTotalAmount
         : cartListener.takeAwayDetails?.amountFormatted?.taxTotalAmount;
+    final subTotal = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.amountFormatted?.cartGrossAmount
+        : cartListener.takeAwayDetails?.amountFormatted?.cartGrossAmount;
+    final deliveryCharge =
+        cartListener.deliveryDetails?.amountFormatted?.deliveryFeeAmount;
+
+    final totalDiscount = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.amountFormatted?.totalDiscount
+        : cartListener.takeAwayDetails?.amountFormatted?.totalDiscount;
     final cartDiscount = cartListener.selectedOrderType == OrderType.delivery
-        ? cartListener.totalCartDiscount
-        : cartListener.selectedOrderType == OrderType.takeaway
-            ? 0.00
-            : 0.0;
+        ? cartListener.deliveryDetails?.amountFormatted?.cartDiscountAmount
+        : cartListener.takeAwayDetails?.amountFormatted?.cartDiscountAmount;
+    final deliveryDiscount =
+        cartListener.deliveryDetails?.amountFormatted?.deliveryDiscount;
+    final takeawayDiscount =
+        cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -590,105 +601,71 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
 
                     _SummaryRow(
                       label: "Sub Total",
-                      value:
-                          " ${cartListener.cartDetailsModel?.cartTotal?.cartTotalPrice_NormalDisplay}",
+                      value: subTotal ??
+                          '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
                       style: context.customTextTheme.text16W600
                           .copyWith(color: context.customTextTheme.color),
                     ),
-                    verticalSpaceTiny,
+                    cartListener.selectedOrderType == OrderType.delivery
+                        ? verticalSpaceTiny
+                        : SizedBox.shrink(),
                     cartListener.selectedOrderType == OrderType.delivery
                         ? _SummaryRow(
                             label: "Delivery Charge",
                             value: cartListener.calculatedDeliveryFee == 0.00
                                 ? 'Free'
-                                : "${AppConfig.instance.country.symbol} ${cartListener.calculatedDeliveryFee.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                                : "$deliveryCharge",
                             style: context.customTextTheme.text16W600
                                 .copyWith(color: context.customTextTheme.color))
-                        : const SizedBox.shrink(),
+                        : SizedBox.shrink(),
                     verticalSpaceTiny,
-                    cartListener.selectedOrderType == OrderType.delivery
-                        ? _SummaryRow(
-                            label: "Discount",
-                            value: cartListener.deliveryDetails?.amountFormatted
-                                    ?.totalDiscount ??
-                                'BHD 0.000',
-                            style: context.customTextTheme.text16W600
-                                .copyWith(color: context.customTextTheme.color),
-                            infoWidget: Tooltip(
-                              showDuration: Duration(seconds: 8),
-                              triggerMode: TooltipTriggerMode.tap,
-                              richMessage: TextSpan(
-                                children: [
-                                  // const TextSpan(
-                                  //   text: '\nDiscount Breakdown\n\n',
-                                  //   style: TextStyle(
-                                  //     fontWeight: FontWeight.bold,
-                                  //     fontSize: 14,
-                                  //   ),
-                                  // ),
-                                  TextSpan(
-                                    text:
-                                        "Cart Discount : ${cartListener.cartDetailsModel?.cartTotal?.cartDiscountTotalDisplay}",
-                                    style: const TextStyle(
-                                      fontSize: 13,
+                    _SummaryRow(
+                        label: "Discount",
+                        value: totalDiscount ??
+                            '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
+                        style: context.customTextTheme.text16W600
+                            .copyWith(color: context.customTextTheme.color),
+                        infoWidget: totalDiscount !=
+                                '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                            ? Tooltip(
+                                decoration: BoxDecoration(
+                                  color: context.customTextTheme.color,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 12,
+                                ),
+                                showDuration: Duration(seconds: 8),
+                                triggerMode: TooltipTriggerMode.tap,
+                                richMessage: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          "Cart Discount : ${cartDiscount ?? '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'}",
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                      ),
                                     ),
-                                  ),
-                                  TextSpan(
-                                    text:
-                                        "\nDelivery Discount : ${AppConfig.instance.country.symbol} ${cartListener.deliveryDiscountAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
-                                    style: const TextStyle(
-                                      fontSize: 13,
+                                    TextSpan(
+                                      text: cartListener.selectedOrderType ==
+                                              OrderType.delivery
+                                          ? "\nDelivery Discount : ${deliveryDiscount ?? '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'}"
+                                          : "\nTakeaway Discount : ${takeawayDiscount ?? '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'}",
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.info_outline,
-                                size: 18,
-                              ),
-                            ))
-                        : _SummaryRow(
-                            label: "Discount",
-                            value: cartListener.takeAwayDetails?.amountFormatted
-                                    ?.totalDiscount ??
-                                'BHD 0.000',
-                            style: context.customTextTheme.text16W600
-                                .copyWith(color: context.customTextTheme.color),
-                            infoWidget: Tooltip(
-                              showDuration: Duration(seconds: 8),
-                              triggerMode: TooltipTriggerMode.tap,
-                              richMessage: TextSpan(
-                                children: [
-                                  // const TextSpan(
-                                  //   text: '\nDiscount Breakdown\n\n',
-                                  //   style: TextStyle(
-                                  //     fontWeight: FontWeight.bold,
-                                  //     fontSize: 14,
-                                  //   ),
-                                  // ),
-                                  TextSpan(
-                                    text:
-                                        "Cart Discount : ${cartListener.cartDetailsModel?.cartTotal?.cartDiscountTotalDisplay}",
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text:
-                                        "\nTakeAway Discount : ${cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount ?? 'BHD 0.000'}",
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.info_outline,
-                                size: 18,
-                              ),
-                            )),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.info_outline,
+                                  size: 18,
+                                ),
+                              )
+                            : SizedBox.shrink()),
 
-                    if (isTaxApplied == true) ...[
+                    if (isTaxApplied == true || taxAmount != null) ...[
                       verticalSpaceTiny,
                       _SummaryRow(
                           label: "VAT",
@@ -697,17 +674,18 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           style: context.customTextTheme.text16W600
                               .copyWith(color: context.customTextTheme.color),
                           infoWidget: Tooltip(
+                            decoration: BoxDecoration(
+                              color: context.customTextTheme.color,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
                             showDuration: Duration(seconds: 8),
                             triggerMode: TooltipTriggerMode.tap,
                             richMessage: TextSpan(
                               children: [
-                                // const TextSpan(
-                                //   text: '\nTax Breakdown\n\n',
-                                //   style: TextStyle(
-                                //     fontWeight: FontWeight.bold,
-                                //     fontSize: 14,
-                                //   ),
-                                // ),
                                 ...?taxGroup?.expand(
                                   (tax) => [
                                     TextSpan(
@@ -766,7 +744,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         shopListener.storeSettings.data?.deliveryInfo?.takeAway != null &&
             shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
 
-    if (isTakeAwayEnabled && isHomeDeliveryEnabled) {
+    if (isTakeAwayEnabled && isHomeDeliveryEnabled
+       ) {
       return ListTileTheme(
         enableFeedback: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -853,7 +832,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     AlertDialogs.showInfo("Takeaway not available");
                     return;
                   }
+
                   cartProvider.onChangeOrderType(OrderType.takeaway);
+                  cartProvider.calculateTakeAwayCharge();
                   cartProvider.clearCalculatedDeliveryDetails();
                 },
               ),
@@ -1515,7 +1496,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                           : 'The address is not found',
                                       style: context.customTextTheme.text14W400
                                           .copyWith(
-                                       color: context.customTextTheme.color,
+                                        color: context.customTextTheme.color,
                                       ),
                                     ),
                                   ),

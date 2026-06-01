@@ -374,40 +374,45 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                   value: " ${orderDetails.totalDiscount}",
                   style: context.customTextTheme.text16W600
                       .copyWith(color: context.customTextTheme.color),
-                  infoWidget: Tooltip(
-                    showDuration: Duration(seconds: 8),
-                    triggerMode: TooltipTriggerMode.tap,
-                    richMessage: TextSpan(
-                      children: [
-                        // const TextSpan(
-                        //   text: '\nDiscount Breakdown\n\n',
-                        //   style: TextStyle(
-                        //     fontWeight: FontWeight.bold,
-                        //     fontSize: 14,
-                        //   ),
-                        // ),
-                        TextSpan(
-                          text:
-                              'Cart Discount :  ${orderDetails.productDiscountAmount}\n',
-                          style: const TextStyle(
-                            fontSize: 13,
+                  infoWidget: orderDetails.totalDiscount !=
+                          '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                      ? Tooltip(
+                          decoration: BoxDecoration(
+                            color: context.customTextTheme.color,
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ),
-                        TextSpan(
-                          text: orderDetails?.deliveryType == "door_delivery"
-                              ? 'Delivery Discount : ${orderDetails.deliveryDiscount}'
-                              : 'Takeaway Discount : ${orderDetails.deliveryDiscount}',
-                          style: const TextStyle(
-                            fontSize: 13,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
                           ),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.info_outline,
-                      size: 18,
-                    ),
-                  )),
+                          showDuration: Duration(seconds: 8),
+                          triggerMode: TooltipTriggerMode.tap,
+                          richMessage: TextSpan(
+                            children: [
+                              TextSpan(
+                                text:
+                                    'Cart Discount :  ${orderDetails.productDiscountAmount}\n',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                ),
+                              ),
+                              TextSpan(
+                                text: orderDetails?.deliveryType ==
+                                        "door_delivery"
+                                    ? 'Delivery Discount : ${orderDetails.deliveryDiscount}'
+                                    : 'Takeaway Discount : ${orderDetails.deliveryDiscount}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.info_outline,
+                            size: 18,
+                          ),
+                        )
+                      : SizedBox.shrink()),
               if (isTaxApplicable) ...[
                 verticalSpaceTiny,
                 _SummaryRow(
@@ -415,32 +420,36 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                     value: orderDetails.taxTotalAmount ?? '0.00',
                     style: context.customTextTheme.text16W600
                         .copyWith(color: context.customTextTheme.color),
-                    infoWidget: Tooltip(
-                      showDuration: Duration(seconds: 8),
-                      triggerMode: TooltipTriggerMode.tap,
-                      richMessage: TextSpan(
-                        children: [
-                          // const TextSpan(
-                          //   text: '\nTax Breakdown\n\n',
-                          //   style: TextStyle(
-                          //     fontWeight: FontWeight.bold,
-                          //     fontSize: 14,
-                          //   ),
-                          // ),
-                          TextSpan(
-                            text:
-                                '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}',
-                            style: const TextStyle(
-                              fontSize: 13,
+                    infoWidget: orderDetails.taxTotalAmount !=
+                            '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                        ? Tooltip(
+                            decoration: BoxDecoration(
+                              color: context.customTextTheme.color,
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.info_outline,
-                        size: 18,
-                      ),
-                    )),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            showDuration: Duration(seconds: 8),
+                            triggerMode: TooltipTriggerMode.tap,
+                            richMessage: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text:
+                                      '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.info_outline,
+                              size: 18,
+                            ),
+                          )
+                        : SizedBox.shrink()),
                 const Divider(height: 20.0),
                 _SummaryRow(
                   label: "Total",

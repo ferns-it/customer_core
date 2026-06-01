@@ -281,7 +281,7 @@ class DeliveryFeeGeneralData {
   final int? calibratedDistance;
   final String? duration;
   final int? cartItemsCount;
-  final int? discountPercentage;
+  final double? discountPercentage;
 
   DeliveryFeeGeneralData({
     this.shopID,
@@ -304,7 +304,7 @@ class DeliveryFeeGeneralData {
     int? calibratedDistance,
     String? duration,
     int? cartItemsCount,
-    int? discountPercentage,
+    double? discountPercentage,
   }) {
     return DeliveryFeeGeneralData(
       shopID: shopID ?? this.shopID,
@@ -351,7 +351,7 @@ class DeliveryFeeGeneralData {
       cartItemsCount:
           map['cartItemsCount'] != null ? map['cartItemsCount'] as int : null,
       discountPercentage: map['discountPercentage'] != null
-          ? map['discountPercentage'] as int
+          ? map['discountPercentage'] as double
           : null,
     );
   }

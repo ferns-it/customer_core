@@ -598,7 +598,6 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           .copyWith(color: context.customTextTheme.color),
                     ),
                     verticalSpaceSmall,
-
                     _SummaryRow(
                       label: "Sub Total",
                       value: subTotal ??
@@ -664,7 +663,6 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                 ),
                               )
                             : SizedBox.shrink()),
-
                     if (isTaxApplied == true || taxAmount != null) ...[
                       verticalSpaceTiny,
                       _SummaryRow(
@@ -673,54 +671,45 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                               '${AppConfig.instance.country.symbol}0.00',
                           style: context.customTextTheme.text16W600
                               .copyWith(color: context.customTextTheme.color),
-                          infoWidget: Tooltip(
-                            decoration: BoxDecoration(
-                              color: context.customTextTheme.color,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            showDuration: Duration(seconds: 8),
-                            triggerMode: TooltipTriggerMode.tap,
-                            richMessage: TextSpan(
-                              children: [
-                                ...?taxGroup?.expand(
-                                  (tax) => [
-                                    TextSpan(
-                                      text: '${tax.taxSlab} : ',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
+                          infoWidget: taxAmount !=
+                                  '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                              ? Tooltip(
+                                  decoration: BoxDecoration(
+                                    color: context.customTextTheme.color,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 12,
+                                  ),
+                                  showDuration: Duration(seconds: 8),
+                                  triggerMode: TooltipTriggerMode.tap,
+                                  richMessage: TextSpan(
+                                    children: [
+                                      ...?taxGroup?.expand(
+                                        (tax) => [
+                                          TextSpan(
+                                            text: '${tax.taxSlab} : ',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: '${tax.totalTax}',
+                                            style: const TextStyle(),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    TextSpan(
-                                      text: '${tax.totalTax}',
-                                      style: const TextStyle(),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.info_outline,
-                              size: 18,
-                            ),
-                          )),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.info_outline,
+                                    size: 18,
+                                  ),
+                                )
+                              : SizedBox.shrink()),
                     ],
-
                     verticalSpaceTiny,
-                    // _SummaryRow(
-                    //   label: "Coupon Discount",
-                    //   value: "-${AppConfig.instance.country.symbol}${cartListener.offerDiscount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
-                    // ),
-                    // const Divider(height: 20.0),
-                    // _SummaryRow(
-                    //   label: "To Pay",
-                    //   value: Utils.format(cartListener.totalAmount),
-                    //   style: context.customTextTheme.text18W600,
-                    // ),
-                    // verticalSpaceRegular,
                   ],
                 ),
               ),
@@ -744,8 +733,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         shopListener.storeSettings.data?.deliveryInfo?.takeAway != null &&
             shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
 
-    if (isTakeAwayEnabled && isHomeDeliveryEnabled
-       ) {
+    if (isTakeAwayEnabled && isHomeDeliveryEnabled) {
       return ListTileTheme(
         enableFeedback: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 10.0),

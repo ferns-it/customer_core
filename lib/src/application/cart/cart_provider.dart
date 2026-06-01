@@ -93,26 +93,26 @@ class CartProvider extends ChangeNotifier with BaseController {
               AppConfig.instance.country.currencyDivisor
           : null;
 
-  double? get cartDiscountTotalDisplay =>
-      cartDetailsModel?.cartTotal?.cartDiscountTotal != null
-          ? cartDetailsModel!.cartTotal!.cartDiscountTotal! /
-              AppConfig.instance.country.currencyDivisor
-          : null;
-  String get subTotal {
-    double total = 0;
+  // double? get cartDiscountTotalDisplay =>
+  //     cartDetailsModel?.cartTotal?.cartDiscountTotal != null
+  //         ? cartDetailsModel!.cartTotal!.cartDiscountTotal! /
+  //             AppConfig.instance.country.currencyDivisor
+  //         : null;
+  // String get subTotal {
+  //   double total = 0;
 
-    for (final item in cartItems) {
-      total += double.tryParse(
-            item.amountDetails?.itemDetails?.display?.totalAmountNormal
-                    ?.replaceAll('BHD', '')
-                    .trim() ??
-                '0',
-          ) ??
-          0;
-    }
+  //   for (final item in cartItems) {
+  //     total += double.tryParse(
+  //           item.amountDetails?.itemDetails?.display?.totalAmountNormal
+  //                   ?.replaceAll('BHD', '')
+  //                   .trim() ??
+  //               '0',
+  //         ) ??
+  //         0;
+  //   }
 
-    return 'BHD ${total.toStringAsFixed(3)}';
-  }
+  //   return 'BHD ${total.toStringAsFixed(3)}';
+  // }
   // double get cartGrossAmount =>
   //     double.tryParse(
   //       selectedOrderType == OrderType.delivery
@@ -150,42 +150,42 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   String? get selectedItemId => _selectedItemId;
 
-  double get selectedItemPrice {
-    double selectedVariationPrice = 0.00;
-    if (selectedItemVariation?.price != null) {
-      try {
-        selectedVariationPrice = double.parse(selectedItemVariation!.price!);
-      } catch (e) {
-        selectedVariationPrice = 0.00;
-      }
-    }
-    final selectedAddonsOption =
-        selectedRegularAddons.expand((e) => e.options).toList();
-    final totalAddonsPrice = selectedAddonsOption.fold(0.00, (prev, curr) {
-      try {
-        return prev + (curr.price != null ? double.parse(curr.price!) : 0.00);
-      } catch (e) {
-        return prev;
-      }
-    });
-    final selectedMasterAddonsOption =
-        (selectedMasterAddons).expand((e) => e.options).toList();
-    final totalMasterAddonsPrice =
-        selectedMasterAddonsOption.fold(0.00, (prev, curr) {
-      try {
-        return prev + (curr.price != null ? double.parse(curr.price!) : 0.00);
-      } catch (e) {
-        return prev;
-      }
-    });
-    return double.parse(
-      (_selectedItemQty *
-              (selectedVariationPrice +
-                  totalAddonsPrice +
-                  totalMasterAddonsPrice))
-          .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
-    );
-  }
+  // double get selectedItemPrice {
+  //   double selectedVariationPrice = 0.00;
+  //   if (selectedItemVariation?.price != null) {
+  //     try {
+  //       selectedVariationPrice = double.parse(selectedItemVariation!.price!);
+  //     } catch (e) {
+  //       selectedVariationPrice = 0.00;
+  //     }
+  //   }
+  //   final selectedAddonsOption =
+  //       selectedRegularAddons.expand((e) => e.options).toList();
+  //   final totalAddonsPrice = selectedAddonsOption.fold(0.00, (prev, curr) {
+  //     try {
+  //       return prev + (curr.price != null ? double.parse(curr.price!) : 0.00);
+  //     } catch (e) {
+  //       return prev;
+  //     }
+  //   });
+  //   final selectedMasterAddonsOption =
+  //       (selectedMasterAddons).expand((e) => e.options).toList();
+  //   final totalMasterAddonsPrice =
+  //       selectedMasterAddonsOption.fold(0.00, (prev, curr) {
+  //     try {
+  //       return prev + (curr.price != null ? double.parse(curr.price!) : 0.00);
+  //     } catch (e) {
+  //       return prev;
+  //     }
+  //   });
+  //   return double.parse(
+  //     (_selectedItemQty *
+  //             (selectedVariationPrice +
+  //                 totalAddonsPrice +
+  //                 totalMasterAddonsPrice))
+  //         .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
+  //   );
+  // }
 
   final notesFieldKey = GlobalKey<FormBuilderFieldState>();
 
@@ -230,29 +230,29 @@ class CartProvider extends ChangeNotifier with BaseController {
   double get calculatedDeliveryFee =>
       _deliveryDetails?.deliveryFeeAmount?.toDouble() ?? 0.00;
 
-  double get cartDiscountAmount {
-    final value = _deliveryDetails?.amountFormatted?.cartDiscountAmount ?? "0";
+  // double get cartDiscountAmount {
+  //   final value = _deliveryDetails?.amountFormatted?.cartDiscountAmount ?? "0";
 
-    final cleanedValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
+  //   final cleanedValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
 
-    return double.tryParse(cleanedValue) ?? 0.0;
-  }
+  //   return double.tryParse(cleanedValue) ?? 0.0;
+  // }
 
-  double get deliveryDiscountAmount {
-    final value = _deliveryDetails?.amountFormatted?.deliveryDiscount ?? "0";
+  // double get deliveryDiscountAmount {
+  //   final value = _deliveryDetails?.amountFormatted?.deliveryDiscount ?? "0";
 
-    final cleanedValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
+  //   final cleanedValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
 
-    return double.tryParse(cleanedValue) ?? 0.0;
-  }
+  //   return double.tryParse(cleanedValue) ?? 0.0;
+  // }
 
-  double get totalDiscountAmount {
-    final value = _deliveryDetails?.amountFormatted?.totalDiscount ?? "0";
+  // double get totalDiscountAmount {
+  //   final value = _deliveryDetails?.amountFormatted?.totalDiscount ?? "0";
 
-    final cleanedValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
+  //   final cleanedValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
 
-    return double.tryParse(cleanedValue) ?? 0.0;
-  }
+  //   return double.tryParse(cleanedValue) ?? 0.0;
+  // }
 
   CalculateTakeAwayDetails? _takeAwayDetails;
 
@@ -286,13 +286,13 @@ class CartProvider extends ChangeNotifier with BaseController {
       : (double.tryParse(_takeAwayDetails?.takeAwayDiscount ?? '0.00') ?? 0.00);
 
   double get totalCalculatedDiscount => calculatedDiscount + offerDiscount;
-  double get cartDiscount => selectedOrderType == OrderType.delivery
-      ? (double.tryParse(_deliveryDetails?.cartDiscountAmount ?? '0.00') ??
-          0.00)
-      : (double.tryParse(_takeAwayDetails?.cartDiscountAmount ?? '0.00') ??
-          0.00);
+  // double get cartDiscount => selectedOrderType == OrderType.delivery
+  //     ? (double.tryParse(_deliveryDetails?.cartDiscountAmount ?? '0.00') ??
+  //         0.00)
+  //     : (double.tryParse(_takeAwayDetails?.cartDiscountAmount ?? '0.00') ??
+  //         0.00);
 
-  double get totalCartDiscount => totalCalculatedDiscount + cartDiscount;
+  // double get totalCartDiscount => totalCalculatedDiscount + cartDiscount;
 
   double get calculatedTax => selectedOrderType == OrderType.delivery
       ? (double.tryParse(_deliveryDetails?.taxTotalAmount ?? '0.00') ?? 0.00)
@@ -1132,7 +1132,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     // without setting the user-visible selectedPickUpTime.
     // selectedPickUpTime stays null so the UI still shows "Select Pick Up Time".
     calculateTakeAwayCharge(
-      pickupTime: _selectedPickUpTime ?? DateTime.now().add(const Duration(minutes: 15)),
+      pickupTime: _selectedPickUpTime ??
+          DateTime.now().add(const Duration(minutes: 15)),
     );
   }
 

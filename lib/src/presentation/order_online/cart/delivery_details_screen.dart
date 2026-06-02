@@ -57,9 +57,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final taxAmount = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.amountFormatted?.taxTotalAmount
         : cartListener.takeAwayDetails?.amountFormatted?.taxTotalAmount;
-    final subTotal = cartListener.selectedOrderType == OrderType.delivery
-        ? cartListener.deliveryDetails?.amountFormatted?.cartGrossAmount
-        : cartListener.takeAwayDetails?.amountFormatted?.cartGrossAmount;
+
+    final subTotal =
+        cartListener.cartDetailsModel?.cartTotal?.cartTotalPriceDisplay;
+    // final subTotal = cartListener.selectedOrderType == OrderType.delivery
+    //     ? cartListener.deliveryDetails?.amountFormatted?.cartGrossAmount
+    //     : cartListener.takeAwayDetails?.amountFormatted?.cartGrossAmount;
     final deliveryCharge =
         cartListener.deliveryDetails?.amountFormatted?.deliveryFeeAmount;
 
@@ -685,22 +688,23 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   showDuration: Duration(seconds: 8),
                                   triggerMode: TooltipTriggerMode.tap,
                                   richMessage: TextSpan(
-                                    children: [
-                                      ...?taxGroup?.expand(
-                                        (tax) => [
-                                          TextSpan(
-                                            text: '${tax.taxSlab} : ',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: '${tax.totalTax}',
-                                            style: const TextStyle(),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                    text: 'VAT 10% : $taxAmount',
+                                    // children: [
+                                    //   ...?taxGroup?.expand(
+                                    //     (tax) => [
+                                    //       TextSpan(
+                                    //         text: '${tax.taxSlab} : ',
+                                    //         style: const TextStyle(
+                                    //           fontWeight: FontWeight.w600,
+                                    //         ),
+                                    //       ),
+                                    //       TextSpan(
+                                    //         text: '${tax.totalTax}',
+                                    //         style: const TextStyle(),
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // ],
                                   ),
                                   child: const Icon(
                                     Icons.info_outline,

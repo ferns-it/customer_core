@@ -29,7 +29,7 @@ class SearchProvider extends ChangeNotifier with BaseController {
 
   bool get isSearchLoading => _isSearchLoading;
 
-  List<ProductDataModel>? _searchResponse;
+  List<ProductDataModel> _searchResponse = [];
 
   List<ProductDataModel>? get searchResponse => _searchResponse;
 
@@ -153,9 +153,9 @@ class SearchProvider extends ChangeNotifier with BaseController {
     bool updateCondition(ProductDataModel p) =>
         isByFavID ? p.favouriteID == productID : p.pID == productID;
 
-    final index = _searchResponse!.indexWhere(updateCondition);
+    final index = _searchResponse.indexWhere(updateCondition);
     if (index != -1) {
-      _searchResponse![index] = _searchResponse![index].copyWith(
+      _searchResponse[index] = _searchResponse[index].copyWith(
         isFavourite: isFavourite,
         favouriteID: favouriteId,
       );
@@ -164,7 +164,7 @@ class SearchProvider extends ChangeNotifier with BaseController {
   }
 
   void clearSearchData() {
-    _searchResponse = null;
+    _searchResponse = [];
     previousSearchKey = '';
     notifyListeners();
   }

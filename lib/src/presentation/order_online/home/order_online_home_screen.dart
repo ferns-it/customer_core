@@ -511,11 +511,13 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                         await context
                                             .read<ProductsProvider>()
                                             .removeFavourite(
-                                                product.favouriteID!);
+                                                product.favouriteID!,
+                                                context.read<SearchProvider>());
                                       } else {
                                         await context
                                             .read<ProductsProvider>()
-                                            .addFavourite(product.pID!);
+                                            .addFavourite(product.pID!,
+                                                context.read<SearchProvider>());
                                       }
                                     },
                                     secondaryWidget: QtyCounterButton2(
@@ -617,11 +619,13 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               if (product.isFavourite) {
                                 await context
                                     .read<ProductsProvider>()
-                                    .removeFavourite(product.favouriteID!);
+                                    .removeFavourite(product.favouriteID!,
+                                        context.read<SearchProvider>());
                               } else {
                                 await context
                                     .read<ProductsProvider>()
-                                    .addFavourite(product.pID!);
+                                    .addFavourite(product.pID!,
+                                        context.read<SearchProvider>());
                               }
                             },
                             secondaryWidget: QtyCounterButton2(
@@ -718,12 +722,13 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                     if (product.isFavourite) {
                                       await context
                                           .read<ProductsProvider>()
-                                          .removeFavourite(
-                                              product.favouriteID!);
+                                          .removeFavourite(product.favouriteID!,
+                                              context.read<SearchProvider>());
                                     } else {
                                       await context
                                           .read<ProductsProvider>()
-                                          .addFavourite(product.pID!);
+                                          .addFavourite(product.pID!,
+                                              context.read<SearchProvider>());
                                     }
                                   },
                                   secondaryWidget: QtyCounterButton2(
@@ -1268,10 +1273,11 @@ class __SearchResultsState extends State<_SearchResults> {
 
   void _fetchProducts() {
     if (widget.query.isNotEmpty) {
-      Future.microtask(() {
-        Provider.of<SearchProvider>(context, listen: false)
-            .getAllSearchProducts(widget.query);
-      });
+      // Future.microtask(() {
+      //   Provider.of<SearchProvider>(context, listen: false)
+      //       .getAllSearchProducts(widget.query);
+      // });
+      context.read<SearchProvider>().getAllSearchProducts(widget.query);
     }
   }
 
@@ -1318,12 +1324,12 @@ class __SearchResultsState extends State<_SearchResults> {
                         onPressFavouriteBtn: () async {
                           if (product.isFavourite) {
                             await context
-                                .read<SearchProvider>()
-                                .removeFavourite(product.favouriteID!);
+                                .read<ProductsProvider>()
+                                .removeFavourite(product.favouriteID!,
+                                    context.read<SearchProvider>());
                           } else {
-                            await context
-                                .read<SearchProvider>()
-                                .addFavourite(product.pID!);
+                            await context.read<ProductsProvider>().addFavourite(
+                                product.pID!, context.read<SearchProvider>());
                           }
                         },
                         onPressAddBtn: () {

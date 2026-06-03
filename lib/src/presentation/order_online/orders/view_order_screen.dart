@@ -416,10 +416,11 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
               if (isTaxApplicable) ...[
                 verticalSpaceTiny,
                 _SummaryRow(
-                    label: 'VAT',
+                    label: 'VAT 10%',
                     value: orderDetails.taxTotalAmount ?? '0.00',
-                    style: context.customTextTheme.text16W600
-                        .copyWith(color: context.customTextTheme.color),
+                    style: context.customTextTheme.text16W600.copyWith(
+                        color: context.customTextTheme.color,
+                       ),
                     infoWidget: orderDetails.taxTotalAmount !=
                             '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
                         ? Tooltip(

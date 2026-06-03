@@ -1,4 +1,5 @@
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/application/search/search_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:customer_core/src/domain/store/models/product_details_model.dart';
@@ -52,7 +53,8 @@ class CustomSearchDelegate extends SearchDelegate {
             final item = results[index];
             return ListTile(
               title: Text(item.name!),
-              subtitle: Text('${AppConfig.instance.country.symbol}${item.price.toString()}'),
+              subtitle: Text(
+                  '${AppConfig.instance.country.symbol}${item.price.toString()}'),
             );
           },
         );
@@ -62,6 +64,7 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    final cartListener = context.watch<CartProvider>();
     return Consumer<ProductsProvider>(
       builder: (context, productProvider, child) {
         final datas = productProvider.productsList
@@ -78,16 +81,15 @@ class CustomSearchDelegate extends SearchDelegate {
               child: ProductDetailsTile(
                 onPressFavouriteBtn: () async {
                   if (item.isFavourite) {
-                    await context
-                        .read<ProductsProvider>()
-                        .removeFavourite(item.favouriteID!);
+                    await context.read<ProductsProvider>().removeFavourite(
+                        item.favouriteID!, context.read<SearchProvider>());
                   } else {
-                    await context
-                        .read<ProductsProvider>()
-                        .addFavourite(item.pID!);
+                    await context.read<ProductsProvider>().addFavourite(
+                        item.pID!, context.read<SearchProvider>());
                   }
                 },
                 item,
+                showFavIcon: cartListener.isUserLoggedIn,
                 secondaryWidget: const SizedBox.shrink(),
                 onPressed: () {
                   showItemDetailsBottomSheet(item, context);

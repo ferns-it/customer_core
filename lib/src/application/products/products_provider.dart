@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:customer_core/src/application/search/search_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
@@ -387,9 +388,11 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     });
   }
 
-  Future<bool> addFavourite(String productID) async {
+  Future<bool> addFavourite(
+      String productID, SearchProvider searchProvider) async {
     // Optimistic Update
     _updateFavouriteLocally(productID, true, "temp");
+    searchProvider.updateProductFavouriteLocally(productID, true, "temp");
     notifyListeners();
 
     try {
@@ -398,6 +401,8 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       return response.fold((error) {
         // Revert on error
         _updateFavouriteLocally(productID, false, "");
+        searchProvider.updateProductFavouriteLocally(productID, false, "temp");
+
         AlertDialogs.showError(error.message);
         notifyListeners();
         return false;
@@ -405,6 +410,9 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         final favouriteId = data['favouriteID'] ?? "";
         // Update with actual favouriteID
         _updateFavouriteLocally(productID, true, favouriteId.toString());
+        searchProvider.updateProductFavouriteLocally(
+            productID, true, favouriteId.toString());
+
         notifyListeners();
         return true;
       });
@@ -412,14 +420,24 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       inspect(e);
       // Revert on error
       _updateFavouriteLocally(productID, false, "");
+      searchProvider.updateProductFavouriteLocally(productID, false, "");
+
       notifyListeners();
       return false;
     }
   }
 
-  Future<bool> removeFavourite(String productID) async {
+  Future<bool> removeFavourite(
+      String productID, SearchProvider searchProvider) async {
     // Optimistic Update
     _updateFavouriteLocally(productID, false, "", isByFavID: true);
+    searchProvider.updateProductFavouriteLocally(
+      productID,
+      false,
+      "",
+      isByFavID: true,
+    );
+
     notifyListeners();
 
     try {
@@ -458,6 +476,27 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         favouriteID: favouriteId,
         isFavourite: isFav,
       );
+    }
+
+    // Update _productsCollection
+    final indexCollection = _productsCollection.indexWhere(updateCondition);
+    if (indexCollection != -1) {
+      _productsCollection[indexCollection] =
+          _productsCollection[indexCollection].copyWith(
+        favouriteID: favouriteId,
+        isFavourite: isFav,
+      );
+    }
+
+    // Update all entries in _cachedProducts
+    for (final entry in _cachedProducts.entries) {
+      final cachedIndex = entry.value.indexWhere(updateCondition);
+      if (cachedIndex != -1) {
+        entry.value[cachedIndex] = entry.value[cachedIndex].copyWith(
+          favouriteID: favouriteId,
+          isFavourite: isFav,
+        );
+      }
     }
 
     final featuredList =

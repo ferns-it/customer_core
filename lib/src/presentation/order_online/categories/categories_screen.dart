@@ -1,4 +1,5 @@
 import 'package:customer_core/gen/assets.gen.dart';
+import 'package:customer_core/src/application/search/search_provider.dart';
 import 'package:flutter/rendering.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
 import 'package:customer_core/src/application/home/home_provider.dart';
@@ -441,11 +442,13 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                   if (product.isFavourite) {
                                     await context
                                         .read<ProductsProvider>()
-                                        .removeFavourite(product.favouriteID!);
+                                        .removeFavourite(product.favouriteID!,
+                                            context.read<SearchProvider>());
                                   } else {
                                     await context
                                         .read<ProductsProvider>()
-                                        .addFavourite(product.pID!);
+                                        .addFavourite(product.pID!,
+                                            context.read<SearchProvider>());
                                   }
                                 },
                                 onPressAddBtn: () {

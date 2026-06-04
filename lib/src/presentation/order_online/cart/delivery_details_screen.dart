@@ -58,11 +58,11 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         ? cartListener.deliveryDetails?.amountFormatted?.taxTotalAmount
         : cartListener.takeAwayDetails?.amountFormatted?.taxTotalAmount;
 
-    final subTotal =
-        cartListener.cartDetailsModel?.cartTotal?.cartTotalPriceDisplay;
-    // final subTotal = cartListener.selectedOrderType == OrderType.delivery
-    //     ? cartListener.deliveryDetails?.amountFormatted?.cartGrossAmount
-    //     : cartListener.takeAwayDetails?.amountFormatted?.cartGrossAmount;
+    // final subTotal =
+    //     cartListener.cartDetailsModel?.cartTotal?.cartTotalPriceDisplay;
+    final subTotal = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.amountFormatted?.cartGrossAmount
+        : cartListener.takeAwayDetails?.amountFormatted?.cartGrossAmount;
     final deliveryCharge =
         cartListener.deliveryDetails?.amountFormatted?.deliveryFeeAmount;
 

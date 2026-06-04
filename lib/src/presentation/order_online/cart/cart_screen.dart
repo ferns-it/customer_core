@@ -364,7 +364,7 @@ class _CartScreenState extends State<CartScreen>
                           children: [
                             Expanded(
                                 child: _buildTotalAmountWidget(
-                                    "${cartListener.cartTotalPriceDisplay}")),
+                                    "${cartListener.cartDetailsModel?.cartTotal?.cartTotalPrice_NormalDisplay}")),
                             Expanded(
                               child: InkWell(
                                 onTap: () async {

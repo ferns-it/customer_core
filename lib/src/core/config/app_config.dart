@@ -31,11 +31,8 @@ class AppConfig {
     required this.country,
     this.fcmTopicId,
     required this.fireBaseProjectId,
-    required this.isCategoryImageEnabled,
-
-  
     required this.env,
-  
+    this.isCategoryImageEnabled = true,
     this.themeMode = AppThemeMode.system,
   });
 }

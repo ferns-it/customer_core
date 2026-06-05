@@ -260,11 +260,14 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                 children: [
                   if (productListner.selectedSubCategory != null) ...[
                     ChoiceChip(
-                      label: const Text("Clear"),
+                      label: Text(
+                        "Clear",
+                        style: TextStyle(color: Colors.white),
+                      ),
                       selected: false,
-                      avatar: const Icon(
+                      avatar: Icon(
                         Icons.close,
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       labelStyle: const TextStyle(color: AppColors.kBlack),

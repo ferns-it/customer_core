@@ -49,23 +49,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
               itemBuilder: (context, index) {
                 final notification = notifications.elementAt(index);
                 return ListTile(
-                  leading: Icon(
-                    FluentIcons.alert_20_regular,
-                           color:  context.customTextTheme.color
-
-                  ),
+                  leading: Icon(FluentIcons.alert_20_regular,
+                      color: context.customTextTheme.color),
                   title: Text(notification.title ?? ''),
-                  titleTextStyle: TextStyle(
-                            color:  context.customTextTheme.color
-),
+                  titleTextStyle:
+                      TextStyle(color: context.customTextTheme.color),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         notification.body ?? '',
-                        style: TextStyle(
-                                   color:  context.customTextTheme.color
-),
+                        style: TextStyle(color: context.customTextTheme.color),
                       ),
                       notification.dateTime != null
                           ? Text(
@@ -86,8 +80,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
       floatingActionButton: notifications.isEmpty
           ? null
           : FloatingActionButton.extended(
+              //
+              elevation: 6,
+              extendedPadding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(24),
               ),
               onPressed: () {
                 NotificationSharedPrefs.clearNotification();

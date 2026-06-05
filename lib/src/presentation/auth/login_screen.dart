@@ -981,6 +981,7 @@ class _LoginScreenState extends State<LoginScreen> {
             style: const TextStyle(color: AppColors.kWhite),
             // obscureText: authListener.resetPasswordHide,
             decoration: InputDecoration(
+                errorMaxLines: 2,
                 fillColor: Colors.white.withOpacity(0.1),
                 filled: true,
                 prefixIcon: const Icon(
@@ -1024,6 +1025,7 @@ class _LoginScreenState extends State<LoginScreen> {
             obscureText: authListener.resetPasswordHide,
             style: const TextStyle(color: AppColors.kWhite),
             decoration: InputDecoration(
+                errorMaxLines: 2,
                 fillColor: Colors.white.withOpacity(0.1),
                 filled: true,
                 prefixIcon: const Icon(

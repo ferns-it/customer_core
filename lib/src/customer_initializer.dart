@@ -33,6 +33,7 @@ class CustomerInitializer {
     log(token ?? 'NULL', name: 'FCM');
 
     FirebaseMessaging.onMessage.listen((message) async {
+      log("Received message: ${message.data}", name: 'FCM');
       if (message.data["title"] != null || message.data["body"] != null) {
         NotificationProvider().showNotification(
           message.data["title"],

@@ -99,7 +99,7 @@ class NotificationProvider extends ChangeNotifier with BaseController {
       );
 
       // Add the notification message to the list (if needed)
-      // addNotification("$title: $body");
+      addNotification("$title: $body");
     } catch (e) {
       log("Error showing notification: $e");
     }

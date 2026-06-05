@@ -17,6 +17,7 @@ class AppConfig {
 
   final Country country;
   final AppThemeMode themeMode;
+  final bool isCategoryImageEnabled;
 
   AppConfig({
     required this.applicationName,
@@ -30,6 +31,7 @@ class AppConfig {
     required this.country,
     this.fcmTopicId,
     required this.fireBaseProjectId,
+    required this.isCategoryImageEnabled,
 
   
     required this.env,

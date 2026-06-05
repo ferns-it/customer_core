@@ -1,3 +1,4 @@
+import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
 import 'package:flutter/rendering.dart';
@@ -176,60 +177,83 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                       dividerColor: Colors.transparent,
                       indicatorColor: Theme.of(context).colorScheme.primary,
                       tabs: productListner.categories
-                          .mapIndexed((index, e) => Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    height: 50,
-                                    padding: const EdgeInsets.all(2),
-                                    margin: const EdgeInsets.only(bottom: 0),
-                                    // decoration: BoxDecoration(
-                                    // color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                    // border: productListner.selectedCategory == e
-                                    //     ? Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5)
-                                    //     : null,
-                                    // borderRadius: BorderRadius.circular(10)),
-                                    child: e.image != null
-                                        ? Center(
-                                            child: CachedNetworkImage(
-                                            imageUrl: e.image ?? '',
-                                            height: 50,
-                                            errorWidget:
-                                                (context, url, error) => Image(
-                                              image: AssetImage(
-                                                  Assets.lib.assets.images
-                                                      .noimage.path,
-                                                  package: 'customer_core'),
+                          .mapIndexed((index, e) => AppConfig
+                                      .instance.isCategoryImageEnabled ==
+                                  true
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      height: 50,
+                                      padding: const EdgeInsets.all(2),
+                                      margin: const EdgeInsets.only(bottom: 0),
+                                      // decoration: BoxDecoration(
+                                      // color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                      // border: productListner.selectedCategory == e
+                                      //     ? Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5)
+                                      //     : null,
+                                      // borderRadius: BorderRadius.circular(10)),
+                                      child: e.image != null
+                                          ? Center(
+                                              child: CachedNetworkImage(
+                                              imageUrl: e.image ?? '',
                                               height: 50,
-                                            ),
-                                          ))
-                                        : SizedBox(
-                                            height: 60,
-                                            width: 60,
-                                            child: Center(
-                                              child: Image(
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Image(
                                                 image: AssetImage(
                                                     Assets.lib.assets.images
                                                         .noimage.path,
                                                     package: 'customer_core'),
                                                 height: 50,
                                               ),
+                                            ))
+                                          : SizedBox(
+                                              height: 60,
+                                              width: 60,
+                                              child: Center(
+                                                child: Image(
+                                                  image: AssetImage(
+                                                      Assets.lib.assets.images
+                                                          .noimage.path,
+                                                      package: 'customer_core'),
+                                                  height: 50,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                  ),
-                                  Text(
-                                    e.name ?? '',
-                                    maxLines: 1,
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: context.customTextTheme.text12W500
-                                        .copyWith(
-                                      color: context.customTextTheme.color,
                                     ),
-                                  ),
-                                  verticalSpaceSmall,
-                                ],
-                              ))
+                                    Text(
+                                      e.name ?? '',
+                                      maxLines: 1,
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: context.customTextTheme.text12W500
+                                          .copyWith(
+                                        color: context.customTextTheme.color,
+                                      ),
+                                    ),
+                                    verticalSpaceSmall,
+                                  ],
+                                )
+                              : Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      child: Text(
+                                        e.name ?? '',
+                                        maxLines: 1,
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: context
+                                            .customTextTheme.text14W500
+                                            .copyWith(
+                                          color: context.customTextTheme.color,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ))
                           .toList()),
               verticalSpaceSmall,
               Row(

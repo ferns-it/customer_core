@@ -1,6 +1,7 @@
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/application/theme/theme_provider.dart';
 import 'package:customer_core/src/core/theme/app_theme.dart';
+import 'package:customer_core/src/presentation/widgets/connectivity_wrapper.dart';
 import 'package:customer_core/theme/customer_theme_override.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -118,11 +119,12 @@ class _CustomerAppState extends State<CustomerApp> {
             //     : _mapThemeMode(widget.config.themeMode), // change this 👈
             routerConfig: appRouter.config(),
             builder: (context, child) {
-              return MediaQuery(
+              final wrappedChild = MediaQuery(
                 data: MediaQuery.of(context)
                     .copyWith(textScaler: const TextScaler.linear(0.95)),
                 child: ToastificationWrapper(child: child!),
               );
+              return ConnectivityWrapper(child: wrappedChild);
             },
           );
         });

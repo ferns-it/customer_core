@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:customer_core/src/application/connectivity/connectivity_controller.dart';
 import 'package:customer_core/src/domain/notification/models/notification_model.dart';
 import 'package:customer_core/src/infrastructure/notification/notification_shared_prefs_repo.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,8 +12,10 @@ import 'domain/dependency_injection/injection_config.dart';
 
 class CustomerInitializer {
   static Future<void> init(
+
       // {required String env}
       ) async {
+    await ConnectivityController.instance.init();
     // WidgetsFlutterBinding.ensureInitialized();
 
     // Firebase

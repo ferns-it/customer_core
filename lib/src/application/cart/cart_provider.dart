@@ -1234,25 +1234,30 @@ class CartProvider extends ChangeNotifier with BaseController {
   }
 
   Future<void> calculateTakeAwayCharge({DateTime? pickupTime}) async {
+    final effectivePickupTime = pickupTime ?? _selectedPickUpTime;
+
+    if (effectivePickupTime == null) {
+      return;
+    }
+
     try {
-      final effectivePickupTime = pickupTime ?? _selectedPickUpTime;
-      if (effectivePickupTime == null) return;
       _takeAwayDetails = null;
       notifyListeners();
+
       _deliveryOrTakeAwayChargeCalculating = true;
       notifyListeners();
+
       final response = await checkRepo.calculateTakeAwayFee(
         effectivePickupTime,
       );
 
       response.fold((error) {
-        // Only clear the user-facing pickup time if it was a user-selected one
-        // that caused the error (i.e. pickupTime param was not provided)
         if (pickupTime == null) {
           _selectedPickUpTime = null;
         }
-        notifyListeners();
+
         AlertDialogs.showError(error.message);
+        notifyListeners();
       }, (details) {
         _takeAwayDetails = details;
         notifyListeners();

@@ -255,9 +255,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                       context
                                           .read<CartProvider>()
                                           .checkUserIsLogged();
-                                      context
-                                          .read<ProductsProvider>()
-                                          .getFavouriteProductList();
 
                                       return;
                                     }

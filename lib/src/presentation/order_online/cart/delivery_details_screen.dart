@@ -1331,10 +1331,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                               icon: Assets
                                                   .lib.assets.icons.editIcon
                                                   .svg(
-                                                      color: themeListener
-                                                              .isDarkMode
-                                                          ? Colors.white
-                                                          : null),
+                                                      color: Theme.of(context)
+                                                          .iconTheme
+                                                          .color),
                                             ),
                                             IconButton(
                                               onPressed: () {

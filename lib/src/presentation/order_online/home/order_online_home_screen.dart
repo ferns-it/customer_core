@@ -1273,11 +1273,11 @@ class __SearchResultsState extends State<_SearchResults> {
 
   void _fetchProducts() {
     if (widget.query.isNotEmpty) {
-      // Future.microtask(() {
-      //   Provider.of<SearchProvider>(context, listen: false)
-      //       .getAllSearchProducts(widget.query);
-      // });
-      context.watch<SearchProvider>().getAllSearchProducts(widget.query);
+      Future.microtask(() {
+        Provider.of<SearchProvider>(context, listen: false)
+            .getAllSearchProducts(widget.query);
+      });
+      // context.watch<SearchProvider>().getAllSearchProducts(widget.query);
     }
   }
 

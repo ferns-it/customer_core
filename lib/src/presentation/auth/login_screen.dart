@@ -6,6 +6,7 @@ import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:customer_core/src/application/home/home_provider.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -254,6 +255,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       context
                                           .read<CartProvider>()
                                           .checkUserIsLogged();
+                                      context
+                                          .read<ProductsProvider>()
+                                          .getFavouriteProductList();
 
                                       return;
                                     }

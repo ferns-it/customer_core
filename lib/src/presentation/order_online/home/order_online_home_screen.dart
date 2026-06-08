@@ -1277,7 +1277,7 @@ class __SearchResultsState extends State<_SearchResults> {
       //   Provider.of<SearchProvider>(context, listen: false)
       //       .getAllSearchProducts(widget.query);
       // });
-      context.read<SearchProvider>().getAllSearchProducts(widget.query);
+      context.watch<SearchProvider>().getAllSearchProducts(widget.query);
     }
   }
 

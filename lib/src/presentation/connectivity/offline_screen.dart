@@ -25,17 +25,7 @@ class OfflineScreen extends StatelessWidget {
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 32),
-            // ElevatedButton.icon(
-            //   onPressed: () async {
-            //     Center(
-            //         child: CircularProgressIndicator(
-            //       color: Theme.of(context).colorScheme.primary,
-            //     ));
-            //     await ConnectivityController.instance.retry();
-            //   },
-            //   icon: const Icon(Icons.refresh),
-            //   label: const Text('Retry'),
-            // ),
+      
             FilledButton.icon(
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(

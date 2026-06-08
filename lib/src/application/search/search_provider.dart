@@ -61,8 +61,8 @@ class SearchProvider extends ChangeNotifier with BaseController {
             favouriteID: favId ?? "",
           );
         }).toList();
-
         _searchResponse = updatedSearchList;
+        notifyListeners();
       });
     } finally {
       _isSearchLoading = false;

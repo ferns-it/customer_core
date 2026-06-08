@@ -9,7 +9,13 @@ class ThemeProvider extends ChangeNotifier with BaseController {
 
 var themeMode = ThemeMode.system;
 
-bool get isDarkMode => themeMode == ThemeMode.dark;
+bool get isDarkMode {
+  if (themeMode == ThemeMode.dark) return true;
+  if (themeMode == ThemeMode.light) return false;
+  // ThemeMode.system: reflect actual platform brightness
+  final brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
+  return brightness == Brightness.dark;
+}
 
 
   AppThemeMode? _tMode;

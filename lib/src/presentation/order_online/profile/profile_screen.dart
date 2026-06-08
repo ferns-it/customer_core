@@ -968,7 +968,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
           Text(
             (userListener.userData?.user.userEmail?.isNotEmpty ?? false)
                 ? userListener.userData!.user.userEmail!
-                : '-',
+                : '',
             style: context.customTextTheme.text16W400,
           ),
           verticalSpaceTiny,

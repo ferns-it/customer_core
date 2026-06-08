@@ -44,7 +44,6 @@ class APIManager {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    inspect(options);
     final needAuth = (options.headers["needToken"] as bool);
     if (!needAuth) return handler.next(options);
     var auth = await UserSharedPrefsRepo().getToken();

@@ -908,7 +908,6 @@ class CartProvider extends ChangeNotifier with BaseController {
             totalDiscountInPaisa / AppConfig.instance.country.currencyDivisor),
       ),
     );
-    inspect(_cartDetailsModel);
 
     notifyListeners();
     return true;

@@ -1332,8 +1332,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                   .lib.assets.icons.editIcon
                                                   .svg(
                                                       color: Theme.of(context)
-                                                          .iconTheme
-                                                          .color),
+                                                          .colorScheme
+                                                          .secondary),
                                             ),
                                             IconButton(
                                               onPressed: () {
@@ -1466,8 +1466,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                               icon: Icon(
                                                 Icons.remove_circle_outline,
                                                 color: Theme.of(context)
-                                                    .iconTheme
-                                                    .color,
+                                                    .colorScheme
+                                                    .secondary,
                                               ),
                                             )
                                           ],

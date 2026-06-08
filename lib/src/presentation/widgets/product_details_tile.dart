@@ -57,7 +57,6 @@ class ProductDetailsTile extends StatelessWidget {
   }
 
   Widget buildTileView2(BuildContext context, bool isPlaceHolderUrl) {
-    inspect(product);
     return Card(
       // color: Colors.black12,
       shape: RoundedRectangleBorder(

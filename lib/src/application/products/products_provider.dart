@@ -88,10 +88,10 @@ class ProductsProvider extends ChangeNotifier with BaseController {
   // }
 
   @override
-  Future<void> init() {
+  Future<void> init() async {
     // getAllProductsByPagination();
-    getFeaturedPopularProducts();
-    getFavouriteProductList();
+    await getFeaturedPopularProducts();
+    await getFavouriteProductList();
     return super.init();
   }
 
@@ -170,7 +170,6 @@ class ProductsProvider extends ChangeNotifier with BaseController {
             favouriteID: favId ?? "",
           );
         }).toList();
-
         _productsListAPIResponse = APIResponse.completed([...updatedList]);
 
         if (isRandom) {
@@ -349,6 +348,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
 
   Future<void> getAllCategories() async {
     _categoriesListAPIResponse = APIResponse.loading();
+
     notifyListeners();
 
     final response = await storeRepo.getCategories();
@@ -417,7 +417,6 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         return true;
       });
     } catch (e) {
-      inspect(e);
       // Revert on error
       _updateFavouriteLocally(productID, false, "");
       searchProvider.updateProductFavouriteLocally(productID, false, "");
@@ -469,13 +468,17 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       );
     }
 
-    final productList = _productsListAPIResponse.data ?? [];
+    // Update main products list and persist into APIResponse
+    final productList =
+        List<ProductDataModel>.from(_productsListAPIResponse.data ?? []);
     final index2 = productList.indexWhere(updateCondition);
+    ProductDataModel? updatedProduct;
     if (index2 != -1) {
-      productList[index2] = productList[index2].copyWith(
+      updatedProduct = productList[index2] = productList[index2].copyWith(
         favouriteID: favouriteId,
         isFavourite: isFav,
       );
+      _productsListAPIResponse = APIResponse.completed(productList);
     }
 
     // Update _productsCollection
@@ -498,34 +501,94 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         );
       }
     }
-
-    final featuredList =
-        _featuredPopularProductsAPIResponse.data?.featuredProducts ?? [];
+    // Update featured / popular and reassign response when changed
+    final featuredList = List<ProductDataModel>.from(
+        _featuredPopularProductsAPIResponse.data?.featuredProducts ?? [])
+      ..removeWhere((p) => p == null);
     final index3 = featuredList.indexWhere(updateCondition);
     if (index3 != -1) {
       featuredList[index3] = featuredList[index3].copyWith(
         favouriteID: favouriteId,
         isFavourite: isFav,
       );
+      final current = _featuredPopularProductsAPIResponse.data;
+      if (current != null) {
+        _featuredPopularProductsAPIResponse = APIResponse.completed(
+          current.copyWith(featuredProducts: featuredList),
+        );
+      }
     }
 
-    final popularList =
-        _featuredPopularProductsAPIResponse.data?.popularProducts ?? [];
+    final popularList = List<ProductDataModel>.from(
+        _featuredPopularProductsAPIResponse.data?.popularProducts ?? [])
+      ..removeWhere((p) => p == null);
     final index4 = popularList.indexWhere(updateCondition);
     if (index4 != -1) {
       popularList[index4] = popularList[index4].copyWith(
         favouriteID: favouriteId,
         isFavourite: isFav,
       );
+      final current = _featuredPopularProductsAPIResponse.data;
+      if (current != null) {
+        _featuredPopularProductsAPIResponse = APIResponse.completed(
+          current.copyWith(popularProducts: popularList),
+        );
+      }
     }
 
-    if (!isFav) {
-      final favouriteProductsList =
-          _favouriteProductResponse.data?.favouriteList?.productList ?? [];
-      final index5 =
-          favouriteProductsList.indexWhere((p) => p.favouriteID == productID);
+    // Maintain favourites list
+    final favRaw = _favouriteProductResponse.data;
+    final favList = favRaw?.favouriteList?.productList != null
+        ? List<ProductDataModel>.from(favRaw!.favouriteList!.productList)
+        : <ProductDataModel>[];
+
+    if (isFav) {
+      // Add to favourites if not already present
+      ProductDataModel? prod = updatedProduct;
+      try {
+        prod ??= productsListRandom.firstWhere(updateCondition);
+      } catch (_) {}
+      try {
+        prod ??= _productsCollection.firstWhere(updateCondition);
+      } catch (_) {}
+      for (final entry in _cachedProducts.entries) {
+        try {
+          prod ??= entry.value.firstWhere(updateCondition);
+        } catch (_) {}
+        if (prod != null) break;
+      }
+      try {
+        prod ??= featuredList.firstWhere(updateCondition);
+      } catch (_) {}
+      try {
+        prod ??= popularList.firstWhere(updateCondition);
+      } catch (_) {}
+
+      if (prod != null) {
+        final newFav = prod.copyWith(
+          favouriteID: favouriteId,
+          isFavourite: true,
+        );
+        final exists = favList.any(
+            (p) => p.pID == newFav.pID || p.favouriteID == newFav.favouriteID);
+        if (!exists) {
+          favList.add(newFav);
+          _favouriteProductResponse = APIResponse.completed(
+            FavouriteProductRawDataModel(
+              favouriteList: FavouriteProductDataModel(productList: favList),
+            ),
+          );
+        }
+      }
+    } else {
+      final index5 = favList.indexWhere((p) => p.favouriteID == productID);
       if (index5 != -1) {
-        favouriteProductsList.removeAt(index5);
+        favList.removeAt(index5);
+        _favouriteProductResponse = APIResponse.completed(
+          FavouriteProductRawDataModel(
+            favouriteList: FavouriteProductDataModel(productList: favList),
+          ),
+        );
       }
     }
   }

@@ -153,6 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
     AuthProvider authListener,
     HomeProvider homeProvider,
   ) {
+    final productsProvider = context.read<ProductsProvider>();
+
     return SingleChildScrollView(
       child: PopScope(
         onPopInvokedWithResult: (_, __) {
@@ -247,6 +249,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   if (logged) {
                                     AlertDialogs.showSuccess(
                                         "Login successfully!");
+                                    productsProvider
+                                        .getFeaturedPopularProducts();
+
                                     if (widget.showBackButton) {
                                       Navigator.pop(context, true);
                                       context

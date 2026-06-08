@@ -127,13 +127,17 @@ class _CategoriesScreenState extends State<CategoriesScreen>
 
   @override
   Widget build(BuildContext context) {
-    final productListner = context.watch<ProductsProvider>();
+    final productListener = context.watch<ProductsProvider>();
     final productProvider = context.read<ProductsProvider>();
     final cartProvider = context.read<CartProvider>();
     final cartListener = context.read<CartProvider>();
     final homeProvider = context.read<HomeProvider>();
     final userProvider = context.read<UserProvider>();
     // final products = productProvider.productsList;
+    final subCategories = productListener.selectedCategory?.childrens
+            ?.where((category) => (category.productsCount?.online ?? 0) > 0)
+            .toList() ??
+        [];
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -146,7 +150,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                   : TabBar(
                       controller: _categoryTabController,
                       onTap: (index) async {
-                        final category = productListner.categories[index];
+                        final category = productListener.categories[index];
                         final cID = category.cID;
 
                         // If same category, still sync controller
@@ -154,7 +158,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                           _categoryTabController!.animateTo(index);
                         }
 
-                        if (cID == productListner.selectedCategory?.cID) return;
+                        if (cID == productListener.selectedCategory?.cID)
+                          return;
 
                         productProvider.onChangeHasMoreProducts(true);
                         productProvider.onChangeSelectedCategory(category);
@@ -176,7 +181,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                       isScrollable: true,
                       dividerColor: Colors.transparent,
                       indicatorColor: Theme.of(context).colorScheme.primary,
-                      tabs: productListner.categories
+                      tabs: productListener.categories
                           .mapIndexed((index, e) => AppConfig
                                       .instance.isCategoryImageEnabled ==
                                   true
@@ -258,7 +263,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
               verticalSpaceSmall,
               Row(
                 children: [
-                  if (productListner.selectedSubCategory != null) ...[
+                  if (productListener.selectedSubCategory != null) ...[
                     ChoiceChip(
                       label: Text(
                         "Clear",
@@ -286,7 +291,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                         );
                         await productProvider.getAllProductsByPagination(
                           categoryID:
-                              productListner.selectedCategory?.cID ?? '0',
+                              productListener.selectedCategory?.cID ?? '0',
                           isRandom: false,
                           isRefresh: true,
                         );
@@ -299,11 +304,11 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                       controller: _subCategoryScrollController,
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children: productListner.selectedCategory?.childrens
-                                ?.mapIndexed((index, category) {
+                        children: subCategories.mapIndexed((index, category) {
                               final isSelected =
-                                  productListner.selectedSubCategory?.cID ==
+                                  productListener.selectedSubCategory?.cID ==
                                       category.cID;
+
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 4.0),
@@ -364,7 +369,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
 
                                       await productProvider
                                           .getAllProductsByPagination(
-                                        categoryID: productListner
+                                        categoryID: productListener
                                                 .selectedCategory?.cID ??
                                             '0',
                                         isRandom: false,
@@ -403,22 +408,24 @@ class _CategoriesScreenState extends State<CategoriesScreen>
               //     : const SizedBox.shrink(),
 
               Expanded(
-                child: productListner.productsListAPIResponse.status ==
+                child: productListener.productsListAPIResponse.status ==
                         APIResponseStatus.loading
                     ? const ShimmerProductDetailsTile()
-                    : productListner.productsList.isEmpty
+                    : productListener.productsList.isEmpty
                         ? const Text("No Products Found")
                         : AlignedGridView.count(
                             padding: const EdgeInsets.only(bottom: 200),
                             controller: _scrollController,
                             crossAxisCount: 2,
-                            itemCount: productListner.productsList.length +
-                                (productListner.isFetchingProductsFromPagination
+                            itemCount: productListener.productsList.length +
+                                (productListener
+                                        .isFetchingProductsFromPagination
                                     ? 1
                                     : 0),
                             cacheExtent: 200,
                             itemBuilder: (context, index) {
-                              if (index >= productListner.productsList.length) {
+                              if (index >=
+                                  productListener.productsList.length) {
                                 return SizedBox(
                                   width: double.infinity,
                                   child: Center(
@@ -433,7 +440,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                 );
                               }
                               final product =
-                                  productListner.productsList.elementAt(index);
+                                  productListener.productsList.elementAt(index);
                               final isExist =
                                   cartProvider.isProductExist(product.pID);
                               final productQtyUpdated =

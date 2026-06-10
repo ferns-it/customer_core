@@ -149,7 +149,12 @@ class _CartScreenState extends State<CartScreen>
                                 // isScrollable: true,
                                 tabs: const <Widget>[
                                   Tab(text: 'Items'),
-                                  Tab(text: 'Delivery & Pay'),
+                                  Tab(
+                                    child: Text(
+                                      'Delivery & Pay',
+                                      overflow: TextOverflow.visible,
+                                    ),
+                                  ),
                                   Tab(text: 'Checkout'),
                                 ],
                               ),

@@ -56,7 +56,6 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                               .then((done) {
                             if (done) {
                               userProvider.clearAddressForm();
-
                               userProvider.getAddressList();
                               // ignore: use_build_context_synchronously
                               // Navigator.pop(context);
@@ -66,9 +65,15 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                           });
                         }
                       },
-                child: Text(userListener.isAddingOrUpdatingUserAddress
-                    ? "Saving"
-                    : "Save")),
+                child: Text(
+                    userListener.isAddingOrUpdatingUserAddress
+                        ? "Saving.."
+                        : "Save",
+                    style: TextStyle(
+                      color: userListener.isAddingOrUpdatingUserAddress
+                          ? Theme.of(context).colorScheme.secondary
+                          : Theme.of(context).colorScheme.primary,
+                    ))),
             horizontalSpaceRegular,
           ],
         ),

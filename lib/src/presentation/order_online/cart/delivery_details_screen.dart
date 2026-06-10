@@ -1193,11 +1193,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 12.0),
                                 child: Assets.lib.assets.icons.searchNormal.svg(
-                                  height: 16,
-                                  width: 16,
-                                  color: themeListener.isDarkMode
-                                      ? AppColors.kGray3
-                                      : null,
+                                  height: 14,
+                                  width: 14,
+                                  color: Theme.of(context).iconTheme.color,
                                   fit: BoxFit.contain,
                                 ),
                               ),

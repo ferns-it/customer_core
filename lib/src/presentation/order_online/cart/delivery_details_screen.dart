@@ -826,7 +826,6 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                   }
 
                   cartProvider.onChangeOrderType(OrderType.takeaway);
-                  cartProvider.calculateTakeAwayCharge();
                   cartProvider.clearCalculatedDeliveryDetails();
                 },
               ),

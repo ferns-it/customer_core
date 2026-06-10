@@ -1120,20 +1120,18 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   void onChangeOrderType(OrderType type) {
     _selectedOrderType = type;
+    _selectedPaymentMethod = PaymentMethod.cash;
     notifyListeners();
 
     if (_selectedOrderType == OrderType.delivery) {
       calculateDeliveryCharge();
       return;
+    } else {
+      calculateTakeAwayCharge(
+        pickupTime: _selectedPickUpTime ??
+            DateTime.now().add(const Duration(minutes: 15)),
+      );
     }
-
-    // Pass a temporary pickup time to fetch takeaway billing details
-    // without setting the user-visible selectedPickUpTime.
-    // selectedPickUpTime stays null so the UI still shows "Select Pick Up Time".
-    calculateTakeAwayCharge(
-      pickupTime: _selectedPickUpTime ??
-          DateTime.now().add(const Duration(minutes: 15)),
-    );
   }
 
   void onChangePaymentMethod(PaymentMethod method) {
@@ -1215,10 +1213,6 @@ class CartProvider extends ChangeNotifier with BaseController {
 
       return response.fold((error) {
         AlertDialogs.showError(error.message);
-        _deliveryOrTakeAwayChargeCalculating = false;
-        _selectedAddress = null;
-        _selectedAddressSecondary = null;
-        notifyListeners();
         return false;
       }, (result) {
         _deliveryDetails = result;

@@ -80,6 +80,7 @@ ThemeData appLightTheme(BuildContext context) {
   );
 
   return ThemeData(
+    highlightColor: Colors.grey.shade300,
     dividerColor: Colors.grey.shade200,
     cardColor: AppColors.kWhite,
     useMaterial3: true,
@@ -155,6 +156,7 @@ ThemeData appDarkTheme(BuildContext context) {
   );
 
   return ThemeData(
+    highlightColor: AppColors.kGray,
     dividerColor: AppColors.kDarkBg,
     cardColor: AppColors.kCardBackground2,
     useMaterial3: true,

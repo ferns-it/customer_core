@@ -26,9 +26,7 @@ class ShimmerProductDetailsTile extends StatelessWidget {
 
   Widget buildShimmerContainer(context) {
     return Shimmer.fromColors(
-      baseColor: Theme.of(context).brightness == Brightness.dark
-          ? AppColors.kCardBackground2
-          : Colors.grey.shade200,
+      baseColor:Theme.of(context).cardColor,
       highlightColor: Theme.of(context).brightness == Brightness.dark
           ? AppColors.kGray
           : Colors.grey.shade300,

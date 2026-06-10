@@ -326,6 +326,7 @@ class _CartScreenState extends State<CartScreen>
     final cartProvider = context.read<CartProvider>();
     final shopListener = context.read<ShopProvider>();
     final paymentProvider = context.read<PaymentProvider>();
+    final paymentListener = context.watch<PaymentProvider>();
     final orderProvider = context.read<OrderProvider>();
     final userListener = context.watch<UserProvider>();
 
@@ -662,28 +663,44 @@ class _CartScreenState extends State<CartScreen>
                                                 ),
                                               ),
                                             )
-                                          : Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FluentIcons.check_24_regular,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
+                                          : paymentListener
+                                                  .creatingPaymentIntent
+                                              ? Center(
+                                                  child: SizedBox(
+                                                    height: 20,
+                                                    width: 20,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                    ),
+                                                  ),
+                                                )
+                                              : Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      FluentIcons
+                                                          .check_24_regular,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                    ),
+                                                    horizontalSpaceSmall,
+                                                    Text("Pay",
+                                                        style: context
+                                                            .customTextTheme
+                                                            .text14W700
+                                                            .copyWith(
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .colorScheme
+                                                                    .onSurface)),
+                                                  ],
                                                 ),
-                                                horizontalSpaceSmall,
-                                                Text("Pay",
-                                                    style: context
-                                                        .customTextTheme
-                                                        .text14W700
-                                                        .copyWith(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .onSurface)),
-                                              ],
-                                            ),
                                     ),
                                   ),
                                 ),

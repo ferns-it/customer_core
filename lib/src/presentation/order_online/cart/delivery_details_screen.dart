@@ -100,7 +100,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                 ],
               ),
               // Divider(),
-              if (cartListener.selectedAddressSecondary == null) ...[
+              if (cartListener.selectedAddress == null) ...[
                 Card(
                   color: Theme.of(context).scaffoldBackgroundColor,
                   child: Padding(
@@ -189,8 +189,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                     ),
                                   ),
                                   Text(
-                                    cartListener.selectedAddressSecondary!
-                                        .userFulladdress
+                                    cartListener
+                                        .selectedAddress!.userFulladdress
                                         .trimLeft()
                                         .capitalize(),
                                     style: GoogleFonts.quicksand(

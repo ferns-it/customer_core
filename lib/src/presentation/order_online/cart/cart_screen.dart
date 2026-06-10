@@ -483,24 +483,29 @@ class _CartScreenState extends State<CartScreen>
                                     onTap: cartProvider.createOrderPending
                                         ? null
                                         : () async {
-                                            if (cartListener.selectedAddress ==
-                                                null) {
-                                              AlertDialogs.showError(
-                                                  "Please select an address",
-                                                  context: context);
-                                              return;
-                                            }
+                                            // Validate address / delivery charges first
                                             if (cartListener
-                                                        .selectedOrderType ==
-                                                    OrderType.takeaway &&
-                                                cartListener
-                                                        .selectedPickUpTime ==
-                                                    null) {
-                                              AlertDialogs.showError(
-                                                  "Please select pickup time",
-                                                  context: context);
-                                              return;
+                                                    .selectedOrderType ==
+                                                OrderType.delivery) {
+                                              final validated =
+                                                  await cartProvider
+                                                      .validateAddress();
+                                              if (!validated) return;
+                                            } else {
+                                              if (cartListener
+                                                      .selectedPickUpTime ==
+                                                  null) {
+                                                AlertDialogs.showError(
+                                                    "Please select pickup time",
+                                                    context: context);
+                                                return;
+                                              }
+                                              // ensure takeaway calculations present
+                                              final ok = cartProvider
+                                                  .validateInputData();
+                                              if (!ok) return;
                                             }
+
                                             if (cartListener
                                                         .selectedPaymentMethod ==
                                                     PaymentMethod.card &&
@@ -512,14 +517,7 @@ class _CartScreenState extends State<CartScreen>
                                                   context: context);
                                               return;
                                             }
-                                            // if (shopListener.selectedDate == null) {
-                                            //   AlertDialogs.showError("Please select an delivery date", context: context);
-                                            //   return;
-                                            // }
-                                            // if (shopListener.selectedDeliverySlot == null) {
-                                            //   AlertDialogs.showError("Please select an delivery time", context: context);
-                                            //   return;
-                                            // }
+
                                             cartProvider.jumpToPage(2);
                                           },
                                     child: Container(
@@ -565,6 +563,20 @@ class _CartScreenState extends State<CartScreen>
                                     onTap: cartListener.createOrderPending
                                         ? null
                                         : () async {
+                                            // Validate address / delivery charges before payment
+                                            if (cartProvider
+                                                    .selectedOrderType ==
+                                                OrderType.delivery) {
+                                              final validated =
+                                                  await cartProvider
+                                                      .validateAddress();
+                                              if (!validated) return;
+                                            } else {
+                                              final ok = cartProvider
+                                                  .validateInputData();
+                                              if (!ok) return;
+                                            }
+
                                             if (cartProvider
                                                     .selectedPaymentMethod ==
                                                 PaymentMethod.card) {

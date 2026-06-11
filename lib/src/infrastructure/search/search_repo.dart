@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:customer_core/src/core/constants/app_identifiers.dart';
 import 'package:customer_core/src/domain/store/models/product_details_model.dart';
@@ -19,15 +20,22 @@ class SearchRepo implements ISearchRepo {
   Future<Either<AppExceptions, List<ProductDataModel>>> getAllSearchProducts(
       {required String searchKey}) async {
     try {
-      final data = {"shopId": AppIdentifiers.kShopId, "searchkey": searchKey};
-      final response =
-          await APIManager.post(api: Endpoints.kSearchProducts, data: data);
-
+      // final data = {"shopId": AppIdentifiers.kShopId, "searchkey": searchKey};
+      // final response =
+      //     await APIManager.post(api: Endpoints.kSearchProducts, data: data);
+      final response = await APIManager.get(
+        api: '${Endpoints.kSearch}/${AppIdentifiers.kShopId}/$searchKey',
+      );
       if (response == null) return Left(InternalServerErrorException());
       final jsonData = jsonDecode(response);
-      final result = jsonData['dataList'] as List;
+      final result = jsonData['searchResult']['products'] as List;
+
       final products = result.map((e) => ProductDataModel.fromMap(e)).toList();
+
       return Right(products);
+//       final result = jsonData['dataList'] as List;
+//       final products = result.map((e) => ProductDataModel.fromMap(e)).toList();
+//       return Right(products);
     } on DioException catch (e) {
       return Left(e.error is AppExceptions
           ? e.error as AppExceptions
@@ -36,5 +44,4 @@ class SearchRepo implements ISearchRepo {
       return Left(InternalServerErrorException());
     }
   }
-
 }

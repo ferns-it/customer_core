@@ -409,6 +409,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                         child: FormBuilderTextField(
                           name: 'notes',
                           key: cartListener.notesFieldKey,
+                          onChanged: (value) {
+                            cartListener.setDeliveryNotes(value ?? '');
+                          },
                           style: context.customTextTheme.text14W600
                               .copyWith(color: context.customTextTheme.color),
                           decoration: InputDecoration(

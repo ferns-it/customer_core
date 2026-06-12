@@ -560,15 +560,14 @@ class CheckoutDetailsScreen extends StatelessWidget {
                       ),
                     ),
               verticalSpaceRegular,
-              if (cartListener.notesFieldKey.currentState?.value != null &&
-                  cartListener.notesFieldKey.currentState!.value!.isNotEmpty)
+              if (cartListener.deliveryNotes.isNotEmpty)
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text("Order / Delivery Notes",
                       style: context.customTextTheme.text16W600
                           .copyWith(color: isDark ? Colors.white : null)),
                   verticalSpaceTiny,
                   Text(
-                    cartListener.notesFieldKey.currentState?.value ?? '',
+                    cartListener.deliveryNotes,
                     style: GoogleFonts.quicksand(
                       textStyle: context.customTextTheme.text16W500.copyWith(
                         color: isDark ? Colors.white : AppColors.kBlack2,

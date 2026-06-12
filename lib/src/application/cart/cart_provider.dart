@@ -188,6 +188,14 @@ class CartProvider extends ChangeNotifier with BaseController {
   // }
 
   final notesFieldKey = GlobalKey<FormBuilderFieldState>();
+  String _deliveryNotes = '';
+
+  String get deliveryNotes => _deliveryNotes;
+
+  void setDeliveryNotes(String value) {
+    _deliveryNotes = value;
+    notifyListeners();
+  }
 
   OrderType _selectedOrderType = OrderType.delivery;
 
@@ -1344,7 +1352,7 @@ class CartProvider extends ChangeNotifier with BaseController {
             selectedPaymentMethod == PaymentMethod.cash ? 'COD' : 'STRIPE',
         transactionID: selectedPaymentMethod == PaymentMethod.cash ? '' : tID,
         paymentStatus: selectedPaymentMethod == PaymentMethod.cash ? '0' : '1',
-        deliveryNotes: notesFieldKey.currentState?.value ?? '',
+        deliveryNotes: _deliveryNotes,
         deliveryLocation: selectedAddress?.addressTitle,
         deliveryDate: deliveryDate,
         deliverySlot: deliverySlot,

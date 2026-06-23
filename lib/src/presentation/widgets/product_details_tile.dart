@@ -247,7 +247,6 @@ class ProductDetailsTile extends StatelessWidget {
                         ),
                     ],
                   ),
-                  verticalSpaceTiny,
                   Text(
                     Utils.removeExtraSpaces(
                       Utils.removeHtmlTags(

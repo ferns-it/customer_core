@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
@@ -80,16 +81,18 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                     margin: const EdgeInsets.only(top: 10),
                     child: Row(
                       children: [
-                        product.productPhoto != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: CachedNetworkImage(
-                                    height: 60,
-                                    width: 60,
-                                    fit: BoxFit.cover,
-                                    imageUrl: product.productPhoto!),
-                              )
-                            : const SizedBox.shrink(),
+                        AppConfig.instance.isCategoryImageEnabled
+                            ? product.productPhoto != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                        height: 60,
+                                        width: 60,
+                                        fit: BoxFit.cover,
+                                        imageUrl: product.productPhoto!),
+                                  )
+                                : const SizedBox.shrink()
+                            : SizedBox.shrink(),
                         product.productPhoto != null
                             ? horizontalSpaceSmall
                             : const SizedBox.shrink(),

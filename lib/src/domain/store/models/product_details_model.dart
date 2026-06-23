@@ -359,6 +359,14 @@ class ProductDataModel {
         isOfferPrice.hashCode ^
         offerPriceDetails.hashCode;
   }
+List<String> get allergensList {
+  return variations
+      .expand((variation) => variation.allergens ?? [])
+      .map((allergen) => allergen.name)
+      .whereType<String>()
+      .toSet()
+      .toList();
+}
 }
 
 class ProductVariationDataModel {
@@ -464,6 +472,24 @@ class ProductVariationDataModel {
       //         ),
       //       )
       //     : null,
+      allergens: map['allergens'] != null
+          ? List<ProductsAllergenDataModel>.from(
+              (map['allergens'] as List<dynamic>)
+                  .map<ProductsAllergenDataModel?>(
+                (x) => ProductsAllergenDataModel.fromMap(
+                    x as Map<String, dynamic>),
+              ),
+            )
+          : null,
+      // allergens: map['allergens'] != null
+      //     ? List<ProductsAllergenDataModel>.from(
+      //         (map['allergens'] as List).map(
+      //           (x) => ProductsAllergenDataModel.fromMap(
+      //             x as Map<String, dynamic>,
+      //           ),
+      //         ),
+      //       )
+      //     : [],
       selectedallergens: map['selectedallergens'] != null
           ? List<dynamic>.from((map['selectedallergens'] as List<dynamic>))
           : null,

@@ -113,19 +113,22 @@ class CheckoutDetailsScreen extends StatelessWidget {
                                             .elementAt(index);
                                         return Row(
                                           children: [
-                                            product.productPhoto != null
-                                                ? ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    child: CachedNetworkImage(
-                                                        height: 60,
-                                                        width: 60,
-                                                        fit: BoxFit.cover,
-                                                        imageUrl: product
-                                                            .productPhoto!),
-                                                  )
-                                                : const SizedBox.shrink(),
+                                            AppConfig.instance
+                                                    .isCategoryImageEnabled
+                                                ? product.productPhoto != null
+                                                    ? ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        child: CachedNetworkImage(
+                                                            height: 60,
+                                                            width: 60,
+                                                            fit: BoxFit.cover,
+                                                            imageUrl: product
+                                                                .productPhoto!),
+                                                      )
+                                                    : const SizedBox.shrink()
+                                                : SizedBox.shrink(),
                                             product.productPhoto != null
                                                 ? horizontalSpaceSmall
                                                 : const SizedBox.shrink(),
@@ -383,7 +386,6 @@ class CheckoutDetailsScreen extends StatelessWidget {
                                             horizontalSpaceRegular
                                           ],
                                         );
-                                        
                                       },
                                       separatorBuilder: (context, index) {
                                         return verticalSpaceSmall;

@@ -888,118 +888,89 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                             ),
-                            child: Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: e.image != null
-                                      ? CachedNetworkImage(
-                                          imageUrl: e.image!,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Image.asset(
-                                          Assets.lib.assets.images.noimage.path,
-                                          fit: BoxFit.cover,
-                                          package: 'customer_core',
-                                        ),
-                                ),
-
-                                // Dark overlay – fades stronger when selected
-                                Positioned.fill(
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    color: Colors.black.withOpacity(0.3),
-                                  ),
-                                ),
-
-                                Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6),
-                                    child: Text(
-                                      e.name ?? '',
-                                      maxLines: 2,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
-                                        shadows: [
-                                          Shadow(
-                                            color: Colors.black,
-                                            offset: Offset(0, 1), // x, y
-                                            blurRadius: 4,
-                                          ),
-                                        ],
+                            child: AppConfig.instance.isCategoryImageEnabled ==
+                                    true
+                                ? Stack(
+                                    children: [
+                                      Positioned.fill(
+                                        child: e.image != null
+                                            ? CachedNetworkImage(
+                                                imageUrl: e.image!,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Image.asset(
+                                                Assets.lib.assets.images.noimage
+                                                    .path,
+                                                fit: BoxFit.cover,
+                                                package: 'customer_core',
+                                              ),
                                       ),
-                                    ),
+
+                                      // Dark overlay – fades stronger when selected
+                                      Positioned.fill(
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          color: Colors.black.withOpacity(0.3),
+                                        ),
+                                      ),
+
+                                      Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 6),
+                                          child: Text(
+                                            e.name ?? '',
+                                            maxLines: 2,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                              shadows: [
+                                                Shadow(
+                                                  color: Colors.black,
+                                                  offset: Offset(0, 1), // x, y
+                                                  blurRadius: 4,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Stack(
+                                    children: [
+                                      Positioned.fill(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                              )),
+                                        ),
+                                      ),
+                                      Center(
+                                        child: Text(e.name ?? '',
+                                            maxLines: 2,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color:
+                                                  context.customTextTheme.color,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                            )),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
                           ),
                         );
                       }).toList(),
                     ),
-                    // SingleChildScrollView(
-                    //   scrollDirection: Axis.horizontal,
-                    //   child: Row(
-                    //     children: productListner.categories
-                    //         .mapIndexed((index, e) => InkWell(
-                    //               onTap: () async {
-                    //                 final cID = e.cID;
-
-                    //                 if (cID != null) {
-                    //                   productProvider.onChangeSelectedCategory(e);
-                    //                   productProvider.onChangeSelectedCategoryIndex(index);
-                    //                   context.read<HomeProvider>().onChangeCurrentPage(1);
-                    //                   context.read<HomeProvider>().showNavBar();
-
-                    //                   await productProvider.getAllProducts(cID);
-                    //                 }
-                    //               },
-                    //               child: Container(
-                    //                 width: 100,
-                    //                 // height: 100,
-                    //                 margin: const EdgeInsets.only(right: 10.0),
-                    //                 padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                    //                 decoration: BoxDecoration(
-                    //                     border: Border.all(
-                    //                         color:
-                    //                             //  productListner.selectedCategory == e
-                    //                             //     ? AppColors.kprimary
-                    //                             //     :
-                    //                             AppColors.kLightWhite2,
-                    //                         width: 1.5),
-                    //                     borderRadius: BorderRadius.circular(15)),
-                    //                 child: Center(
-                    //                   child: Column(
-                    //                     crossAxisAlignment: CrossAxisAlignment.center,
-                    //                     mainAxisAlignment: MainAxisAlignment.center,
-                    //                     children: [
-                    //                       e.image != null
-                    //                           ? CachedNetworkImage(
-                    //                               imageUrl: e.image ?? '',
-                    //                               height: 30,
-                    //                             )
-                    //                           : Image(
-                    //                               image: AssetImage(Assets.images.noimage.path),
-                    //                               height: 30,
-                    //                             ),
-                    //                       verticalSpaceTiny,
-                    //                       Text(
-                    //                         e.name ?? '',
-                    //                         style: context.customTextTheme.text12W500.copyWith(color: AppColors.kBlack),
-                    //                         overflow: TextOverflow.ellipsis,
-                    //                         textAlign: TextAlign.center,
-                    //                       ),
-                    //                     ],
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             ))
-                    //         .toList(),
-                    //   ),
-                    // )
                   ],
                 ),
               ),

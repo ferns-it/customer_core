@@ -67,9 +67,14 @@ class DishDetailBottomSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // verticalSpaceTiny,
-                  _ProductImageWidget(product: product),
+                  AppConfig.instance.isCategoryImageEnabled == true
+                      ? _ProductImageWidget(product: product)
+                      : SizedBox.shrink(),
                   verticalSpaceRegular,
-                  _ProductNameWidget(product: product),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: _ProductNameWidget(product: product),
+                  ),
                   // _RatingAndTimeWidget(product: product),
                   product.description != null && product.description!.isNotEmpty
                       ? verticalSpaceSmall
@@ -82,6 +87,36 @@ class DishDetailBottomSheet extends StatelessWidget {
                   product.description != null && product.description!.isNotEmpty
                       ? verticalSpaceRegular
                       : const SizedBox.shrink(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Wrap(
+                      spacing: 2,
+                      runSpacing: 4,
+                      children: [
+                        ...product.allergensList.map(
+                          (e) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.grey.shade800
+                                  : AppColors.kGray3.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              e,
+                              style: TextStyle(
+                                  fontSize: 8,
+                                  color: context.customTextTheme.color),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   _OrderSectionWidget(
                     product: product,
                     onRequestOrderDish: onRequestOrderDish,
@@ -107,6 +142,22 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
 
     final baseTextTheme = Theme.of(context).textTheme;
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
+    List<String> getSelectedVariationAllergens() {
+      final variation = cartListener.selectedItemVariation;
+      if (variation == null) {
+        return product.allergensList;
+      }
+      if (variation.allergensMaster?.isNotEmpty == true) {
+        return variation.allergensMaster!
+            .map((e) => e['name'].toString())
+            .toList();
+      }
+      return variation.allergens
+              ?.map((e) => e.name ?? '')
+              .where((e) => e.isNotEmpty)
+              .toList() ??
+          [];
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -143,18 +194,67 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
                   verticalSpaceTiny,
                   Row(
                     children: [
-                      Expanded(child: _ProductImageWidget(product: product)),
-                      horizontalSpaceSmall,
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            _ProductNameWidget(product: product),
-                            // _RatingAndTimeWidget(product: product),
-                          ],
-                        ),
-                      ),
+                      AppConfig.instance.isCategoryImageEnabled
+                          ? Expanded(
+                              child: _ProductImageWidget(product: product))
+                          : SizedBox.shrink(),
+                      AppConfig.instance.isCategoryImageEnabled
+                          ? horizontalSpaceSmall
+                          : SizedBox.shrink(),
+                      AppConfig.instance.isCategoryImageEnabled
+                          ? Expanded(
+                              flex: 3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  _ProductNameWidget(product: product),
+                                  // _RatingAndTimeWidget(product: product),
+                                ],
+                              ),
+                            )
+                          : Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _ProductNameWidget(product: product),
+                                  verticalSpaceSmall,
+                                  Wrap(
+                                    spacing: 4,
+                                    runSpacing: 4,
+                                    children: getSelectedVariationAllergens()
+                                        .map(
+                                          (e) => Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              // border: Border.all(
+                                              //     color: Colors.grey.shade400),
+                                              color: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? Colors.grey.shade800
+                                                  : AppColors.kGray3
+                                                      .withOpacity(0.3),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              e,
+                                              style: TextStyle(
+                                                fontSize: 8,
+                                                color: context
+                                                    .customTextTheme.color,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                  )
+                                ],
+                              ),
+                            ),
                     ],
                   ),
                   verticalSpaceSmall,
@@ -245,13 +345,9 @@ class _ProductNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15.0).copyWith(bottom: 0),
-      child: Text(
-        (product.name ?? "").capitalize(),
-        style: context.customTextTheme.text20W600.copyWith(
-          color: context.customTextTheme.color,
-        ),
+    return Text(      (product.name ?? "").capitalize(),
+      style: context.customTextTheme.text20W600.copyWith(
+        color: context.customTextTheme.color,
       ),
     );
   }

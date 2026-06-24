@@ -113,8 +113,28 @@ class APIManager {
     }
 
     try {
-      final jsonData = jsonDecode(data) as Map<String, dynamic>?;
-      if (jsonData?["error"] ?? false) {
+      // If the response data is already a Map (from ResponseType.json),
+      // encode it to a JSON string first so we can consistently process it.
+      final String rawJson;
+      if (data is String) {
+        rawJson = data;
+      } else {
+        rawJson = jsonEncode(data);
+      }
+
+      final jsonData = jsonDecode(rawJson) as Map<String, dynamic>?;
+      if (jsonData == null) {
+        return handler.reject(
+          DioException(
+            requestOptions: response.requestOptions,
+            message: FormatErrorException().message,
+            type: DioExceptionType.badResponse,
+            error: FormatErrorException(),
+          ),
+        );
+      }
+
+      if (jsonData["error"] ?? false) {
         final errorMessage = _getErrorMessage(jsonData);
         return handler.reject(
           DioException(
@@ -132,9 +152,14 @@ class APIManager {
       final dataKey = response.requestOptions.headers["dataKey"] ?? "data";
       final checking =
           response.requestOptions.headers["dataKeyChecking"] ?? true;
-      if (!checking) return handler.next(response);
+      if (!checking) {
+        // Re-encode the full JSON back to a string so the returned type
+        // matches the expected String? return type from post()/get() etc.
+        response.data = rawJson;
+        return handler.next(response);
+      }
 
-      final responseData = jsonData?[dataKey];
+      final responseData = jsonData[dataKey];
       if (responseData == null) {
         return handler.reject(
           DioException(

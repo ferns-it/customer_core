@@ -61,7 +61,7 @@ class CheckoutRepo implements ICheckoutRepo {
         api: Endpoints.kCompleteOrderWeb,
         data: data.toJson(),
         authDataKey: "user",
-        dataKeyChecking: true,
+        dataKeyChecking: false,
         needAuth: true,
       );
       if (response == null) return Left(InternalServerErrorException());
@@ -85,7 +85,7 @@ class CheckoutRepo implements ICheckoutRepo {
           "x-secretkey": KeyConfig.instance.fpSecretKey,
         },
         authDataKey: "user",
-        dataKeyChecking: true,
+        dataKeyChecking: false,
         data: {
           "pickupTime": DateTimeUtils.format(pickupTime),
           "shopID": AppIdentifiers.kShopId,
@@ -121,6 +121,7 @@ class CheckoutRepo implements ICheckoutRepo {
         api: Endpoints.kCancelPaymentIntent,
         data: data,
         authDataKey: "user",
+        dataKeyChecking: false,
         needAuth: true,
       );
 
@@ -164,6 +165,7 @@ class CheckoutRepo implements ICheckoutRepo {
         api: Endpoints.kCreatePaymentIntent,
         data: data,
         authDataKey: "user",
+        dataKeyChecking: false,
         needAuth: true,
       );
 

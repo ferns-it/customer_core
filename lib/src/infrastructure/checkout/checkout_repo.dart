@@ -38,7 +38,7 @@ class CheckoutRepo implements ICheckoutRepo {
         },
         needAuth: true,
         authDataKey: "user",
-        dataKeyChecking: true,
+        dataKeyChecking: false,
         additionalHeaders: {"x-secretkey": KeyConfig.instance.fpSecretKey},
       );
       if (response == null) return Left(InternalServerErrorException());

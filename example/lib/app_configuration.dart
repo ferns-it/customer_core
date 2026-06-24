@@ -15,14 +15,27 @@ final appConfig = AppConfig(
   fireBaseProjectId: 'customerapp-6d5f7',
   themeMode: AppThemeMode.system,
   isCategoryImageEnabled: false,
+  // applicationName: 'Urban Spice',
+  // shopName: 'Urban Spice',
+  // shopId: '76',
+  // country: Country.uk,
+  // env: AppEnv.prod,
+  // shopIdentifier: 'urban-spice',
+  // shopInfoEmail: 'info@urbanspicechelmsford.com',
+  // shopInfoPhone: ['+44 01245939257'],
+  // shopInfoAddress: '63 New Writtle Street, Chelmsford, CM2 0LF',
+  // buildIdentifier: 'co.uk.urbanspice.app',
+  // fireBaseProjectId: 'customerapp-6d5f7',
+  // themeMode: AppThemeMode.system,
+  // isCategoryImageEnabled: false,
 );
 final uiConfig = UiConfig(
-  logo: 'assets/images/freshden logo v3.png',
+  logo: 'assets/images/urban spice logo.png',
   bgImage: 'assets/images/urban spicebg.png',
   bannerImages: [
-    "assets/images/freshden banner.png",
-    "assets/images/freshden banner (1).png",
-    "assets/images/freshden banner (2).png",
+    "assets/images/banner1.png",
+    "assets/images/banner2.png",
+    "assets/images/banner3.png",
   ],
 );
 

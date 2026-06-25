@@ -563,41 +563,27 @@ class OrderDetailsModel {
   // }
 
   bool get orderPending {
-    const pendingMessage = "Waiting for seller to accept the order";
-    if (status?.toLowerCase() == pendingMessage.toLowerCase()) {
-      return true;
-    } else {
-      return false;
-    }
+    const pendingMessage = "waiting for seller to accept the order";
+    if (orderStatus == OrderStatus.pending) return true;
+    return status?.toLowerCase() == pendingMessage;
   }
 
   bool get orderAccepted {
     const acceptedMessage =
-        "Order accepted by the seller and waiting for dispatch";
-    if (status?.toLowerCase() == acceptedMessage.toLowerCase()) {
-      return true;
-    } else {
-      return false;
-    }
+        "order accepted by the seller and waiting for dispatch";
+    if (orderStatus == OrderStatus.accepted) return true;
+    return status?.toLowerCase() == acceptedMessage;
   }
 
   bool get orderDispatched {
-    const dispatchMessage = "Order dispatched";
-
-    if (status?.toLowerCase() == dispatchMessage.toLowerCase()) {
-      return true;
-    } else {
-      return false;
-    }
+    const dispatchMessage = "order dispatched";
+    if (orderStatus == OrderStatus.dispatched) return true;
+    return status?.toLowerCase() == dispatchMessage;
   }
 
   bool get orderRejected {
-    const rejectedMessage = "order rejected";
-    if (status?.toLowerCase().contains(rejectedMessage) == true) {
-      return true;
-    } else {
-      return false;
-    }
+    if (orderStatus == OrderStatus.rejected) return true;
+    return status?.toLowerCase().contains("order rejected") == true;
   }
 }
 

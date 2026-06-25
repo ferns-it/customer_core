@@ -65,80 +65,64 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
           builder: (context, snapshot) {
             final isLogged = snapshot.data ?? false;
             return orderListener.ordersResponse.when(
-              initial: () => Center(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (!isLogged) ...[
+              initial: () {
+                if (isLogged) {
+                  Future.microtask(() => orderProvider.fetchAllOrders());
+                  return Center(
+                      child: showButtonProgress(
+                          Theme.of(context).colorScheme.primary));
+                }
+
+                return Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                     Assets.lib.assets.images.userlogin.image(height: 300),
                     Text(
-                      !isLogged ? "Please log in to continue" : "No Orders",
+                      "Please log in to continue",
                       style: context.customTextTheme.text16W400
                           .copyWith(color: context.customTextTheme.color),
                     ),
                     verticalSpaceSmall,
-                    Visibility(
-                      visible: !isLogged,
-                      child: FilledButton(
-                        onPressed: () async {
-                          // context.router.replace(LoginScreenRoute());
-                          final result = await Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => LoginScreen(
-                                  showBackButton: true,
-                                ),
-                              ));
+                    FilledButton(
+                      onPressed: () async {
+                        // context.router.replace(LoginScreenRoute());
+                        final result = await Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => LoginScreen(
+                                showBackButton: true,
+                              ),
+                            ));
 
-                          if (result) {
-                            Future.wait([
-                              userListener.getUserData(),
-                              userListener.getAddressList(),
-                              orderProvider.fetchAllOrders(),
-                              if (cartListener.cartItems.isNotEmpty) ...[
-                                cartProvider.transferCart(),
-                              ],
-                            ]);
-                          }
-                        },
-                        style: FilledButton.styleFrom(
-                            disabledBackgroundColor: Colors.transparent,
-                            disabledForegroundColor:
-                                Theme.of(context).disabledColor,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0)),
-                            fixedSize: const Size(double.infinity, 30),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary),
-                        child: const Text(
-                          'LOGIN',
-                          style: TextStyle(color: AppColors.kWhite),
-                        ),
+                        if (result) {
+                          Future.wait([
+                            userListener.getUserData(),
+                            userListener.getAddressList(),
+                            orderProvider.fetchAllOrders(),
+                            if (cartListener.cartItems.isNotEmpty) ...[
+                              cartProvider.transferCart(),
+                            ],
+                          ]);
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                          disabledBackgroundColor: Colors.transparent,
+                          disabledForegroundColor:
+                              Theme.of(context).disabledColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0)),
+                          fixedSize: const Size(double.infinity, 30),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary),
+                      child: const Text(
+                        'LOGIN',
+                        style: TextStyle(color: AppColors.kWhite),
                       ),
                     )
                   ],
-                  if (isLogged) ...[
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Assets.lib.assets.images.noOrders.image(
-                            width: context.screenWidth * 0.4,
-                            height: context.screenHeight * 0.2,
-                          ),
-                          verticalSpaceSmall,
-                          Text(
-                            'No orders found..',
-                            style: context.customTextTheme.text16W700.copyWith(
-                              color: context.customTextTheme.color,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ]
-                ],
-              )),
+                ));
+              },
               loading: () => Center(
                   child: showButtonProgress(
                       Theme.of(context).colorScheme.primary)),
@@ -528,8 +512,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
               )
             ],
           ),
-          Divider(
-              color:Theme.of(context).dividerColor),
+          Divider(color: Theme.of(context).dividerColor),
           Column(
             children: listOfProducts
                 .take(3)
@@ -557,8 +540,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                   : const SizedBox.shrink(),
             ],
           ),
-          Divider(
-               color:Theme.of(context).dividerColor),
+          Divider(color: Theme.of(context).dividerColor),
           Text(
               "Order Placed On: ${DateTimeUtils.formatDateTimeToDate(order.orderedAt)}, ${DateTimeUtils.formatTimeMinimal(order.orderedAt)}",
               style: context.customTextTheme.text14W400
@@ -609,15 +591,13 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             buildTitleCard(order, context),
-            Divider(
-                color:Theme.of(context).dividerColor),
+            Divider(color: Theme.of(context).dividerColor),
             verticalSpaceSmall,
             buildOrderDetails(order, context),
             verticalSpaceRegular,
             buildOrderFooter(order, context),
             verticalSpaceSmall,
-            Divider(
-                color:Theme.of(context).dividerColor),
+            Divider(color: Theme.of(context).dividerColor),
             buildFooterDetails(order, context),
           ],
         ),

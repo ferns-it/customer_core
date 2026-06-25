@@ -166,7 +166,8 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
 
     final baseTextTheme = Theme.of(context).textTheme;
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
-    List<String> getSelectedVariationAllergens() {
+
+    List<String> getSelectedVariationAllergens(CartProvider cartListener) {
       final variation = cartListener.selectedItemVariation;
       if (variation == null) {
         return allergens;
@@ -187,8 +188,11 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
                 .toList() ??
             [];
       }
-      return allergens;
+      return [];
     }
+
+    final selectedVariationAllergens =
+        getSelectedVariationAllergens(cartListener);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -239,6 +243,43 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   _ProductNameWidget(product: product),
+                                  if (selectedVariationAllergens.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Wrap(
+                                        spacing: 4,
+                                        runSpacing: 4,
+                                        children: selectedVariationAllergens
+                                            .map(
+                                              (e) => Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.dark
+                                                      ? Colors.grey.shade800
+                                                      : AppColors.kGray3
+                                                          .withOpacity(0.3),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  e,
+                                                  style: TextStyle(
+                                                    fontSize: 8,
+                                                    color: context
+                                                        .customTextTheme.color,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                      ),
+                                    ),
                                   // _RatingAndTimeWidget(product: product),
                                 ],
                               ),
@@ -248,41 +289,44 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _ProductNameWidget(product: product),
-                                  verticalSpaceSmall,
-                                  Wrap(
-                                    spacing: 4,
-                                    runSpacing: 4,
-                                    children: getSelectedVariationAllergens()
-                                        .map(
-                                          (e) => Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(
-                                              //     color: Colors.grey.shade400),
-                                              color: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.dark
-                                                  ? Colors.grey.shade800
-                                                  : AppColors.kGray3
-                                                      .withOpacity(0.3),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Text(
-                                              e,
-                                              style: TextStyle(
-                                                fontSize: 8,
-                                                color: context
-                                                    .customTextTheme.color,
+                                  if (selectedVariationAllergens.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Wrap(
+                                        spacing: 4,
+                                        runSpacing: 4,
+                                        children: selectedVariationAllergens
+                                            .map(
+                                              (e) => Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.dark
+                                                      ? Colors.grey.shade800
+                                                      : AppColors.kGray3
+                                                          .withOpacity(0.3),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  e,
+                                                  style: TextStyle(
+                                                    fontSize: 8,
+                                                    color: context
+                                                        .customTextTheme.color,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
-                                  )
+                                            )
+                                            .toList(),
+                                      ),
+                                    ),
+                                  verticalSpaceSmall,
                                 ],
                               ),
                             ),

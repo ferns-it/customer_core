@@ -202,6 +202,7 @@ class ProductDetailsTile extends StatelessWidget {
   }
 
   Widget buildTileView3(BuildContext context) {
+    final allergens = product.selectedAllergensList;
     return Card(
       color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -247,6 +248,7 @@ class ProductDetailsTile extends StatelessWidget {
                         ),
                     ],
                   ),
+                  verticalSpaceTiny,
                   Text(
                     Utils.removeExtraSpaces(
                       Utils.removeHtmlTags(
@@ -258,12 +260,12 @@ class ProductDetailsTile extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  verticalSpaceTiny,
+                  verticalSpaceSmall,
                   Wrap(
                     spacing: 2,
                     runSpacing: 4,
                     children: [
-                      ...product.allergensList.take(4).map(
+                      ...allergens.take(4).map(
                             (e) => Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -279,12 +281,13 @@ class ProductDetailsTile extends StatelessWidget {
                               child: Text(
                                 e,
                                 style: TextStyle(
-                                    fontSize: 8,
-                                    color: context.customTextTheme.color),
+                                  fontSize: 8,
+                                  color: context.customTextTheme.color,
+                                ),
                               ),
                             ),
                           ),
-                      if (product.allergensList.length > 2)
+                      if (allergens.length > 4)
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
@@ -298,15 +301,16 @@ class ProductDetailsTile extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            '+${product.allergensList.length - 4}',
+                            '+${allergens.length - 4}',
                             style: TextStyle(
-                                fontSize: 8,
-                                color: context.customTextTheme.color),
+                              fontSize: 8,
+                              color: context.customTextTheme.color,
+                            ),
                           ),
                         ),
                     ],
                   ),
-                  verticalSpaceTiny,
+                  verticalSpaceSmall,
                   product.isOfferPrice == 'Yes' &&
                           product.offerPriceDetails?.currentOfferPrice != null
                       ? RichText(
@@ -335,7 +339,7 @@ class ProductDetailsTile extends StatelessWidget {
                             color: context.customTextTheme.color,
                           ),
                         ),
-                  verticalSpaceTiny,
+                  verticalSpaceSmall,
                   useSecondaryWidget
                       ? SizedBox(
                           height: 50, child: Center(child: secondaryWidget))

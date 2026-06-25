@@ -240,8 +240,7 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                         ),
                         child: Row(
                           children: [
-                            Flexible(
-                              flex: 14,
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
@@ -268,12 +267,11 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                                                         Brightness.dark
                                                     ? Colors.white
                                                     : null),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                             ),
-                            const Spacer(),
+
                             FilledButton(
                               style: FilledButton.styleFrom(
                                 backgroundColor:

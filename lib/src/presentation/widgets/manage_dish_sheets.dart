@@ -33,6 +33,7 @@ class DishDetailBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseTextTheme = Theme.of(context).textTheme;
+    final allergens = product.selectedAllergensList;
 
     return SafeArea(
       bottom: false,
@@ -93,8 +94,30 @@ class DishDetailBottomSheet extends StatelessWidget {
                       spacing: 2,
                       runSpacing: 4,
                       children: [
-                        ...product.allergensList.map(
-                          (e) => Container(
+                        ...allergens.take(4).map(
+                              (e) => Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey.shade800
+                                      : AppColors.kGray3.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  e,
+                                  style: TextStyle(
+                                    fontSize: 8,
+                                    color: context.customTextTheme.color,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        if (allergens.length > 4)
+                          Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
@@ -107,13 +130,13 @@ class DishDetailBottomSheet extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              e,
+                              '+${allergens.length - 4}',
                               style: TextStyle(
-                                  fontSize: 8,
-                                  color: context.customTextTheme.color),
+                                fontSize: 8,
+                                color: context.customTextTheme.color,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -139,24 +162,32 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
   @override
   Widget build(BuildContext context) {
     final cartListener = listener(context);
+    final allergens = product.selectedAllergensList;
 
     final baseTextTheme = Theme.of(context).textTheme;
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
     List<String> getSelectedVariationAllergens() {
       final variation = cartListener.selectedItemVariation;
       if (variation == null) {
-        return product.allergensList;
+        return allergens;
       }
-      if (variation.allergensMaster?.isNotEmpty == true) {
-        return variation.allergensMaster!
-            .map((e) => e['name'].toString())
-            .toList();
-      }
-      return variation.allergens
-              ?.map((e) => e.name ?? '')
+      if (variation.selectedallergens?.isNotEmpty == true) {
+        if (variation.allergensMaster?.isNotEmpty == true) {
+          return variation.allergensMaster!
+              .where((e) => variation.selectedallergens!.contains(e['id']))
+              .map((e) => e['name'].toString())
               .where((e) => e.isNotEmpty)
-              .toList() ??
-          [];
+              .toList();
+        }
+        return variation.allergens
+                ?.where((allergen) =>
+                    variation.selectedallergens!.contains(allergen.id))
+                .map((e) => e.name ?? '')
+                .where((e) => e.isNotEmpty)
+                .toList() ??
+            [];
+      }
+      return allergens;
     }
 
     return Column(
@@ -345,7 +376,8 @@ class _ProductNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(      (product.name ?? "").capitalize(),
+    return Text(
+      (product.name ?? "").capitalize(),
       style: context.customTextTheme.text20W600.copyWith(
         color: context.customTextTheme.color,
       ),
@@ -564,12 +596,14 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
           return RadioListTile(
             value: cartListener.selectedItemVariation == variation,
             groupValue: true,
+
             title: Text(
               (variation.name ?? "").capitalize(),
               style: context.customTextTheme.text14W600.copyWith(
                 color: context.customTextTheme.color,
               ),
             ),
+
             subtitle: variation.offerPriceEnabled == 'Yes' &&
                     variation.offerPriceDetails?.currentOfferPrice != null
                 ? RichText(

@@ -691,23 +691,23 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   showDuration: Duration(seconds: 8),
                                   triggerMode: TooltipTriggerMode.tap,
                                   richMessage: TextSpan(
-                                    text: 'VAT 10% : $taxAmount',
-                                    // children: [
-                                    //   ...?taxGroup?.expand(
-                                    //     (tax) => [
-                                    //       TextSpan(
-                                    //         text: '${tax.taxSlab} : ',
-                                    //         style: const TextStyle(
-                                    //           fontWeight: FontWeight.w600,
-                                    //         ),
-                                    //       ),
-                                    //       TextSpan(
-                                    //         text: '${tax.totalTax}',
-                                    //         style: const TextStyle(),
-                                    //       ),
-                                    //     ],
-                                    //   ),
-                                    // ],
+                                    // text: 'VAT 10% : $taxAmount',
+                                    children: [
+                                      ...?taxGroup?.expand(
+                                        (tax) => [
+                                          TextSpan(
+                                            text: '${tax.taxSlab} : ',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: '${tax.totalTax}',
+                                            style: const TextStyle(),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                   child: const Icon(
                                     Icons.info_outline,

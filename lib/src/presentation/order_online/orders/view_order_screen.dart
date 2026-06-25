@@ -438,8 +438,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                               children: [
                                 TextSpan(
                                   text:
-                                      '${'VAT 10%'} : ${orderDetails.taxTotalAmount}',
-                                  // '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}',
+                                      // '${'VAT 10%'} : ${orderDetails.taxTotalAmount}',
+                                      '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}',
                                   style: const TextStyle(
                                     fontSize: 13,
                                   ),

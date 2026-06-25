@@ -359,13 +359,23 @@ class ProductDataModel {
         isOfferPrice.hashCode ^
         offerPriceDetails.hashCode;
   }
-List<String> get allergensList {
-  return variations
-      .expand((variation) => variation.allergens ?? [])
-      .map((allergen) => allergen.name)
-      .whereType<String>()
-      .toSet()
-      .toList();
+// List<String> get allergensList {
+//   return variations
+//       .expand((variation) => variation.allergens ?? [])
+//       .map((allergen) => allergen.name)
+//       .whereType<String>()
+//       .toSet()
+//       .toList();
+// }
+List<String> get selectedAllergensList {
+  return variations.expand((variation) {
+    return variation.allergens!.where(
+      (allergen) => variation.selectedallergens!.contains(allergen.id),
+    );
+  }).map((e) => e.name ?? '')
+    .where((e) => e.isNotEmpty)
+    .toSet()
+    .toList();
 }
 }
 

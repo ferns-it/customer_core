@@ -23,8 +23,8 @@ class CheckoutDetailsScreen extends StatelessWidget {
     // final shopListener = context.watch<ShopProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final taxGroup = cartListener.selectedOrderType == OrderType.delivery
-        ? cartListener.deliveryDetails?.taxDetailsGroup
-        : cartListener.takeAwayDetails?.taxDetailsGroup;
+        ? cartListener.deliveryDetails?.taxDetails
+        : cartListener.takeAwayDetails?.taxDetails;
     final isTaxApplied = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.isTaxAppliedBool
         : cartListener.takeAwayDetails?.isTaxAppliedBool;
@@ -697,24 +697,27 @@ class CheckoutDetailsScreen extends StatelessWidget {
                             showDuration: Duration(seconds: 8),
                             triggerMode: TooltipTriggerMode.tap,
                             richMessage: TextSpan(
-                              // text: 'VAT 10% : $taxAmount',
-
-                              children: [
-                                ...?taxGroup?.expand(
-                                  (tax) => [
-                                    TextSpan(
-                                      text: '${tax.taxSlab} : ',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
+                              children: List.generate(
+                                taxGroup?.length ?? 0,
+                                (index) {
+                                  final tax = taxGroup![index];
+                                  return TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: '${tax.taxSlab} : ',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
-                                    TextSpan(
-                                      text: '${tax.totalTax}',
-                                      style: const TextStyle(),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      TextSpan(
+                                        text: '${tax.tax}',
+                                      ),
+                                      if (index != taxGroup.length - 1)
+                                        const TextSpan(text: '\n'),
+                                    ],
+                                  );
+                                },
+                              ),
                             ),
                             child: const Icon(
                               Icons.info_outline,

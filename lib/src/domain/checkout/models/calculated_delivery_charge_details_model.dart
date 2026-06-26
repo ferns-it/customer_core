@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:customer_core/src/domain/cart/models/cart_details_model.dart';
 
 class CalculatedDeliveryChargeDetailsModel {
@@ -26,6 +28,7 @@ class CalculatedDeliveryChargeDetailsModel {
   final DeliveryFeeAmountInPaisa? amountInPaisa;
   final DeliveryFeeAmountFormatted? amountFormatted;
   final List<DeliveryFeeTaxDetailsGroup> taxDetailsGroup;
+  final List<TaxDetailsData> taxDetails;
   final CartDetailsModel? cartData;
 
   CalculatedDeliveryChargeDetailsModel({
@@ -50,6 +53,7 @@ class CalculatedDeliveryChargeDetailsModel {
     this.amountInPaisa,
     this.amountFormatted,
     this.taxDetailsGroup = const [],
+    this.taxDetails = const [],
     this.cartData,
   });
 
@@ -75,6 +79,7 @@ class CalculatedDeliveryChargeDetailsModel {
     DeliveryFeeAmountInPaisa? amountInPaisa,
     DeliveryFeeAmountFormatted? amountFormatted,
     List<DeliveryFeeTaxDetailsGroup>? taxDetailsGroup,
+    List<TaxDetailsData>? taxDetails,
     CartDetailsModel? cartData,
   }) {
     return CalculatedDeliveryChargeDetailsModel(
@@ -103,6 +108,7 @@ class CalculatedDeliveryChargeDetailsModel {
       amountInPaisa: amountInPaisa ?? this.amountInPaisa,
       amountFormatted: amountFormatted ?? this.amountFormatted,
       taxDetailsGroup: taxDetailsGroup ?? this.taxDetailsGroup,
+      taxDetails: taxDetails ?? this.taxDetails,
       cartData: cartData ?? this.cartData,
     );
   }
@@ -130,6 +136,7 @@ class CalculatedDeliveryChargeDetailsModel {
       'amountInPaisa': amountInPaisa?.toMap(),
       'amountFormatted': amountFormatted?.toMap(),
       'taxDetailsGroup': taxDetailsGroup,
+  'taxDetails': taxDetails.map((e) => e.toMap()).toList(),
       'cartData': cartData?.toMap(),
     };
   }
@@ -199,6 +206,12 @@ class CalculatedDeliveryChargeDetailsModel {
                   DeliveryFeeTaxDetailsGroup.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
+     taxDetails: map['taxDetails'] != null
+    ? (map['taxDetails'] as Map<String, dynamic>)
+        .values
+        .map((e) => TaxDetailsData.fromMap(e as Map<String, dynamic>))
+        .toList()
+    : [],
       cartData: map['cartData'] != null
           ? CartDetailsModel.fromMap(map['cartData'] as Map<String, dynamic>)
           : null,
@@ -213,7 +226,7 @@ class CalculatedDeliveryChargeDetailsModel {
 
   @override
   String toString() {
-    return 'CalculatedDeliveryChargeDetailsModel(message: $message, status: $status, userType: $userType, cart_NetAmount: $cart_NetAmount, deliveryFeeAmount: $deliveryFeeAmount, generalData: $generalData, calculatedDeliverySettings: $calculatedDeliverySettings, cartGrossAmount: $cartGrossAmount, cartDiscountAmount: $cartDiscountAmount, cartTotalAmount: $cartTotalAmount, deliveryDiscount: $deliveryDiscount, cartNetAmount_ExcludingTax: $cartNetAmount_ExcludingTax, taxTotalAmount: $taxTotalAmount, cart_NetAmount_IncludingDelivery: $cart_NetAmount_IncludingDelivery, totalDiscount: $totalDiscount, minimumAmountForDelivery: $minimumAmountForDelivery, minimumAmountType: $minimumAmountType, isTaxApplied: $isTaxApplied, amountInPaisa: $amountInPaisa, amountFormatted: $amountFormatted, taxDetailsGroup: $taxDetailsGroup, cartData: $cartData)';
+    return 'CalculatedDeliveryChargeDetailsModel(message: $message, status: $status, userType: $userType, cart_NetAmount: $cart_NetAmount, deliveryFeeAmount: $deliveryFeeAmount, generalData: $generalData, calculatedDeliverySettings: $calculatedDeliverySettings, cartGrossAmount: $cartGrossAmount, cartDiscountAmount: $cartDiscountAmount, cartTotalAmount: $cartTotalAmount, deliveryDiscount: $deliveryDiscount, cartNetAmount_ExcludingTax: $cartNetAmount_ExcludingTax, taxTotalAmount: $taxTotalAmount, cart_NetAmount_IncludingDelivery: $cart_NetAmount_IncludingDelivery, totalDiscount: $totalDiscount, minimumAmountForDelivery: $minimumAmountForDelivery, minimumAmountType: $minimumAmountType, isTaxApplied: $isTaxApplied, amountInPaisa: $amountInPaisa, amountFormatted: $amountFormatted, taxDetailsGroup: $taxDetailsGroup,taxDetails: $taxDetails, cartData: $cartData)';
   }
 
   @override
@@ -241,6 +254,7 @@ class CalculatedDeliveryChargeDetailsModel {
         other.amountInPaisa == amountInPaisa &&
         other.amountFormatted == amountFormatted &&
         other.taxDetailsGroup == taxDetailsGroup &&
+        other.taxDetails == taxDetails &&
         other.cartData == cartData;
   }
 
@@ -266,6 +280,7 @@ class CalculatedDeliveryChargeDetailsModel {
         amountInPaisa.hashCode ^
         amountFormatted.hashCode ^
         taxDetailsGroup.hashCode ^
+        taxDetails.hashCode ^
         cartData.hashCode;
   }
 
@@ -668,6 +683,119 @@ class DeliveryFeeAmountInPaisa {
         deliveryFeeAmount.hashCode ^
         cart_NetAmount_IncludingDelivery.hashCode ^
         totalDiscount.hashCode;
+  }
+}
+
+class TaxDetailsData {
+  final String? cartID;
+  final String? itemID;
+  final String? itemName;
+  final String? variation;
+  final String? taxSlab;
+  final String? amount;
+  final String? discount;
+  final String? tax;
+  final String? netAmount;
+  TaxDetailsData({
+    this.cartID,
+    this.itemID,
+    this.itemName,
+    this.variation,
+    this.taxSlab,
+    this.amount,
+    this.discount,
+    this.tax,
+    this.netAmount,
+  });
+
+  TaxDetailsData copyWith({
+    String? cartID,
+    String? itemID,
+    String? itemName,
+    String? variation,
+    String? taxSlab,
+    String? amount,
+    String? discount,
+    String? tax,
+    String? netAmount,
+  }) {
+    return TaxDetailsData(
+      cartID: cartID ?? this.cartID,
+      itemID: itemID ?? this.itemID,
+      itemName: itemName ?? this.itemName,
+      variation: variation ?? this.variation,
+      taxSlab: taxSlab ?? this.taxSlab,
+      amount: amount ?? this.amount,
+      discount: discount ?? this.discount,
+      tax: tax ?? this.tax,
+      netAmount: netAmount ?? this.netAmount,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'cartID': cartID,
+      'itemID': itemID,
+      'itemName': itemName,
+      'variation': variation,
+      'taxSlab': taxSlab,
+      'amount': amount,
+      'discount': discount,
+      'tax': tax,
+      'netAmount': netAmount,
+    };
+  }
+
+  factory TaxDetailsData.fromMap(Map<String, dynamic> map) {
+    return TaxDetailsData(
+      cartID: map['cartID'] != null ? map['cartID'] as String : null,
+      itemID: map['itemID'] != null ? map['itemID'] as String : null,
+      itemName: map['itemName'] != null ? map['itemName'] as String : null,
+      variation: map['variation'] != null ? map['variation'] as String : null,
+      taxSlab: map['taxSlab'] != null ? map['taxSlab'] as String : null,
+      amount: map['amount'] != null ? map['amount'] as String : null,
+      discount: map['discount'] != null ? map['discount'] as String : null,
+      tax: map['tax'] != null ? map['tax'] as String : null,
+      netAmount: map['netAmount'] != null ? map['netAmount'] as String : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory TaxDetailsData.fromJson(String source) =>
+      TaxDetailsData.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'TaxDetailsData(cartID: $cartID, itemID: $itemID, itemName: $itemName, variation: $variation, taxSlab: $taxSlab, amount: $amount, discount: $discount, tax: $tax, netAmount: $netAmount)';
+  }
+
+  @override
+  bool operator ==(covariant TaxDetailsData other) {
+    if (identical(this, other)) return true;
+
+    return other.cartID == cartID &&
+        other.itemID == itemID &&
+        other.itemName == itemName &&
+        other.variation == variation &&
+        other.taxSlab == taxSlab &&
+        other.amount == amount &&
+        other.discount == discount &&
+        other.tax == tax &&
+        other.netAmount == netAmount;
+  }
+
+  @override
+  int get hashCode {
+    return cartID.hashCode ^
+        itemID.hashCode ^
+        itemName.hashCode ^
+        variation.hashCode ^
+        taxSlab.hashCode ^
+        amount.hashCode ^
+        discount.hashCode ^
+        tax.hashCode ^
+        netAmount.hashCode;
   }
 }
 

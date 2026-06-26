@@ -7,7 +7,6 @@ import 'package:customer_core/src/domain/cart/models/cart_details_model.dart';
 import 'package:customer_core/src/domain/checkout/models/calculated_delivery_charge_details_model.dart';
 
 class CalculateTakeAwayDetails {
-
   final String? cartGrossAmount;
   final String? cartDiscountAmount;
   final String? cartTotalAmount;
@@ -24,6 +23,7 @@ class CalculateTakeAwayDetails {
   final CalculateTakeawayAmountInPaisa? amountInPaisa;
   final CalculateTakeawayAmountFormatted? amountFormatted;
   final List<DeliveryFeeTaxDetailsGroup> taxDetailsGroup;
+  final List<TaxDetailsData> taxDetails;
   final CartDetailsModel? cartData;
   CalculateTakeAwayDetails({
     this.cartGrossAmount,
@@ -41,13 +41,10 @@ class CalculateTakeAwayDetails {
     this.generalData,
     this.amountInPaisa,
     this.amountFormatted,
-     this.taxDetailsGroup =const [],
+    this.taxDetailsGroup = const [],
+    this.taxDetails = const [],
     this.cartData,
   });
-
-
-
-  
 
   CalculateTakeAwayDetails copyWith({
     String? cartGrossAmount,
@@ -66,6 +63,8 @@ class CalculateTakeAwayDetails {
     CalculateTakeawayAmountInPaisa? amountInPaisa,
     CalculateTakeawayAmountFormatted? amountFormatted,
     List<DeliveryFeeTaxDetailsGroup>? taxDetailsGroup,
+         List<TaxDetailsData>? taxDetails,
+
     CartDetailsModel? cartData,
   }) {
     return CalculateTakeAwayDetails(
@@ -73,7 +72,8 @@ class CalculateTakeAwayDetails {
       cartDiscountAmount: cartDiscountAmount ?? this.cartDiscountAmount,
       cartTotalAmount: cartTotalAmount ?? this.cartTotalAmount,
       takeAwayDiscount: takeAwayDiscount ?? this.takeAwayDiscount,
-      cartNetAmount_ExcludingTax: cartNetAmount_ExcludingTax ?? this.cartNetAmount_ExcludingTax,
+      cartNetAmount_ExcludingTax:
+          cartNetAmount_ExcludingTax ?? this.cartNetAmount_ExcludingTax,
       taxTotalAmount: taxTotalAmount ?? this.taxTotalAmount,
       cart_NetAmount: cart_NetAmount ?? this.cart_NetAmount,
       totalDiscount: totalDiscount ?? this.totalDiscount,
@@ -85,6 +85,8 @@ class CalculateTakeAwayDetails {
       amountInPaisa: amountInPaisa ?? this.amountInPaisa,
       amountFormatted: amountFormatted ?? this.amountFormatted,
       taxDetailsGroup: taxDetailsGroup ?? this.taxDetailsGroup,
+            taxDetails: taxDetails ?? this.taxDetails,
+
       cartData: cartData ?? this.cartData,
     );
   }
@@ -107,84 +109,128 @@ class CalculateTakeAwayDetails {
       'amountInPaisa': amountInPaisa?.toMap(),
       'amountFormatted': amountFormatted?.toMap(),
       'taxDetailsGroup': taxDetailsGroup.map((x) => x.toMap()).toList(),
+        'taxDetails': taxDetails.map((e) => e.toMap()).toList(),
+
       'cartData': cartData?.toMap(),
     };
   }
 
   factory CalculateTakeAwayDetails.fromMap(Map<String, dynamic> map) {
     return CalculateTakeAwayDetails(
-      cartGrossAmount: map['cartGrossAmount'] != null ? map['cartGrossAmount'] as String : null,
-      cartDiscountAmount: map['cartDiscountAmount'] != null ? map['cartDiscountAmount'] as String : null,
-      cartTotalAmount: map['cartTotalAmount'] != null ? map['cartTotalAmount'] as String : null,
-      takeAwayDiscount: map['takeAwayDiscount'] != null ? map['takeAwayDiscount'] as String : null,
-      cartNetAmount_ExcludingTax: map['cartNetAmount_ExcludingTax'] != null ? map['cartNetAmount_ExcludingTax'] as String : null,
-      taxTotalAmount: map['taxTotalAmount'] != null ? map['taxTotalAmount'] as String : null,
-      cart_NetAmount: map['cart_NetAmount'] != null ? map['cart_NetAmount'] as String : null,
-      totalDiscount: map['totalDiscount'] != null ? map['totalDiscount'] as String : null,
+      cartGrossAmount: map['cartGrossAmount'] != null
+          ? map['cartGrossAmount'] as String
+          : null,
+      cartDiscountAmount: map['cartDiscountAmount'] != null
+          ? map['cartDiscountAmount'] as String
+          : null,
+      cartTotalAmount: map['cartTotalAmount'] != null
+          ? map['cartTotalAmount'] as String
+          : null,
+      takeAwayDiscount: map['takeAwayDiscount'] != null
+          ? map['takeAwayDiscount'] as String
+          : null,
+      cartNetAmount_ExcludingTax: map['cartNetAmount_ExcludingTax'] != null
+          ? map['cartNetAmount_ExcludingTax'] as String
+          : null,
+      taxTotalAmount: map['taxTotalAmount'] != null
+          ? map['taxTotalAmount'] as String
+          : null,
+      cart_NetAmount: map['cart_NetAmount'] != null
+          ? map['cart_NetAmount'] as String
+          : null,
+      totalDiscount:
+          map['totalDiscount'] != null ? map['totalDiscount'] as String : null,
       userType: map['userType'] != null ? map['userType'] as String : null,
       message: map['message'] != null ? map['message'] as String : null,
       status: map['status'] != null ? map['status'] as String : null,
-      isTaxApplied: map['isTaxApplied'] != null ? map['isTaxApplied'] as String : null,
-      generalData: map['generalData'] != null ? GeneralData.fromMap(map['generalData'] as Map<String,dynamic>) : null,
-      amountInPaisa: map['amountInPaisa'] != null ? CalculateTakeawayAmountInPaisa.fromMap(map['amountInPaisa'] as Map<String,dynamic>) : null,
-      amountFormatted: map['amountFormatted'] != null ? CalculateTakeawayAmountFormatted.fromMap(map['amountFormatted'] as Map<String,dynamic>) : null,
-      taxDetailsGroup: List<DeliveryFeeTaxDetailsGroup>.from((map['taxDetailsGroup'] as List<dynamic>).map<DeliveryFeeTaxDetailsGroup>((x) => DeliveryFeeTaxDetailsGroup.fromMap(x as Map<String,dynamic>),),),
-      cartData: map['cartData'] != null ? CartDetailsModel.fromMap(map['cartData'] as Map<String,dynamic>) : null,
+      isTaxApplied:
+          map['isTaxApplied'] != null ? map['isTaxApplied'] as String : null,
+      generalData: map['generalData'] != null
+          ? GeneralData.fromMap(map['generalData'] as Map<String, dynamic>)
+          : null,
+      amountInPaisa: map['amountInPaisa'] != null
+          ? CalculateTakeawayAmountInPaisa.fromMap(
+              map['amountInPaisa'] as Map<String, dynamic>)
+          : null,
+      amountFormatted: map['amountFormatted'] != null
+          ? CalculateTakeawayAmountFormatted.fromMap(
+              map['amountFormatted'] as Map<String, dynamic>)
+          : null,
+      taxDetailsGroup: List<DeliveryFeeTaxDetailsGroup>.from(
+        (map['taxDetailsGroup'] as List<dynamic>)
+            .map<DeliveryFeeTaxDetailsGroup>(
+          (x) => DeliveryFeeTaxDetailsGroup.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
+        taxDetails: map['taxDetails'] != null
+    ? (map['taxDetails'] as Map<String, dynamic>)
+        .values
+        .map((e) => TaxDetailsData.fromMap(e as Map<String, dynamic>))
+        .toList()
+    : [],
+      cartData: map['cartData'] != null
+          ? CartDetailsModel.fromMap(map['cartData'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory CalculateTakeAwayDetails.fromJson(String source) => CalculateTakeAwayDetails.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CalculateTakeAwayDetails.fromJson(String source) =>
+      CalculateTakeAwayDetails.fromMap(
+          json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'CalculateTakeAwayDetails(cartGrossAmount: $cartGrossAmount, cartDiscountAmount: $cartDiscountAmount, cartTotalAmount: $cartTotalAmount, takeAwayDiscount: $takeAwayDiscount, cartNetAmount_ExcludingTax: $cartNetAmount_ExcludingTax, taxTotalAmount: $taxTotalAmount, cart_NetAmount: $cart_NetAmount, totalDiscount: $totalDiscount, userType: $userType, message: $message, status: $status, isTaxApplied: $isTaxApplied, generalData: $generalData, amountInPaisa: $amountInPaisa, amountFormatted: $amountFormatted, taxDetailsGroup: $taxDetailsGroup, cartData: $cartData)';
+    return 'CalculateTakeAwayDetails(cartGrossAmount: $cartGrossAmount, cartDiscountAmount: $cartDiscountAmount, cartTotalAmount: $cartTotalAmount, takeAwayDiscount: $takeAwayDiscount, cartNetAmount_ExcludingTax: $cartNetAmount_ExcludingTax, taxTotalAmount: $taxTotalAmount, cart_NetAmount: $cart_NetAmount, totalDiscount: $totalDiscount, userType: $userType, message: $message, status: $status, isTaxApplied: $isTaxApplied, generalData: $generalData, amountInPaisa: $amountInPaisa, amountFormatted: $amountFormatted, taxDetailsGroup: $taxDetailsGroup,taxDetails: $taxDetails, cartData: $cartData)';
   }
 
   @override
   bool operator ==(covariant CalculateTakeAwayDetails other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.cartGrossAmount == cartGrossAmount &&
-      other.cartDiscountAmount == cartDiscountAmount &&
-      other.cartTotalAmount == cartTotalAmount &&
-      other.takeAwayDiscount == takeAwayDiscount &&
-      other.cartNetAmount_ExcludingTax == cartNetAmount_ExcludingTax &&
-      other.taxTotalAmount == taxTotalAmount &&
-      other.cart_NetAmount == cart_NetAmount &&
-      other.totalDiscount == totalDiscount &&
-      other.userType == userType &&
-      other.message == message &&
-      other.status == status &&
-      other.isTaxApplied == isTaxApplied &&
-      other.generalData == generalData &&
-      other.amountInPaisa == amountInPaisa &&
-      other.amountFormatted == amountFormatted &&
-      listEquals(other.taxDetailsGroup, taxDetailsGroup) &&
-      other.cartData == cartData;
+
+    return other.cartGrossAmount == cartGrossAmount &&
+        other.cartDiscountAmount == cartDiscountAmount &&
+        other.cartTotalAmount == cartTotalAmount &&
+        other.takeAwayDiscount == takeAwayDiscount &&
+        other.cartNetAmount_ExcludingTax == cartNetAmount_ExcludingTax &&
+        other.taxTotalAmount == taxTotalAmount &&
+        other.cart_NetAmount == cart_NetAmount &&
+        other.totalDiscount == totalDiscount &&
+        other.userType == userType &&
+        other.message == message &&
+        other.status == status &&
+        other.isTaxApplied == isTaxApplied &&
+        other.generalData == generalData &&
+        other.amountInPaisa == amountInPaisa &&
+        other.amountFormatted == amountFormatted &&
+        listEquals(other.taxDetailsGroup, taxDetailsGroup) &&
+                other.taxDetails == taxDetails &&
+
+        other.cartData == cartData;
   }
 
   @override
   int get hashCode {
     return cartGrossAmount.hashCode ^
-      cartDiscountAmount.hashCode ^
-      cartTotalAmount.hashCode ^
-      takeAwayDiscount.hashCode ^
-      cartNetAmount_ExcludingTax.hashCode ^
-      taxTotalAmount.hashCode ^
-      cart_NetAmount.hashCode ^
-      totalDiscount.hashCode ^
-      userType.hashCode ^
-      message.hashCode ^
-      status.hashCode ^
-      isTaxApplied.hashCode ^
-      generalData.hashCode ^
-      amountInPaisa.hashCode ^
-      amountFormatted.hashCode ^
-      taxDetailsGroup.hashCode ^
-      cartData.hashCode;
+        cartDiscountAmount.hashCode ^
+        cartTotalAmount.hashCode ^
+        takeAwayDiscount.hashCode ^
+        cartNetAmount_ExcludingTax.hashCode ^
+        taxTotalAmount.hashCode ^
+        cart_NetAmount.hashCode ^
+        totalDiscount.hashCode ^
+        userType.hashCode ^
+        message.hashCode ^
+        status.hashCode ^
+        isTaxApplied.hashCode ^
+        generalData.hashCode ^
+        amountInPaisa.hashCode ^
+        amountFormatted.hashCode ^
+        taxDetailsGroup.hashCode ^
+                taxDetails.hashCode ^
+
+        cartData.hashCode;
   }
 
   bool get isTaxAppliedBool => isTaxApplied == 'Yes';
@@ -364,16 +410,15 @@ class PickupTime {
       valid.hashCode ^ currentTime.hashCode ^ pickupTime.hashCode;
 }
 
-
 class CalculateTakeawayAmountFormatted {
-         final String? cartGrossAmount;
-      final String? cartDiscountAmount;
-      final String? cartTotalAmount;
-      final String? takeAwayDiscount;
-      final String? cartNetAmount_ExcludingTax;
-      final String? taxTotalAmount;
-      final String? cart_NetAmount;
-      final String? totalDiscount;
+  final String? cartGrossAmount;
+  final String? cartDiscountAmount;
+  final String? cartTotalAmount;
+  final String? takeAwayDiscount;
+  final String? cartNetAmount_ExcludingTax;
+  final String? taxTotalAmount;
+  final String? cart_NetAmount;
+  final String? totalDiscount;
   CalculateTakeawayAmountFormatted({
     this.cartGrossAmount,
     this.cartDiscountAmount,
@@ -384,7 +429,6 @@ class CalculateTakeawayAmountFormatted {
     this.cart_NetAmount,
     this.totalDiscount,
   });
-      
 
   CalculateTakeawayAmountFormatted copyWith({
     String? cartGrossAmount,
@@ -401,7 +445,8 @@ class CalculateTakeawayAmountFormatted {
       cartDiscountAmount: cartDiscountAmount ?? this.cartDiscountAmount,
       cartTotalAmount: cartTotalAmount ?? this.cartTotalAmount,
       takeAwayDiscount: takeAwayDiscount ?? this.takeAwayDiscount,
-      cartNetAmount_ExcludingTax: cartNetAmount_ExcludingTax ?? this.cartNetAmount_ExcludingTax,
+      cartNetAmount_ExcludingTax:
+          cartNetAmount_ExcludingTax ?? this.cartNetAmount_ExcludingTax,
       taxTotalAmount: taxTotalAmount ?? this.taxTotalAmount,
       cart_NetAmount: cart_NetAmount ?? this.cart_NetAmount,
       totalDiscount: totalDiscount ?? this.totalDiscount,
@@ -423,20 +468,37 @@ class CalculateTakeawayAmountFormatted {
 
   factory CalculateTakeawayAmountFormatted.fromMap(Map<String, dynamic> map) {
     return CalculateTakeawayAmountFormatted(
-      cartGrossAmount: map['cartGrossAmount'] != null ? map['cartGrossAmount'] as String : null,
-      cartDiscountAmount: map['cartDiscountAmount'] != null ? map['cartDiscountAmount'] as String : null,
-      cartTotalAmount: map['cartTotalAmount'] != null ? map['cartTotalAmount'] as String : null,
-      takeAwayDiscount: map['takeAwayDiscount'] != null ? map['takeAwayDiscount'] as String : null,
-      cartNetAmount_ExcludingTax: map['cartNetAmount_ExcludingTax'] != null ? map['cartNetAmount_ExcludingTax'] as String : null,
-      taxTotalAmount: map['taxTotalAmount'] != null ? map['taxTotalAmount'] as String : null,
-      cart_NetAmount: map['cart_NetAmount'] != null ? map['cart_NetAmount'] as String : null,
-      totalDiscount: map['totalDiscount'] != null ? map['totalDiscount'] as String : null,
+      cartGrossAmount: map['cartGrossAmount'] != null
+          ? map['cartGrossAmount'] as String
+          : null,
+      cartDiscountAmount: map['cartDiscountAmount'] != null
+          ? map['cartDiscountAmount'] as String
+          : null,
+      cartTotalAmount: map['cartTotalAmount'] != null
+          ? map['cartTotalAmount'] as String
+          : null,
+      takeAwayDiscount: map['takeAwayDiscount'] != null
+          ? map['takeAwayDiscount'] as String
+          : null,
+      cartNetAmount_ExcludingTax: map['cartNetAmount_ExcludingTax'] != null
+          ? map['cartNetAmount_ExcludingTax'] as String
+          : null,
+      taxTotalAmount: map['taxTotalAmount'] != null
+          ? map['taxTotalAmount'] as String
+          : null,
+      cart_NetAmount: map['cart_NetAmount'] != null
+          ? map['cart_NetAmount'] as String
+          : null,
+      totalDiscount:
+          map['totalDiscount'] != null ? map['totalDiscount'] as String : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory CalculateTakeawayAmountFormatted.fromJson(String source) => CalculateTakeawayAmountFormatted.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CalculateTakeawayAmountFormatted.fromJson(String source) =>
+      CalculateTakeawayAmountFormatted.fromMap(
+          json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -446,40 +508,39 @@ class CalculateTakeawayAmountFormatted {
   @override
   bool operator ==(covariant CalculateTakeawayAmountFormatted other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.cartGrossAmount == cartGrossAmount &&
-      other.cartDiscountAmount == cartDiscountAmount &&
-      other.cartTotalAmount == cartTotalAmount &&
-      other.takeAwayDiscount == takeAwayDiscount &&
-      other.cartNetAmount_ExcludingTax == cartNetAmount_ExcludingTax &&
-      other.taxTotalAmount == taxTotalAmount &&
-      other.cart_NetAmount == cart_NetAmount &&
-      other.totalDiscount == totalDiscount;
+
+    return other.cartGrossAmount == cartGrossAmount &&
+        other.cartDiscountAmount == cartDiscountAmount &&
+        other.cartTotalAmount == cartTotalAmount &&
+        other.takeAwayDiscount == takeAwayDiscount &&
+        other.cartNetAmount_ExcludingTax == cartNetAmount_ExcludingTax &&
+        other.taxTotalAmount == taxTotalAmount &&
+        other.cart_NetAmount == cart_NetAmount &&
+        other.totalDiscount == totalDiscount;
   }
 
   @override
   int get hashCode {
     return cartGrossAmount.hashCode ^
-      cartDiscountAmount.hashCode ^
-      cartTotalAmount.hashCode ^
-      takeAwayDiscount.hashCode ^
-      cartNetAmount_ExcludingTax.hashCode ^
-      taxTotalAmount.hashCode ^
-      cart_NetAmount.hashCode ^
-      totalDiscount.hashCode;
+        cartDiscountAmount.hashCode ^
+        cartTotalAmount.hashCode ^
+        takeAwayDiscount.hashCode ^
+        cartNetAmount_ExcludingTax.hashCode ^
+        taxTotalAmount.hashCode ^
+        cart_NetAmount.hashCode ^
+        totalDiscount.hashCode;
   }
-    }
+}
 
 class CalculateTakeawayAmountInPaisa {
-      final int? cartGrossAmount;
-      final int? cartDiscountAmount;
-      final int? cartTotalAmount;
-      final int? takeAwayDiscount;
-      final int? cartNetAmount_ExcludingTax;
-      final int? taxTotalAmount;
-      final int? cart_NetAmount;
-      final int? totalDiscount;
+  final int? cartGrossAmount;
+  final int? cartDiscountAmount;
+  final int? cartTotalAmount;
+  final int? takeAwayDiscount;
+  final int? cartNetAmount_ExcludingTax;
+  final int? taxTotalAmount;
+  final int? cart_NetAmount;
+  final int? totalDiscount;
   CalculateTakeawayAmountInPaisa({
     this.cartGrossAmount,
     this.cartDiscountAmount,
@@ -490,7 +551,6 @@ class CalculateTakeawayAmountInPaisa {
     this.cart_NetAmount,
     this.totalDiscount,
   });
-      
 
   CalculateTakeawayAmountInPaisa copyWith({
     int? cartGrossAmount,
@@ -507,7 +567,8 @@ class CalculateTakeawayAmountInPaisa {
       cartDiscountAmount: cartDiscountAmount ?? this.cartDiscountAmount,
       cartTotalAmount: cartTotalAmount ?? this.cartTotalAmount,
       takeAwayDiscount: takeAwayDiscount ?? this.takeAwayDiscount,
-      cartNetAmount_ExcludingTax: cartNetAmount_ExcludingTax ?? this.cartNetAmount_ExcludingTax,
+      cartNetAmount_ExcludingTax:
+          cartNetAmount_ExcludingTax ?? this.cartNetAmount_ExcludingTax,
       taxTotalAmount: taxTotalAmount ?? this.taxTotalAmount,
       cart_NetAmount: cart_NetAmount ?? this.cart_NetAmount,
       totalDiscount: totalDiscount ?? this.totalDiscount,
@@ -529,20 +590,33 @@ class CalculateTakeawayAmountInPaisa {
 
   factory CalculateTakeawayAmountInPaisa.fromMap(Map<String, dynamic> map) {
     return CalculateTakeawayAmountInPaisa(
-      cartGrossAmount: map['cartGrossAmount'] != null ? map['cartGrossAmount'] as int : null,
-      cartDiscountAmount: map['cartDiscountAmount'] != null ? map['cartDiscountAmount'] as int : null,
-      cartTotalAmount: map['cartTotalAmount'] != null ? map['cartTotalAmount'] as int : null,
-      takeAwayDiscount: map['takeAwayDiscount'] != null ? map['takeAwayDiscount'] as int : null,
-      cartNetAmount_ExcludingTax: map['cartNetAmount_ExcludingTax'] != null ? map['cartNetAmount_ExcludingTax'] as int : null,
-      taxTotalAmount: map['taxTotalAmount'] != null ? map['taxTotalAmount'] as int : null,
-      cart_NetAmount: map['cart_NetAmount'] != null ? map['cart_NetAmount'] as int : null,
-      totalDiscount: map['totalDiscount'] != null ? map['totalDiscount'] as int : null,
+      cartGrossAmount:
+          map['cartGrossAmount'] != null ? map['cartGrossAmount'] as int : null,
+      cartDiscountAmount: map['cartDiscountAmount'] != null
+          ? map['cartDiscountAmount'] as int
+          : null,
+      cartTotalAmount:
+          map['cartTotalAmount'] != null ? map['cartTotalAmount'] as int : null,
+      takeAwayDiscount: map['takeAwayDiscount'] != null
+          ? map['takeAwayDiscount'] as int
+          : null,
+      cartNetAmount_ExcludingTax: map['cartNetAmount_ExcludingTax'] != null
+          ? map['cartNetAmount_ExcludingTax'] as int
+          : null,
+      taxTotalAmount:
+          map['taxTotalAmount'] != null ? map['taxTotalAmount'] as int : null,
+      cart_NetAmount:
+          map['cart_NetAmount'] != null ? map['cart_NetAmount'] as int : null,
+      totalDiscount:
+          map['totalDiscount'] != null ? map['totalDiscount'] as int : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory CalculateTakeawayAmountInPaisa.fromJson(String source) => CalculateTakeawayAmountInPaisa.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CalculateTakeawayAmountInPaisa.fromJson(String source) =>
+      CalculateTakeawayAmountInPaisa.fromMap(
+          json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -552,27 +626,26 @@ class CalculateTakeawayAmountInPaisa {
   @override
   bool operator ==(covariant CalculateTakeawayAmountInPaisa other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.cartGrossAmount == cartGrossAmount &&
-      other.cartDiscountAmount == cartDiscountAmount &&
-      other.cartTotalAmount == cartTotalAmount &&
-      other.takeAwayDiscount == takeAwayDiscount &&
-      other.cartNetAmount_ExcludingTax == cartNetAmount_ExcludingTax &&
-      other.taxTotalAmount == taxTotalAmount &&
-      other.cart_NetAmount == cart_NetAmount &&
-      other.totalDiscount == totalDiscount;
+
+    return other.cartGrossAmount == cartGrossAmount &&
+        other.cartDiscountAmount == cartDiscountAmount &&
+        other.cartTotalAmount == cartTotalAmount &&
+        other.takeAwayDiscount == takeAwayDiscount &&
+        other.cartNetAmount_ExcludingTax == cartNetAmount_ExcludingTax &&
+        other.taxTotalAmount == taxTotalAmount &&
+        other.cart_NetAmount == cart_NetAmount &&
+        other.totalDiscount == totalDiscount;
   }
 
   @override
   int get hashCode {
     return cartGrossAmount.hashCode ^
-      cartDiscountAmount.hashCode ^
-      cartTotalAmount.hashCode ^
-      takeAwayDiscount.hashCode ^
-      cartNetAmount_ExcludingTax.hashCode ^
-      taxTotalAmount.hashCode ^
-      cart_NetAmount.hashCode ^
-      totalDiscount.hashCode;
+        cartDiscountAmount.hashCode ^
+        cartTotalAmount.hashCode ^
+        takeAwayDiscount.hashCode ^
+        cartNetAmount_ExcludingTax.hashCode ^
+        taxTotalAmount.hashCode ^
+        cart_NetAmount.hashCode ^
+        totalDiscount.hashCode;
   }
-    }
+}

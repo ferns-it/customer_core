@@ -1167,7 +1167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: AppColors.kGray3),
                     const SizedBox(width: 8),
                     Text(
-                      "+973",
+                      AppConfig.instance.country.dialCode,
                       style: context.customTextTheme.text14W400
                           .copyWith(color: AppColors.kWhite),
                     ),
@@ -1181,7 +1181,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 FormBuilderValidators.required(),
                 FormBuilderValidators.match(
                   RegExp(r'^[0-9]{8}$'),
-                  errorText: 'Enter valid Bahrain number',
+                  errorText:
+                      'Enter valid ${AppConfig.instance.country.name} number',
                 ),
               ]),
             ),
@@ -1262,7 +1263,7 @@ class _LoginScreenState extends State<LoginScreen> {
               FormBuilderValidators.equal(
                 authProvider.registerUserPasswordController.text,
                 checkNullOrEmpty: false,
-                errorText: 'Passwords do not ma',
+                errorText: 'Passwords do not match',
               )
             ]),
           ),

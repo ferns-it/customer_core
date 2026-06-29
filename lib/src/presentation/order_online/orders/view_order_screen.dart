@@ -464,15 +464,17 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                             ),
                           )
                         : SizedBox.shrink()),
-                const Divider(height: 20.0),
-                _SummaryRow(
+             
+               
+              ],
+   const Divider(height: 20.0),
+    _SummaryRow(
                   label: "Total",
                   value: orderDetails.netAmount_IncludingDelivery ??
                       "${AppConfig.instance.country.symbol}0.00",
                   style: context.customTextTheme.text18W600
                       .copyWith(color: context.customTextTheme.color),
                 ),
-              ],
             ]),
       ),
     );

@@ -279,12 +279,20 @@ class CartProvider extends ChangeNotifier with BaseController {
                   _validatedCouponDetails!.coupenData!.coupenAmount!);
 
   bool get isStripeEnabled => selectedOrderType == OrderType.delivery
-      ? deliveryDetails?.cartData?.paymentOptions?.isStripeEnabled ?? false
-      : takeAwayDetails?.cartData?.paymentOptions?.isStripeEnabled ?? false;
+      ? deliveryDetails?.cartData?.paymentOptions?.isStripeEnabled ??
+          cartDetailsModel?.paymentOptions?.isStripeEnabled ??
+          false
+      : takeAwayDetails?.cartData?.paymentOptions?.isStripeEnabled ??
+          cartDetailsModel?.paymentOptions?.isStripeEnabled ??
+          false;
 
   bool get isCODEnabled => selectedOrderType == OrderType.delivery
-      ? deliveryDetails?.cartData?.paymentOptions?.isCODEnabled ?? false
-      : takeAwayDetails?.cartData?.paymentOptions?.isCODEnabled ?? false;
+      ? deliveryDetails?.cartData?.paymentOptions?.isCODEnabled ??
+          cartDetailsModel?.paymentOptions?.isCODEnabled ??
+          false
+      : takeAwayDetails?.cartData?.paymentOptions?.isCODEnabled ??
+          cartDetailsModel?.paymentOptions?.isCODEnabled ??
+          false;
 
   double get discountAfterCouponApplied =>
       cartTotalPrice == null ? 0.00 : cartTotalPrice! - offerDiscount;

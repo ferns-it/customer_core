@@ -787,6 +787,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
     bool isExpand = false,
   }) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           icon,
@@ -794,23 +795,18 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
           color: AppColors.kGray3,
         ),
         horizontalSpaceSmall,
-        isExpand
-            ? Expanded(
-                child: Text(
-                  text,
-                  style: context.customTextTheme.text12W400
-                      .copyWith(color: context.customTextTheme.color),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
-                ),
-              )
-            : Text(
-                text,
-                style: context.customTextTheme.text14W400
+        Expanded(
+          child: Text(
+            text,
+            style: isExpand
+                ? context.customTextTheme.text12W400
+                    .copyWith(color: context.customTextTheme.color)
+                : context.customTextTheme.text14W400
                     .copyWith(color: context.customTextTheme.color),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
+            maxLines: isExpand ? 3 : 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ],
     );
   }

@@ -584,7 +584,9 @@ class OrderDetailsModel {
   bool get orderRejected {
     if (orderStatus == OrderStatus.rejected) return true;
     return status?.toLowerCase().contains("order rejected") == true;
+    
   }
+  
 }
 
 class OrderHistoryDishesDataModel {

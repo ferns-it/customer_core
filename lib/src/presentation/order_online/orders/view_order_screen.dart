@@ -185,7 +185,27 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
             ?.where((dish) => dish.taxLabel != null && dish.taxAmount != "0")
             .toList() ??
         [];
+    final Map<String, double> taxDetailsGroup = {};
 
+    for (final item in taxItems) {
+      if (item.isTaxApplied == "Yes" &&
+          item.taxLabel != null &&
+          item.taxAmount != null) {
+        final amount = double.tryParse(
+              item.taxAmount!
+                  .replaceAll(AppConfig.instance.country.symbol, "")
+                  .replaceAll(",", "")
+                  .trim(),
+            ) ??
+            0.0;
+
+        taxDetailsGroup.update(
+          item.taxLabel!,
+          (value) => value + amount,
+          ifAbsent: () => amount,
+        );
+      }
+    }
     return ClipPath(
       clipper: RPSCustomClipper(),
       child: Container(
@@ -441,19 +461,25 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                             triggerMode: TooltipTriggerMode.tap,
                             richMessage: TextSpan(
                               children: [
-                                for (int i = 0; i < taxItems.length; i++) ...[
+                                for (int i = 0;
+                                    i < taxDetailsGroup.entries.length;
+                                    i++) ...[
                                   TextSpan(
-                                    text: '${taxItems[i].taxLabel} : ',
+                                    text:
+                                        '${taxDetailsGroup.entries.elementAt(i).key} : ',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13,
                                     ),
                                   ),
                                   TextSpan(
-                                    text: (taxItems[i].taxAmount!),
-                                    style: const TextStyle(fontSize: 13),
+                                    text:
+                                        '${AppConfig.instance.country.symbol} ${taxDetailsGroup.entries.elementAt(i).value.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                    ),
                                   ),
-                                  if (i != taxItems.length - 1)
+                                  if (i != taxDetailsGroup.length - 1)
                                     const TextSpan(text: '\n'),
                                 ],
                               ],
@@ -464,17 +490,15 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                             ),
                           )
                         : SizedBox.shrink()),
-             
-               
               ],
-   const Divider(height: 20.0),
-    _SummaryRow(
-                  label: "Total",
-                  value: orderDetails.netAmount_IncludingDelivery ??
-                      "${AppConfig.instance.country.symbol}0.00",
-                  style: context.customTextTheme.text18W600
-                      .copyWith(color: context.customTextTheme.color),
-                ),
+              const Divider(height: 20.0),
+              _SummaryRow(
+                label: "Total",
+                value: orderDetails.netAmount_IncludingDelivery ??
+                    "${AppConfig.instance.country.symbol}0.00",
+                style: context.customTextTheme.text18W600
+                    .copyWith(color: context.customTextTheme.color),
+              ),
             ]),
       ),
     );

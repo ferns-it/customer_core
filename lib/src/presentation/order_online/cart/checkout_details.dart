@@ -23,8 +23,8 @@ class CheckoutDetailsScreen extends StatelessWidget {
     // final shopListener = context.watch<ShopProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final taxGroup = cartListener.selectedOrderType == OrderType.delivery
-        ? cartListener.deliveryDetails?.taxDetails
-        : cartListener.takeAwayDetails?.taxDetails;
+        ? cartListener.deliveryDetails?.taxDetailsGroup
+        : cartListener.takeAwayDetails?.taxDetailsGroup;
     final isTaxApplied = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.isTaxAppliedBool
         : cartListener.takeAwayDetails?.isTaxAppliedBool;
@@ -711,7 +711,7 @@ class CheckoutDetailsScreen extends StatelessWidget {
                                             ),
                                           ),
                                           TextSpan(
-                                            text: '${tax.tax}',
+                                            text: '${tax.totalTax}',
                                           ),
                                           if (index != taxGroup.length - 1)
                                             const TextSpan(text: '\n'),

@@ -181,6 +181,10 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
     OrderDetailsModel orderDetails,
   ) {
     final isTaxApplicable = orderDetails.isTaxApplicablebool;
+    final taxItems = orderDetails.orderDishes
+            ?.where((dish) => dish.taxLabel != null && dish.taxAmount != "0")
+            .toList() ??
+        [];
 
     return ClipPath(
       clipper: RPSCustomClipper(),
@@ -361,7 +365,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                 verticalSpaceTiny,
                 _SummaryRow(
                   label: "Delivery Charge",
-                  value: orderDetails.deliveryCharge == 0.00
+                  value: orderDetails.deliveryCharge ==
+                          '${AppConfig.instance.country.symbol} ${0.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
                       ? 'Free'
                       : orderDetails.deliveryCharge ?? "0.00",
                   style: context.customTextTheme.text16W600
@@ -436,14 +441,21 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                             triggerMode: TooltipTriggerMode.tap,
                             richMessage: TextSpan(
                               children: [
-                                TextSpan(
-                                  text:
-                                      // '${'VAT 10%'} : ${orderDetails.taxTotalAmount}',
-                                      '${orderDetails.taxLabel} : ${orderDetails.taxTotalAmount}',
-                                  style: const TextStyle(
-                                    fontSize: 13,
+                                for (int i = 0; i < taxItems.length; i++) ...[
+                                  TextSpan(
+                                    text: '${taxItems[i].taxLabel} : ',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
+                                    ),
                                   ),
-                                ),
+                                  TextSpan(
+                                    text: (taxItems[i].taxAmount!),
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                  if (i != taxItems.length - 1)
+                                    const TextSpan(text: '\n'),
+                                ],
                               ],
                             ),
                             child: const Icon(

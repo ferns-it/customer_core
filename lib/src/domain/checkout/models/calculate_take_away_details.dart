@@ -63,8 +63,7 @@ class CalculateTakeAwayDetails {
     CalculateTakeawayAmountInPaisa? amountInPaisa,
     CalculateTakeawayAmountFormatted? amountFormatted,
     List<DeliveryFeeTaxDetailsGroup>? taxDetailsGroup,
-         List<TaxDetailsData>? taxDetails,
-
+    List<TaxDetailsData>? taxDetails,
     CartDetailsModel? cartData,
   }) {
     return CalculateTakeAwayDetails(
@@ -85,8 +84,7 @@ class CalculateTakeAwayDetails {
       amountInPaisa: amountInPaisa ?? this.amountInPaisa,
       amountFormatted: amountFormatted ?? this.amountFormatted,
       taxDetailsGroup: taxDetailsGroup ?? this.taxDetailsGroup,
-            taxDetails: taxDetails ?? this.taxDetails,
-
+      taxDetails: taxDetails ?? this.taxDetails,
       cartData: cartData ?? this.cartData,
     );
   }
@@ -109,8 +107,7 @@ class CalculateTakeAwayDetails {
       'amountInPaisa': amountInPaisa?.toMap(),
       'amountFormatted': amountFormatted?.toMap(),
       'taxDetailsGroup': taxDetailsGroup.map((x) => x.toMap()).toList(),
-        'taxDetails': taxDetails.map((e) => e.toMap()).toList(),
-
+      'taxDetails': taxDetails.map((e) => e.toMap()).toList(),
       'cartData': cartData?.toMap(),
     };
   }
@@ -162,12 +159,22 @@ class CalculateTakeAwayDetails {
           (x) => DeliveryFeeTaxDetailsGroup.fromMap(x as Map<String, dynamic>),
         ),
       ),
-        taxDetails: map['taxDetails'] != null
-    ? (map['taxDetails'] as Map<String, dynamic>)
-        .values
-        .map((e) => TaxDetailsData.fromMap(e as Map<String, dynamic>))
-        .toList()
-    : [],
+      //     taxDetails: map['taxDetails'] != null
+      // ? (map['taxDetails'] as Map<String, dynamic>)
+      //     .values
+      //     .map((e) => TaxDetailsData.fromMap(e as Map<String, dynamic>))
+      //     .toList()
+      // : [],
+      taxDetails: map['taxDetails'] != null
+          ? (map['taxDetails'] is List
+              ? (map['taxDetails'] as List<dynamic>)
+                  .map((e) => TaxDetailsData.fromMap(e as Map<String, dynamic>))
+                  .toList()
+              : (map['taxDetails'] as Map<String, dynamic>)
+                  .values
+                  .map((e) => TaxDetailsData.fromMap(e as Map<String, dynamic>))
+                  .toList())
+          : [],
       cartData: map['cartData'] != null
           ? CartDetailsModel.fromMap(map['cartData'] as Map<String, dynamic>)
           : null,
@@ -205,8 +212,7 @@ class CalculateTakeAwayDetails {
         other.amountInPaisa == amountInPaisa &&
         other.amountFormatted == amountFormatted &&
         listEquals(other.taxDetailsGroup, taxDetailsGroup) &&
-                other.taxDetails == taxDetails &&
-
+        other.taxDetails == taxDetails &&
         other.cartData == cartData;
   }
 
@@ -228,8 +234,7 @@ class CalculateTakeAwayDetails {
         amountInPaisa.hashCode ^
         amountFormatted.hashCode ^
         taxDetailsGroup.hashCode ^
-                taxDetails.hashCode ^
-
+        taxDetails.hashCode ^
         cartData.hashCode;
   }
 

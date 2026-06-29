@@ -677,54 +677,56 @@ class CheckoutDetailsScreen extends StatelessWidget {
                       : SizedBox.shrink()),
               if (isTaxApplied == true || taxAmount != null) ...[
                 verticalSpaceTiny,
-                _SummaryRow(
-                    label: "VAT",
-                    value:
-                        taxAmount ?? '${AppConfig.instance.country.symbol}0.00',
-                    style: context.customTextTheme.text16W600
-                        .copyWith(color: context.customTextTheme.color),
-                    infoWidget: taxAmount !=
-                            '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
-                        ? Tooltip(
-                            decoration: BoxDecoration(
-                              color: context.customTextTheme.color,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            showDuration: Duration(seconds: 8),
-                            triggerMode: TooltipTriggerMode.tap,
-                            richMessage: TextSpan(
-                              children: List.generate(
-                                taxGroup?.length ?? 0,
-                                (index) {
-                                  final tax = taxGroup![index];
-                                  return TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: '${tax.taxSlab} : ',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: '${tax.tax}',
-                                      ),
-                                      if (index != taxGroup.length - 1)
-                                        const TextSpan(text: '\n'),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.info_outline,
-                              size: 18,
-                            ),
-                          )
-                        : SizedBox.shrink()),
+                isTaxApplied == true
+                    ? _SummaryRow(
+                        label: "VAT",
+                        value: taxAmount ??
+                            '${AppConfig.instance.country.symbol}0.00',
+                        style: context.customTextTheme.text16W600
+                            .copyWith(color: context.customTextTheme.color),
+                        infoWidget: taxAmount !=
+                                '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                            ? Tooltip(
+                                decoration: BoxDecoration(
+                                  color: context.customTextTheme.color,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 12,
+                                ),
+                                showDuration: Duration(seconds: 8),
+                                triggerMode: TooltipTriggerMode.tap,
+                                richMessage: TextSpan(
+                                  children: List.generate(
+                                    taxGroup?.length ?? 0,
+                                    (index) {
+                                      final tax = taxGroup![index];
+                                      return TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: '${tax.taxSlab} : ',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: '${tax.tax}',
+                                          ),
+                                          if (index != taxGroup.length - 1)
+                                            const TextSpan(text: '\n'),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.info_outline,
+                                  size: 18,
+                                ),
+                              )
+                            : SizedBox.shrink())
+                    : SizedBox.shrink(),
               ],
             ]),
           ),

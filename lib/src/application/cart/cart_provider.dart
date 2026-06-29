@@ -1392,6 +1392,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     _selectedItemVariation = null;
     _selectedItemQty = 1;
     _selectedAddress = null;
+    _deliveryNotes = '';
     _deliveryDetails = null;
     _takeAwayDetails = null;
     _createOrderPending = false;

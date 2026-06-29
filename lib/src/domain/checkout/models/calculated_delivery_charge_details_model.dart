@@ -136,7 +136,7 @@ class CalculatedDeliveryChargeDetailsModel {
       'amountInPaisa': amountInPaisa?.toMap(),
       'amountFormatted': amountFormatted?.toMap(),
       'taxDetailsGroup': taxDetailsGroup,
-  'taxDetails': taxDetails.map((e) => e.toMap()).toList(),
+      'taxDetails': taxDetails.map((e) => e.toMap()).toList(),
       'cartData': cartData?.toMap(),
     };
   }
@@ -206,12 +206,16 @@ class CalculatedDeliveryChargeDetailsModel {
                   DeliveryFeeTaxDetailsGroup.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
-     taxDetails: map['taxDetails'] != null
-    ? (map['taxDetails'] as Map<String, dynamic>)
-        .values
-        .map((e) => TaxDetailsData.fromMap(e as Map<String, dynamic>))
-        .toList()
-    : [],
+      taxDetails: map['taxDetails'] != null
+          ? (map['taxDetails'] is List
+              ? (map['taxDetails'] as List<dynamic>)
+                  .map((e) => TaxDetailsData.fromMap(e as Map<String, dynamic>))
+                  .toList()
+              : (map['taxDetails'] as Map<String, dynamic>)
+                  .values
+                  .map((e) => TaxDetailsData.fromMap(e as Map<String, dynamic>))
+                  .toList())
+          : [],
       cartData: map['cartData'] != null
           ? CartDetailsModel.fromMap(map['cartData'] as Map<String, dynamic>)
           : null,

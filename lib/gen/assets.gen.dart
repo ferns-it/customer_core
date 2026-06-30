@@ -168,6 +168,18 @@ class $LibAssetsImagesGen {
   AssetGenImage get appLogo01 =>
       const AssetGenImage('lib/assets/images/app_logo_01.png');
 
+  /// File path: lib/assets/images/banner1.png
+  AssetGenImage get banner1 =>
+      const AssetGenImage('lib/assets/images/banner1.png');
+
+  /// File path: lib/assets/images/banner2.png
+  AssetGenImage get banner2 =>
+      const AssetGenImage('lib/assets/images/banner2.png');
+
+  /// File path: lib/assets/images/banner3.png
+  AssetGenImage get banner3 =>
+      const AssetGenImage('lib/assets/images/banner3.png');
+
   /// File path: lib/assets/images/bg01.png
   AssetGenImage get bg01 => const AssetGenImage('lib/assets/images/bg01.png');
 
@@ -371,6 +383,9 @@ class $LibAssetsImagesGen {
         pattern,
         profileCircle,
         appLogo01,
+        banner1,
+        banner2,
+        banner3,
         bg01,
         bg02,
         bg03,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/gen/assets.gen.dart';
 import 'package:flutter/services.dart';
 import 'package:customer_core/src/application/home/home_provider.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
@@ -108,8 +109,8 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                 children: [
                   CustomNavItem(
                     selected: currentPage == 0,
-                    icon: Icons.home,
                     label: "Home",
+                    icon: Assets.lib.assets.lottie.homeIconLottieGrey,
                     activeTextColor:
                         Theme.of(context).brightness == Brightness.dark
                             ? Colors.grey
@@ -120,7 +121,7 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                   ),
                   CustomNavItem(
                     selected: currentPage == 1,
-                    icon: Icons.category,
+                    icon: Assets.lib.assets.lottie.categoryIconLottieGrey,
                     label: "Categories",
                     activeTextColor:
                         Theme.of(context).brightness == Brightness.dark
@@ -156,7 +157,7 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                   ),
                   CustomNavItem(
                     selected: currentPage == 2,
-                    icon: Icons.history,
+                    icon: Assets.lib.assets.lottie.historyIconLottieGrey,
                     label: "Orders",
                     activeTextColor:
                         Theme.of(context).brightness == Brightness.dark
@@ -168,7 +169,7 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                   ),
                   CustomNavItem(
                     selected: currentPage == 3,
-                    icon: Icons.person,
+                    icon: Assets.lib.assets.lottie.profileIconLottieGrey,
                     label: "Profile",
                     activeTextColor:
                         Theme.of(context).brightness == Brightness.dark
@@ -271,7 +272,6 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                                 ],
                               ),
                             ),
-
                             FilledButton(
                               style: FilledButton.styleFrom(
                                 backgroundColor:

@@ -848,14 +848,15 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
       return ListTile(
         contentPadding: EdgeInsets.zero,
         minLeadingWidth: 5,
-        leading: Assets.lib.assets.icons.fastDelivery
+        leading: Assets.lib.assets.icons.takeAway
             .image(height: 25, color: isDark ? Colors.white : null),
         title: Text(
-          "Home Delivery",
-          style: context.customTextTheme.text16W600,
+          "Takeaway",
+          style: context.customTextTheme.text16W600
+              .copyWith(color: context.customTextTheme.color),
         ),
         subtitle: Text(
-          'We\'re serving home delivery orders only',
+          'We\'re serving takeaway orders only',
           style: context.customTextTheme.text14W500,
         ),
       );
@@ -863,14 +864,15 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
       return ListTile(
         contentPadding: EdgeInsets.zero,
         minLeadingWidth: 5,
-        leading: Assets.lib.assets.icons.takeAway
+        leading: Assets.lib.assets.icons.fastDelivery
             .image(height: 23, color: isDark ? Colors.white : null),
         title: Text(
-          "Takeaway",
-          style: context.customTextTheme.text16W600,
+          "Home Delivery",
+          style: context.customTextTheme.text16W600
+              .copyWith(color: context.customTextTheme.color),
         ),
         subtitle: Text(
-          'We\'re serving takeaway orders only',
+          'We\'re serving home delivery orders only',
           style: context.customTextTheme.text14W500,
         ),
       );

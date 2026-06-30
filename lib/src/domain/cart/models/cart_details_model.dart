@@ -8,7 +8,7 @@ import 'package:customer_core/customer_core.dart';
 import 'add_product_cart_request_model.dart';
 
 class CartDetailsModel {
-  final String? restaurantID;
+  final String? shopId;
   final String? restaurantName;
   final List<CartItemDataModel> cartItems;
   final CartItemTotalSummary? cartTotal;
@@ -18,7 +18,7 @@ class CartDetailsModel {
   final String? shopPhone;
 
   CartDetailsModel({
-    this.restaurantID,
+    this.shopId,
     this.restaurantName,
     this.cartItems = const [],
     this.cartTotal,
@@ -29,7 +29,7 @@ class CartDetailsModel {
   });
 
   CartDetailsModel copyWith({
-    String? restaurantID,
+    String? shopId,
     String? restaurantName,
     List<CartItemDataModel>? cartItems,
     CartItemTotalSummary? cartTotal,
@@ -39,7 +39,7 @@ class CartDetailsModel {
     String? shopPhone,
   }) {
     return CartDetailsModel(
-      restaurantID: restaurantID ?? this.restaurantID,
+      shopId: shopId ?? this.shopId,
       restaurantName: restaurantName ?? this.restaurantName,
       cartItems: cartItems ?? this.cartItems,
       cartTotal: cartTotal ?? this.cartTotal,
@@ -52,7 +52,7 @@ class CartDetailsModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'restaurantID': restaurantID,
+      'restaurantID': shopId,
       'restaurantName': restaurantName,
       'cartItems': cartItems.map((x) => x.toMap()).toList(),
       'cartTotal': cartTotal?.toMap(),
@@ -65,8 +65,8 @@ class CartDetailsModel {
 
   factory CartDetailsModel.fromMap(Map<String, dynamic> map) {
     return CartDetailsModel(
-      restaurantID:
-          map['restaurantID'] != null ? map['restaurantID'] as String : null,
+      shopId:
+          map['shopId'] != null ? map['shopId'] as String : null,
       restaurantName: map['restaurantName'] != null
           ? map['restaurantName'] as String
           : null,
@@ -99,14 +99,14 @@ class CartDetailsModel {
 
   @override
   String toString() {
-    return 'CartSummarySubDataModel(restaurantID: $restaurantID, restaurantName: $restaurantName, cartItems: $cartItems, cartTotal: $cartTotal, paymentOptions: $paymentOptions,shopCurrency: $shopCurrency,shopCurrencyIcon: $shopCurrencyIcon,shopPhone: $shopPhone)';
+    return 'CartSummarySubDataModel(restaurantID: $shopId, restaurantName: $restaurantName, cartItems: $cartItems, cartTotal: $cartTotal, paymentOptions: $paymentOptions,shopCurrency: $shopCurrency,shopCurrencyIcon: $shopCurrencyIcon,shopPhone: $shopPhone)';
   }
 
   @override
   bool operator ==(covariant CartDetailsModel other) {
     if (identical(this, other)) return true;
 
-    return other.restaurantID == restaurantID &&
+    return other.shopId == shopId &&
         other.restaurantName == restaurantName &&
         listEquals(other.cartItems, cartItems) &&
         other.cartTotal == cartTotal &&
@@ -118,7 +118,7 @@ class CartDetailsModel {
 
   @override
   int get hashCode {
-    return restaurantID.hashCode ^
+    return shopId.hashCode ^
         restaurantName.hashCode ^
         cartItems.hashCode ^
         cartTotal.hashCode ^

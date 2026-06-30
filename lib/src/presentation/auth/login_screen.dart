@@ -1180,7 +1180,7 @@ class _LoginScreenState extends State<LoginScreen> {
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
                 FormBuilderValidators.match(
-                  RegExp(r'^[0-9]{8}$'),
+                  RegExp((r'^[0-9]{10,11}$')),
                   errorText:
                       'Enter valid ${AppConfig.instance.country.name} number',
                 ),

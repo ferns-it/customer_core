@@ -45,5 +45,6 @@ final keyConfig = KeyConfig(
     secretKey: dotenv.env['SECRETKEY'] ?? '',
     fpSecretKey: dotenv.env['FPSECRETKEY'] ?? '',
     reservationSecretKey: dotenv.env['RESERVATIONSECRETKEY'] ?? '',
-    stripeKey:"pk_test_BEdMOuu01og3dXu6tF86DdAe00Nb6Sb37J")
-    ;
+    stripeKey:dotenv.env['STRIPEKEY'] ?? '');
+    // stripeKey:"pk_test_BEdMOuu01og3dXu6tF86DdAe00Nb6Sb37J");
+    

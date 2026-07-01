@@ -56,9 +56,9 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                               .then((done) {
                             if (done) {
                               userProvider.clearAddressForm();
-                              userProvider.getAddressList();
-                              // ignore: use_build_context_synchronously
-                              // Navigator.pop(context);
+                              // Address list is already refreshed inside
+                              // addOrUpdateUserAddress(), so avoid a duplicate
+                              // refresh here and keep the UI responsive.
                               // ignore: use_build_context_synchronously
                               Navigator.pop(context);
                             }
@@ -223,7 +223,9 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                   .addOrUpdateUserAddress(address?.uaID)
                   .then((done) {
                 if (done) {
-                  userProvider.getAddressList();
+                  // Address list is already refreshed inside
+                  // addOrUpdateUserAddress(), so avoid a duplicate
+                  // refresh here and keep the UI responsive.
                   // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                   // ignore: use_build_context_synchronously

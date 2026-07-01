@@ -161,6 +161,9 @@ class UserProvider extends ChangeNotifier with BaseController {
   }
 
   void clearAddressForm({bool delay = true}) async {
+    // Clear search controller immediately so the bottom sheet address list
+    // doesn't get stuck showing filtered results after editing an address.
+    searchAddressTxtController.clear();
     if (delay) {
       await Future.delayed(const Duration(milliseconds: 600));
     }
@@ -173,7 +176,6 @@ class UserProvider extends ChangeNotifier with BaseController {
     postCodeTxtController.clear();
     countyTxtController.clear();
     landMarkTxtController.clear();
-    searchAddressTxtController.clear();
   }
 
   Future<void> getAddressList() async {

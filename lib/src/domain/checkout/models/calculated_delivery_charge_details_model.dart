@@ -419,7 +419,7 @@ class DeliveryFeeDeliverySettings {
   final String? fixedDeliveryCharges;
   final String? freeDelivery;
   final int? calibratedDistance;
-  final int? freeDeliveryRadius;
+  final double? freeDeliveryRadius;
   final double? maxDeliveryRadius;
   final int? ratePerMile;
   final String? deliveryChargeType;
@@ -442,7 +442,7 @@ class DeliveryFeeDeliverySettings {
     String? fixedDeliveryCharges,
     String? freeDelivery,
     int? calibratedDistance,
-    int? freeDeliveryRadius,
+    double? freeDeliveryRadius,
     double? maxDeliveryRadius,
     int? ratePerMile,
     String? deliveryChargeType,
@@ -487,9 +487,12 @@ class DeliveryFeeDeliverySettings {
       calibratedDistance: map['calibratedDistance'] != null
           ? map['calibratedDistance'] as int
           : null,
-      freeDeliveryRadius: map['freeDeliveryRadius'] != null
-          ? map['freeDeliveryRadius'] as int
-          : null,
+      // freeDeliveryRadius: map['freeDeliveryRadius'] != null
+      //     ? map['freeDeliveryRadius'] as int
+      // : null,
+      freeDeliveryRadius: map['freeDeliveryRadius'] == null
+          ? null
+          : double.tryParse(map['freeDeliveryRadius'].toString()) ?? 0.0,
       maxDeliveryRadius: map['maxDeliveryRadius'] != null
           ? map["maxDeliveryRadius"] is int
               ? (map["maxDeliveryRadius"] as int).toDouble()

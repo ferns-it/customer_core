@@ -1189,7 +1189,7 @@ class OrderHistoryAddonsDataModel {
     return OrderHistoryAddonsDataModel(
       name: map['name'] != null ? map['name'] as String : null,
       price: map['price'] != null ? map['price'] as String : null,
-      groupName: map['groupName'] as String,
+      groupName: map['groupName']?.toString() ?? '',
       itemPrice: map['itemPrice'] as String,
       addonsAmountInPaisa: map['addonsAmountInPaisa'] != null
           ? AddonsAmountInPaisaDataModel.fromMap(

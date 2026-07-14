@@ -25,6 +25,9 @@ class StoreSettingsDataModel {
   final String? footerColor;
   final StoreTableReservationSettings? tableReservationSettings;
   final String? hash;
+  final String? smsVerification;
+  final String? emailVerification;
+  final List<SmsAvailableCountrieData> smsAvailableCountries;
 
   StoreSettingsDataModel({
     this.id,
@@ -48,6 +51,9 @@ class StoreSettingsDataModel {
     this.footerColor,
     this.tableReservationSettings,
     this.hash,
+    this.smsVerification,
+    this.emailVerification,
+    required this.smsAvailableCountries,
   });
 
   StoreSettingsDataModel copyWith({
@@ -72,6 +78,7 @@ class StoreSettingsDataModel {
     String? footerColor,
     StoreTableReservationSettings? tableReservationSettings,
     String? hash,
+    List<SmsAvailableCountrieData>? smsAvailableCountries,
   }) {
     return StoreSettingsDataModel(
       id: id ?? this.id,
@@ -96,6 +103,8 @@ class StoreSettingsDataModel {
       tableReservationSettings:
           tableReservationSettings ?? this.tableReservationSettings,
       hash: hash ?? this.hash,
+      smsAvailableCountries:
+          smsAvailableCountries ?? this.smsAvailableCountries,
     );
   }
 
@@ -122,6 +131,8 @@ class StoreSettingsDataModel {
       'footerColor': footerColor,
       'tableReservationSettings': tableReservationSettings?.toMap(),
       'hash': hash,
+      'smsAvailableCountries':
+          smsAvailableCountries.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -167,6 +178,18 @@ class StoreSettingsDataModel {
               map['tableReservationSettings'] as Map<String, dynamic>)
           : null,
       hash: map['hash'] != null ? map['hash'] as String : null,
+      smsVerification: map['smsVerification'] != null
+          ? map['smsVerification'] as String
+          : null,
+      emailVerification: map['emailVerification'] != null
+          ? map['emailVerification'] as String
+          : null,
+      smsAvailableCountries: List<SmsAvailableCountrieData>.from(
+        (map['smsAvailableCountries'] as List<dynamic>)
+            .map<SmsAvailableCountrieData>(
+          (x) => SmsAvailableCountrieData.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
     );
   }
 
@@ -178,7 +201,7 @@ class StoreSettingsDataModel {
 
   @override
   String toString() {
-    return 'StoreSettingsDataModel(id: $id, name: $name, email: $email, available: $available, shopStatus: $shopStatus, mobile: $mobile, image: $image, deliveryInfo: $deliveryInfo, themeTitle: $themeTitle, themeBanner: $themeBanner, themeLogo: $themeLogo, primaryColor: $primaryColor, SecondaryColor: $SecondaryColor, buttonColor: $buttonColor, buttonHoverColor: $buttonHoverColor, linkColor: $linkColor, linkHoverColor: $linkHoverColor, headerColor: $headerColor, footerColor: $footerColor, tableReservationSettings: $tableReservationSettings, hash: $hash)';
+    return 'StoreSettingsDataModel(id: $id, name: $name, email: $email, available: $available, shopStatus: $shopStatus, mobile: $mobile, image: $image, deliveryInfo: $deliveryInfo, themeTitle: $themeTitle, themeBanner: $themeBanner, themeLogo: $themeLogo, primaryColor: $primaryColor, SecondaryColor: $SecondaryColor, buttonColor: $buttonColor, buttonHoverColor: $buttonHoverColor, linkColor: $linkColor, linkHoverColor: $linkHoverColor, headerColor: $headerColor, footerColor: $footerColor, tableReservationSettings: $tableReservationSettings, hash: $hash,smsAvailableCountries: $smsAvailableCountries)';
   }
 
   @override
@@ -205,7 +228,8 @@ class StoreSettingsDataModel {
         other.headerColor == headerColor &&
         other.footerColor == footerColor &&
         other.tableReservationSettings == tableReservationSettings &&
-        other.hash == hash;
+        other.hash == hash &&
+        listEquals(other.smsAvailableCountries, smsAvailableCountries);
   }
 
   @override
@@ -230,7 +254,8 @@ class StoreSettingsDataModel {
         headerColor.hashCode ^
         footerColor.hashCode ^
         tableReservationSettings.hashCode ^
-        hash.hashCode;
+        hash.hashCode ^
+        smsAvailableCountries.hashCode;
   }
 }
 
@@ -749,4 +774,75 @@ class StoreTableReservationSettings {
   @override
   int get hashCode =>
       haveAdvance.hashCode ^ advanceAmount.hashCode ^ advanceType.hashCode;
+}
+
+class SmsAvailableCountrieData {
+  final String? iso;
+  final String? name;
+  final String? code;
+  SmsAvailableCountrieData({
+    this.iso,
+    this.name,
+    this.code,
+  });
+
+  SmsAvailableCountrieData copyWith({
+    String? iso,
+    String? name,
+    String? code,
+  }) {
+    return SmsAvailableCountrieData(
+      iso: iso ?? this.iso,
+      name: name ?? this.name,
+      code: code ?? this.code,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'iso': iso,
+      'name': name,
+      'code': code,
+    };
+  }
+
+  factory SmsAvailableCountrieData.fromMap(Map<String, dynamic> map) {
+    return SmsAvailableCountrieData(
+      iso: map['iso'] != null ? map['iso'] as String : null,
+      name: map['name'] != null ? map['name'] as String : null,
+      code: map['code'] != null ? map['code'] as String : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory SmsAvailableCountrieData.fromJson(String source) =>
+      SmsAvailableCountrieData.fromMap(
+          json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() =>
+      'SmsAvailableCountrieData(iso: $iso, name: $name, code: $code)';
+
+  @override
+  bool operator ==(covariant SmsAvailableCountrieData other) {
+    if (identical(this, other)) return true;
+
+    return other.iso == iso && other.name == name && other.code == code;
+  }
+
+  @override
+  int get hashCode => iso.hashCode ^ name.hashCode ^ code.hashCode;
+}
+
+extension CountryFlag on SmsAvailableCountrieData {
+  String get flagEmoji {
+    final countryCode = iso?.toUpperCase() ?? "";
+
+    if (countryCode.length != 2) return "";
+
+    return countryCode.codeUnits
+        .map((e) => String.fromCharCode(e + 127397))
+        .join();
+  }
 }

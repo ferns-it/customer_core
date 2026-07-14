@@ -81,7 +81,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: PinCodeTextField(
-                    length: 4,
+                    length: 6,
                     obscureText: false,
                     animationType: AnimationType.scale,
                     pinTheme: PinTheme(
@@ -129,8 +129,8 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
                 verticalSpaceMedium,
                 InkWell(
-                  onTap: () {
-                    final validated = authProvider.validateRegisterOTP();
+                  onTap: () async {
+                    final validated = await authProvider.validateRegisterOTP();
                     if (validated) {
                       authProvider.registerUser().then((registered) {
                         if (registered) {

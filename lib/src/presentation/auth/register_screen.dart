@@ -97,7 +97,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // ], begin: Alignment.topLeft, end: Alignment.bottomRight),
                       ),
                       child: Center(
-                        child: !authListener.registerOTPLoading
+                        child: !authListener.registrationButtonLoading
                             ? Text(
                                 authListener.currentRegForm == 1
                                     ? "REGISTER"

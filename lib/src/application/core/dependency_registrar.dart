@@ -1,4 +1,5 @@
 import 'package:customer_core/src/application/home/home_provider.dart';
+import 'package:customer_core/src/application/otp/otp_provider.dart';
 import 'package:customer_core/src/application/promotion/promotions_provider.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ class DependencyRegistrar {
     ChangeNotifierProvider(create: (context) => getIt<HomeProvider>()),
     ChangeNotifierProvider(create: (context) => getIt<SearchProvider>()),
     ChangeNotifierProvider(create: (context) => ThemeProvider()),
+    ChangeNotifierProvider(create: (context) => getIt<OtpProvider>()),
   ];
 
   static Future<void> initializeAllProviders(BuildContext context) async {
@@ -50,6 +52,8 @@ class DependencyRegistrar {
       context.read<PromotionsProvider>().init();
       context.read<HomeProvider>().init();
       context.read<SearchProvider>().init();
+    
+
     });
   }
 }

@@ -40,5 +40,11 @@ enum Country {
     required this.dialCode
   });
 }
+enum VerificationType {
+  none,
+  sms,
+  email,
+  both,
+}
 
 enum AppThemeMode { light, dark, system }

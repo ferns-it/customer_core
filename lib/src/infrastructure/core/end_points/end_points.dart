@@ -145,4 +145,9 @@ class Endpoints {
 
   //search
   static const String kSearch = 'shop/seller/search';
+
+  //OTP services
+
+  static const String kSendPhoneOTP = 'shop/otpservices/sendotptophone';
+  static const String kVerifyPhoneOTP = 'shop/otpservices/verifyotptophone';
 }

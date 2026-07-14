@@ -15,6 +15,7 @@ import 'package:customer_core/src/application/notification/notification_provider
     as _i86;
 import 'package:customer_core/src/application/order/order_provider.dart'
     as _i592;
+import 'package:customer_core/src/application/otp/otp_provider.dart' as _i615;
 import 'package:customer_core/src/application/payment/payment_provider.dart'
     as _i412;
 import 'package:customer_core/src/application/products/products_provider.dart'
@@ -33,6 +34,7 @@ import 'package:customer_core/src/domain/cart/i_cart_repo.dart' as _i696;
 import 'package:customer_core/src/domain/checkout/i_checkout_repo.dart'
     as _i706;
 import 'package:customer_core/src/domain/offer/i_offer_repo.dart' as _i94;
+import 'package:customer_core/src/domain/otp/i_otp_repo.dart' as _i654;
 import 'package:customer_core/src/domain/promotion/i_promotion_repo.dart'
     as _i304;
 import 'package:customer_core/src/domain/search/i_search_repo.dart' as _i71;
@@ -46,6 +48,7 @@ import 'package:customer_core/src/infrastructure/checkout/checkout_repo.dart'
     as _i454;
 import 'package:customer_core/src/infrastructure/offer/offer_repo.dart'
     as _i459;
+import 'package:customer_core/src/infrastructure/otp/otp_repo.dart' as _i782;
 import 'package:customer_core/src/infrastructure/promotions/promotions_repo.dart'
     as _i1037;
 import 'package:customer_core/src/infrastructure/search/search_repo.dart'
@@ -87,6 +90,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i266.IUserRepo>(() => _i854.UserRepo());
     gh.lazySingleton<_i94.IOfferRepo>(() => _i459.OfferRepo());
     gh.lazySingleton<_i706.ICheckoutRepo>(() => _i454.CheckoutRepo());
+    gh.lazySingleton<_i654.IOtpRepo>(() => _i782.OtpRepo());
     gh.lazySingleton<_i592.OrderProvider>(() => _i592.OrderProvider(
           userRepo: gh<_i266.IUserRepo>(),
           sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
@@ -107,19 +111,22 @@ extension GetItInjectableX on _i174.GetIt {
           offerRepo: gh<_i94.IOfferRepo>(),
           sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
         ));
+    gh.lazySingleton<_i615.OtpProvider>(
+        () => _i615.OtpProvider(otpRepo: gh<_i654.IOtpRepo>()));
     gh.lazySingleton<_i412.PaymentProvider>(
         () => _i412.PaymentProvider(checkoutRepo: gh<_i706.ICheckoutRepo>()));
     gh.lazySingleton<_i663.ShopProvider>(
         () => _i663.ShopProvider(gh<_i333.IStoreRepo>()));
-    gh.lazySingleton<_i993.AuthProvider>(() => _i993.AuthProvider(
-          userRepository: gh<_i266.IUserRepo>(),
-          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
-        ));
     gh.factory<_i184.PromotionsProvider>(
         () => _i184.PromotionsProvider(gh<_i304.IPromotionRepo>()));
     gh.lazySingleton<_i553.SearchProvider>(() => _i553.SearchProvider(
           searchRepo: gh<_i71.ISearchRepo>(),
           productsProvider: gh<_i805.ProductsProvider>(),
+        ));
+    gh.lazySingleton<_i993.AuthProvider>(() => _i993.AuthProvider(
+          userRepository: gh<_i266.IUserRepo>(),
+          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
+          otpProvider: gh<_i615.OtpProvider>(),
         ));
     return this;
   }

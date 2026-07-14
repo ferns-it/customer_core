@@ -1,4 +1,4 @@
-
+import 'package:customer_core/src/core/constants/enums.dart';
 import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/domain/store/models/store_delivery_slot_model.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +47,10 @@ class ShopProvider extends ChangeNotifier with BaseController {
   bool isLoading = false;
   String? errorMessage;
 
+  List<SmsAvailableCountrieData> smsCountries = [];
+
+  SmsAvailableCountrieData? selectedCountry;
+
   List<StoreDeliverySlotDataModelResponse>? get slotForSelectedDate {
     final slots = _deliverySlots.data?.deliverySlots;
     if (slots == null) return null;
@@ -80,6 +84,34 @@ class ShopProvider extends ChangeNotifier with BaseController {
     final formattedAmt = double.tryParse(amtString ?? '0') ?? 0.00;
 
     return formattedAmt;
+  }
+
+  VerificationType get verificationType {
+    final settings = storeSettings.data;
+    if (settings == null) return VerificationType.email;
+
+    final sms = settings.smsVerification?.toLowerCase() == 'enabled';
+    final email = settings.emailVerification?.toLowerCase() == 'enabled';
+
+    if (sms && email) return VerificationType.both;
+    if (sms) return VerificationType.sms;
+    return VerificationType.email;
+  }
+
+  String get otpMessage {
+    switch (verificationType) {
+      case VerificationType.sms:
+        return "Enter the OTP sent to your registered mobile number";
+
+      case VerificationType.email:
+        return "Enter the OTP sent to your registered email address";
+
+      case VerificationType.both:
+        return "Enter the OTP sent to your registered mobile number and email address";
+
+      case VerificationType.none:
+        return "Enter the OTP";
+    }
   }
 
   @override
@@ -120,9 +152,23 @@ class ShopProvider extends ChangeNotifier with BaseController {
       },
       (data) {
         _storeSettings = APIResponse.completed(data);
+
+        // Load allowed SMS countries from API
+        smsCountries = data.smsAvailableCountries ?? [];
+
+        // Select the first country by default
+        if (smsCountries.isNotEmpty) {
+          selectedCountry = smsCountries.first;
+        }
+
         notifyListeners();
       },
     );
+  }
+
+  void updateSelectedCountry(SmsAvailableCountrieData country) {
+    selectedCountry = country;
+    notifyListeners();
   }
 
   Future<void> fetchShopDeliverySlots() async {

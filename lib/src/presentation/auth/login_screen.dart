@@ -608,7 +608,7 @@ class _LoginScreenState extends State<LoginScreen> {
       case RegStage.otpEmail:
         // When both enabled, email OTP auto-verifies
         if (authListener.emailRequired && authListener.smsRequired) {
-          return "Verify OTP";
+          return "";
         }
         return "Verify Email OTP";
       case RegStage.otpPhone:
@@ -1851,8 +1851,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 onTap: authProvider.toggleRegisterPassword,
                 child: Icon(
                   authListener.registerPasswordHide
-                      ? FluentIcons.eye_24_regular
-                      : FluentIcons.eye_off_24_regular,
+                      ? FluentIcons.eye_off_24_regular
+                      : FluentIcons.eye_24_regular,
                   color: AppColors.kGray3,
                 )),
             inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
@@ -1870,7 +1870,7 @@ class _LoginScreenState extends State<LoginScreen> {
             fillColor: Colors.white.withOpacity(0.1),
             controller: authProvider.registerUserConfirmPasswordController,
             hintText: "Confirm Password",
-            obscureText: authListener.registerPasswordHide,
+            obscureText: authListener.confirmPasswordHide,
             keyboardType: TextInputType.visiblePassword,
             textInputAction: TextInputAction.done,
             inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
@@ -1878,11 +1878,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: AppColors.kGray3),
             suffixIcon: InkWell(
                 customBorder: const CircleBorder(),
-                onTap: authProvider.toggleRegisterPassword,
+                onTap: authProvider.confirmRegisterPassword,
                 child: Icon(
-                  authListener.registerPasswordHide
-                      ? FluentIcons.eye_24_regular
-                      : FluentIcons.eye_off_24_regular,
+                  authListener.confirmPasswordHide
+                      ? FluentIcons.eye_off_24_regular
+                      : FluentIcons.eye_24_regular,
                   color: AppColors.kGray3,
                 )),
             onChanged: (_) => setState(() {}),

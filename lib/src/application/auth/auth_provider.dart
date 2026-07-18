@@ -181,6 +181,8 @@ void setContactLoading(bool value) {
   bool _registerPasswordHide = true;
 
   bool get registerPasswordHide => _registerPasswordHide;
+  bool _confirmPasswordHide=true;
+  bool get confirmPasswordHide=> _confirmPasswordHide;
 
   final resetFormKey = GlobalKey<FormBuilderState>();
 
@@ -249,6 +251,10 @@ void setContactLoading(bool value) {
 
   void toggleRegisterPassword() {
     _registerPasswordHide = !_registerPasswordHide;
+    notifyListeners();
+  }
+  void confirmRegisterPassword(){
+    _confirmPasswordHide=!_confirmPasswordHide;
     notifyListeners();
   }
 

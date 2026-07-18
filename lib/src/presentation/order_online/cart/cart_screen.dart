@@ -339,6 +339,7 @@ class _CartScreenState extends State<CartScreen>
     final orderProvider = context.read<OrderProvider>();
     final userListener = context.watch<UserProvider>();
     final userProvider = context.read<UserProvider>();
+    final authProvider = context.read<AuthProvider>();
 
     return Visibility(
       visible: !cartListener.isCartEmpty &&
@@ -529,8 +530,9 @@ class _CartScreenState extends State<CartScreen>
                                             }
 
                                             if (userProvider.userData?.user
-                                                    .isMobileVerified !=
-                                                "Yes") {
+                                                        .isMobileVerified !=
+                                                    "Yes" &&
+                                                authProvider.smsRequired) {
                                               final verified =
                                                   await mobileVerificationDialog(
                                                 context,

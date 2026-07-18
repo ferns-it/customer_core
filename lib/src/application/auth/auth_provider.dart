@@ -3,6 +3,9 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/domain/otp/models/verify_already_registered_model.dart';
+import 'package:customer_core/src/domain/store/models/store_settings_data_model.dart';
+import 'package:customer_core/src/domain/user/models/user_login_response.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,9 +27,19 @@ import '../otp/otp_provider.dart';
 enum AuthView { login, register, forgotPassword }
 
 /// Stages for the new registration flow:
-/// phone → (if SMS enabled) verifySms → (if SMS disabled) email
-///     → (if email enabled) verifyEmail → details → register
-enum RegStage { phone, verifySms, email, verifyEmail, details, register }
+/// The flow progresses sequentially:
+/// contact (enter all details) →
+///   if email+phone enabled: otpEmail → otpPhone → register
+///   if only email: otpEmail → register
+///   if only phone: otpPhone → register
+///   if none: register
+enum RegStage {
+  contact, // phone, email
+  otpEmail, // email OTP verification
+  otpPhone, // phone OTP verification
+  register,
+  success
+}
 
 @LazySingleton()
 class AuthProvider extends ChangeNotifier with BaseController {
@@ -66,7 +79,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
   final emailFormKey = GlobalKey<FormState>();
 
   // Registration flow stage
-  RegStage _currentRegStage = RegStage.phone;
+  RegStage _currentRegStage = RegStage.contact;
   RegStage get currentRegStage => _currentRegStage;
 
   int _currentForgotForm = 0;
@@ -82,23 +95,60 @@ class AuthProvider extends ChangeNotifier with BaseController {
 
   bool _verifyOtpLoading = false;
   bool get verifyOtpLoading => _verifyOtpLoading;
+  VerifyAlreadyRegisteredModel? verifyResponse;
 
-  
+  // OTP state tracking for inline verification
+  bool _emailOtpSent = false;
+  bool get emailOtpSent => _emailOtpSent;
+
+  bool _phoneOtpSent = false;
+  bool get phoneOtpSent => _phoneOtpSent;
+
+  bool _phoneOtpSending = false;
+  bool get phoneOtpSending => _phoneOtpSending;
+
+  bool _emailOtpVerified = false;
+  bool get emailOtpVerified => _emailOtpVerified;
+
+  bool _phoneOtpVerified = false;
+  bool get phoneOtpVerified => _phoneOtpVerified;
+
+  bool emailVerified = false;
+  bool phoneVerified = false;
+
+  bool emailVerifying = false;
+  bool phoneVerifying = false;
+
+  // Error messages for OTP
+  String _emailOtpError = '';
+  String get emailOtpError => _emailOtpError;
+
+  String _phoneOtpError = '';
+  String get phoneOtpError => _phoneOtpError;
+  bool contactLoading = false;
+
+void setContactLoading(bool value) {
+  contactLoading = value;
+  notifyListeners();
+}
 
   bool get registrationButtonLoading {
     switch (_currentRegStage) {
-      case RegStage.phone:
-        return false;
-      case RegStage.verifySms:
-        return sendOtpLoading;
-      case RegStage.email:
-        return false;
-      case RegStage.verifyEmail:
-        return verifyOtpLoading;
-      case RegStage.details:
-        return false;
+      case RegStage.contact:
+      return contactLoading;
+
+
+      case RegStage.otpEmail:
+        return sendOtpLoading || verifyOtpLoading;
+
+      case RegStage.otpPhone:
+        return sendOtpLoading || verifyOtpLoading;
+
       case RegStage.register:
         return registerLoading;
+
+      case RegStage.success:
+        return false;
     }
   }
 
@@ -109,7 +159,15 @@ class AuthProvider extends ChangeNotifier with BaseController {
   final registerUserPhoneController = TextEditingController();
   final registerUserPasswordController = TextEditingController();
   final registerUserConfirmPasswordController = TextEditingController();
-  final registerOTPController = TextEditingController();
+  final phoneOtpController = TextEditingController();
+
+  final emailOtpController = TextEditingController();
+  bool _smsRequired = false;
+  bool _emailRequired = false;
+
+  bool get smsRequired => _smsRequired;
+
+  bool get emailRequired => _emailRequired;
 
   String get registerUserFullName =>
       "${registerUserFirstNameController.text} ${registerUserLastNameController.text}";
@@ -158,10 +216,31 @@ class AuthProvider extends ChangeNotifier with BaseController {
 
   AuthView _selectedAuthView = AuthView.login;
   AuthView get selectedAuthView => _selectedAuthView;
+    UserLoginResponse? _userData;
+
+  UserLoginResponse? get userData => _userData;
 
   String? _savedResetEmail;
 
   String get savedResetEmail => _savedResetEmail ?? '';
+
+  void resetOtpVerification() {
+    emailVerified = false;
+    phoneVerified = false;
+    emailVerifying = false;
+    phoneVerifying = false;
+
+    emailOtpController.clear();
+    phoneOtpController.clear();
+
+    notifyListeners();
+  }
+
+  void initializeOtpRequirement(StoreSettingsDataModel settings) {
+    _smsRequired = settings.smsVerification == "Enabled";
+    _emailRequired = settings.emailVerification == "Enabled";
+    notifyListeners();
+  }
 
   void toggleLoginPassword() {
     _loginPasswordHide = !_loginPasswordHide;
@@ -196,7 +275,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
   }
 
   bool validateRegisterForm1() {
-    return registerFormKey1.currentState?.validate() ?? false;
+    return validatePhoneForm() && validateEmailForm();
   }
 
   bool validateRegisterForm2() {
@@ -212,15 +291,37 @@ class AuthProvider extends ChangeNotifier with BaseController {
     notifyListeners();
   }
 
-  // Backward compatibility - delegates to new stage system
-  @Deprecated('Use currentRegStage instead')
-  int get currentRegForm => _currentRegStage.index;
+  // Backward compatibility - uses RegStage stages
+  int get currentRegForm {
+    // Map RegStage to old form numbers for backward compatibility only
+    switch (_currentRegStage) {
+      case RegStage.contact:
+        return 0;
+      case RegStage.otpEmail:
+      case RegStage.otpPhone:
+        return 1;
+      case RegStage.register:
+        return 2;
+      case RegStage.success:
+        return 3;
+    }
+  }
 
   @Deprecated('Use updateCurrentRegStage instead')
   void updateCurrentRegForm(int formNo) {
-    _currentRegStage =
-        RegStage.values[formNo.clamp(0, RegStage.values.length - 1)];
+    _currentRegStage = _currentRegFormToStage(formNo);
     notifyListeners();
+  }
+
+  RegStage _currentRegFormToStage(int formNo) {
+    switch (formNo) {
+      case 0:
+        return RegStage.contact;
+      case 1:
+        return RegStage.register;
+      default:
+        return RegStage.contact;
+    }
   }
 
   void updateCurrentForgotForm(int formNo) {
@@ -287,18 +388,19 @@ class AuthProvider extends ChangeNotifier with BaseController {
   }
 
   /// Send SMS OTP to the phone number entered
-  Future<bool> sendSmsOtp() async {
+  Future<bool> sendSmsOtp({String? countryCode}) async {
     try {
       _sendOtpLoading = true;
       notifyListeners();
 
       final smsSent = await otpProvider.sendPhoneOtp(
         phone: registerUserPhoneController.text,
-        countryCode: AppConfig.instance.country.dialCode,
+        countryCode: countryCode ?? AppConfig.instance.country.dialCode,
         purpose: OtpPurpose.signup,
       );
       if (smsSent) {
         otpProvider.startTimer();
+        _phoneOtpSent = true;
         return true;
       }
       return false;
@@ -308,32 +410,12 @@ class AuthProvider extends ChangeNotifier with BaseController {
     }
   }
 
-  /// Verify SMS OTP via API
-  Future<bool> verifySmsOtp() async {
-    try {
-      _verifyOtpLoading = true;
-      notifyListeners();
-      return await otpProvider.verifyPhoneOtp(
-        purpose: OtpPurpose.signup,
-        phone: registerUserPhoneController.text,
-        countryCode: AppConfig.instance.country.dialCode,
-      );
-    } finally {
-      _verifyOtpLoading = false;
-      notifyListeners();
-    }
-  }
-
   /// Send Email OTP
+  /// This method should only be called after user is verified as new
   Future<bool> sendEmailOtp() async {
     try {
       _sendOtpLoading = true;
       notifyListeners();
-
-      final isNewUser = await checkUserAlreadyRegistered();
-      if (!isNewUser) {
-        return false;
-      }
 
       final userEmail = registerUserEmailController.text.trim();
       final generatedOTP = Utils.generateOTP();
@@ -347,6 +429,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
       return response.fold(() {
         _registrationOTP = generatedOTP;
         otpProvider.startTimer();
+        _emailOtpSent = true;
         return true;
       }, (error) {
         AlertDialogs.showError(error.message);
@@ -358,69 +441,314 @@ class AuthProvider extends ChangeNotifier with BaseController {
     }
   }
 
-  void initializeRegistrationFlow(VerificationType verificationType) {
-    _currentVerificationType = verificationType;
-
-    switch (verificationType) {
-      case VerificationType.sms:
-      case VerificationType.both:
-        _currentRegStage = RegStage.phone;
-        break;
-
-      case VerificationType.email:
-        _currentRegStage = RegStage.email;
-        break;
-
-      case VerificationType.none:
-        _currentRegStage = RegStage.details;
-        break;
-    }
-
+  void initializeRegistrationFlow() {
+    _currentRegStage = RegStage.contact;
+    _emailOtpSent = false;
+    _phoneOtpSent = false;
+    _emailOtpVerified = false;
+    _phoneOtpVerified = false;
+    _registrationOTP = null;
+    _emailOtpError = '';
+    _phoneOtpError = '';
     notifyListeners();
   }
 
-  /// Verify email OTP (local comparison)
+  /// Main registration flow following the diagram:
+  /// Form 1 → Validate → VerifyAlreadyRegistered API → Branch based on response
+  Future<bool> startRegistration() async {
+    try {
+      // Step 1: Validate form (already done before calling this)
+
+      // Step 2: Call VerifyAlreadyRegistered API
+      final isNewUser = await checkUserAlreadyRegistered();
+      if (!isNewUser) {
+        if (verifyResponse?.isPartialUser == true) {
+          return false;
+        } else if (verifyResponse != null) {
+          return false;
+        } else {
+          return false;
+        }
+      }
+
+      if (!_smsRequired && !_emailRequired) {
+        // Both disabled - Skip OTP, go directly to register
+        _currentRegStage = RegStage.register;
+      } else if (_emailRequired && _smsRequired) {
+        // Both enabled - Start with email OTP first
+        _currentRegStage = RegStage.otpEmail;
+      } else if (_emailRequired) {
+        // Only email enabled
+        _currentRegStage = RegStage.otpEmail;
+      } else {
+        // Only SMS enabled
+        _currentRegStage = RegStage.otpPhone;
+      }
+
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Send email OTP for the inline flow (resets state)
+  Future<bool> sendEmailOtpForInline() async {
+    _emailOtpSent = false;
+    _emailOtpVerified = false;
+    _emailOtpError = '';
+    emailOtpController.clear();
+    final result = await sendEmailOtp();
+    return result;
+  }
+
+  /// Verify email OTP (local comparison) for inline flow
+  bool verifyEmailOtpForInline() {
+    _emailOtpError = '';
+    if (_registrationOTP != null &&
+        _registrationOTP == emailOtpController.text) {
+      _emailOtpVerified = true;
+      emailVerified = true;
+      notifyListeners();
+      return true;
+    }
+
+    _emailOtpError = 'Invalid Email OTP';
+    emailOtpController.clear();
+    notifyListeners();
+    return false;
+  }
+
+  /// Send phone OTP for the inline flow (resets state)
+  Future<bool> sendPhoneOtpForInline() async {
+    _phoneOtpSending = true;
+    _phoneOtpSent = false;
+    _phoneOtpVerified = false;
+    _phoneOtpError = '';
+    phoneOtpController.clear();
+    notifyListeners();
+
+    final result = await sendSmsOtp();
+
+    _phoneOtpSending = false;
+    if (result) {
+      _phoneOtpSent = true;
+    }
+    notifyListeners();
+    return result;
+  }
+
+  /// Verify phone OTP for inline flow
+  Future<bool> verifyPhoneOtpForInline() async {
+    _phoneOtpError = '';
+    final result = await verifySmsOtp();
+    if (result) {
+      _phoneOtpVerified = true;
+      phoneVerified = true;
+      notifyListeners();
+    } else {
+      _phoneOtpError = 'Invalid Mobile OTP';
+      phoneOtpController.clear();
+      notifyListeners();
+    }
+    return result;
+  }
+
+  /// Verify SMS OTP via the OTP provider
+  Future<bool> verifySmsOtp() async {
+    try {
+      _verifyOtpLoading = true;
+      notifyListeners();
+
+      final result = await otpProvider.verifyPhoneOtp(
+        purpose: OtpPurpose.signup,
+        phone: registerUserPhoneController.text,
+        countryCode: AppConfig.instance.country.dialCode,
+        otp: phoneOtpController.text,
+        userID:_userData?.user.userID??'',
+        userType: 'Registered',
+      );
+      return result;
+    } finally {
+      _verifyOtpLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Move from email OTP stage to phone OTP stage (when both enabled)
+  void proceedToPhoneOtp() {
+    if (_emailOtpVerified) {
+      _currentRegStage = RegStage.otpPhone;
+      notifyListeners();
+    }
+  }
+
+  /// Proceed to registration after all OTPs are verified
+  void proceedToRegister() {
+    bool canProceed = true;
+
+    if (_emailRequired && !_emailOtpVerified) {
+      canProceed = false;
+    }
+    if (_smsRequired && !_phoneOtpVerified) {
+      canProceed = false;
+    }
+
+    if (canProceed) {
+      _currentRegStage = RegStage.register;
+      notifyListeners();
+    }
+  }
+
+  /// Verify email OTP (local comparison) - used by verifyRegistrationOtp
   bool verifyEmailOtp() {
-    return _registrationOTP == registerOTPController.text;
+    if (_registrationOTP != null &&
+        _registrationOTP == emailOtpController.text) {
+      return true;
+    }
+    return false;
   }
 
+  @Deprecated('Use sendEmailOtpForInline / sendPhoneOtpForInline instead')
   Future<bool> sendVerifyOTPForRegistration() async {
-    // This method is kept for backward compatibility - delegates to new flow
+    bool smsSent = true;
+    bool emailSent = true;
+
     if (_currentVerificationType == VerificationType.sms ||
         _currentVerificationType == VerificationType.both) {
-      return sendSmsOtp();
-    } else {
-      return sendEmailOtp();
+      smsSent = await sendSmsOtp();
+    }
+
+    if (_currentVerificationType == VerificationType.email ||
+        _currentVerificationType == VerificationType.both) {
+      emailSent = await sendEmailOtp();
+    }
+
+    return smsSent && emailSent;
+  }
+
+  Future<bool> verifyRegistrationOtp() async {
+    try {
+      if (_smsRequired) {
+        final phoneResult = await otpProvider.verifyPhoneOtp(
+          purpose: OtpPurpose.signup,
+          phone: registerUserPhoneController.text,
+          countryCode: AppConfig.instance.country.dialCode,
+          otp: phoneOtpController.text,
+            userID:_userData?.user.userID??'',
+        userType: 'Registered',
+        );
+
+        if (!phoneResult) {
+          AlertDialogs.showError("Invalid Mobile OTP");
+          return false;
+        }
+
+        phoneVerified = true;
+      }
+
+      if (_emailRequired) {
+        if (emailOtpController.text.isEmpty) {
+          AlertDialogs.showError("Please enter Email OTP");
+          return false;
+        }
+
+        if (!verifyEmailOtp()) {
+          AlertDialogs.showError("Invalid Email OTP");
+          return false;
+        }
+
+        emailVerified = true;
+      }
+
+      // OTP verified successfully, move to details stage
+      _currentRegStage = RegStage.register;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      AlertDialogs.showError("OTP verification failed. Please try again.");
+      return false;
     }
   }
 
-  Future<bool> validateRegisterOTP() async {
-    // This method is kept for backward compatibility - delegates to new flow
-    if (_currentVerificationType == VerificationType.sms ||
-        _currentVerificationType == VerificationType.both) {
-      return verifySmsOtp();
-    } else {
-      return verifyEmailOtp();
+  @Deprecated('Use sendEmailOtpForInline / sendPhoneOtpForInline instead')
+  Future<bool> sendOtpBasedOnSettings() async {
+    bool smsSent = true;
+    bool emailSent = true;
+
+    if (_smsRequired) {
+      smsSent = await sendSmsOtp();
+    }
+
+    if (_emailRequired) {
+      emailSent = await sendEmailOtp();
+    }
+
+    return smsSent && emailSent;
+  }
+
+  /// Link partial user - called when user clicks "Yes" on link dialog
+  Future<bool> linkPartialUser() async {
+    try {
+      _registerLoading = true;
+      notifyListeners();
+
+      // Call the Link API to link the partial user's mobile with this email
+      final response = await userRepository.linkPartialUser(
+        userEmail: registerUserEmailController.text,
+        userMobile: registerUserPhoneController.text,
+        shopID: AppIdentifiers.kShopId,
+      );
+
+      return response.fold(
+        (error) {
+          AlertDialogs.showError(error.message);
+          return false;
+        },
+        (success) {
+          // After linking, proceed with registration flow
+          if (!_smsRequired && !_emailRequired) {
+            _currentRegStage = RegStage.register;
+          } else if (_emailRequired && _smsRequired) {
+            _currentRegStage = RegStage.otpEmail;
+          } else if (_emailRequired) {
+            _currentRegStage = RegStage.otpEmail;
+          } else {
+            _currentRegStage = RegStage.otpPhone;
+          }
+          notifyListeners();
+          return true;
+        },
+      );
+    } catch (e) {
+      return false;
+    } finally {
+      _registerLoading = false;
+      notifyListeners();
     }
   }
 
-  Future<bool> registerUser() async {
+  Future<bool> registerUser({String? countryCode}) async {
     try {
       _registerLoading = true;
       notifyListeners();
       final payload = UserRegisterRequest(
-        shopID: AppIdentifiers.kShopId,
-        userFirstName: registerUserFirstNameController.text,
-        userLastName: registerUserLastNameController.text,
-        userEmail: registerUserEmailController.text,
-        userMobile: registerUserPhoneController.text,
-        userPassword: registerUserPasswordController.text,
-        userAddress: UserAddress.empty(),
-        userPostCode: '',
-      );
+          shopID: AppIdentifiers.kShopId,
+          userFirstName: registerUserFirstNameController.text,
+          userLastName: registerUserLastNameController.text,
+          userEmail: registerUserEmailController.text,
+          userMobile: registerUserPhoneController.text,
+          userPassword: registerUserPasswordController.text,
+          countryCode: countryCode ?? AppConfig.instance.country.dialCode,
+          userAddress: UserAddress.empty(),
+          userPostCode: '',
+          userMobileToken: otpProvider.otpTokenId,
+          isEmailVerified: 'Yes');
       final response = await userRepository.registerUser(payload);
+      print("Mobile OTP Token in Payload: ${payload.userMobileToken}");
       return response.fold(
         (error) {
+          AlertDialogs.showError(error.message);
           return false;
         },
         (userData) {
@@ -515,10 +843,18 @@ class AuthProvider extends ChangeNotifier with BaseController {
       userMobile: registerUserPhoneController.text,
       shopID: AppIdentifiers.kShopId,
     );
+    print("Response: $response");
     return response.fold((error) {
-      AlertDialogs.showError(error.message);
+      // Don't show snackbar here
       return false;
     }, (result) {
+      if (result["error"] == true) {
+        verifyResponse = VerifyAlreadyRegisteredModel.fromMap(
+          result["errorMessage"],
+        );
+        return false;
+      }
+      verifyResponse = null;
       return true;
     });
   }
@@ -543,9 +879,16 @@ class AuthProvider extends ChangeNotifier with BaseController {
     registerUserPhoneController.clear();
     registerUserPasswordController.clear();
     registerUserConfirmPasswordController.clear();
-    registerOTPController.clear();
+    phoneOtpController.clear();
+    emailOtpController.clear();
     _registrationOTP = null;
-    _currentRegStage = RegStage.phone;
+    _currentRegStage = RegStage.contact;
+    _emailOtpSent = false;
+    _phoneOtpSent = false;
+    _emailOtpVerified = false;
+    _phoneOtpVerified = false;
+    _emailOtpError = '';
+    _phoneOtpError = '';
     otpProvider.clear();
 
     if (!registerControllersOnly) {
@@ -565,6 +908,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
     registerUserPhoneController.dispose();
     registerUserPasswordController.dispose();
     registerUserConfirmPasswordController.dispose();
-    registerOTPController.dispose();
+    phoneOtpController.clear();
+    emailOtpController.clear();
   }
 }

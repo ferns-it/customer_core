@@ -43,7 +43,12 @@ class OtpRepo implements IOtpRepo {
         return Left(InternalServerErrorException());
       }
 
-      final result = SendOtpResponse.fromJson(response);
+      // The API returns { "error": false, "data": { ... } }
+      // Since dataKeyChecking is false, response contains the full wrapper.
+      // Extract the inner "data" object before parsing.
+      final Map<String, dynamic> fullResponse = jsonDecode(response);
+      final innerData = fullResponse['data'];
+      final result = SendOtpResponse.fromJson(jsonEncode(innerData));
 
       return Right(result);
     } on DioException catch (e) {
@@ -61,12 +66,14 @@ class OtpRepo implements IOtpRepo {
 
   @override
   Future<Option<AppExceptions>> verifyPhoneOtp({
-    required String shopID,
-    required String phone,
-    required String countryCode,
-    required String purpose,
-    required String otp,
-    required String tokenId,
+   required String shopID,
+  required String phone,
+  required String countryCode,
+  required String purpose,
+  required String otp,
+  required String tokenId,
+  required String userID,
+  required String userType,
   }) async {
     try {
       final data = {
@@ -77,6 +84,9 @@ class OtpRepo implements IOtpRepo {
         "otp": otp,
         "purpose": purpose,
         "otpToken": tokenId,
+        "userID":userID,
+        "userType":userType
+
       };
 
       final response = await APIManager.post(

@@ -14,6 +14,8 @@ class User {
   final String? userStatus;
   final String? addedTime;
   final String? userActivationCode;
+  final String? isMobileVerified;
+  final String? isEmailVerified;
   User({
     required this.userID,
     required this.shopID,
@@ -27,6 +29,8 @@ class User {
     required this.userStatus,
     required this.addedTime,
     required this.userActivationCode,
+    required this.isMobileVerified,
+    required this.isEmailVerified,
   });
 
   User copyWith({
@@ -42,21 +46,24 @@ class User {
     String? userStatus,
     String? addedTime,
     String? userActivationCode,
+    String? isMobileVerified,
+    String? isEmailVerified,
   }) {
     return User(
-      userID: userID ?? this.userID,
-      shopID: shopID ?? this.shopID,
-      userFirstName: userFirstName ?? this.userFirstName,
-      userLastName: userLastName ?? this.userLastName,
-      userAddress: userAddress ?? this.userAddress,
-      userPostCode: userPostCode ?? this.userPostCode,
-      userMobile: userMobile ?? this.userMobile,
-      userEmail: userEmail ?? this.userEmail,
-      userPassword: userPassword ?? this.userPassword,
-      userStatus: userStatus ?? this.userStatus,
-      addedTime: addedTime ?? this.addedTime,
-      userActivationCode: userActivationCode ?? this.userActivationCode,
-    );
+        userID: userID ?? this.userID,
+        shopID: shopID ?? this.shopID,
+        userFirstName: userFirstName ?? this.userFirstName,
+        userLastName: userLastName ?? this.userLastName,
+        userAddress: userAddress ?? this.userAddress,
+        userPostCode: userPostCode ?? this.userPostCode,
+        userMobile: userMobile ?? this.userMobile,
+        userEmail: userEmail ?? this.userEmail,
+        userPassword: userPassword ?? this.userPassword,
+        userStatus: userStatus ?? this.userStatus,
+        addedTime: addedTime ?? this.addedTime,
+        userActivationCode: userActivationCode ?? this.userActivationCode,
+        isMobileVerified: isMobileVerified ?? this.isMobileVerified,
+        isEmailVerified: isEmailVerified ?? this.isEmailVerified);
   }
 
   Map<String, dynamic> toMap() {
@@ -73,6 +80,8 @@ class User {
       'userStatus': userStatus,
       'addedTime': addedTime,
       'userActivationCode': userActivationCode,
+      'isMobileVerified': isMobileVerified,
+      'isEmailVerified': isEmailVerified
     };
   }
 
@@ -99,6 +108,12 @@ class User {
       userActivationCode: map['userActivationCode'] != null
           ? map['userActivationCode'] as String
           : null,
+      isMobileVerified: map['isMobileVerified'] != null
+          ? map['isMobileVerified'] as String
+          : null,
+      isEmailVerified: map['isEmailVerified'] != null
+          ? map['isEmailVerified'] as String
+          : null,
     );
   }
 
@@ -109,7 +124,7 @@ class User {
 
   @override
   String toString() {
-    return 'User(userID: $userID, shopID: $shopID, userFirstName: $userFirstName, userLastName: $userLastName, userAddress: $userAddress, userPostCode: $userPostCode, userMobile: $userMobile, userEmail: $userEmail, userPassword: $userPassword, userStatus: $userStatus, addedTime: $addedTime, userActivationCode: $userActivationCode)';
+    return 'User(userID: $userID, shopID: $shopID, userFirstName: $userFirstName, userLastName: $userLastName, userAddress: $userAddress, userPostCode: $userPostCode, userMobile: $userMobile, userEmail: $userEmail, userPassword: $userPassword, userStatus: $userStatus, addedTime: $addedTime, userActivationCode: $userActivationCode,isMobileVerified: $isMobileVerified,isEmailVerified:$isEmailVerified)';
   }
 
   @override
@@ -127,7 +142,9 @@ class User {
         other.userPassword == userPassword &&
         other.userStatus == userStatus &&
         other.addedTime == addedTime &&
-        other.userActivationCode == userActivationCode;
+        other.userActivationCode == userActivationCode &&
+        other.isMobileVerified == isMobileVerified &&
+        other.isEmailVerified == isEmailVerified;
   }
 
   @override
@@ -143,6 +160,10 @@ class User {
         userPassword.hashCode ^
         userStatus.hashCode ^
         addedTime.hashCode ^
-        userActivationCode.hashCode;
+        userActivationCode.hashCode ^
+        isMobileVerified.hashCode ^
+        isEmailVerified.hashCode;
   }
+
+  bool get mobileVerified => isMobileVerified == "Yes";
 }

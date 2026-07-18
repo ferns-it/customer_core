@@ -41,6 +41,12 @@ abstract class IUserRepo {
     required String customerName,
   });
 
+  Future<Either<AppExceptions, bool>> linkPartialUser({
+    required String userEmail,
+    required String userMobile,
+    required String shopID,
+  });
+
   Future<Either<AppExceptions, UserAddressListDataModel>> getUserAddressList();
 
   Future<Either<AppExceptions, String>> addNewAddress(

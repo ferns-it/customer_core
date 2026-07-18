@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:customer_core/gen/assets.gen.dart';
+import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/core/routes/routes.gr.dart';
@@ -72,17 +73,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           authProvider.updateCurrentRegForm(1);
                         }
                       } else {
-                        validated = authProvider.validateRegisterForm2();
-                        if (validated) {
-                          authProvider
-                              .sendVerifyOTPForRegistration()
-                              .then((done) {
-                            if (done) {
-                              // Navigate to OTP Screen
-                              context.pushRoute(const OtpScreenRoute());
-                            }
-                          });
-                        }
+                        final settings =
+                            context.read<ShopProvider>().storeSettings.data;
+
+                        final smsEnabled =
+                            settings?.smsVerification == "Enabled";
+                        final emailEnabled =
+                            settings?.emailVerification == "Enabled";
+
+                        await authProvider
+                            .sendVerifyOTPForRegistration()
+                            .then((done) {
+                          if (done) {
+                            // Navigate to OTP Screen
+                            context.pushRoute(const OtpScreenRoute());
+                          }
+                        });
                       }
                     },
                     child: Container(

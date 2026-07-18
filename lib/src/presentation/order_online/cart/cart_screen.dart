@@ -9,7 +9,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import 'package:customer_core/src/application/auth/auth_provider.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
+import 'package:customer_core/src/application/otp/otp_provider.dart';
 import 'package:customer_core/src/application/payment/payment_provider.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/application/user/user_provider.dart';
@@ -18,9 +20,11 @@ import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/core/utils/date_utils.dart';
 import 'package:customer_core/src/core/utils/ui_utils.dart';
+import 'package:customer_core/src/domain/otp/otp_purpose.dart';
 import 'package:customer_core/src/presentation/auth/login_screen.dart';
 import 'package:customer_core/src/presentation/widgets/bottom_sheet_drag_handler.dart';
 import 'package:customer_core/src/presentation/widgets/custom_close_icon.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../../application/order/order_provider.dart';
 import '../../../core/theme/app_colors.dart';
@@ -334,6 +338,7 @@ class _CartScreenState extends State<CartScreen>
     final paymentListener = context.watch<PaymentProvider>();
     final orderProvider = context.read<OrderProvider>();
     final userListener = context.watch<UserProvider>();
+    final userProvider = context.read<UserProvider>();
 
     return Visibility(
       visible: !cartListener.isCartEmpty &&
@@ -523,6 +528,19 @@ class _CartScreenState extends State<CartScreen>
                                               return;
                                             }
 
+                                            if (userProvider.userData?.user
+                                                    .isMobileVerified !=
+                                                "Yes") {
+                                              final verified =
+                                                  await mobileVerificationDialog(
+                                                context,
+                                              );
+
+                                              if (!verified) return;
+
+                                              cartProvider.jumpToPage(2);
+                                              return;
+                                            }
                                             cartProvider.jumpToPage(2);
                                           },
                                     child: Container(
@@ -1471,6 +1489,231 @@ class _CartScreenState extends State<CartScreen>
         ),
       );
     });
+  }
+
+  /// Shows a mobile verification dialog
+  Future<bool> mobileVerificationDialog(BuildContext context) async {
+    final otpProvider = context.read<OtpProvider>();
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return const _MobileVerificationDialogContent();
+      },
+    );
+
+    // Clean up OTP resources regardless of how dialog was dismissed
+    otpProvider.stopTimer();
+    otpProvider.clear();
+    return result ?? false;
+  }
+}
+
+/// Internal widget for the mobile verification dialog content.
+/// Handles phone number input and OTP verification steps.
+class _MobileVerificationDialogContent extends StatefulWidget {
+  const _MobileVerificationDialogContent();
+
+  @override
+  State<_MobileVerificationDialogContent> createState() =>
+      _MobileVerificationDialogContentState();
+}
+
+class _MobileVerificationDialogContentState
+    extends State<_MobileVerificationDialogContent> {
+  final phoneController = TextEditingController();
+  final otpController = TextEditingController();
+  bool otpSent = false;
+  late final String countryCode;
+
+  @override
+  void initState() {
+    super.initState();
+    final userProvider = context.read<UserProvider>();
+    final authProvider = context.read<AuthProvider>();
+    phoneController.text = userProvider.userData?.user.userMobile ?? '';
+    countryCode = AppConfig.instance.country.dialCode;
+  }
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    otpController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final otpProvider = context.read<OtpProvider>();
+    final userProvider = context.read<UserProvider>();
+    final otpListener = context.watch<OtpProvider>();
+    final authProvider = context.read<AuthProvider>();
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      title: Column(
+        children: [
+          Text(
+            "Mobile Verification",
+            style: context.customTextTheme.text18W600,
+          ),
+          if (!otpSent) ...[
+            verticalSpaceTiny,
+            Text(
+              "Enter your mobile number to verify",
+              textAlign: TextAlign.center,
+              style: context.customTextTheme.text14W500,
+            ),
+          ],
+        ],
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!otpSent)
+              TextFormField(
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  prefixText: '$countryCode ',
+                  labelText: 'Mobile Number',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              )
+            else ...[
+              Text(
+                "Enter the OTP sent to $countryCode ${phoneController.text}",
+                textAlign: TextAlign.center,
+                style: context.customTextTheme.text14W500,
+              ),
+              verticalSpaceRegular,
+              PinCodeTextField(
+                length: 6,
+                obscureText: false,
+                animationType: AnimationType.scale,
+                pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(10.0),
+                  activeColor: AppColors.kBlack2,
+                  inactiveColor: AppColors.kBlack2,
+                  inactiveFillColor: AppColors.kOffWhite3,
+                  activeFillColor: AppColors.kOffWhite3,
+                  selectedColor: AppColors.kBlack2,
+                  selectedFillColor: AppColors.kOffWhite3,
+                  fieldHeight: MediaQuery.of(context).size.height / 20,
+                  fieldWidth: MediaQuery.of(context).size.width / 11,
+                  fieldOuterPadding: const EdgeInsets.symmetric(horizontal: 2),
+                ),
+                controller: otpController,
+                showCursor: false,
+                animationDuration: const Duration(milliseconds: 300),
+                enableActiveFill: true,
+                keyboardType: TextInputType.phone,
+                onCompleted: (v) {},
+                onChanged: (value) {},
+                appContext: context,
+                autoDisposeControllers: false,
+              ),
+              if (otpListener.canResend)
+                TextButton(
+                  onPressed: otpListener.loading
+                      ? null
+                      : () async {
+                          await otpProvider.sendPhoneOtp(
+                            phone: phoneController.text.trim(),
+                            countryCode: countryCode,
+                            purpose: OtpPurpose.phoneVerification,
+                          );
+                        },
+                  child: const Text("Resend OTP"),
+                )
+              else
+                Text(
+                  "Resend OTP in ${otpListener.seconds} seconds",
+                  style: context.customTextTheme.text12W500
+                      .copyWith(color: AppColors.kGray3),
+                ),
+            ],
+            verticalSpaceSmall,
+            if (otpListener.loading)
+              const Center(child: CircularProgressIndicator()),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+          child: Text(
+            "Cancel",
+            style: context.customTextTheme.text14W600,
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          onPressed: otpListener.loading
+              ? null
+              : () async {
+                  if (!otpSent) {
+                    // Step 1: Send OTP
+                    final phone = phoneController.text.trim();
+                    if (phone.isEmpty) {
+                      AlertDialogs.showError("Please enter your mobile number",
+                          context: context);
+                      return;
+                    }
+                    final sent = await otpProvider.sendPhoneOtp(
+                      phone: phone,
+                      countryCode: countryCode,
+                      purpose: OtpPurpose.phoneVerification,
+                    );
+                    if (sent && mounted) {
+                      setState(() => otpSent = true);
+                    }
+                  } else {
+                    // Step 2: Verify OTP
+                    final otp = otpController.text.trim();
+                    if (otp.isEmpty) {
+                      AlertDialogs.showError("Please enter the OTP",
+                          context: context);
+                      return;
+                    }
+                    final isValid = await otpProvider.verifyPhoneOtp(
+                        phone: phoneController.text.trim(),
+                        countryCode: countryCode,
+                        purpose: OtpPurpose.phoneVerification,
+                        otp: otp,
+                        userID: userProvider.userData?.user.userID ?? '',
+                        userType: 'Registered');
+                    if (isValid) {
+                      await authProvider.loginUser();
+                      await userProvider.getUserData();
+                      if (mounted) {
+                        Navigator.of(context).pop(true);
+                      }
+                    }
+                  }
+                },
+          child: Text(
+            otpSent ? "Verify" : "Send OTP",
+            style: context.customTextTheme.text14W600
+                .copyWith(color: AppColors.kWhite),
+          ),
+        ),
+      ],
+    );
   }
 }
 

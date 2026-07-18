@@ -30,7 +30,7 @@ class _OtpScreenState extends State<OtpScreen> {
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (_, __) =>
-          authProvider.registerOTPController.clear(),
+          authProvider.emailOtpController.clear(),
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -96,7 +96,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       fieldHeight: 52,
                       fieldWidth: 52,
                     ),
-                    controller: authProvider.registerOTPController,
+                    controller: authProvider.emailOtpController,
                     showCursor: false,
                     animationDuration: const Duration(milliseconds: 300),
                     enableActiveFill: true,
@@ -130,7 +130,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 verticalSpaceMedium,
                 InkWell(
                   onTap: () async {
-                    final validated = await authProvider.validateRegisterOTP();
+                    final validated = await authProvider.validateEmailForm();
                     if (validated) {
                       authProvider.registerUser().then((registered) {
                         if (registered) {

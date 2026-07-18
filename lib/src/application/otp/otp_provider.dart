@@ -88,6 +88,11 @@ class OtpProvider extends ChangeNotifier {
         (result) {
           _otpTokenId = result.otpToken; // <-- use tokenId
           debugPrint("OTP Token: $_otpTokenId");
+          if (_otpTokenId == null || _otpTokenId!.isEmpty) {
+            AlertDialogs.showError(
+                "Failed to get OTP token. Please try again.");
+            return false;
+          }
           startTimer();
           return true;
         },
@@ -102,6 +107,9 @@ class OtpProvider extends ChangeNotifier {
     required String phone,
     required String countryCode,
     required OtpPurpose purpose,
+    required String otp,
+    required String userID,
+    required String userType
   }) async {
     try {
       _loading = true;
@@ -110,10 +118,14 @@ class OtpProvider extends ChangeNotifier {
         shopID: AppIdentifiers.kShopId,
         phone: phone,
         countryCode: countryCode,
-        otp: otpController.text,
+        otp: otp,
         purpose: purpose.value,
-        tokenId: _otpTokenId ?? "",
+        tokenId: otpTokenId ?? "",
+        userID:userID,
+        userType: userType,
+
       );
+      print("verify response: $response");
       return response.fold(
         () => true,
         (error) {

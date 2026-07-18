@@ -23,7 +23,7 @@ class ForgotOtpScreen extends GetProviderView<AuthProvider> {
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (_, __) =>
-          authProvider.registerOTPController.clear(),
+          authProvider.emailOtpController.clear(),
       child: Scaffold(
         appBar: AppBar(elevation: 0),
         body: Padding(

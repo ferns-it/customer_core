@@ -45,11 +45,32 @@ class UserRegisterResponse {
 
   factory UserRegisterResponse.fromMap(Map<String, dynamic> map) {
     return UserRegisterResponse(
-      message: map['message'] as String,
-      activationCode: map['activationCode'] as String,
-      token: map['token'] as String,
-      expireAt: map['expireAt'] != null ? map['expireAt'] as int : null,
-      user: User.fromMap(map['user'] as Map<String, dynamic>),
+      message: map['message']?.toString() ?? '',
+      activationCode: map['activationCode']?.toString() ?? '',
+      token: map['token']?.toString() ?? '',
+      expireAt: map['expireAt'] == null
+          ? null
+          : (map['expireAt'] is int
+              ? map['expireAt'] as int
+              : int.tryParse(map['expireAt'].toString())),
+      user: map['user'] is Map
+          ? User.fromMap(map['user'] as Map<String, dynamic>)
+          : User(
+              userID: null,
+              shopID: null,
+              userFirstName: null,
+              userLastName: null,
+              userAddress: null,
+              userPostCode: null,
+              userMobile: null,
+              userEmail: null,
+              userPassword: null,
+              userStatus: null,
+              addedTime: null,
+              userActivationCode: null,
+              isMobileVerified:null,
+              isEmailVerified:null
+            ),
     );
   }
 

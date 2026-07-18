@@ -36,6 +36,7 @@ class Endpoints {
   static const String kActiveOrders = 'shop/user/activeorders/';
   static const String kVerifyAlreadyRegistered =
       'shop/user/verifyalreadyregistered';
+  static const String kLinkPartialUser = 'shop/user/linkpartialuser';
   static const String kUserConsent = 'shop/user/getconsents/';
   static const String kSaveUserConsent = 'shop/user/saveconsent';
 

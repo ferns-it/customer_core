@@ -12,12 +12,14 @@ abstract class IOtpRepo {
     required String userID,
   });
 
- Future<Option<AppExceptions>> verifyPhoneOtp({
+  Future<Option<AppExceptions>> verifyPhoneOtp({
     required String shopID,
     required String phone,
     required String countryCode,
+    required String purpose,
     required String otp,
-        required String purpose,
     required String tokenId,
+    required String userID,
+    required String userType,
   });
 }

@@ -38,7 +38,8 @@ enum RegStage {
   otpEmail, // email OTP verification
   otpPhone, // phone OTP verification
   register,
-  success
+  success,
+  mobileChoice
 }
 
 @LazySingleton()
@@ -119,6 +120,13 @@ class AuthProvider extends ChangeNotifier with BaseController {
   bool emailVerifying = false;
   bool phoneVerifying = false;
 
+  // Verify Later / Skip OTP flow
+  bool _otpSkipped = false;
+  bool get otpSkipped => _otpSkipped;
+
+  bool _mobileVerifiedLater = false;
+  bool get mobileVerifiedLater => _mobileVerifiedLater;
+
   // Error messages for OTP
   String _emailOtpError = '';
   String get emailOtpError => _emailOtpError;
@@ -127,16 +135,44 @@ class AuthProvider extends ChangeNotifier with BaseController {
   String get phoneOtpError => _phoneOtpError;
   bool contactLoading = false;
 
-void setContactLoading(bool value) {
-  contactLoading = value;
-  notifyListeners();
-}
+  bool isEditingEmail = false;
+  bool isEditingMobile = false;
+
+  void disableEmailEdit() {
+    isEditingEmail = false;
+    notifyListeners();
+  }
+
+  void enableEmailEdit() {
+    isEditingEmail = true;
+    emailOtpController.clear();
+    _emailOtpVerified = false;
+    _emailOtpError = "";
+    notifyListeners();
+  }
+
+  void enableMobileEdit() {
+    isEditingMobile = true;
+    phoneOtpController.clear();
+    _phoneOtpVerified = false;
+    _phoneOtpError = "";
+    notifyListeners();
+  }
+
+  void disableMobileEdit() {
+    isEditingMobile = false;
+    notifyListeners();
+  }
+
+  void setContactLoading(bool value) {
+    contactLoading = value;
+    notifyListeners();
+  }
 
   bool get registrationButtonLoading {
     switch (_currentRegStage) {
       case RegStage.contact:
-      return contactLoading;
-
+        return contactLoading;
 
       case RegStage.otpEmail:
         return sendOtpLoading || verifyOtpLoading;
@@ -148,6 +184,8 @@ void setContactLoading(bool value) {
         return registerLoading;
 
       case RegStage.success:
+        return false;
+      case RegStage.mobileChoice:
         return false;
     }
   }
@@ -181,8 +219,8 @@ void setContactLoading(bool value) {
   bool _registerPasswordHide = true;
 
   bool get registerPasswordHide => _registerPasswordHide;
-  bool _confirmPasswordHide=true;
-  bool get confirmPasswordHide=> _confirmPasswordHide;
+  bool _confirmPasswordHide = true;
+  bool get confirmPasswordHide => _confirmPasswordHide;
 
   final resetFormKey = GlobalKey<FormBuilderState>();
 
@@ -218,7 +256,7 @@ void setContactLoading(bool value) {
 
   AuthView _selectedAuthView = AuthView.login;
   AuthView get selectedAuthView => _selectedAuthView;
-    UserLoginResponse? _userData;
+  UserLoginResponse? _userData;
 
   UserLoginResponse? get userData => _userData;
 
@@ -238,6 +276,13 @@ void setContactLoading(bool value) {
     notifyListeners();
   }
 
+  // void resetVerificationAfterBack() {
+  //   _emailRequired = false;
+  //   _smsRequired = false;
+  //   phoneOtpController.clear();
+  //   notifyListeners();
+  // }
+
   void initializeOtpRequirement(StoreSettingsDataModel settings) {
     _smsRequired = settings.smsVerification == "Enabled";
     _emailRequired = settings.emailVerification == "Enabled";
@@ -253,8 +298,9 @@ void setContactLoading(bool value) {
     _registerPasswordHide = !_registerPasswordHide;
     notifyListeners();
   }
-  void confirmRegisterPassword(){
-    _confirmPasswordHide=!_confirmPasswordHide;
+
+  void confirmRegisterPassword() {
+    _confirmPasswordHide = !_confirmPasswordHide;
     notifyListeners();
   }
 
@@ -294,6 +340,14 @@ void setContactLoading(bool value) {
 
   void updateCurrentRegStage(RegStage stage) {
     _currentRegStage = stage;
+    if (stage == RegStage.otpEmail) {
+      isEditingEmail = false;
+    }
+
+    if (stage == RegStage.otpPhone) {
+      isEditingMobile = false;
+    }
+
     notifyListeners();
   }
 
@@ -310,6 +364,8 @@ void setContactLoading(bool value) {
         return 2;
       case RegStage.success:
         return 3;
+      case RegStage.mobileChoice:
+        return 4;
     }
   }
 
@@ -449,6 +505,8 @@ void setContactLoading(bool value) {
 
   void initializeRegistrationFlow() {
     _currentRegStage = RegStage.contact;
+    isEditingEmail = true;
+    isEditingMobile = true;
     _emailOtpSent = false;
     _phoneOtpSent = false;
     _emailOtpVerified = false;
@@ -456,6 +514,25 @@ void setContactLoading(bool value) {
     _registrationOTP = null;
     _emailOtpError = '';
     _phoneOtpError = '';
+    _otpSkipped = false;
+    _mobileVerifiedLater = false;
+    notifyListeners();
+  }
+
+  /// Skip OTP flow and proceed directly to register stage
+  void skipMobileVerification() {
+    _otpSkipped = true;
+    _mobileVerifiedLater = true;
+    _phoneOtpVerified = false;
+    _currentRegStage = RegStage.register;
+    notifyListeners();
+  }
+
+  /// Proceed after verifying OTP (Verify Now flow)
+  void verifyNowAndProceed() {
+    _otpSkipped = false;
+    _mobileVerifiedLater = false;
+    _currentRegStage = RegStage.register;
     notifyListeners();
   }
 
@@ -488,7 +565,7 @@ void setContactLoading(bool value) {
         _currentRegStage = RegStage.otpEmail;
       } else {
         // Only SMS enabled
-        _currentRegStage = RegStage.otpPhone;
+        _currentRegStage = RegStage.mobileChoice;
       }
 
       notifyListeners();
@@ -571,7 +648,7 @@ void setContactLoading(bool value) {
         phone: registerUserPhoneController.text,
         countryCode: AppConfig.instance.country.dialCode,
         otp: phoneOtpController.text,
-        userID:_userData?.user.userID??'',
+        userID: _userData?.user.userID ?? '',
         userType: 'Registered',
       );
       return result;
@@ -641,8 +718,8 @@ void setContactLoading(bool value) {
           phone: registerUserPhoneController.text,
           countryCode: AppConfig.instance.country.dialCode,
           otp: phoneOtpController.text,
-            userID:_userData?.user.userID??'',
-        userType: 'Registered',
+          userID: _userData?.user.userID ?? '',
+          userType: 'Registered',
         );
 
         if (!phoneResult) {
@@ -738,20 +815,24 @@ void setContactLoading(bool value) {
     try {
       _registerLoading = true;
       notifyListeners();
+
       final payload = UserRegisterRequest(
-          shopID: AppIdentifiers.kShopId,
-          userFirstName: registerUserFirstNameController.text,
-          userLastName: registerUserLastNameController.text,
-          userEmail: registerUserEmailController.text,
-          userMobile: registerUserPhoneController.text,
-          userPassword: registerUserPasswordController.text,
-          countryCode: countryCode ?? AppConfig.instance.country.dialCode,
-          userAddress: UserAddress.empty(),
-          userPostCode: '',
-          userMobileToken: otpProvider.otpTokenId,
-          isEmailVerified: 'Yes');
+        shopID: AppIdentifiers.kShopId,
+        userFirstName: registerUserFirstNameController.text,
+        userLastName: registerUserLastNameController.text,
+        userEmail: registerUserEmailController.text,
+        userMobile: registerUserPhoneController.text,
+        userPassword: registerUserPasswordController.text,
+        countryCode: countryCode ?? AppConfig.instance.country.dialCode,
+        userAddress: UserAddress.empty(),
+        userPostCode: '',
+        userMobileToken: _mobileVerifiedLater ? "" : otpProvider.otpTokenId,
+        isEmailVerified: 'Yes',
+        mobileVerifiedLater: _mobileVerifiedLater ? "Yes" : "No",
+      );
       final response = await userRepository.registerUser(payload);
       print("Mobile OTP Token in Payload: ${payload.userMobileToken}");
+      print("Mobile Verified Later: ${payload.mobileVerifiedLater}");
       return response.fold(
         (error) {
           AlertDialogs.showError(error.message);

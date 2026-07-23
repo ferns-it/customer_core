@@ -47,9 +47,9 @@ class ShopProvider extends ChangeNotifier with BaseController {
   bool isLoading = false;
   String? errorMessage;
 
-  List<SmsAvailableCountrieData> smsCountries = [];
+  List<SmsAvailableCountriesData> smsCountries = [];
 
-  SmsAvailableCountrieData? selectedCountry;
+  SmsAvailableCountriesData? selectedCountry;
 
   List<StoreDeliverySlotDataModelResponse>? get slotForSelectedDate {
     final slots = _deliverySlots.data?.deliverySlots;
@@ -166,7 +166,7 @@ class ShopProvider extends ChangeNotifier with BaseController {
     );
   }
 
-  void updateSelectedCountry(SmsAvailableCountrieData country) {
+  void updateSelectedCountry(SmsAvailableCountriesData country) {
     selectedCountry = country;
     notifyListeners();
   }

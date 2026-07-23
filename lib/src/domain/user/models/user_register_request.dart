@@ -12,6 +12,7 @@ class UserRegisterRequest {
   final UserAddress userAddress;
   final String? userMobileToken;
   final String? isEmailVerified;
+  final String? mobileVerifiedLater;
 
   UserRegisterRequest({
     required this.shopID,
@@ -23,8 +24,9 @@ class UserRegisterRequest {
     required this.userPassword,
     required this.countryCode,
     required this.userAddress,
-    this.userMobileToken,
-    this.isEmailVerified,
+    required this.userMobileToken,
+    required this.isEmailVerified,
+    required this.mobileVerifiedLater,
   });
 
   UserRegisterRequest copyWith({
@@ -38,7 +40,8 @@ class UserRegisterRequest {
     String? countryCode,
     UserAddress? userAddress,
     String? userMobileToken,
-    String?isEmailVerified,
+    String? isEmailVerified,
+    String? mobileVerifiedLater,
   }) {
     return UserRegisterRequest(
       shopID: shopID ?? this.shopID,
@@ -51,7 +54,8 @@ class UserRegisterRequest {
       countryCode: countryCode ?? this.countryCode,
       userAddress: userAddress ?? this.userAddress,
       userMobileToken: userMobileToken ?? this.userMobileToken,
-      isEmailVerified:isEmailVerified??this.isEmailVerified
+      isEmailVerified: isEmailVerified ?? this.isEmailVerified,
+      mobileVerifiedLater: mobileVerifiedLater ?? this.mobileVerifiedLater,
     );
   }
 
@@ -67,7 +71,8 @@ class UserRegisterRequest {
       'countryCode': countryCode,
       'userAddress': userAddress.toMap(),
       'userMobileToken': userMobileToken,
-      'isEmailVerified':isEmailVerified,
+      'isEmailVerified': isEmailVerified,
+      'mobileVerifiedLater': mobileVerifiedLater,
     };
   }
 
@@ -85,6 +90,7 @@ class UserRegisterRequest {
           UserAddress.fromMap(map['userAddress'] as Map<String, dynamic>),
       userMobileToken: map['userMobileToken'] as String?,
       isEmailVerified: map['isEmailVerified'] as String?,
+      mobileVerifiedLater: map['mobileVerifiedLater'] as String?,
     );
   }
 
@@ -95,7 +101,7 @@ class UserRegisterRequest {
 
   @override
   String toString() {
-    return 'UserRegisterRequest(shopID: $shopID, userFirstName: $userFirstName, userLastName: $userLastName, userPostCode: $userPostCode, userMobile: $userMobile, userEmail: $userEmail, userPassword: $userPassword, userAddress: $userAddress,userMobileToken: $userMobileToken,isEmailVerified:$isEmailVerified)';
+    return 'UserRegisterRequest(shopID: $shopID, userFirstName: $userFirstName, userLastName: $userLastName, userPostCode: $userPostCode, userMobile: $userMobile, userEmail: $userEmail, userPassword: $userPassword, userAddress: $userAddress,userMobileToken: $userMobileToken,isEmailVerified:$isEmailVerified,mobileVerifiedLater:$mobileVerifiedLater)';
   }
 
   @override
@@ -110,8 +116,9 @@ class UserRegisterRequest {
         other.userEmail == userEmail &&
         other.userPassword == userPassword &&
         other.userAddress == userAddress &&
-        other.userMobileToken == userMobileToken&&
-        other.isEmailVerified==isEmailVerified;
+        other.userMobileToken == userMobileToken &&
+        other.isEmailVerified == isEmailVerified &&
+        other.mobileVerifiedLater == mobileVerifiedLater;
   }
 
   @override
@@ -124,8 +131,9 @@ class UserRegisterRequest {
         userEmail.hashCode ^
         userPassword.hashCode ^
         userAddress.hashCode ^
-        userMobileToken.hashCode^
-        isEmailVerified.hashCode;
+        userMobileToken.hashCode ^
+        isEmailVerified.hashCode ^
+        mobileVerifiedLater.hashCode;
   }
 }
 

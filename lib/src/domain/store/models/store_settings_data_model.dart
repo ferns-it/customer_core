@@ -27,7 +27,7 @@ class StoreSettingsDataModel {
   final String? hash;
   final String? smsVerification;
   final String? emailVerification;
-  final List<SmsAvailableCountrieData> smsAvailableCountries;
+  final List<SmsAvailableCountriesData> smsAvailableCountries;
 
   StoreSettingsDataModel({
     this.id,
@@ -78,7 +78,9 @@ class StoreSettingsDataModel {
     String? footerColor,
     StoreTableReservationSettings? tableReservationSettings,
     String? hash,
-    List<SmsAvailableCountrieData>? smsAvailableCountries,
+    String? smsVerification,
+    String? emailVerification,
+    List<SmsAvailableCountriesData>? smsAvailableCountries,
   }) {
     return StoreSettingsDataModel(
       id: id ?? this.id,
@@ -103,6 +105,8 @@ class StoreSettingsDataModel {
       tableReservationSettings:
           tableReservationSettings ?? this.tableReservationSettings,
       hash: hash ?? this.hash,
+      smsVerification: smsVerification ?? this.smsVerification,
+      emailVerification: emailVerification ?? this.emailVerification,
       smsAvailableCountries:
           smsAvailableCountries ?? this.smsAvailableCountries,
     );
@@ -131,6 +135,8 @@ class StoreSettingsDataModel {
       'footerColor': footerColor,
       'tableReservationSettings': tableReservationSettings?.toMap(),
       'hash': hash,
+      'smsVerification': smsVerification,
+      'emailVerification': emailVerification,
       'smsAvailableCountries':
           smsAvailableCountries.map((x) => x.toMap()).toList(),
     };
@@ -184,10 +190,10 @@ class StoreSettingsDataModel {
       emailVerification: map['emailVerification'] != null
           ? map['emailVerification'] as String
           : null,
-      smsAvailableCountries: List<SmsAvailableCountrieData>.from(
+      smsAvailableCountries: List<SmsAvailableCountriesData>.from(
         (map['smsAvailableCountries'] as List<dynamic>)
-            .map<SmsAvailableCountrieData>(
-          (x) => SmsAvailableCountrieData.fromMap(x as Map<String, dynamic>),
+            .map<SmsAvailableCountriesData>(
+          (x) => SmsAvailableCountriesData.fromMap(x as Map<String, dynamic>),
         ),
       ),
     );
@@ -229,6 +235,8 @@ class StoreSettingsDataModel {
         other.footerColor == footerColor &&
         other.tableReservationSettings == tableReservationSettings &&
         other.hash == hash &&
+        other.smsVerification == smsVerification &&
+        other.emailVerification == emailVerification &&
         listEquals(other.smsAvailableCountries, smsAvailableCountries);
   }
 
@@ -255,6 +263,8 @@ class StoreSettingsDataModel {
         footerColor.hashCode ^
         tableReservationSettings.hashCode ^
         hash.hashCode ^
+        smsVerification.hashCode ^
+        emailVerification.hashCode ^
         smsAvailableCountries.hashCode;
   }
 }
@@ -776,22 +786,22 @@ class StoreTableReservationSettings {
       haveAdvance.hashCode ^ advanceAmount.hashCode ^ advanceType.hashCode;
 }
 
-class SmsAvailableCountrieData {
+class SmsAvailableCountriesData {
   final String? iso;
   final String? name;
   final String? code;
-  SmsAvailableCountrieData({
+  SmsAvailableCountriesData({
     this.iso,
     this.name,
     this.code,
   });
 
-  SmsAvailableCountrieData copyWith({
+  SmsAvailableCountriesData copyWith({
     String? iso,
     String? name,
     String? code,
   }) {
-    return SmsAvailableCountrieData(
+    return SmsAvailableCountriesData(
       iso: iso ?? this.iso,
       name: name ?? this.name,
       code: code ?? this.code,
@@ -806,8 +816,8 @@ class SmsAvailableCountrieData {
     };
   }
 
-  factory SmsAvailableCountrieData.fromMap(Map<String, dynamic> map) {
-    return SmsAvailableCountrieData(
+  factory SmsAvailableCountriesData.fromMap(Map<String, dynamic> map) {
+    return SmsAvailableCountriesData(
       iso: map['iso'] != null ? map['iso'] as String : null,
       name: map['name'] != null ? map['name'] as String : null,
       code: map['code'] != null ? map['code'] as String : null,
@@ -816,16 +826,16 @@ class SmsAvailableCountrieData {
 
   String toJson() => json.encode(toMap());
 
-  factory SmsAvailableCountrieData.fromJson(String source) =>
-      SmsAvailableCountrieData.fromMap(
+  factory SmsAvailableCountriesData.fromJson(String source) =>
+      SmsAvailableCountriesData.fromMap(
           json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() =>
-      'SmsAvailableCountrieData(iso: $iso, name: $name, code: $code)';
+      'SmsAvailableCountriesData(iso: $iso, name: $name, code: $code)';
 
   @override
-  bool operator ==(covariant SmsAvailableCountrieData other) {
+  bool operator ==(covariant SmsAvailableCountriesData other) {
     if (identical(this, other)) return true;
 
     return other.iso == iso && other.name == name && other.code == code;
@@ -835,7 +845,7 @@ class SmsAvailableCountrieData {
   int get hashCode => iso.hashCode ^ name.hashCode ^ code.hashCode;
 }
 
-extension CountryFlag on SmsAvailableCountrieData {
+extension CountryFlag on SmsAvailableCountriesData {
   String get flagEmoji {
     final countryCode = iso?.toUpperCase() ?? "";
 

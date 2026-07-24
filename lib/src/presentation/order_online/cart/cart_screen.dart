@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
+import 'package:customer_core/src/core/utils/country_flag.dart';
+import 'package:customer_core/src/domain/store/models/store_settings_data_model.dart';
 import 'package:dartx/dartx.dart';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -21,6 +23,8 @@ import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/core/utils/date_utils.dart';
 import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:customer_core/src/domain/otp/otp_purpose.dart';
+import 'package:customer_core/src/domain/user/models/user.dart';
+import 'package:customer_core/src/domain/user/models/user_login_response.dart';
 import 'package:customer_core/src/presentation/auth/login_screen.dart';
 import 'package:customer_core/src/presentation/widgets/bottom_sheet_drag_handler.dart';
 import 'package:customer_core/src/presentation/widgets/custom_close_icon.dart';
@@ -28,6 +32,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../../application/order/order_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/country_flag.dart';
 import '../../../core/utils/utils.dart';
 
 import '../../widgets/button_progress.dart';
@@ -340,6 +345,8 @@ class _CartScreenState extends State<CartScreen>
     final userListener = context.watch<UserProvider>();
     final userProvider = context.read<UserProvider>();
     final authProvider = context.read<AuthProvider>();
+    final storeSettings = shopListener.storeSettings.data;
+    final smsRequired = storeSettings?.smsVerification == "Enabled";
 
     return Visibility(
       visible: !cartListener.isCartEmpty &&
@@ -529,20 +536,54 @@ class _CartScreenState extends State<CartScreen>
                                               return;
                                             }
 
-                                            if (userProvider.userData?.user
-                                                        .isMobileVerified !=
-                                                    "Yes" &&
-                                                authProvider.smsRequired) {
+                                            // if (userProvider.userData?.user
+                                            //             .isMobileVerified !=
+                                            //         "Yes" &&
+                                            //     smsRequired) {
+                                            //   final verified =
+                                            //       await mobileVerificationDialog(
+                                            //     context,
+                                            //   );
+
+                                            //   if (!verified) return;
+
+                                            //   cartProvider.jumpToPage(2);
+                                            //   return;
+                                            // }
+                                            // cartProvider.jumpToPage(2);
+                                            final user =
+                                                userProvider.userData?.user;
+
+// SMS verification disabled but no phone number
+                                            if (!smsRequired &&
+                                                (user?.userMobile == '0' ||
+                                                    user!.userMobile!
+                                                        .trim()
+                                                        .isEmpty)) {
+                                              final phoneAdded =
+                                                  await mobileNumberDialog(
+                                                      context);
+
+                                              if (!phoneAdded) return;
+
+                                              cartProvider.jumpToPage(2);
+                                              return;
+                                            }
+
+// SMS verification enabled
+                                            if (smsRequired &&
+                                                user?.isMobileVerified !=
+                                                    "Yes") {
                                               final verified =
                                                   await mobileVerificationDialog(
-                                                context,
-                                              );
+                                                      context);
 
                                               if (!verified) return;
 
                                               cartProvider.jumpToPage(2);
                                               return;
                                             }
+
                                             cartProvider.jumpToPage(2);
                                           },
                                     child: Container(
@@ -1511,6 +1552,221 @@ class _CartScreenState extends State<CartScreen>
   }
 }
 
+Future<bool> mobileNumberDialog(BuildContext context) async {
+  final authProvider = context.read<AuthProvider>();
+  final userProvider = context.read<UserProvider>();
+  final formKey = GlobalKey<FormState>();
+  bool isLoading = false;
+
+  authProvider.registerUserPhoneController.clear();
+
+  return await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          return StatefulBuilder(
+            builder: (context, setDialogState) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                title: Column(
+                  children: [
+                    Text(
+                      "Add Mobile Number",
+                      style: context.customTextTheme.text18W600,
+                    ),
+                    verticalSpaceTiny,
+                    Text(
+                      "A mobile number is required to place your order. Enter your number below to continue.",
+                      style: context.customTextTheme.text14W500.copyWith(
+                        color: AppColors.kGray3,
+                      ),
+                    ),
+                  ],
+                ),
+                content: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.kGray3),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            // Container(
+                            //   padding:
+                            //       const EdgeInsets.symmetric(horizontal: 12),
+                            //   decoration: BoxDecoration(
+                            //     border: Border(
+                            //       right: BorderSide(color: AppColors.kGray3),
+                            //     ),
+                            //   ),
+                            //   child: DropdownButtonHideUnderline(
+                            //     child: DropdownButton<String>(
+                            //       value: shopProvider.selectedCountry?.code ??
+                            //           AppConfig.instance.country.dialCode,
+                            //       isDense: true,
+                            //       icon: const Icon(Icons.arrow_drop_down),
+                            //       style: context.customTextTheme.text14W500,
+                            //       items:
+                            //           shopProvider.smsCountries.map((country) {
+                            //         return DropdownMenuItem(
+                            //           value: country.code,
+                            //           child: Row(
+                            //             mainAxisSize: MainAxisSize.min,
+                            //             children: [
+                            //               Text(
+                            //                 countryCodeToEmoji(
+                            //                     country.iso ?? ""),
+                            //                 style:
+                            //                     const TextStyle(fontSize: 16),
+                            //               ),
+                            //               const SizedBox(width: 6),
+                            //               Text(
+                            //                 country.code ?? "",
+                            //                 style:
+                            //                     const TextStyle(fontSize: 14),
+                            //               ),
+                            //             ],
+                            //           ),
+                            //         );
+                            //       }).toList(),
+                            //       onChanged: (value) {
+                            //         if (value != null) {
+                            //           final country = shopProvider.smsCountries
+                            //               .firstWhere((c) => c.code == value);
+                            //           shopProvider
+                            //               .updateSelectedCountry(country);
+                            //         }
+                            //       },
+                            //     ),
+                            //   ),
+                            // ),
+                            Expanded(
+                              child: TextFormField(
+                                controller:
+                                    authProvider.registerUserPhoneController,
+                                keyboardType: TextInputType.phone,
+                                decoration: InputDecoration(
+                                  labelText: 'Mobile Number',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // verticalSpaceSmall,
+                      // Text(
+                      //   "Example: 7700000000",
+                      //   style: context.customTextTheme.text12W500
+                      //       .copyWith(color: AppColors.kGray3),
+                      //   textAlign: TextAlign.start,
+                      // ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: isLoading
+                        ? null
+                        : () => Navigator.pop(dialogContext, false),
+                    child: Text(
+                      "Cancel",
+                      style: context.customTextTheme.text14W600,
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                    ),
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            // if (!formKey.currentState!.validate()) return;
+
+                            setDialogState(() => isLoading = true);
+
+                            final success =
+                                await userProvider.updateBasicProfile(
+                              firstName:
+                                  userProvider.userData?.user.userFirstName ??
+                                      "",
+                              lastName:
+                                  userProvider.userData?.user.userLastName ??
+                                      "",
+                              mobile: authProvider
+                                  .registerUserPhoneController.text
+                                  .trim(),
+                            );
+
+                            if (success && context.mounted) {
+                              // Update local user data with the new mobile number
+                              if (userProvider.userData != null) {
+                                final updatedUserData = UserLoginResponse(
+                                  user: User(
+                                    userID: userProvider.userData!.user.userID,
+                                    shopID: userProvider.userData!.user.shopID,
+                                    userFirstName: userProvider.userData!.user.userFirstName,
+                                    userLastName: userProvider.userData!.user.userLastName,
+                                    userAddress: userProvider.userData!.user.userAddress,
+                                    userPostCode: userProvider.userData!.user.userPostCode,
+                                    userMobile: authProvider.registerUserPhoneController.text.trim(),
+                                    userEmail: userProvider.userData!.user.userEmail,
+                                    userPassword: userProvider.userData!.user.userPassword,
+                                    userStatus: userProvider.userData!.user.userStatus,
+                                    addedTime: userProvider.userData!.user.addedTime,
+                                    userActivationCode: userProvider.userData!.user.userActivationCode,
+                                    isMobileVerified: userProvider.userData!.user.isMobileVerified,
+                                    isEmailVerified: userProvider.userData!.user.isEmailVerified,
+                                  ),
+                                  token: userProvider.userData!.token,
+                                  expireAt: userProvider.userData!.expireAt,
+                                );
+                                await userProvider.sharedPrefsRepository.saveUserData(updatedUserData);
+                                await userProvider.getUserData();
+                              }
+                              Navigator.pop(context, true);
+                            }
+                          },
+                    // child: isLoading
+                    //     ? const SizedBox(
+                    //         height: 16,
+                    //         width: 16,
+                    //         child: CircularProgressIndicator(
+                    //           strokeWidth: 2,
+                    //           color: AppColors.kWhite,
+                    //         ),
+                    //       )
+                    // :
+                    child: Text(
+                      "Save",
+                      style: context.customTextTheme.text14W600
+                          .copyWith(color: AppColors.kWhite),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ) ??
+      false;
+}
+
 /// Internal widget for the mobile verification dialog content.
 /// Handles phone number input and OTP verification steps.
 class _MobileVerificationDialogContent extends StatefulWidget {
@@ -1526,15 +1782,16 @@ class _MobileVerificationDialogContentState
   final phoneController = TextEditingController();
   final otpController = TextEditingController();
   bool otpSent = false;
-  late final String countryCode;
+  String countryCode = '';
 
   @override
   void initState() {
     super.initState();
     final userProvider = context.read<UserProvider>();
-    final authProvider = context.read<AuthProvider>();
+    final shopProvider = context.read<ShopProvider>();
     phoneController.text = userProvider.userData?.user.userMobile ?? '';
-    countryCode = AppConfig.instance.country.dialCode;
+    countryCode = shopProvider.selectedCountry?.code ??
+        AppConfig.instance.country.dialCode;
   }
 
   @override
@@ -1550,6 +1807,7 @@ class _MobileVerificationDialogContentState
     final userProvider = context.read<UserProvider>();
     final otpListener = context.watch<OtpProvider>();
     final authProvider = context.read<AuthProvider>();
+    final shopProvider = context.watch<ShopProvider>();
 
     return AlertDialog(
       shape: RoundedRectangleBorder(
@@ -1577,16 +1835,87 @@ class _MobileVerificationDialogContentState
           mainAxisSize: MainAxisSize.min,
           children: [
             if (!otpSent)
-              TextFormField(
-                controller: phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  prefixText: '$countryCode ',
-                  labelText: 'Mobile Number',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              Row(
+                children: [
+                  Flexible(
+                    flex: 23,
+                    child: Container(
+                      height: 50,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.kGray3),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<SmsAvailableCountriesData>(
+                          value: shopProvider.selectedCountry,
+                          isDense: true,
+                          dropdownColor: Colors.white,
+                          icon: const Icon(Icons.arrow_drop_down),
+                          selectedItemBuilder: (context) {
+                            return shopProvider.smsCountries.map((country) {
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    countryCodeToEmoji(country.iso ?? ""),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    country.code ?? "",
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              );
+                            }).toList();
+                          },
+                          items: shopProvider.smsCountries.map((country) {
+                            return DropdownMenuItem(
+                              value: country,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    countryCodeToEmoji(country.iso ?? ""),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    country.code ?? "",
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              shopProvider.updateSelectedCountry(value);
+                              setState(() {
+                                countryCode = value.code ??
+                                    AppConfig.instance.country.dialCode;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    flex: 40,
+                    child: TextFormField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: 'Mobile Number',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               )
             else ...[
               Text(

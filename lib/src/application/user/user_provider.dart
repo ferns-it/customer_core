@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:customer_core/src/domain/user/models/basic_profile_data_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -51,6 +52,9 @@ class UserProvider extends ChangeNotifier with BaseController {
   bool _isAddingOrUpdatingUserAddress = false;
 
   bool get isAddingOrUpdatingUserAddress => _isAddingOrUpdatingUserAddress;
+  bool _isUpdateBasicProfile = false;
+
+  bool get isUpdateBasicProfile => _isUpdateBasicProfile;
 
   bool _isUserAddressListLoading = false;
 
@@ -280,6 +284,40 @@ class UserProvider extends ChangeNotifier with BaseController {
       _isAddingOrUpdatingUserAddress = false;
       notifyListeners();
       await getAddressList();
+    }
+  }
+
+  Future<bool> updateBasicProfile({
+    required String firstName,
+    required String lastName,
+    required String mobile,
+  }) async {
+    try {
+      _isUpdateBasicProfile = true;
+      notifyListeners();
+
+      final data = BasicProfileDataModel(
+        userFirstName: firstName,
+        userLastName: lastName,
+        userMobile: mobile,
+      );
+
+      final Either<AppExceptions, String> response =
+          await userRepo.updateBasicProfile(data: data);
+      print("updateprofileResponse: $response");
+      return response.fold(
+        (error) {
+          AlertDialogs.showError(error.message);
+          return false;
+        },
+        (message) {
+          AlertDialogs.showSuccess(message);
+          return true;
+        },
+      );
+    } finally {
+      _isUpdateBasicProfile = false;
+      notifyListeners();
     }
   }
 

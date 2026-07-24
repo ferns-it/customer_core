@@ -1,3 +1,4 @@
+import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/core/constants/enums.dart';
 import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/domain/store/models/store_delivery_slot_model.dart';
@@ -157,13 +158,25 @@ class ShopProvider extends ChangeNotifier with BaseController {
         smsCountries = data.smsAvailableCountries ?? [];
 
         // Select the first country by default
-        if (smsCountries.isNotEmpty) {
-          selectedCountry = smsCountries.first;
-        }
+        // if (smsCountries.isNotEmpty) {
+        //   selectedCountry = smsCountries.first;
+        // }
 
+        setDefaultCountry();
         notifyListeners();
       },
     );
+  }
+
+  void setDefaultCountry() {
+    if (smsCountries.isEmpty) return;
+
+    selectedCountry = smsCountries.firstWhere(
+      (country) => country.code == AppConfig.instance.country.dialCode,
+      orElse: () => smsCountries.first,
+    );
+
+    notifyListeners();
   }
 
   void updateSelectedCountry(SmsAvailableCountriesData country) {

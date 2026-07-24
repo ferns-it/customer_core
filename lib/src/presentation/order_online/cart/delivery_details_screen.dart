@@ -202,7 +202,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                     ),
                                   ),
                                   userListener.userData?.user.userMobile ==
-                                              null ||
+                                              '0' ||
                                           userListener.userData?.user.userMobile
                                                   ?.isEmpty ==
                                               true

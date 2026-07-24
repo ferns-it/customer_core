@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/domain/user/models/basic_profile_data_model.dart';
 import 'package:customer_core/src/domain/user/models/user_consent_list_data_model.dart';
 import 'package:customer_core/src/domain/user/models/user_register_response.dart';
 import 'package:dio/dio.dart';
@@ -211,6 +212,25 @@ class UserRepo implements IUserRepo {
     }
   }
 
+  Future<Either<AppExceptions, String>> updateBasicProfile(
+      {required BasicProfileDataModel data,}) async {
+    try {
+      final response = await APIManager.put(
+        api: Endpoints.kUpdateBasicProfile,
+        needAuthentication: true,
+        data: data.toJson(),
+      );
+      if (response == null) return Left(InternalServerErrorException());
+      final decodedData = jsonDecode(response);
+      return Right(decodedData["message"]);
+    } on DioException catch (e) {
+      return Left(e.error is AppExceptions
+          ? e.error as AppExceptions
+          : InternalServerErrorException());
+    } catch (_) {
+      return Left(InternalServerErrorException());
+    }
+  }
   @override
   Future<Either<AppExceptions, String>> updateAddress(
       {required AddNewUserAddressRequestModel data,

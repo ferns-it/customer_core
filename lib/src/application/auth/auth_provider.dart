@@ -39,7 +39,8 @@ enum RegStage {
   otpPhone, // phone OTP verification
   register,
   success,
-  mobileChoice
+  mobileChoice,
+  otpCombined // Combined email + phone OTP on one page
 }
 
 @LazySingleton()
@@ -148,6 +149,8 @@ class AuthProvider extends ChangeNotifier with BaseController {
     emailOtpController.clear();
     _emailOtpVerified = false;
     _emailOtpError = "";
+    // Navigate back to contact stage to allow editing the email field
+    _currentRegStage = RegStage.contact;
     notifyListeners();
   }
 
@@ -186,6 +189,8 @@ class AuthProvider extends ChangeNotifier with BaseController {
       case RegStage.success:
         return false;
       case RegStage.mobileChoice:
+        return false;
+      case RegStage.otpCombined:
         return false;
     }
   }
@@ -366,6 +371,8 @@ class AuthProvider extends ChangeNotifier with BaseController {
         return 3;
       case RegStage.mobileChoice:
         return 4;
+      case RegStage.otpCombined:
+        return 5;
     }
   }
 
@@ -603,7 +610,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
   }
 
   /// Send phone OTP for the inline flow (resets state)
-  Future<bool> sendPhoneOtpForInline() async {
+  Future<bool> sendPhoneOtpForInline({String? countryCode}) async {
     _phoneOtpSending = true;
     _phoneOtpSent = false;
     _phoneOtpVerified = false;
@@ -611,7 +618,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
     phoneOtpController.clear();
     notifyListeners();
 
-    final result = await sendSmsOtp();
+    final result = await sendSmsOtp(countryCode: countryCode);
 
     _phoneOtpSending = false;
     if (result) {

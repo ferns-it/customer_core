@@ -1,3 +1,4 @@
+import 'package:customer_core/src/domain/user/models/basic_profile_data_model.dart';
 import 'package:customer_core/src/domain/user/models/user_consent_list_data_model.dart';
 import 'package:customer_core/src/domain/user/models/user_login_request.dart';
 import 'package:customer_core/src/domain/user/models/user_login_response.dart';
@@ -56,7 +57,9 @@ abstract class IUserRepo {
     required AddNewUserAddressRequestModel data,
     required String addressID,
   });
-
+  Future<Either<AppExceptions, String>> updateBasicProfile({
+    required BasicProfileDataModel data,
+  });
   Future<Option> deleteUserAddress({required String addressID});
 
   Future<Either<AppExceptions, String>> setDefaultUserAddress(

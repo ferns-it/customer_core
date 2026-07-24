@@ -39,6 +39,7 @@ class Endpoints {
   static const String kLinkPartialUser = 'shop/user/linkpartialuser';
   static const String kUserConsent = 'shop/user/getconsents/';
   static const String kSaveUserConsent = 'shop/user/saveconsent';
+  static const String kUpdateBasicProfile = 'shop/user/updatebasicprofile';
 
   // Cart Endpoints
   static const String kListCartItems = 'shop/user/carts';

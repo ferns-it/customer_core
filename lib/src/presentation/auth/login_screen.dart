@@ -698,6 +698,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (authListener.currentRegStage == RegStage.otpCombined) {
       return const SizedBox.shrink();
     }
+    if (authListener.currentRegStage == RegStage.otpPhone) {
+      return const SizedBox.shrink();
+    }
 
     //   if (authListener.emailVerified && authListener.phoneVerified) {
     //     return SizedBox(
@@ -763,8 +766,8 @@ class _LoginScreenState extends State<LoginScreen> {
           return "";
         }
         return "Continue";
-      case RegStage.otpPhone:
-        return "Continue";
+      // case RegStage.otpPhone:
+      //   return "Continue";
       case RegStage.register:
         return "Register";
       case RegStage.success:
@@ -2010,7 +2013,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                verticalSpaceSmall,
+                verticalSpaceMedium,
                 Row(
                   children: [
                     const Flexible(
@@ -2032,7 +2035,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     )),
                   ],
                 ),
-                verticalSpaceSmall,
+                verticalSpaceMedium,
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

@@ -331,8 +331,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     onTap: authProvider.toggleLoginPassword,
                     child: Icon(
                       authListener.loginPasswordHide
-                          ? FluentIcons.eye_24_regular
-                          : FluentIcons.eye_off_24_regular,
+                          ? FluentIcons.eye_off_24_regular
+                          : FluentIcons.eye_24_regular,
                       color: AppColors.kGray3,
                     )),
                 validator: FormBuilderValidators.compose([
@@ -1964,20 +1964,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)))),
                     onPressed: () async {
-                      // final available =
-                      //     await authProvider.checkUserAlreadyRegistered();
-                      // if (!available) {
-                      //   if (authProvider.verifyResponse?.isPartialUser ==
-                      //       true) {
-                      //     _showLinkDialog(context, authProvider);
-                      //   } else {
-                      //     AlertDialogs.showError(
-                      //       authProvider.verifyResponse?.message ??
-                      //           "User already exists",
-                      //     );
-                      //   }
-                      //   return;
-                      // }
+                      final available =
+                          await authProvider.checkUserAlreadyRegistered();
+                      if (!available) {
+                        if (authProvider.verifyResponse?.isPartialUser ==
+                            true) {
+                          _showLinkDialog(context, authProvider);
+                        } else {
+                          AlertDialogs.showError(
+                            authProvider.verifyResponse?.message ??
+                                "User already exists",
+                          );
+                        }
+                        return;
+                      }
                       // Send OTP
                       final countryCode = shopProvider.selectedCountry?.code;
                       final sent = await authProvider.sendPhoneOtpForInline(

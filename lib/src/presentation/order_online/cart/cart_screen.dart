@@ -1682,6 +1682,7 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                         controller: authProvider.registerUserPhoneController,
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
+                          // hintStyle: TextStyle(color: Colors.grey),
                           labelStyle: TextStyle(color: Colors.grey),
                           labelText: 'Mobile Number',
                           border: OutlineInputBorder(
@@ -1958,6 +1959,7 @@ class _MobileVerificationDialogContentState
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
+                        labelStyle: TextStyle(color: Colors.grey),
                         labelText: 'Mobile Number',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),

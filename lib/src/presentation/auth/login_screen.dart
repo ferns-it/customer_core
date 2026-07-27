@@ -1389,7 +1389,7 @@ class _LoginScreenState extends State<LoginScreen> {
               pinTheme: PinTheme(
                 shape: PinCodeFieldShape.box,
                 borderRadius: BorderRadius.circular(10.0),
-                activeColor: Colors.black,
+                activeColor: AppColors.kGray,
                 inactiveColor: AppColors.kGray,
                 inactiveFillColor: AppColors.kWhite.withOpacity(0.1),
                 activeFillColor: AppColors.kWhite.withOpacity(0.1),
@@ -1827,7 +1827,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     pinTheme: PinTheme(
                       shape: PinCodeFieldShape.box,
                       borderRadius: BorderRadius.circular(10.0),
-                      activeColor: AppColors.kBlack,
+                      activeColor: AppColors.kGray,
                       inactiveColor: AppColors.kGray,
                       inactiveFillColor:
                           bothEnabled && !authProvider.emailOtpVerified
@@ -1996,9 +1996,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 verticalSpaceSmall,
-                Text(
-                  "OR",
-                  style: TextStyle(color: Colors.white),
+                Row(
+                  children: [
+                    const Flexible(
+                        child: Divider(
+                      thickness: 2,
+                      color: AppColors.kGray,
+                    )),
+                    horizontalSpaceMedium,
+                    Text(
+                      'OR',
+                      style: context.customTextTheme.text12W600
+                          .copyWith(color: AppColors.kGray),
+                    ),
+                    horizontalSpaceMedium,
+                    const Flexible(
+                        child: Divider(
+                      thickness: 2,
+                      color: AppColors.kGray,
+                    )),
+                  ],
                 ),
                 verticalSpaceSmall,
                 SizedBox(

@@ -817,13 +817,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final locatedCartItem = cartItems.elementAt(index);
     final newQty = (locatedCartItem.quantity ?? 0) + 1;
 
-    // _debounceTimer?.cancel();
-    // _debounceTimer = Timer(
-    //   const Duration(seconds: 2),
-    //   () => _updateQty(locatedCartItem, newQty),
-    // );
-
-    _updateQty(locatedCartItem, newQty); // Call _updateQty directly
+    _updateQty(locatedCartItem, newQty);
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
@@ -834,9 +828,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedAddons = appliedAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice = option.priceSingle;
-
         final price = _parseCurrencyToDouble(rawPrice);
-
         final updatedPrice = price * newQty;
 
         return option.copyWith(
@@ -850,9 +842,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedMasterAddons = appliedMasterAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice = option.priceSingle;
-
         final price = _parseCurrencyToDouble(rawPrice);
-
         final updatedPrice = price * newQty;
 
         return option.copyWith(
@@ -863,19 +853,18 @@ class CartProvider extends ChangeNotifier with BaseController {
       return e.copyWith(choosedOption: updatedOptions);
     }).toList();
 
-    newCartItems[index] = item.copyWith(
-      master_addon_apllied: updatedAppliedMasterAddons,
-      addon_apllied: updatedAppliedAddons,
-    );
+    // Use getModifiersTotal which now uses priceSingle (unit prices) with safe fold()
+    final itemModifiersTotal = item.getModifiersTotal;
+    final itemModifiersTotalInPaisa =
+        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final itemProductPrice = _parseCurrencyToDouble(item.product_price);
     final itemProductPriceInPaisa =
         itemProductPrice * AppConfig.instance.country.currencyDivisor;
-    final itemModifiersTotal = item.getModifiersTotal * newQty;
-    final itemModifiersTotalInPaisa =
-        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final totalItemPrice = newQty * itemProductPriceInPaisa;
+    final totalPriceWithModifiers =
+        totalItemPrice + (newQty * itemModifiersTotalInPaisa);
     final productTotalPriceFormatted =
-        (totalItemPrice) / AppConfig.instance.country.currencyDivisor;
+        totalPriceWithModifiers / AppConfig.instance.country.currencyDivisor;
     final updatedAmountDetails = _scaleAmountDetailsForQty(
       amountDetails: item.amountDetails,
       previousQty: prevQty,
@@ -887,17 +876,14 @@ class CartProvider extends ChangeNotifier with BaseController {
       quantity: newQty,
       master_addon_apllied: updatedAppliedMasterAddons,
       addon_apllied: updatedAppliedAddons,
-      total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
+      total: totalPriceWithModifiers.toInt(),
       amountDetails: updatedAmountDetails,
       product_total_price: _formatDynamicCurrency(productTotalPriceFormatted),
     );
 
     final totalAmountInPaisa = newCartItems.fold<int>(
       0,
-      (sum, item) {
-        log(sum.toString(), name: "totalAmountInPaisaSum");
-        return sum + (item.total ?? 0);
-      },
+      (sum, item) => sum + (item.total ?? 0),
     );
     final totalDiscountInPaisa = newCartItems.fold<int>(
       0,
@@ -938,13 +924,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     }
     final newQty = prevQty - 1;
 
-    // _debounceTimer?.cancel();
-    // _debounceTimer = Timer(
-    //   const Duration(seconds: 2),
-    //   () => _updateQty(locatedCartItem, newQty),
-    // );
-
-    _updateQty(locatedCartItem, newQty); // Call _updateQty directly
+    _updateQty(locatedCartItem, newQty);
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
@@ -955,9 +935,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedAddons = appliedAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice = option.priceSingle;
-
         final price = _parseCurrencyToDouble(rawPrice);
-
         final updatedPrice = price * newQty;
 
         return option.copyWith(
@@ -971,9 +949,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedMasterAddons = appliedMasterAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice = option.priceSingle;
-
         final price = _parseCurrencyToDouble(rawPrice);
-
         final updatedPrice = price * newQty;
 
         return option.copyWith(
@@ -984,18 +960,18 @@ class CartProvider extends ChangeNotifier with BaseController {
       return e.copyWith(choosedOption: updatedOptions);
     }).toList();
 
-    newCartItems[index] = item.copyWith(
-        master_addon_apllied: updatedAppliedMasterAddons,
-        addon_apllied: updatedAppliedAddons);
+    // Use getModifiersTotal which now uses priceSingle (unit prices) with safe fold()
+    final itemModifiersTotal = item.getModifiersTotal;
+    final itemModifiersTotalInPaisa =
+        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final itemProductPrice = _parseCurrencyToDouble(item.product_price);
     final itemProductPriceInPaisa =
         itemProductPrice * AppConfig.instance.country.currencyDivisor;
-    final itemModifiersTotal = item.getModifiersTotal * newQty;
-    final itemModifiersTotalInPaisa =
-        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final totalItemPrice = newQty * itemProductPriceInPaisa;
+    final totalPriceWithModifiers =
+        totalItemPrice + (newQty * itemModifiersTotalInPaisa);
     final productTotalPriceFormatted =
-        (totalItemPrice) / AppConfig.instance.country.currencyDivisor;
+        totalPriceWithModifiers / AppConfig.instance.country.currencyDivisor;
     final updatedAmountDetails = _scaleAmountDetailsForQty(
       amountDetails: item.amountDetails,
       previousQty: prevQty1,
@@ -1007,7 +983,7 @@ class CartProvider extends ChangeNotifier with BaseController {
       quantity: newQty,
       master_addon_apllied: updatedAppliedMasterAddons,
       addon_apllied: updatedAppliedAddons,
-      total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
+      total: totalPriceWithModifiers.toInt(),
       amountDetails: updatedAmountDetails,
       product_total_price: _formatDynamicCurrency(productTotalPriceFormatted),
     );
@@ -1041,9 +1017,6 @@ class CartProvider extends ChangeNotifier with BaseController {
             totalDiscountInPaisa / AppConfig.instance.country.currencyDivisor),
       ),
     );
-    //new cart value => totalAmountInPaisa /  AppConfig.instance.country.currencyDivisor
-
-    //validatedCouponDetails => minSpend
 
     _selectedAddress = null;
     _deliveryDetails = null;

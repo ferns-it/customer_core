@@ -1576,12 +1576,12 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                       "Add Mobile Number",
                       style: context.customTextTheme.text18W600,
                     ),
-                    verticalSpaceTiny,
+                    verticalSpaceSmall,
                     Text(
-                      "A mobile number is required to place your order. Enter your number below to continue.",
+                      "A mobile number is required to place your order.",
                       style: context.customTextTheme.text14W500.copyWith(
-                        color: AppColors.kGray3,
-                      ),
+                          // color: AppColors.kGray3,
+                          ),
                     ),
                   ],
                 ),
@@ -1590,97 +1590,114 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.kGray3),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            // Container(
-                            //   padding:
-                            //       const EdgeInsets.symmetric(horizontal: 12),
-                            //   decoration: BoxDecoration(
-                            //     border: Border(
-                            //       right: BorderSide(color: AppColors.kGray3),
-                            //     ),
-                            //   ),
-                            //   child: DropdownButtonHideUnderline(
-                            //     child: DropdownButton<String>(
-                            //       value: shopProvider.selectedCountry?.code ??
-                            //           AppConfig.instance.country.dialCode,
-                            //       isDense: true,
-                            //       icon: const Icon(Icons.arrow_drop_down),
-                            //       style: context.customTextTheme.text14W500,
-                            //       items:
-                            //           shopProvider.smsCountries.map((country) {
-                            //         return DropdownMenuItem(
-                            //           value: country.code,
-                            //           child: Row(
-                            //             mainAxisSize: MainAxisSize.min,
-                            //             children: [
-                            //               Text(
-                            //                 countryCodeToEmoji(
-                            //                     country.iso ?? ""),
-                            //                 style:
-                            //                     const TextStyle(fontSize: 16),
-                            //               ),
-                            //               const SizedBox(width: 6),
-                            //               Text(
-                            //                 country.code ?? "",
-                            //                 style:
-                            //                     const TextStyle(fontSize: 14),
-                            //               ),
-                            //             ],
-                            //           ),
-                            //         );
-                            //       }).toList(),
-                            //       onChanged: (value) {
-                            //         if (value != null) {
-                            //           final country = shopProvider.smsCountries
-                            //               .firstWhere((c) => c.code == value);
-                            //           shopProvider
-                            //               .updateSelectedCountry(country);
-                            //         }
-                            //       },
-                            //     ),
-                            //   ),
-                            // ),
-                            Expanded(
-                              child: TextFormField(
-                                controller:
-                                    authProvider.registerUserPhoneController,
-                                keyboardType: TextInputType.phone,
-                                decoration: InputDecoration(
-                                  labelText: 'Mobile Number',
-                                  hintText: 'Enter mobile number',
-                                  hintStyle:
-                                      const TextStyle(color: AppColors.kGray),
-                                  prefixIcon: const Icon(Icons.phone_outlined),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: BorderSide.none),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    // borderSide:
-                                    //     BorderSide(color: Colors.grey.shade300),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    // borderSide: const BorderSide(
-                                    //   color: Colors.grey,
-                                    // ),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 16,
-                                  ),
-                                ),
-                              ),
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     border: Border.all(color: AppColors.kGray3),
+                      //     borderRadius: BorderRadius.circular(10),
+                      //   ),
+                      //   child: Row(
+                      //     children: [
+                      // Container(
+                      //   padding:
+                      //       const EdgeInsets.symmetric(horizontal: 12),
+                      //   decoration: BoxDecoration(
+                      //     border: Border(
+                      //       right: BorderSide(color: AppColors.kGray3),
+                      //     ),
+                      //   ),
+                      //   child: DropdownButtonHideUnderline(
+                      //     child: DropdownButton<String>(
+                      //       value: shopProvider.selectedCountry?.code ??
+                      //           AppConfig.instance.country.dialCode,
+                      //       isDense: true,
+                      //       icon: const Icon(Icons.arrow_drop_down),
+                      //       style: context.customTextTheme.text14W500,
+                      //       items:
+                      //           shopProvider.smsCountries.map((country) {
+                      //         return DropdownMenuItem(
+                      //           value: country.code,
+                      //           child: Row(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Text(
+                      //                 countryCodeToEmoji(
+                      //                     country.iso ?? ""),
+                      //                 style:
+                      //                     const TextStyle(fontSize: 16),
+                      //               ),
+                      //               const SizedBox(width: 6),
+                      //               Text(
+                      //                 country.code ?? "",
+                      //                 style:
+                      //                     const TextStyle(fontSize: 14),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       }).toList(),
+                      //       onChanged: (value) {
+                      //         if (value != null) {
+                      //           final country = shopProvider.smsCountries
+                      //               .firstWhere((c) => c.code == value);
+                      //           shopProvider
+                      //               .updateSelectedCountry(country);
+                      //         }
+                      //       },
+                      //     ),
+                      //   ),
+                      // ),
+                      // Expanded(
+                      //   child: TextFormField(
+                      //     controller:
+                      //         authProvider.registerUserPhoneController,
+                      //     keyboardType: TextInputType.phone,
+                      //     decoration: InputDecoration(
+                      //       labelText: 'Mobile Number',
+                      //       hintText: 'Enter mobile number',
+                      //       hintStyle:
+                      //           const TextStyle(color: AppColors.kGray),
+                      //       prefixIcon: const Icon(Icons.phone_outlined),
+                      //       border: OutlineInputBorder(
+                      //           borderRadius: BorderRadius.circular(10),
+                      //           borderSide: BorderSide.none),
+                      //       enabledBorder: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(10),
+                      //         // borderSide:
+                      //         //     BorderSide(color: Colors.grey.shade300),
+                      //       ),
+                      //       focusedBorder: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(10),
+                      //         // borderSide: const BorderSide(
+                      //         //   color: Colors.grey,
+                      //         // ),
+                      //       ),
+                      //       contentPadding: const EdgeInsets.symmetric(
+                      //         horizontal: 16,
+                      //         vertical: 16,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      TextFormField(
+                        controller: authProvider.registerUserPhoneController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelStyle: TextStyle(color: Colors.grey),
+                          labelText: 'Mobile Number',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: Colors.grey,
                             ),
-                          ],
+                          ),
                         ),
                       ),
+                      //   ],
+                      // ),
+                      // ),
                       // verticalSpaceSmall,
                       // Text(
                       //   "Example: 7700000000",

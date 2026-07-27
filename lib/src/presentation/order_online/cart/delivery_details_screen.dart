@@ -1008,62 +1008,68 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                       minute: cartListener.selectedPickUpTime!.minute)
                   : DateTimeUtils.addMinutesToTime(TimeOfDay.now(), 15),
               builder: (BuildContext context, Widget? child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    dialogBackgroundColor: AppColors.kWhite,
-                    textTheme: poppinsTextTheme(context).textTheme.copyWith(
-                        bodySmall: const TextStyle(color: Colors.white)),
-                    timePickerTheme: TimePickerThemeData(
-                        helpTextStyle:
-                            TextStyle(color: context.customTextTheme.color),
-                        entryModeIconColor:
-                            Theme.of(context).colorScheme.primary,
-                        dialTextColor: WidgetStateColor.resolveWith(
-                          (states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return Theme.of(context).colorScheme.onSurface;
-                            }
-                            return context.customTextTheme.color!;
-                          },
-                        ),
-                        backgroundColor:
-                            Theme.of(context).colorScheme.brightness ==
-                                    Brightness.dark
-                                ? AppColors.kCardBackground2
-                                : AppColors.kOffWhite,
-                        dialBackgroundColor: Theme.of(context).cardColor,
-                        dayPeriodColor: WidgetStateColor.resolveWith(
-                          (states) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    alwaysUse24HourFormat: false,
+                  ),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      dialogBackgroundColor: AppColors.kWhite,
+                      textTheme: poppinsTextTheme(context).textTheme.copyWith(
+                          bodySmall: const TextStyle(color: Colors.white)),
+                      timePickerTheme: TimePickerThemeData(
+                          helpTextStyle:
+                              TextStyle(color: context.customTextTheme.color),
+                          entryModeIconColor:
+                              Theme.of(context).colorScheme.primary,
+                          dialTextColor: WidgetStateColor.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return Theme.of(context).colorScheme.onSurface;
+                              }
+                              return context.customTextTheme.color!;
+                            },
+                          ),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.brightness ==
+                                      Brightness.dark
+                                  ? AppColors.kCardBackground2
+                                  : AppColors.kOffWhite,
+                          dialBackgroundColor: Theme.of(context).cardColor,
+                          dayPeriodColor: WidgetStateColor.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return Theme.of(context).colorScheme.primary;
+                              }
+                              return Theme.of(context).cardColor;
+                            },
+                          ),
+                          hourMinuteColor:
+                              WidgetStateColor.resolveWith((states) {
                             if (states.contains(WidgetState.selected)) {
                               return Theme.of(context).colorScheme.primary;
                             }
                             return Theme.of(context).cardColor;
-                          },
-                        ),
-                        hourMinuteColor: WidgetStateColor.resolveWith((states) {
-                          if (states.contains(WidgetState.selected)) {
-                            return Theme.of(context).colorScheme.primary;
-                          }
-                          return Theme.of(context).cardColor;
-                        }),
-                        hourMinuteTextColor: WidgetStateColor.resolveWith(
-                          (states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return Theme.of(context).colorScheme.surface;
-                            }
-                            return Theme.of(context).colorScheme.primary;
-                          },
-                        ),
-                        dayPeriodTextColor: WidgetStateColor.resolveWith(
-                          (states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return Theme.of(context).colorScheme.surface;
-                            }
-                            return Theme.of(context).colorScheme.secondary;
-                          },
-                        )),
+                          }),
+                          hourMinuteTextColor: WidgetStateColor.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return Theme.of(context).colorScheme.surface;
+                              }
+                              return Theme.of(context).colorScheme.primary;
+                            },
+                          ),
+                          dayPeriodTextColor: WidgetStateColor.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return Theme.of(context).colorScheme.surface;
+                              }
+                              return Theme.of(context).colorScheme.secondary;
+                            },
+                          )),
+                    ),
+                    child: child!,
                   ),
-                  child: child!,
                 );
               },
             );

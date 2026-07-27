@@ -1653,8 +1653,27 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                                 keyboardType: TextInputType.phone,
                                 decoration: InputDecoration(
                                   labelText: 'Mobile Number',
+                                  hintText: 'Enter mobile number',
+                                  hintStyle:
+                                      const TextStyle(color: AppColors.kGray),
+                                  prefixIcon: const Icon(Icons.phone_outlined),
                                   border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide.none),
+                                  enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
+                                    // borderSide:
+                                    //     BorderSide(color: Colors.grey.shade300),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    // borderSide: const BorderSide(
+                                    //   color: Colors.grey,
+                                    // ),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 16,
                                   ),
                                 ),
                               ),
@@ -1720,23 +1739,37 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                                   user: User(
                                     userID: userProvider.userData!.user.userID,
                                     shopID: userProvider.userData!.user.shopID,
-                                    userFirstName: userProvider.userData!.user.userFirstName,
-                                    userLastName: userProvider.userData!.user.userLastName,
-                                    userAddress: userProvider.userData!.user.userAddress,
-                                    userPostCode: userProvider.userData!.user.userPostCode,
-                                    userMobile: authProvider.registerUserPhoneController.text.trim(),
-                                    userEmail: userProvider.userData!.user.userEmail,
-                                    userPassword: userProvider.userData!.user.userPassword,
-                                    userStatus: userProvider.userData!.user.userStatus,
-                                    addedTime: userProvider.userData!.user.addedTime,
-                                    userActivationCode: userProvider.userData!.user.userActivationCode,
-                                    isMobileVerified: userProvider.userData!.user.isMobileVerified,
-                                    isEmailVerified: userProvider.userData!.user.isEmailVerified,
+                                    userFirstName: userProvider
+                                        .userData!.user.userFirstName,
+                                    userLastName: userProvider
+                                        .userData!.user.userLastName,
+                                    userAddress:
+                                        userProvider.userData!.user.userAddress,
+                                    userPostCode: userProvider
+                                        .userData!.user.userPostCode,
+                                    userMobile: authProvider
+                                        .registerUserPhoneController.text
+                                        .trim(),
+                                    userEmail:
+                                        userProvider.userData!.user.userEmail,
+                                    userPassword: userProvider
+                                        .userData!.user.userPassword,
+                                    userStatus:
+                                        userProvider.userData!.user.userStatus,
+                                    addedTime:
+                                        userProvider.userData!.user.addedTime,
+                                    userActivationCode: userProvider
+                                        .userData!.user.userActivationCode,
+                                    isMobileVerified: userProvider
+                                        .userData!.user.isMobileVerified,
+                                    isEmailVerified: userProvider
+                                        .userData!.user.isEmailVerified,
                                   ),
                                   token: userProvider.userData!.token,
                                   expireAt: userProvider.userData!.expireAt,
                                 );
-                                await userProvider.sharedPrefsRepository.saveUserData(updatedUserData);
+                                await userProvider.sharedPrefsRepository
+                                    .saveUserData(updatedUserData);
                                 await userProvider.getUserData();
                               }
                               Navigator.pop(context, true);

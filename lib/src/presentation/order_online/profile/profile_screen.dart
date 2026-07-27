@@ -687,139 +687,149 @@ class ProfileScreen extends GetProviderView<UserProvider> {
                   ),
                 ),
                 builder: (context) {
-                  return Container(
-                      height: context.screenHeight * 0.4,
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10)
-                          .copyWith(bottom: 30),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? AppColors.kWhite
-                            : AppColors.kCardBackground2,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const BottomSheetDragHandler(),
-                          verticalSpaceMedium,
-                          Container(
-                            width: context.screenWidth * 0.2,
-                            height: context.screenWidth * 0.2,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Icon(
-                              Icons.logout_rounded,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 50,
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.8,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10)
+                              .copyWith(bottom: 30),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? AppColors.kWhite
+                                    : AppColors.kCardBackground2,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
                             ),
                           ),
-                          verticalSpaceMedium,
-                          Text(
-                            'Confirm Logout',
-                            style: context.customTextTheme.text14W600.copyWith(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.light
-                                  ? AppColors.kBlack
-                                  : Colors.white,
-                            ),
-                          ),
-                          verticalSpaceSmall,
-                          Text(
-                            'Are you sure you want to logout?',
-                            style: context.customTextTheme.text14W700,
-                          ),
-                          verticalSpaceMedium,
-                          Consumer<CartProvider>(
-                            builder: (context, value, child) {
-                              return value.isClearCartProgress ||
-                                      value.cartLoading
-                                  ? showButtonProgress()
-                                  : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Flexible(
-                                          child: FilledButton(
-                                            style: FilledButton.styleFrom(
-                                              backgroundColor: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.dark
-                                                  ? Colors.transparent
-                                                  : AppColors.kWhite,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const BottomSheetDragHandler(),
+                              verticalSpaceMedium,
+                              Container(
+                                width: context.screenWidth * 0.2,
+                                height: context.screenWidth * 0.2,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                child: Icon(
+                                  Icons.logout_rounded,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 50,
+                                ),
+                              ),
+                              verticalSpaceMedium,
+                              Text(
+                                'Confirm Logout',
+                                style:
+                                    context.customTextTheme.text14W600.copyWith(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? AppColors.kBlack
+                                      : Colors.white,
+                                ),
+                              ),
+                              verticalSpaceSmall,
+                              Text(
+                                'Are you sure you want to logout?',
+                                style: context.customTextTheme.text14W700,
+                              ),
+                              verticalSpaceMedium,
+                              Consumer<CartProvider>(
+                                builder: (context, value, child) {
+                                  return value.isClearCartProgress ||
+                                          value.cartLoading
+                                      ? showButtonProgress()
+                                      : Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Flexible(
+                                              child: FilledButton(
+                                                style: FilledButton.styleFrom(
+                                                  backgroundColor:
+                                                      Theme.of(context)
+                                                                  .brightness ==
+                                                              Brightness.dark
+                                                          ? Colors.transparent
+                                                          : AppColors.kWhite,
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  'Not Now',
+                                                  style: context.customTextTheme
+                                                      .text14W600
+                                                      .copyWith(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .primary),
+                                                ),
+                                              ),
                                             ),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text(
-                                              'Not Now',
-                                              style: context
-                                                  .customTextTheme.text14W600
-                                                  .copyWith(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .primary),
-                                            ),
-                                          ),
-                                        ),
-                                        horizontalSpaceSmall,
-                                        Flexible(
-                                          child: FilledButton(
-                                            onPressed: () async {
-                                              await context
-                                                  .read<CartProvider>()
-                                                  .clearCart();
-                                              await context
-                                                  .read<CartProvider>()
-                                                  .listCartItems();
+                                            horizontalSpaceSmall,
+                                            Flexible(
+                                              child: FilledButton(
+                                                onPressed: () async {
+                                                  await context
+                                                      .read<CartProvider>()
+                                                      .clearCart();
+                                                  await context
+                                                      .read<CartProvider>()
+                                                      .listCartItems();
 
-                                              await authProvider
-                                                  .logoutUser()
-                                                  .then((_) {
-                                                Navigator.pop(context);
-                                                context
-                                                    .read<UserProvider>()
-                                                    .clearAllData();
-                                                context
-                                                    .read<OrderProvider>()
-                                                    .clearData();
-                                                context
-                                                    .read<CartProvider>()
-                                                    .checkUserIsLogged();
-                                              });
+                                                  await authProvider
+                                                      .logoutUser()
+                                                      .then((_) {
+                                                    Navigator.pop(context);
+                                                    context
+                                                        .read<UserProvider>()
+                                                        .clearAllData();
+                                                    context
+                                                        .read<OrderProvider>()
+                                                        .clearData();
+                                                    context
+                                                        .read<CartProvider>()
+                                                        .checkUserIsLogged();
+                                                  });
 
-                                              context.router.replace(
-                                                  OrderOnlineScreenRoute());
-                                            },
-                                            style: FilledButton.styleFrom(
-                                                backgroundColor:
-                                                    Theme.of(context)
-                                                        .colorScheme
-                                                        .primary),
-                                            child: Text(
-                                              'Logout',
-                                              style: context
-                                                  .customTextTheme.text14W500,
+                                                  context.router.replace(
+                                                      OrderOnlineScreenRoute());
+                                                },
+                                                style: FilledButton.styleFrom(
+                                                    backgroundColor:
+                                                        Theme.of(context)
+                                                            .colorScheme
+                                                            .primary),
+                                                child: Text(
+                                                  'Logout',
+                                                  style: context.customTextTheme
+                                                      .text14W500,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                            },
-                          ),
-                          verticalSpaceSmall,
-                        ],
-                      ));
+                                          ],
+                                        );
+                                },
+                              ),
+                              verticalSpaceSmall,
+                            ],
+                          )),
+                    ),
+                  );
                 });
           },
           leading: const Icon(

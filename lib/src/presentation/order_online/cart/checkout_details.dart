@@ -48,12 +48,15 @@ class CheckoutDetailsScreen extends StatelessWidget {
         cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15.0),
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.only(bottom: context.screenHeight * 0.1),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).padding.bottom + 120,
+            ),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               verticalSpaceRegular,

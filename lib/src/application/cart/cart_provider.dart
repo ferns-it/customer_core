@@ -1143,10 +1143,13 @@ class CartProvider extends ChangeNotifier with BaseController {
       calculateDeliveryCharge();
       return;
     } else {
-      calculateTakeAwayCharge(
-        pickupTime: _selectedPickUpTime ??
-            DateTime.now().add(const Duration(minutes: 15)),
-      );
+      if (_selectedPickUpTime != null) {
+        calculateTakeAwayCharge();
+      }
+      // calculateTakeAwayCharge(
+      //   pickupTime: _selectedPickUpTime ??
+      //       DateTime.now().add(const Duration(minutes: 15)),
+      // );
     }
   }
 

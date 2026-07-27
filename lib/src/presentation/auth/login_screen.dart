@@ -696,28 +696,31 @@ class _LoginScreenState extends State<LoginScreen> {
       return const SizedBox.shrink();
     }
     if (authListener.currentRegStage == RegStage.otpCombined) {
-      if (authListener.emailVerified && authListener.phoneVerified) {
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(
-                    Theme.of(context).colorScheme.primary),
-                foregroundColor: WidgetStatePropertyAll(Colors.white),
-                shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)))),
-            onPressed: () {
-              authProvider.updateCurrentRegStage(
-                RegStage.register,
-              );
-            },
-            child: const Text("Continue"),
-          ),
-        );
-      } else {
-        return const SizedBox.shrink();
-      }
+      return const SizedBox.shrink();
     }
+
+    //   if (authListener.emailVerified && authListener.phoneVerified) {
+    //     return SizedBox(
+    //       width: double.infinity,
+    //       child: ElevatedButton(
+    //         style: ButtonStyle(
+    //             backgroundColor: WidgetStatePropertyAll(
+    //                 Theme.of(context).colorScheme.primary),
+    //             foregroundColor: WidgetStatePropertyAll(Colors.white),
+    //             shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+    //                 borderRadius: BorderRadius.circular(10)))),
+    //         onPressed: () {
+    //           authProvider.updateCurrentRegStage(
+    //             RegStage.register,
+    //           );
+    //         },
+    //         child: const Text("Continue"),
+    //       ),
+    //     );
+    //   } else {
+    //     return const SizedBox.shrink();
+    //   }
+    // }
 
     // When both OTP are enabled, hide button during OTP stages (auto-verify)
     if (authProvider.emailRequired && authProvider.smsRequired) {
@@ -1007,6 +1010,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             onPressed: () async {
               Navigator.pop(context);
+
+              // Mark the link as accepted so the same email+mobile
+              // combination won't trigger the dialog again in this session.
+              authProvider.markLinkAccepted();
 
               if (!authProvider.smsRequired && !authProvider.emailRequired) {
                 // No verification required
@@ -1964,6 +1971,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)))),
                     onPressed: () async {
+                      if (authProvider.phoneOtpVerified) {
+                        authProvider.updateCurrentRegStage(
+                          RegStage.register,
+                        );
+                        return;
+                      }
                       final available =
                           await authProvider.checkUserAlreadyRegistered();
                       if (!available) {
@@ -1992,7 +2005,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       }
                     },
-                    child: const Text("Send OTP"),
+                    child: Text(
+                      authProvider.phoneOtpVerified ? "Continue" : "Send OTP",
+                    ),
                   ),
                 ),
                 verticalSpaceSmall,
@@ -2033,21 +2048,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text("Verify later"),
                   ),
                 ),
-                if (!bothEnabled && authProvider.phoneOtpVerified)
-                  ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(
-                            Theme.of(context).colorScheme.primary),
-                        foregroundColor: WidgetStatePropertyAll(Colors.white),
-                        shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)))),
-                    onPressed: () {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.register,
-                      );
-                    },
-                    child: Text("Continue"),
-                  )
+                // if (!bothEnabled && authProvider.phoneOtpVerified)
+                //   ElevatedButton(
+                //     style: ButtonStyle(
+                //         backgroundColor: WidgetStatePropertyAll(
+                //             Theme.of(context).colorScheme.primary),
+                //         foregroundColor: WidgetStatePropertyAll(Colors.white),
+                //         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(10)))),
+                //     onPressed: () {
+                //       authProvider.updateCurrentRegStage(
+                //         RegStage.register,
+                //       );
+                //     },
+                //     child: Text("Continue"),
+                //   )
               ],
             );
           });

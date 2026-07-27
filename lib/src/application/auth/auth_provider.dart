@@ -139,6 +139,43 @@ class AuthProvider extends ChangeNotifier with BaseController {
   bool isEditingEmail = false;
   bool isEditingMobile = false;
 
+  // --- Link dialog state management ---
+  // Tracks whether the user has already accepted the link dialog
+  // for the current email+mobile combination in this registration session.
+  bool _linkAccepted = false;
+  bool get linkAccepted => _linkAccepted;
+
+  // Stores the email and mobile for which the link was accepted,
+  // so we can detect if the user changes either field later.
+  String _linkedEmail = '';
+  String _linkedMobile = '';
+
+  /// Call this when the user clicks "Yes" on the link dialog.
+  /// Stores the current email+mobile so subsequent checkUserAlreadyRegistered
+  /// calls for the same combination skip the API and return true.
+  void markLinkAccepted() {
+    _linkAccepted = true;
+    _linkedEmail = registerUserEmailController.text.trim();
+    _linkedMobile = registerUserPhoneController.text.trim();
+  }
+
+  /// Returns true if the link was already accepted for the current
+  /// email+mobile combination.
+  bool get isCurrentCombinationLinked {
+    if (!_linkAccepted) return false;
+    return registerUserEmailController.text.trim() == _linkedEmail &&
+        registerUserPhoneController.text.trim() == _linkedMobile;
+  }
+
+  /// Resets the link-accepted state (called when user changes email/mobile
+  /// or when the registration flow is re-initialized).
+  void resetLinkAcceptedState() {
+    _linkAccepted = false;
+    _linkedEmail = '';
+    _linkedMobile = '';
+  }
+  // --- End link dialog state management ---
+
   void disableEmailEdit() {
     isEditingEmail = false;
     notifyListeners();
@@ -523,6 +560,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
     _phoneOtpError = '';
     _otpSkipped = false;
     _mobileVerifiedLater = false;
+    resetLinkAcceptedState();
     notifyListeners();
   }
 
@@ -932,6 +970,14 @@ class AuthProvider extends ChangeNotifier with BaseController {
   }
 
   Future<bool> checkUserAlreadyRegistered() async {
+    // If the user has already accepted the link for this exact
+    // email+mobile combination in this session, skip the API call
+    // and treat the user as "new" (i.e. proceed with registration).
+    if (isCurrentCombinationLinked) {
+      verifyResponse = null;
+      return true;
+    }
+
     final response = await userRepository.checkUserAlreadyRegistered(
       userEmail: registerUserEmailController.text,
       userMobile: registerUserPhoneController.text,
@@ -989,6 +1035,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
     _emailOtpError = '';
     _phoneOtpError = '';
     otpProvider.clear();
+    resetLinkAcceptedState();
 
     if (!registerControllersOnly) {
       loginUserNameController.clear();
@@ -997,17 +1044,4 @@ class AuthProvider extends ChangeNotifier with BaseController {
   }
 
   void clearResetFormValues() {}
-
-  void disposeController() {
-    loginUserNameController.dispose();
-    loginUserPasswordController.dispose();
-    registerUserEmailController.dispose();
-    registerUserFirstNameController.dispose();
-    registerUserLastNameController.dispose();
-    registerUserPhoneController.dispose();
-    registerUserPasswordController.dispose();
-    registerUserConfirmPasswordController.dispose();
-    phoneOtpController.clear();
-    emailOtpController.clear();
-  }
 }

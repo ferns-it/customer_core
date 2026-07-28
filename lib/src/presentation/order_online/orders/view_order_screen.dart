@@ -3,6 +3,7 @@ import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:customer_core/src/application/core/dependency_registrar.dart';
+import 'package:customer_core/src/application/user/user_provider.dart';
 import 'package:customer_core/src/domain/cart/models/cart_details_model.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/order/order_provider.dart';
@@ -110,6 +111,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
     // UserLoginResponse customerDetails,
     BuildContext context,
   ) {
+    final userListener = context.watch<UserProvider>();
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -161,7 +163,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
               ),
             ),
             Text(
-              orderDetails.formattedPhone ?? "",
+              '${userListener.userData?.user.countryCode} ${userListener.userData?.user.userMobileActual}' ??
+                  "",
               style: context.customTextTheme.text16W500
                   .copyWith(color: context.customTextTheme.color),
             ),

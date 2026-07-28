@@ -208,8 +208,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                               true
                                       ? const SizedBox.shrink()
                                       : Text(
-                                          userListener
-                                                  .userData?.user.userMobileFormatted ??
+                                          '${userListener.userData?.user.countryCode} ${userListener.userData?.user.userMobileActual}' ??
                                               "",
                                           style: GoogleFonts.quicksand(
                                             textStyle: context

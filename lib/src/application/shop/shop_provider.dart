@@ -176,12 +176,14 @@ class ShopProvider extends ChangeNotifier with BaseController {
       orElse: () => smsCountries.first,
     );
 
-    notifyListeners();
+    // Defer notifyListeners to avoid calling it during build phase
+    Future.microtask(() => notifyListeners());
   }
 
   void updateSelectedCountry(SmsAvailableCountriesData country) {
     selectedCountry = country;
-    notifyListeners();
+    // Defer notifyListeners to avoid calling it during build phase
+    Future.microtask(() => notifyListeners());
   }
 
   Future<void> fetchShopDeliverySlots() async {

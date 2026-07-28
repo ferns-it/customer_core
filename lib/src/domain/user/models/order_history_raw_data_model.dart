@@ -95,7 +95,6 @@ class OrderDetailsModel {
   final String? shopMobile;
   final String? shopAddress1;
   final String? shopAddress2;
-
   final String? deliveryDiscountLabel;
   final String? isTaxApplicable;
   final String? taxLabel;
@@ -529,15 +528,7 @@ class OrderDetailsModel {
       : '${AppConfig.instance.country.symbol}0.00';
 
   bool get isTaxApplicablebool => isTaxApplicable == 'Yes';
-  String get formattedPhone {
-    if (phone == null || phone!.isEmpty) return "";
-
-    if (AppConfig.instance.country.dialCode == "+44") {
-      return phone!.startsWith("0") ? phone! : "0$phone";
-    }
-    // Remove leading 0 for other countries
-    return phone!.startsWith("0") ? phone!.substring(1) : phone!;
-  }
+ 
 
   // String get formattedDiscount {
   //   if (deliveryDiscount != null) {

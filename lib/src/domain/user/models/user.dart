@@ -8,6 +8,7 @@ class User {
   final String? userLastName;
   final String? userAddress;
   final String? userPostCode;
+  final String? countryCode;
   final String? userMobile;
   final String? userEmail;
   final String? userPassword;
@@ -16,6 +17,8 @@ class User {
   final String? userActivationCode;
   final String? isMobileVerified;
   final String? isEmailVerified;
+  final String? userMobileActual;
+  final String? userMobileFormatted;
   User({
     required this.userID,
     required this.shopID,
@@ -23,6 +26,7 @@ class User {
     required this.userLastName,
     required this.userAddress,
     required this.userPostCode,
+    required this.countryCode,
     required this.userMobile,
     required this.userEmail,
     required this.userPassword,
@@ -31,6 +35,8 @@ class User {
     required this.userActivationCode,
     required this.isMobileVerified,
     required this.isEmailVerified,
+    required this.userMobileActual,
+    required this.userMobileFormatted,
   });
 
   User copyWith({
@@ -40,6 +46,7 @@ class User {
     String? userLastName,
     String? userAddress,
     String? userPostCode,
+    String? countryCode,
     String? userMobile,
     String? userEmail,
     String? userPassword,
@@ -48,6 +55,8 @@ class User {
     String? userActivationCode,
     String? isMobileVerified,
     String? isEmailVerified,
+    String? userMobileActual,
+    String? userMobileFormatted,
   }) {
     return User(
         userID: userID ?? this.userID,
@@ -56,6 +65,7 @@ class User {
         userLastName: userLastName ?? this.userLastName,
         userAddress: userAddress ?? this.userAddress,
         userPostCode: userPostCode ?? this.userPostCode,
+        countryCode: countryCode ?? this.countryCode,
         userMobile: userMobile ?? this.userMobile,
         userEmail: userEmail ?? this.userEmail,
         userPassword: userPassword ?? this.userPassword,
@@ -63,7 +73,9 @@ class User {
         addedTime: addedTime ?? this.addedTime,
         userActivationCode: userActivationCode ?? this.userActivationCode,
         isMobileVerified: isMobileVerified ?? this.isMobileVerified,
-        isEmailVerified: isEmailVerified ?? this.isEmailVerified);
+        isEmailVerified: isEmailVerified ?? this.isEmailVerified,
+        userMobileActual: userMobileActual ?? this.userMobileActual,
+        userMobileFormatted: userMobileFormatted ?? this.userMobileFormatted);
   }
 
   Map<String, dynamic> toMap() {
@@ -74,6 +86,7 @@ class User {
       'userLastName': userLastName,
       'userAddress': userAddress,
       'userPostCode': userPostCode,
+      'countryCode': countryCode,
       'userMobile': userMobile,
       'userEmail': userEmail,
       'userPassword': userPassword,
@@ -81,7 +94,9 @@ class User {
       'addedTime': addedTime,
       'userActivationCode': userActivationCode,
       'isMobileVerified': isMobileVerified,
-      'isEmailVerified': isEmailVerified
+      'isEmailVerified': isEmailVerified,
+      'userMobileActual': userMobileActual,
+      'userMobileFormatted': userMobileFormatted,
     };
   }
 
@@ -97,6 +112,8 @@ class User {
           map['userAddress'] != null ? map['userAddress'] as String : null,
       userPostCode:
           map['userPostCode'] != null ? map['userPostCode'] as String : null,
+      countryCode:
+          map['countryCode'] != null ? map['countryCode'] as String : null,
       userMobile:
           map['userMobile'] != null ? map['userMobile'] as String : null,
       userEmail: map['userEmail'] != null ? map['userEmail'] as String : null,
@@ -114,6 +131,12 @@ class User {
       isEmailVerified: map['isEmailVerified'] != null
           ? map['isEmailVerified'] as String
           : null,
+      userMobileActual: map['userMobileActual'] != null
+          ? map['userMobileActual'] as String
+          : null,
+      userMobileFormatted: map['userMobileFormatted'] != null
+          ? map['userMobileFormatted'] as String
+          : null,
     );
   }
 
@@ -124,7 +147,7 @@ class User {
 
   @override
   String toString() {
-    return 'User(userID: $userID, shopID: $shopID, userFirstName: $userFirstName, userLastName: $userLastName, userAddress: $userAddress, userPostCode: $userPostCode, userMobile: $userMobile, userEmail: $userEmail, userPassword: $userPassword, userStatus: $userStatus, addedTime: $addedTime, userActivationCode: $userActivationCode,isMobileVerified: $isMobileVerified,isEmailVerified:$isEmailVerified)';
+    return 'User(userID: $userID, shopID: $shopID, userFirstName: $userFirstName, userLastName: $userLastName, userAddress: $userAddress, userPostCode: $userPostCode, userMobile: $userMobile, userEmail: $userEmail, userPassword: $userPassword, userStatus: $userStatus, addedTime: $addedTime, userActivationCode: $userActivationCode,isMobileVerified: $isMobileVerified,isEmailVerified:$isEmailVerified,userMobileActual:$userMobileActual,userMobileFormatted:$userMobileFormatted)';
   }
 
   @override
@@ -144,7 +167,9 @@ class User {
         other.addedTime == addedTime &&
         other.userActivationCode == userActivationCode &&
         other.isMobileVerified == isMobileVerified &&
-        other.isEmailVerified == isEmailVerified;
+        other.isEmailVerified == isEmailVerified &&
+        other.userMobileActual == userMobileActual &&
+        other.userMobileFormatted == userMobileFormatted;
   }
 
   @override
@@ -162,7 +187,9 @@ class User {
         addedTime.hashCode ^
         userActivationCode.hashCode ^
         isMobileVerified.hashCode ^
-        isEmailVerified.hashCode;
+        isEmailVerified.hashCode ^
+        userMobileActual.hashCode ^
+        userMobileFormatted.hashCode;
   }
 
   bool get mobileVerified => isMobileVerified == "Yes";

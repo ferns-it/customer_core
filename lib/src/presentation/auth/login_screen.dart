@@ -217,14 +217,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     RegStage.contact,
                                   );
                                   break;
-
-                                case RegStage.mobileChoice:
-                                  // Mobile choice -> go back to email OTP
-                                  authProvider.updateCurrentRegStage(
-                                    RegStage.otpEmail,
-                                  );
-                                  break;
-
                                 case RegStage.register:
                                   // Details page -> go back based on verification flow
                                   if (authProvider.smsRequired &&
@@ -492,16 +484,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       RegStage.otpEmail,
                     );
                   } else if (authListener.currentRegStage ==
-                      RegStage.mobileChoice) {
-                    authProvider.updateCurrentRegStage(
-                      RegStage.otpEmail,
-                    );
-                  } else if (authListener.currentRegStage ==
                       RegStage.register) {
                     if (authProvider.smsRequired &&
                         authProvider.emailRequired) {
                       authProvider.updateCurrentRegStage(
-                        RegStage.mobileChoice,
+                        RegStage.otpCombined,
                       );
                     } else if (authProvider.emailRequired) {
                       authProvider.updateCurrentRegStage(
@@ -630,8 +617,6 @@ class _LoginScreenState extends State<LoginScreen> {
         return "Create Account";
       case RegStage.success:
         return "";
-      case RegStage.mobileChoice:
-        return "";
       case RegStage.otpCombined:
         return "Verify your details";
     }
@@ -658,8 +643,6 @@ class _LoginScreenState extends State<LoginScreen> {
         return "Set your password to complete registration";
       case RegStage.success:
         return "";
-      case RegStage.mobileChoice:
-        return "";
       case RegStage.otpCombined:
         return '';
     }
@@ -678,12 +661,6 @@ class _LoginScreenState extends State<LoginScreen> {
         return _registerForm2(authProvider, context, authListener);
       case RegStage.success:
         return _successWidget(authProvider, context, authListener);
-      case RegStage.mobileChoice:
-        return _mobileChoiceWidget(
-          authProvider,
-          context,
-          authListener,
-        );
       case RegStage.otpCombined:
         return _inlineCombinedOtpWidget(authProvider, context, authListener);
     }
@@ -691,10 +668,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildRegisterActionButton(AuthProvider authProvider,
       BuildContext context, AuthProvider authListener) {
-    // Hide button for mobileChoice stage
-    if (authListener.currentRegStage == RegStage.mobileChoice) {
-      return const SizedBox.shrink();
-    }
     if (authListener.currentRegStage == RegStage.otpCombined) {
       return const SizedBox.shrink();
     }
@@ -837,34 +810,14 @@ class _LoginScreenState extends State<LoginScreen> {
           AlertDialogs.showError("Please enter the email OTP");
           return;
         }
-        final verified = authProvider.verifyEmailOtpForInline();
+        bool verified = await authProvider.verifyEmailOtpForInline();
         if (verified) {
           AlertDialogs.showSuccess("Email verified successfully!");
           if (verified) {
-            if (authProvider.smsRequired) {
-              authProvider.updateCurrentRegStage(
-                RegStage.mobileChoice,
-              );
-            } else {
-              authProvider.updateCurrentRegStage(
-                RegStage.register,
-              );
-            }
+            authProvider.updateCurrentRegStage(
+              RegStage.register,
+            );
           }
-          // Check if phone OTP is also needed
-          // if (authProvider.smsRequired) {
-          // final phoneOtpSent = await authProvider.sendPhoneOtpForInline();
-          // if (phoneOtpSent) {
-          //   authProvider.updateCurrentRegStage(RegStage.otpPhone);
-          //   startTimer();
-          // } else {
-          //   AlertDialogs.showError(
-          //       "Failed to send phone OTP. Please try again.");
-          // }
-          // authProvider.updateCurrentRegStage(RegStage.mobileChoice);
-          // } else {
-          // authProvider.updateCurrentRegStage(RegStage.register);
-          // }
         } else {
           // Error is set inline in the widget - no need for snackbar
         }
@@ -916,75 +869,6 @@ class _LoginScreenState extends State<LoginScreen> {
       default:
         break;
     }
-  }
-
-  Widget _mobileChoiceWidget(
-    AuthProvider authProvider,
-    BuildContext context,
-    AuthProvider authListener,
-  ) {
-    return Column(
-      children: [
-        Icon(
-          Icons.phone_android,
-          size: 70,
-          color: Colors.white,
-        ),
-        verticalSpaceMedium,
-        Text(
-          "Verify your mobile?",
-          style: context.customTextTheme.text20W600.copyWith(
-            color: AppColors.kWhite,
-          ),
-        ),
-        verticalSpaceSmall,
-        Text(
-          "Mobile verification is optional.\nYou can verify it now or later.",
-          textAlign: TextAlign.center,
-          style: context.customTextTheme.text14W400.copyWith(
-            color: AppColors.kWhite,
-          ),
-        ),
-        verticalSpaceLarge,
-        SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                      Theme.of(context).colorScheme.primary),
-                  foregroundColor: WidgetStatePropertyAll(Colors.white),
-                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)))),
-              onPressed: () async {
-                authProvider.updateCurrentRegStage(
-                  RegStage.otpPhone,
-                );
-                startTimer();
-                final countryCode =
-                    context.read<ShopProvider>().selectedCountry?.code;
-                await authProvider.sendPhoneOtpForInline(
-                    countryCode: countryCode);
-              },
-              child: const Text("Verify Now"),
-            )),
-        verticalSpaceSmall,
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(Colors.white),
-                foregroundColor: WidgetStatePropertyAll(
-                    Theme.of(context).colorScheme.primary),
-                shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)))),
-            onPressed: () {
-              authProvider.skipMobileVerification();
-            },
-            child: const Text("Skip for now"),
-          ),
-        ),
-      ],
-    );
   }
 
   void _showLinkDialog(
@@ -1254,7 +1138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-            verticalSpaceSmall,
+            verticalSpaceMedium,
             Form(
               key: authProvider.emailFormKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -1340,127 +1224,84 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-// Email field error message displayed outside the container
-            // if (_emailFieldError.isNotEmpty && authProvider.isEditingEmail)
-            //   Padding(
-            //     padding: const EdgeInsets.only(left: 4, top: 4),
-            //     child: Text(
-            //       _emailFieldError,
-            //       style: context.customTextTheme.text14W500
-            //           .copyWith(color: Colors.red.shade300),
-            //     ),
-            //   ),
-
-            // verticalSpaceRegular,
-            // if (authProvider.isEditingEmail)
-            //   ElevatedButton(
-            //     style: ButtonStyle(
-            //         backgroundColor: WidgetStatePropertyAll(
-            //             Theme.of(context).colorScheme.primary),
-            //         foregroundColor: WidgetStatePropertyAll(Colors.white),
-            //         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-            //             borderRadius: BorderRadius.circular(10)))),
-            //     onPressed: () async {
-            //       if (!authProvider.validateEmailForm()) {
-            //         return;
-            //       }
-            //       final available =
-            //           await authProvider.checkUserAlreadyRegistered();
-            //       if (!available) {
-            //         if (authProvider.verifyResponse?.isPartialUser == true) {
-            //           _showLinkDialog(context, authProvider);
-            //         } else {
-            //           AlertDialogs.showError(
-            //             authProvider.verifyResponse?.message ??
-            //                 "User already exists",
-            //           );
-            //         }
-            //         return;
-            //       }
-            //       final sent = await authProvider.sendEmailOtpForInline();
-            //       if (sent) {
-            //         AlertDialogs.showSuccess("OTP sent successfully");
-            //         authProvider.disableEmailEdit();
-            //         startTimer();
-            //       }
-            //     },
-            //     child: const Text("Send OTP"),
-            //   ),
-
+            verticalSpaceMedium,
             // Email OTP Field
-            // if (!authProvider.isEditingEmail)
-            PinCodeTextField(
-              textStyle: const TextStyle(
-                color: AppColors.kWhite,
-              ),
-              length: 4,
-              obscureText: false,
-              animationType: AnimationType.scale,
-              pinTheme: PinTheme(
-                shape: PinCodeFieldShape.box,
-                borderRadius: BorderRadius.circular(10.0),
-                activeColor: AppColors.kGray,
-                inactiveColor: AppColors.kGray,
-                inactiveFillColor: AppColors.kWhite.withOpacity(0.1),
-                activeFillColor: AppColors.kWhite.withOpacity(0.1),
-                selectedColor: Theme.of(context).colorScheme.primary,
-                selectedFillColor: AppColors.kWhite.withOpacity(0.1),
-                fieldHeight: MediaQuery.of(context).size.width * 0.12,
-                fieldWidth: MediaQuery.of(context).size.width * 0.12,
-                fieldOuterPadding: const EdgeInsets.all(8.0),
-              ),
-              controller: authProvider.emailOtpController,
-              showCursor: false,
-              animationDuration: const Duration(milliseconds: 300),
-              enableActiveFill: true,
-              keyboardType: TextInputType.number,
-              onCompleted: (v) async {
-                print("COMPLETED: $v");
-                // Auto-verify when both OTPs are enabled
-                // if (bothEnabled) {
-                //   final verified = authProvider.verifyEmailOtpForInline();
+            if (!authProvider.emailOtpVerified)
+              PinCodeTextField(
+                textStyle: const TextStyle(
+                  color: AppColors.kWhite,
+                ),
+                length: 6,
+                obscureText: false,
+                animationType: AnimationType.scale,
+                pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(10.0),
+                  activeColor: AppColors.kGray,
+                  inactiveColor: AppColors.kGray,
+                  inactiveFillColor: AppColors.kWhite.withOpacity(0.1),
+                  activeFillColor: AppColors.kWhite.withOpacity(0.1),
+                  selectedColor: Theme.of(context).colorScheme.primary,
+                  selectedFillColor: AppColors.kWhite.withOpacity(0.1),
+                  fieldHeight: MediaQuery.of(context).size.width * 0.11,
+                  fieldWidth: MediaQuery.of(context).size.width * 0.11,
+                  fieldOuterPadding: const EdgeInsets.all(4.0),
+                ),
+                controller: authProvider.emailOtpController,
+                showCursor: false,
+                animationDuration: const Duration(milliseconds: 300),
+                enableActiveFill: true,
+                keyboardType: TextInputType.number,
+                onCompleted: (v) async {
+                  print("COMPLETED: $v");
+                  // Auto-verify when both OTPs are enabled
+                  // if (bothEnabled) {
+                  //   final verified = authProvider.verifyEmailOtpForInline();
 
-                //   if (verified) {
-                //    if(authProvider.smsRequired){
-                //      authProvider.updateCurrentRegStage(RegStage.mobileChoice);
-                //    }else return;
-                // final sent = await authProvider.sendPhoneOtpForInline();
+                  //   if (verified) {
+                  //    if(authProvider.smsRequired){
+                  //      authProvider.updateCurrentRegStage(RegStage.mobileChoice);
+                  //    }else return;
+                  // final sent = await authProvider.sendPhoneOtpForInline();
 
-                // if (sent) {
-                //   startTimer();
-                // }
-                //   }
-                // }
+                  // if (sent) {
+                  //   startTimer();
+                  // }
+                  //   }
+                  // }
 
-                final verified = await authProvider.verifyEmailOtpForInline();
-                if (verified) {
-                  if (bothEnabled) {
-                    // Stop the email OTP timer when transitioning to phone OTP
-                    _timer?.cancel();
-                    _secondsRemaining = 0;
-                    _streamController.add(0);
-                    authProvider.updateCurrentRegStage(
-                      RegStage.otpCombined,
-                    );
-                  } else {
-                    await Future.delayed(const Duration(seconds: 20));
-                    // No SMS verification required
-                    authProvider.updateCurrentRegStage(
-                      RegStage.register,
-                    );
+                  final verified = await authProvider.verifyEmailOtpForInline();
+                  if (verified) {
+                    // Clear OTP controller after successful verification
+                    authProvider.emailOtpController.clear();
+                    if (bothEnabled) {
+                      // Stop the email OTP timer when transitioning to phone OTP
+                      _timer?.cancel();
+                      _secondsRemaining = 0;
+                      _streamController.add(0);
+                      authProvider.updateCurrentRegStage(
+                        RegStage.otpCombined,
+                      );
+                    } else {
+                      await Future.delayed(const Duration(seconds: 20));
+                      // No SMS verification required
+                      authProvider.updateCurrentRegStage(
+                        RegStage.register,
+                      );
+                    }
                   }
-                }
-              },
-              onChanged: (value) {
-                print("Email OTP: $value");
-                // Clear error when typing
-                if (authProvider.emailOtpError.isNotEmpty && value.isNotEmpty) {
-                  // Reset error state via internal set
-                }
-              },
-              appContext: context,
-              autoDisposeControllers: false,
-            ),
+                },
+                onChanged: (value) {
+                  print("Email OTP: $value");
+                  // Clear error when typing
+                  if (authProvider.emailOtpError.isNotEmpty &&
+                      value.isNotEmpty) {
+                    // Reset error state via internal set
+                  }
+                },
+                appContext: context,
+                autoDisposeControllers: false,
+              ),
             // Error message display
             if (authProvider.emailOtpError.isNotEmpty)
               Padding(
@@ -1516,32 +1357,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             verticalSpaceRegular
-            // When both enabled and email verified, show phone section
-            // if (bothEnabled && authProvider.emailOtpVerified) ...[
-            //   verticalSpaceMedium,
-            //   const Divider(color: AppColors.kGray),
-            //   verticalSpaceSmall,
-            //   if (authProvider.phoneOtpSending)
-            //     const CircularProgressIndicator(color: AppColors.kWhite)
-            //   else
-            //     _inlinePhoneOtpWidget(authProvider, context, authListener),
-            // ],
-            // verticalSpaceSmall,
-            // if (authProvider.emailOtpVerified)
-            //   ElevatedButton(
-            //     style: ButtonStyle(
-            //         backgroundColor: WidgetStatePropertyAll(
-            //             Theme.of(context).colorScheme.primary),
-            //         foregroundColor: WidgetStatePropertyAll(Colors.white),
-            //         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-            //             borderRadius: BorderRadius.circular(10)))),
-            //     onPressed: () {
-            //       authProvider.updateCurrentRegStage(
-            //         RegStage.mobileChoice,
-            //       );
-            //     },
-            //     child: Text("Continue"),
-            //   )
           ],
         );
       },
@@ -1583,7 +1398,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                verticalSpaceSmall,
+                verticalSpaceMedium,
                 Form(
                   key: authProvider.phoneFormKey,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -1826,7 +1641,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 // ),
                 verticalSpaceRegular,
                 // Phone OTP Field - disabled until email is verified when both enabled
-                if (!authProvider.isEditingMobile)
+                if (!authProvider.isEditingMobile &&
+                    !authProvider.phoneOtpVerified)
                   PinCodeTextField(
                     textStyle: const TextStyle(
                       color: AppColors.kWhite,

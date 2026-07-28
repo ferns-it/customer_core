@@ -152,4 +152,6 @@ class Endpoints {
 
   static const String kSendPhoneOTP = 'shop/otpservices/sendotptophone';
   static const String kVerifyPhoneOTP = 'shop/otpservices/verifyotptophone';
+  static const String kSendEmailOTP = 'shop/otpservices/sendotptoemail';
+  static const String kVerifyEmailOTP = 'shop/otpservices/verifyotptoemail';
 }

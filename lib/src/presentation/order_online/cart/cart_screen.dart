@@ -536,52 +536,42 @@ class _CartScreenState extends State<CartScreen>
                                               return;
                                             }
 
-                                            // if (userProvider.userData?.user
-                                            //             .isMobileVerified !=
-                                            //         "Yes" &&
-                                            //     smsRequired) {
-                                            //   final verified =
-                                            //       await mobileVerificationDialog(
-                                            //     context,
-                                            //   );
+                                            // Skip mobile verification for card payments
+                                            if (cartListener
+                                                    .selectedPaymentMethod !=
+                                                PaymentMethod.card) {
+                                              final user =
+                                                  userProvider.userData?.user;
 
-                                            //   if (!verified) return;
+                                              // SMS verification disabled but no phone number
+                                              if (!smsRequired &&
+                                                  (user?.userMobile == '0' ||
+                                                      user!.userMobile!
+                                                          .trim()
+                                                          .isEmpty)) {
+                                                final phoneAdded =
+                                                    await mobileNumberDialog(
+                                                        context);
 
-                                            //   cartProvider.jumpToPage(2);
-                                            //   return;
-                                            // }
-                                            // cartProvider.jumpToPage(2);
-                                            final user =
-                                                userProvider.userData?.user;
+                                                if (!phoneAdded) return;
 
-// SMS verification disabled but no phone number
-                                            if (!smsRequired &&
-                                                (user?.userMobile == '0' ||
-                                                    user!.userMobile!
-                                                        .trim()
-                                                        .isEmpty)) {
-                                              final phoneAdded =
-                                                  await mobileNumberDialog(
-                                                      context);
+                                                cartProvider.jumpToPage(2);
+                                                return;
+                                              }
 
-                                              if (!phoneAdded) return;
+                                              // SMS verification enabled
+                                              if (smsRequired &&
+                                                  user?.isMobileVerified !=
+                                                      "Yes") {
+                                                final verified =
+                                                    await mobileVerificationDialog(
+                                                        context);
 
-                                              cartProvider.jumpToPage(2);
-                                              return;
-                                            }
+                                                if (!verified) return;
 
-// SMS verification enabled
-                                            if (smsRequired &&
-                                                user?.isMobileVerified !=
-                                                    "Yes") {
-                                              final verified =
-                                                  await mobileVerificationDialog(
-                                                      context);
-
-                                              if (!verified) return;
-
-                                              cartProvider.jumpToPage(2);
-                                              return;
+                                                cartProvider.jumpToPage(2);
+                                                return;
+                                              }
                                             }
 
                                             cartProvider.jumpToPage(2);
@@ -1782,6 +1772,12 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                                         .userData!.user.isMobileVerified,
                                     isEmailVerified: userProvider
                                         .userData!.user.isEmailVerified,
+                                    countryCode:
+                                        userProvider.userData!.user.countryCode,
+                                    userMobileActual: userProvider
+                                        .userData!.user.userMobileActual,
+                                    userMobileFormatted: userProvider
+                                        .userData!.user.userMobileFormatted,
                                   ),
                                   token: userProvider.userData!.token,
                                   expireAt: userProvider.userData!.expireAt,
@@ -1840,9 +1836,31 @@ class _MobileVerificationDialogContentState
     super.initState();
     final userProvider = context.read<UserProvider>();
     final shopProvider = context.read<ShopProvider>();
-    phoneController.text = userProvider.userData?.user.userMobile ?? '';
-    countryCode = shopProvider.selectedCountry?.code ??
-        AppConfig.instance.country.dialCode;
+
+    phoneController.text = userProvider.userData?.user.userMobileActual ?? '';
+
+    // Use the country code from the login response if available
+    final userCountryCode = userProvider.userData?.user.countryCode;
+    if (userCountryCode != null && userCountryCode.isNotEmpty) {
+      // Find the matching country from the available SMS countries
+      final matchingCountry = shopProvider.smsCountries
+          .cast<SmsAvailableCountriesData?>()
+          .firstWhere(
+            (c) => c!.code == userCountryCode,
+            orElse: () => null,
+          );
+      if (matchingCountry != null) {
+        shopProvider.updateSelectedCountry(matchingCountry);
+        countryCode =
+            matchingCountry.code ?? AppConfig.instance.country.dialCode;
+      } else {
+        countryCode = shopProvider.selectedCountry?.code ??
+            AppConfig.instance.country.dialCode;
+      }
+    } else {
+      countryCode = shopProvider.selectedCountry?.code ??
+          AppConfig.instance.country.dialCode;
+    }
   }
 
   @override

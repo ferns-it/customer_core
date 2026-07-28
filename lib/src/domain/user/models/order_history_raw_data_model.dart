@@ -529,6 +529,15 @@ class OrderDetailsModel {
       : '${AppConfig.instance.country.symbol}0.00';
 
   bool get isTaxApplicablebool => isTaxApplicable == 'Yes';
+  String get formattedPhone {
+    if (phone == null || phone!.isEmpty) return "";
+
+    if (AppConfig.instance.country.dialCode == "+44") {
+      return phone!.startsWith("0") ? phone! : "0$phone";
+    }
+    // Remove leading 0 for other countries
+    return phone!.startsWith("0") ? phone!.substring(1) : phone!;
+  }
 
   // String get formattedDiscount {
   //   if (deliveryDiscount != null) {
@@ -584,9 +593,7 @@ class OrderDetailsModel {
   bool get orderRejected {
     if (orderStatus == OrderStatus.rejected) return true;
     return status?.toLowerCase().contains("order rejected") == true;
-    
   }
-  
 }
 
 class OrderHistoryDishesDataModel {

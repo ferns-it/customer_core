@@ -103,14 +103,52 @@ class OtpProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> verifyPhoneOtp({
-    required String phone,
-    required String countryCode,
-    required OtpPurpose purpose,
-    required String otp,
-    required String userID,
-    required String userType
+  Future<bool> sendEmailOtp({
+    required String email,
+    required EmailOtpPurpose purpose,
   }) async {
+    try {
+      _loading = true;
+      notifyListeners();
+
+      final response = await otpRepo.sendEmailOtp(
+        shopID: AppIdentifiers.kShopId,
+        email: email,
+        purpose: purpose.value,
+        userID: "",
+        userType: "Guest",
+      );
+
+      return response.match(
+        (error) {
+          AlertDialogs.showError(error.message);
+          return false;
+        },
+        (result) {
+          _otpTokenId = result.otpToken; // <-- use tokenId
+          debugPrint("OTP Token: $_otpTokenId");
+          if (_otpTokenId == null || _otpTokenId!.isEmpty) {
+            AlertDialogs.showError(
+                "Failed to get OTP token. Please try again.");
+            return false;
+          }
+          startTimer();
+          return true;
+        },
+      );
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> verifyPhoneOtp(
+      {required String phone,
+      required String countryCode,
+      required OtpPurpose purpose,
+      required String otp,
+      required String userID,
+      required String userType}) async {
     try {
       _loading = true;
       notifyListeners();
@@ -121,11 +159,42 @@ class OtpProvider extends ChangeNotifier {
         otp: otp,
         purpose: purpose.value,
         tokenId: otpTokenId ?? "",
-        userID:userID,
+        userID: userID,
         userType: userType,
-
       );
-      print("verify response: $response");
+      print("verify response phone: $response");
+      return response.fold(
+        () => true,
+        (error) {
+          AlertDialogs.showError(error.message);
+          return false;
+        },
+      );
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> verifyEmailOtp(
+      {required String email,
+      required EmailOtpPurpose purpose,
+      required String otp,
+      required String userID,
+      required String userType}) async {
+    try {
+      _loading = true;
+      notifyListeners();
+      final response = await otpRepo.verifyEmailOtp(
+        shopID: AppIdentifiers.kShopId,
+        email: email,
+        otp: otp,
+        purpose: purpose.value,
+        tokenId: otpTokenId ?? "",
+        userID: userID,
+        userType: userType,
+      );
+      print("verify response email: $response");
       return response.fold(
         () => true,
         (error) {

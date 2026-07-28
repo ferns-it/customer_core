@@ -161,7 +161,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
               ),
             ),
             Text(
-              orderDetails.phone ?? "",
+              orderDetails.formattedPhone ?? "",
               style: context.customTextTheme.text16W500
                   .copyWith(color: context.customTextTheme.color),
             ),

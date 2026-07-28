@@ -68,8 +68,11 @@ class UserRegisterResponse {
               userStatus: null,
               addedTime: null,
               userActivationCode: null,
-              isMobileVerified:null,
-              isEmailVerified:null
+              isMobileVerified: null,
+              isEmailVerified: null,
+              countryCode: null,
+              userMobileActual: null,
+              userMobileFormatted: null,
             ),
     );
   }

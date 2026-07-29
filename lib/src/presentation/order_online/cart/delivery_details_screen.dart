@@ -208,7 +208,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                               true
                                       ? const SizedBox.shrink()
                                       : Text(
-                                          '${userListener.userData?.user.countryCode} ${userListener.userData?.user.userMobileActual}' ??
+                                          '${userListener.userData?.user.formattedCountryCode} ${userListener.userData?.user.userMobileActual}' ??
                                               "",
                                           style: GoogleFonts.quicksand(
                                             textStyle: context
@@ -543,8 +543,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   Theme.of(context).colorScheme.primary,
 
                               onChanged: (_) {
-                                if (!cartListener.isStripeEnabled) {
-                                  AlertDialogs.showInfo(
+                                final isIndianUser =
+                                    userListener.userData?.user.isIndianUser ??
+                                        cartListener.isIndianUser;
+                                if (!cartListener.isStripeEnabled ||
+                                    isIndianUser) {
+                                  AlertDialogs.showError(
                                       'Card payment not available');
                                   return;
                                 }

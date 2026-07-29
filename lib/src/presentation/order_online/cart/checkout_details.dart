@@ -546,7 +546,7 @@ class CheckoutDetailsScreen extends StatelessWidget {
                       userListener.userData?.user.userMobile?.isEmpty == true
                   ? const SizedBox.shrink()
                   : Text(
-                      '${userListener.userData?.user.countryCode} ${userListener.userData?.user.userMobileActual}' ??
+                      '${userListener.userData?.user.formattedCountryCode} ${userListener.userData?.user.userMobileActual}' ??
                           "",
                       style: GoogleFonts.quicksand(
                         textStyle: context.customTextTheme.text16W500.copyWith(

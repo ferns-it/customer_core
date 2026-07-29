@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
+import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
@@ -337,8 +338,21 @@ class CheckoutScreen extends GetProviderView<CartProvider> {
                       ),
                       selected: cartListener.selectedPaymentMethod ==
                           PaymentMethod.card,
-                      onTap: () => cartListener
-                          .onChangePaymentMethod(PaymentMethod.card),
+                      onTap: () {
+                        final isIndianUser =
+                            userListener.userData?.user.isIndianUser ??
+                                cartListener.isIndianUser;
+                        if (!cartListener.isStripeEnabled || isIndianUser) {
+                          AlertDialogs.showInfo(
+                            isIndianUser
+                                ? 'Card payment not available for Indian registered users'
+                                : 'Card payment not available',
+                            context: context,
+                          );
+                          return;
+                        }
+                        cartListener.onChangePaymentMethod(PaymentMethod.card);
+                      },
                     ),
                   ],
                 ),
@@ -408,9 +422,20 @@ class CheckoutScreen extends GetProviderView<CartProvider> {
                       if (cartProvider.selectedPaymentMethod ==
                           PaymentMethod.card) {
                         paymentProvider.createPaymentIntent(
-                          deliveryType: cartProvider.selectedOrderType == OrderType.delivery ? "door_delivery" : "store_pickup",
-                          postCode:cartProvider.selectedOrderType == OrderType.delivery  ? cartProvider.selectedAddress?.postcode ?? "" : "",
-                          pickupTime:cartProvider.selectedOrderType == OrderType.takeaway ? cartProvider.selectedPickUpTime?.toIso8601String() ?? '' : '',
+                            deliveryType: cartProvider.selectedOrderType ==
+                                    OrderType.delivery
+                                ? "door_delivery"
+                                : "store_pickup",
+                            postCode: cartProvider.selectedOrderType ==
+                                    OrderType.delivery
+                                ? cartProvider.selectedAddress?.postcode ?? ""
+                                : "",
+                            pickupTime: cartProvider.selectedOrderType ==
+                                    OrderType.takeaway
+                                ? cartProvider.selectedPickUpTime
+                                        ?.toIso8601String() ??
+                                    ''
+                                : '',
                             cartProvider.calculatedDiscount,
                             cartProvider.calculatedDeliveryFee,
                             onPaymentSuccess: (transactionId) {

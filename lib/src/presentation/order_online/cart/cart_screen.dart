@@ -1743,44 +1743,18 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                             if (success && context.mounted) {
                               // Update local user data with the new mobile number
                               if (userProvider.userData != null) {
-                                final updatedUserData = UserLoginResponse(
-                                  user: User(
-                                    userID: userProvider.userData!.user.userID,
-                                    shopID: userProvider.userData!.user.shopID,
-                                    userFirstName: userProvider
-                                        .userData!.user.userFirstName,
-                                    userLastName: userProvider
-                                        .userData!.user.userLastName,
-                                    userAddress:
-                                        userProvider.userData!.user.userAddress,
-                                    userPostCode: userProvider
-                                        .userData!.user.userPostCode,
-                                    userMobile: authProvider
-                                        .registerUserPhoneController.text
-                                        .trim(),
-                                    userEmail:
-                                        userProvider.userData!.user.userEmail,
-                                    userPassword: userProvider
-                                        .userData!.user.userPassword,
-                                    userStatus:
-                                        userProvider.userData!.user.userStatus,
-                                    addedTime:
-                                        userProvider.userData!.user.addedTime,
-                                    userActivationCode: userProvider
-                                        .userData!.user.userActivationCode,
-                                    isMobileVerified: userProvider
-                                        .userData!.user.isMobileVerified,
-                                    isEmailVerified: userProvider
-                                        .userData!.user.isEmailVerified,
-                                    countryCode:
-                                        userProvider.userData!.user.countryCode,
-                                    userMobileActual: userProvider
-                                        .userData!.user.userMobileActual,
-                                    userMobileFormatted: userProvider
-                                        .userData!.user.userMobileFormatted,
+                                final phone = authProvider
+                                    .registerUserPhoneController.text
+                                    .trim();
+                                final countryCode = userProvider
+                                        .userData!.user.countryCode ??
+                                    AppConfig.instance.country.dialCode;
+                                final updatedUserData =
+                                    userProvider.userData!.copyWith(
+                                  user: userProvider.userData!.user.copyWith(
+                                    userMobile: "$countryCode$phone",
+                                    userMobileActual: phone,
                                   ),
-                                  token: userProvider.userData!.token,
-                                  expireAt: userProvider.userData!.expireAt,
                                 );
                                 await userProvider.sharedPrefsRepository
                                     .saveUserData(updatedUserData);
@@ -2069,14 +2043,15 @@ class _MobileVerificationDialogContentState
               : () async {
                   if (!otpSent) {
                     // Step 1: Send OTP
-                    final phone = phoneController.text.trim();
-                    if (phone.isEmpty) {
+                    final rawPhone = phoneController.text.trim();
+                    if (rawPhone.isEmpty) {
                       AlertDialogs.showError("Please enter your mobile number",
                           context: context);
                       return;
                     }
+                    final fullPhone = "$countryCode$rawPhone";
                     final sent = await otpProvider.sendPhoneOtp(
-                      phone: phone,
+                      phone: fullPhone,
                       countryCode: countryCode,
                       purpose: OtpPurpose.phoneVerification,
                     );
@@ -2091,17 +2066,34 @@ class _MobileVerificationDialogContentState
                           context: context);
                       return;
                     }
+                    final rawPhone = phoneController.text.trim();
+                    final fullPhone = "$countryCode$rawPhone";
                     final isValid = await otpProvider.verifyPhoneOtp(
-                        phone: phoneController.text.trim(),
+                        phone: fullPhone,
                         countryCode: countryCode,
                         purpose: OtpPurpose.phoneVerification,
                         otp: otp,
                         userID: userProvider.userData?.user.userID ?? '',
                         userType: 'Registered');
                     if (isValid) {
-                      await authProvider.loginUser();
-                      await userProvider.getUserData();
-                      if (mounted) {
+                      if (userProvider.userData != null) {
+                        final phone = phoneController.text.trim();
+                        final formattedCountryCode = countryCode.startsWith('+')
+                            ? countryCode
+                            : '+$countryCode';
+                        final updatedUserData = userProvider.userData!.copyWith(
+                          user: userProvider.userData!.user.copyWith(
+                            isMobileVerified: "Yes",
+                            countryCode: formattedCountryCode,
+                            userMobileActual: phone,
+                            userMobile: "$formattedCountryCode$phone",
+                          ),
+                        );
+                        await userProvider.sharedPrefsRepository
+                            .saveUserData(updatedUserData);
+                        await userProvider.getUserData();
+                      }
+                      if (context.mounted) {
                         Navigator.of(context).pop(true);
                       }
                     }

@@ -278,13 +278,18 @@ class CartProvider extends ChangeNotifier with BaseController {
               : double.parse(
                   _validatedCouponDetails!.coupenData!.coupenAmount!);
 
-  bool get isStripeEnabled => selectedOrderType == OrderType.delivery
-      ? deliveryDetails?.cartData?.paymentOptions?.isStripeEnabled ??
-          cartDetailsModel?.paymentOptions?.isStripeEnabled ??
-          false
-      : takeAwayDetails?.cartData?.paymentOptions?.isStripeEnabled ??
-          cartDetailsModel?.paymentOptions?.isStripeEnabled ??
-          false;
+  bool get isIndianUser => _userData?.user.isIndianUser ?? false;
+
+  bool get isStripeEnabled {
+    if (isIndianUser) return false;
+    return selectedOrderType == OrderType.delivery
+        ? deliveryDetails?.cartData?.paymentOptions?.isStripeEnabled ??
+            cartDetailsModel?.paymentOptions?.isStripeEnabled ??
+            false
+        : takeAwayDetails?.cartData?.paymentOptions?.isStripeEnabled ??
+            cartDetailsModel?.paymentOptions?.isStripeEnabled ??
+            false;
+  }
 
   bool get isCODEnabled => selectedOrderType == OrderType.delivery
       ? deliveryDetails?.cartData?.paymentOptions?.isCODEnabled ??
@@ -363,6 +368,9 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   bool _isUserLoggedIn = false;
   bool get isUserLoggedIn => _isUserLoggedIn;
+
+  UserLoginResponse? _userData;
+  UserLoginResponse? get userData => _userData;
 
   String get _activeCurrencySymbol =>
       (_cartDetailsModel?.shopCurrencyIcon?.trim().isNotEmpty ?? false)
@@ -472,13 +480,17 @@ class CartProvider extends ChangeNotifier with BaseController {
   }
 
   Future<bool> checkUserIsLogged() async {
-    _isUserLoggedIn = await sharedPrefsRepository.getUserData() != null;
+    _userData = await sharedPrefsRepository.getUserData();
+    _isUserLoggedIn = _userData != null;
     notifyListeners();
     return _isUserLoggedIn;
   }
 
-  Future<UserLoginResponse?> getUserData() async =>
-      await sharedPrefsRepository.getUserData();
+  Future<UserLoginResponse?> getUserData() async {
+    _userData = await sharedPrefsRepository.getUserData();
+    notifyListeners();
+    return _userData;
+  }
 
   Future<void> listAllOffers() async {
     try {
@@ -771,6 +783,9 @@ class CartProvider extends ChangeNotifier with BaseController {
         log(exception.toString());
       }, (result) {
         _cartDetailsModel = result;
+        if (isIndianUser && _selectedPaymentMethod == PaymentMethod.card) {
+          _selectedPaymentMethod = PaymentMethod.cash;
+        }
         notifyListeners();
       });
     } finally {
@@ -1127,6 +1142,11 @@ class CartProvider extends ChangeNotifier with BaseController {
   }
 
   void onChangePaymentMethod(PaymentMethod method) {
+    if (method == PaymentMethod.card && isIndianUser) {
+      AlertDialogs.showInfo(
+          "Card payment is not available for Indian registered users");
+      return;
+    }
     _selectedPaymentMethod = method;
     notifyListeners();
   }
@@ -1164,6 +1184,12 @@ class CartProvider extends ChangeNotifier with BaseController {
   }
 
   bool validateInputData() {
+    if (selectedPaymentMethod == PaymentMethod.card && isIndianUser) {
+      AlertDialogs.showInfo(
+          "Card payment is not available for Indian registered users");
+      return false;
+    }
+
     if (selectedAddress == null) {
       AlertDialogs.showInfo("Please pick an address");
       return false;

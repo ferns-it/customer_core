@@ -193,4 +193,24 @@ class User {
   }
 
   bool get mobileVerified => isMobileVerified == "Yes";
+
+  String get formattedCountryCode {
+    if (countryCode == null || countryCode!.trim().isEmpty) return '';
+    final code = countryCode!.trim();
+    return code.startsWith('+') ? code : '+$code';
+  }
+
+  bool get isIndianUser {
+    final code = countryCode?.trim().toUpperCase();
+    if (code == '+91' || code == '91' || code == 'IN' || code == 'IND') {
+      return true;
+    }
+    final mobile = userMobileActual?.trim() ?? userMobile?.trim() ?? '';
+    if (mobile.startsWith('+91') ||
+        (mobile.startsWith('91') && mobile.length == 12)) {
+      return true;
+    }
+    return false;
+  }
 }
+

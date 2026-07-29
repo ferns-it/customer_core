@@ -163,7 +163,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
               ),
             ),
             Text(
-              '${userListener.userData?.user.countryCode} ${userListener.userData?.user.userMobileActual}' ??
+              '${userListener.userData?.user.formattedCountryCode} ${userListener.userData?.user.userMobileActual}' ??
                   "",
               style: context.customTextTheme.text16W500
                   .copyWith(color: context.customTextTheme.color),

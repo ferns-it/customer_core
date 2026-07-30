@@ -974,7 +974,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
             style: context.customTextTheme.text20W600
                 .copyWith(color: context.customTextTheme.color),
           ),
-          verticalSpaceSmall,
+          verticalSpaceTiny,
           Text(
             (userListener.userData?.user.userEmail?.isNotEmpty ?? false)
                 ? userListener.userData!.user.userEmail!
@@ -982,6 +982,25 @@ class ProfileScreen extends GetProviderView<UserProvider> {
             style: context.customTextTheme.text16W400,
           ),
           verticalSpaceTiny,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                FluentIcons.phone_12_regular,
+                size: 18,
+              ),
+              horizontalSpaceTiny,
+              Text(
+                (userListener.userData?.user.userMobileActual?.isNotEmpty ??
+                        false)
+                    ? '${userListener.userData?.user.formattedCountryCode} ${userListener.userData?.user.userMobileActual}'
+                    : '',
+                style: context.customTextTheme.text16W400,
+              ),
+            ],
+          ),
+          verticalSpaceTiny,
+
           // Text(
           //   (userListener.userData?.user.userMobile?.isNotEmpty ?? false)
           //       ? userListener.userData!.user.userMobile!

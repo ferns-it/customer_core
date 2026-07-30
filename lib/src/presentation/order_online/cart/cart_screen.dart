@@ -1746,9 +1746,9 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                                 final phone = authProvider
                                     .registerUserPhoneController.text
                                     .trim();
-                                final countryCode = userProvider
-                                        .userData!.user.countryCode ??
-                                    AppConfig.instance.country.dialCode;
+                                final countryCode =
+                                    userProvider.userData!.user.countryCode ??
+                                        AppConfig.instance.country.dialCode;
                                 final updatedUserData =
                                     userProvider.userData!.copyWith(
                                   user: userProvider.userData!.user.copyWith(

@@ -985,10 +985,12 @@ class ProfileScreen extends GetProviderView<UserProvider> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                FluentIcons.phone_12_regular,
-                size: 18,
-              ),
+              if (userListener.userData?.user.userMobileActual?.isNotEmpty ??
+                  false)
+                const Icon(
+                  FluentIcons.phone_12_regular,
+                  size: 18,
+                ),
               horizontalSpaceTiny,
               Text(
                 (userListener.userData?.user.userMobileActual?.isNotEmpty ??

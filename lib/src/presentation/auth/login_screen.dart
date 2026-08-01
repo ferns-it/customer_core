@@ -383,6 +383,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _otpWidget(authProvider, context, authListener),
       _successWidget(authProvider, context, authListener),
     ];
+        final productsProvider = context.read<ProductsProvider>();
+
     return PopScope(
       onPopInvokedWithResult: (_, __) {
         authProvider.clearValues(registerControllersOnly: true);
@@ -544,6 +546,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   await authProvider
                                       .loginUser()
                                       .then((loggedin) {
+                                           productsProvider
+                                        .getFeaturedPopularProducts();
+
                                     if (widget.showBackButton) {
                                       Navigator.pop(context, true);
                                       context

@@ -51,25 +51,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       data: quickSandTextTheme(context),
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        // appBar: AppBar(
-        //   centerTitle: true,
-        //   leading: widget.isFromProfileScreen
-        //       ? const CustomBackButton()
-        //       : const SizedBox.shrink(),
-        //   // leading: const CustomBackButton(),
-        //   backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        //   automaticallyImplyLeading: false,
-        //   leadingWidth: 70,
-        //   title:
-        //       Text("Orders History", style: context.customTextTheme.text18W600),
-        //   bottom: PreferredSize(
-        //     preferredSize: const Size.fromHeight(1.0),
-        //     child: Container(
-        //       color: AppColors.kLightGray2,
-        //       height: 1.0,
-        //     ),
-        //   ),
-        // ),
         body: !isLogged
             ? Center(
                 child: Column(

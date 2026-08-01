@@ -31,21 +31,21 @@ class OrderHistoryScreen extends StatefulWidget {
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
-  late final Future<bool> _isLoggedFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _isLoggedFuture = context.read<OrderProvider>().checkUserIsLogged();
-  }
-
   @override
   Widget build(BuildContext context) {
     final orderProvider = context.read<OrderProvider>();
     final orderListener = context.watch<OrderProvider>();
     final themeListener = context.watch<ThemeProvider>();
     final cartProvider = context.read<CartProvider>();
-    final userProvider = context.read<UserProvider>();
+    final userProvider = context.watch<UserProvider>();
+
+    // Check if user has userData (logged in)
+    final isLogged = userProvider.userData != null;
+
+    // Auto-fetch orders when user logs in
+    if (isLogged && orderListener.ordersResponse.isInitial) {
+      Future.microtask(() => orderProvider.fetchAllOrders());
+    }
 
     return Theme(
       data: quickSandTextTheme(context),
@@ -70,29 +70,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         //     ),
         //   ),
         // ),
-        body: FutureBuilder<bool>(
-          future: _isLoggedFuture,
-          builder: (context, snapshot) {
-            final isLogged = snapshot.data ?? false;
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: showButtonProgress(
-                  Theme.of(context).colorScheme.primary,
-                ),
-              );
-            }
-
-            return orderListener.ordersResponse.when(
-              initial: () {
-                if (isLogged) {
-                  Future.microtask(() => orderProvider.fetchAllOrders());
-                  return Center(
-                      child: showButtonProgress(
-                          Theme.of(context).colorScheme.primary));
-                }
-
-                return Center(
-                    child: Column(
+        body: !isLogged
+            ? Center(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Assets.lib.assets.images.userlogin.image(height: 300),
@@ -104,14 +84,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     verticalSpaceSmall,
                     FilledButton(
                       onPressed: () async {
-                        // context.router.replace(LoginScreenRoute());
                         final result = await Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) => LoginScreen(
-                                showBackButton: true,
-                              ),
-                            ));
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => LoginScreen(
+                              showBackButton: true,
+                            ),
+                          ),
+                        );
 
                         if (result) {
                           Future.wait([
@@ -125,26 +105,34 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         }
                       },
                       style: FilledButton.styleFrom(
-                          disabledBackgroundColor: Colors.transparent,
-                          disabledForegroundColor:
-                              Theme.of(context).disabledColor,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
-                          fixedSize: const Size(double.infinity, 30),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary),
+                        disabledBackgroundColor: Colors.transparent,
+                        disabledForegroundColor: Theme.of(context).disabledColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        fixedSize: const Size(double.infinity, 30),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
                       child: const Text(
                         'LOGIN',
                         style: TextStyle(color: AppColors.kWhite),
                       ),
                     )
                   ],
-                ));
-              },
-              loading: () => Center(
+                ),
+              )
+            : orderListener.ordersResponse.when(
+                initial: () => Center(
                   child: showButtonProgress(
-                      Theme.of(context).colorScheme.primary)),
-              completed: (_) {
+                    Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                loading: () => Center(
+                  child: showButtonProgress(
+                    Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                completed: (_) {
                 final data = orderListener.orders;
                 final orderHistory = data
                     .where((e) => e.orderDispatched || e.orderRejected)
@@ -310,11 +298,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         },
                         child: const Text("Try Again"))
                   ],
-                ),
+                  )
+                  
+                
               ),
-            );
-          },
-        ),
+            ),
       ),
     );
   }

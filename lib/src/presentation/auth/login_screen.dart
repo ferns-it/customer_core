@@ -6,6 +6,7 @@ import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:customer_core/src/application/home/home_provider.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:customer_core/src/application/order/order_provider.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
@@ -256,6 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         .getFeaturedPopularProducts();
 
                                     if (widget.showBackButton) {
+                                      context.read<OrderProvider>().clearData();
                                       Navigator.pop(context, true);
                                       context
                                           .read<UserProvider>()
@@ -383,7 +385,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _otpWidget(authProvider, context, authListener),
       _successWidget(authProvider, context, authListener),
     ];
-        final productsProvider = context.read<ProductsProvider>();
+    final productsProvider = context.read<ProductsProvider>();
 
     return PopScope(
       onPopInvokedWithResult: (_, __) {
@@ -546,7 +548,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   await authProvider
                                       .loginUser()
                                       .then((loggedin) {
-                                           productsProvider
+                                    productsProvider
                                         .getFeaturedPopularProducts();
 
                                     if (widget.showBackButton) {

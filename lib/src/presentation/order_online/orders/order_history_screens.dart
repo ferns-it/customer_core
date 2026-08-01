@@ -18,24 +18,34 @@ import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:customer_core/src/domain/user/models/order_history_raw_data_model.dart';
 import 'package:customer_core/src/presentation/auth/login_screen.dart';
 import 'package:customer_core/src/presentation/widgets/button_progress.dart';
-import 'package:customer_core/src/presentation/widgets/get_provider_view.dart';
-
 import '../../../core/routes/routes.gr.dart';
 
 @RoutePage()
-class OrderHistoryScreen extends GetProviderView<OrderProvider> {
+class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen(this.isFromProfileScreen, {super.key});
 
   final bool isFromProfileScreen;
 
   @override
+  State<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
+}
+
+class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
+  late final Future<bool> _isLoggedFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLoggedFuture = context.read<OrderProvider>().checkUserIsLogged();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final orderProvider = notifier(context);
-    final orderListener = listener(context);
-    final themeListener = listener2<ThemeProvider>(context);
-    final cartListener = context.watch<CartProvider>();
+    final orderProvider = context.read<OrderProvider>();
+    final orderListener = context.watch<OrderProvider>();
+    final themeListener = context.watch<ThemeProvider>();
     final cartProvider = context.read<CartProvider>();
-    final userListener = context.watch<UserProvider>();
+    final userProvider = context.read<UserProvider>();
 
     return Theme(
       data: quickSandTextTheme(context),
@@ -43,7 +53,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         // appBar: AppBar(
         //   centerTitle: true,
-        //   leading: isFromProfileScreen
+        //   leading: widget.isFromProfileScreen
         //       ? const CustomBackButton()
         //       : const SizedBox.shrink(),
         //   // leading: const CustomBackButton(),
@@ -60,10 +70,18 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
         //     ),
         //   ),
         // ),
-        body: FutureBuilder(
-          future: orderProvider.checkUserIsLogged(),
+        body: FutureBuilder<bool>(
+          future: _isLoggedFuture,
           builder: (context, snapshot) {
             final isLogged = snapshot.data ?? false;
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: showButtonProgress(
+                  Theme.of(context).colorScheme.primary,
+                ),
+              );
+            }
+
             return orderListener.ordersResponse.when(
               initial: () {
                 if (isLogged) {
@@ -97,10 +115,10 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
 
                         if (result) {
                           Future.wait([
-                            userListener.getUserData(),
-                            userListener.getAddressList(),
+                            userProvider.getUserData(),
+                            userProvider.getAddressList(),
                             orderProvider.fetchAllOrders(),
-                            if (cartListener.cartItems.isNotEmpty) ...[
+                            if (cartProvider.cartItems.isNotEmpty) ...[
                               cartProvider.transferCart(),
                             ],
                           ]);
@@ -302,7 +320,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
   }
 
   Widget buildSearchFilterWidget(BuildContext context) {
-    final orderProvider = notifier(context);
+    final orderProvider = context.read<OrderProvider>();
 
     return Row(
       children: [

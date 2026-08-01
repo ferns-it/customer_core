@@ -52,7 +52,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
               // Optional: logout after showing message
-              context.read<AuthProvider>().logoutUser();
+              final authProvider = context.read<AuthProvider>();
+              authProvider.logoutUser();
+              authProvider.clearValues();
               context.router.replace(LoginScreenRoute());
 
               return NavigationDecision.prevent;
@@ -73,7 +75,8 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           WebViewWidget(controller: controller),
           if (loadingPercentage < 100)
             LinearProgressIndicator(
-              value: loadingPercentage /  AppConfig.instance.country.currencyDivisor,
+              value: loadingPercentage /
+                  AppConfig.instance.country.currencyDivisor,
               backgroundColor: Colors.grey[200],
               color: Theme.of(context).colorScheme.primary,
               minHeight: 3,

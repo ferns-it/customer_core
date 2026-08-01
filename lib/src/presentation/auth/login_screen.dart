@@ -64,8 +64,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    startTimer();
     super.initState();
+    startTimer();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthProvider>().clearValues();
+    });
   }
 
   @override

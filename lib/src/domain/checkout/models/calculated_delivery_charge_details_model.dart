@@ -498,8 +498,7 @@ class DeliveryFeeDeliverySettings {
               ? (map["maxDeliveryRadius"] as int).toDouble()
               : map["maxDeliveryRadius"]
           : null,
-      ratePerMile:
-          map['ratePerMile'] != null ? map['ratePerMile'] as double : null,
+      ratePerMile: (map['ratePerMile'] as num?)?.toDouble(),
       deliveryChargeType: map['deliveryChargeType'] != null
           ? map['deliveryChargeType'] as String
           : null,

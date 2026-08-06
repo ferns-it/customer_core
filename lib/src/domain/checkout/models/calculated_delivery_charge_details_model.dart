@@ -421,7 +421,7 @@ class DeliveryFeeDeliverySettings {
   final int? calibratedDistance;
   final double? freeDeliveryRadius;
   final double? maxDeliveryRadius;
-  final int? ratePerMile;
+  final double? ratePerMile;
   final String? deliveryChargeType;
   final int? freeDeliveryMinOrder;
   final String? calculateNormalDeliveryFee;
@@ -444,7 +444,7 @@ class DeliveryFeeDeliverySettings {
     int? calibratedDistance,
     double? freeDeliveryRadius,
     double? maxDeliveryRadius,
-    int? ratePerMile,
+    double? ratePerMile,
     String? deliveryChargeType,
     int? freeDeliveryMinOrder,
     String? calculateNormalDeliveryFee,
@@ -498,8 +498,7 @@ class DeliveryFeeDeliverySettings {
               ? (map["maxDeliveryRadius"] as int).toDouble()
               : map["maxDeliveryRadius"]
           : null,
-      ratePerMile:
-          map['ratePerMile'] != null ? map['ratePerMile'] as int : null,
+      ratePerMile: (map['ratePerMile'] as num?)?.toDouble(),
       deliveryChargeType: map['deliveryChargeType'] != null
           ? map['deliveryChargeType'] as String
           : null,

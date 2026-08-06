@@ -18,63 +18,42 @@ import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:customer_core/src/domain/user/models/order_history_raw_data_model.dart';
 import 'package:customer_core/src/presentation/auth/login_screen.dart';
 import 'package:customer_core/src/presentation/widgets/button_progress.dart';
-import 'package:customer_core/src/presentation/widgets/get_provider_view.dart';
-
 import '../../../core/routes/routes.gr.dart';
 
 @RoutePage()
-class OrderHistoryScreen extends GetProviderView<OrderProvider> {
+class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen(this.isFromProfileScreen, {super.key});
 
   final bool isFromProfileScreen;
 
   @override
+  State<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
+}
+
+class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
+  @override
   Widget build(BuildContext context) {
-    final orderProvider = notifier(context);
-    final orderListener = listener(context);
-    final themeListener = listener2<ThemeProvider>(context);
-    final cartListener = context.watch<CartProvider>();
+    final orderProvider = context.read<OrderProvider>();
+    final orderListener = context.watch<OrderProvider>();
+    final themeListener = context.watch<ThemeProvider>();
     final cartProvider = context.read<CartProvider>();
-    final userListener = context.watch<UserProvider>();
+    final userProvider = context.watch<UserProvider>();
+
+    // Check if user has userData (logged in)
+    final isLogged = userProvider.userData != null;
+
+    // Auto-fetch orders when user logs in
+    if (isLogged && orderListener.ordersResponse.isInitial) {
+      Future.microtask(() => orderProvider.fetchAllOrders());
+    }
 
     return Theme(
       data: quickSandTextTheme(context),
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        // appBar: AppBar(
-        //   centerTitle: true,
-        //   leading: isFromProfileScreen
-        //       ? const CustomBackButton()
-        //       : const SizedBox.shrink(),
-        //   // leading: const CustomBackButton(),
-        //   backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        //   automaticallyImplyLeading: false,
-        //   leadingWidth: 70,
-        //   title:
-        //       Text("Orders History", style: context.customTextTheme.text18W600),
-        //   bottom: PreferredSize(
-        //     preferredSize: const Size.fromHeight(1.0),
-        //     child: Container(
-        //       color: AppColors.kLightGray2,
-        //       height: 1.0,
-        //     ),
-        //   ),
-        // ),
-        body: FutureBuilder(
-          future: orderProvider.checkUserIsLogged(),
-          builder: (context, snapshot) {
-            final isLogged = snapshot.data ?? false;
-            return orderListener.ordersResponse.when(
-              initial: () {
-                if (isLogged) {
-                  Future.microtask(() => orderProvider.fetchAllOrders());
-                  return Center(
-                      child: showButtonProgress(
-                          Theme.of(context).colorScheme.primary));
-                }
-
-                return Center(
-                    child: Column(
+        body: !isLogged
+            ? Center(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Assets.lib.assets.images.userlogin.image(height: 300),
@@ -86,47 +65,55 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                     verticalSpaceSmall,
                     FilledButton(
                       onPressed: () async {
-                        // context.router.replace(LoginScreenRoute());
                         final result = await Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) => LoginScreen(
-                                showBackButton: true,
-                              ),
-                            ));
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => LoginScreen(
+                              showBackButton: true,
+                            ),
+                          ),
+                        );
 
                         if (result) {
                           Future.wait([
-                            userListener.getUserData(),
-                            userListener.getAddressList(),
+                            userProvider.getUserData(),
+                            userProvider.getAddressList(),
                             orderProvider.fetchAllOrders(),
-                            if (cartListener.cartItems.isNotEmpty) ...[
+                            if (cartProvider.cartItems.isNotEmpty) ...[
                               cartProvider.transferCart(),
                             ],
                           ]);
                         }
                       },
                       style: FilledButton.styleFrom(
-                          disabledBackgroundColor: Colors.transparent,
-                          disabledForegroundColor:
-                              Theme.of(context).disabledColor,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0)),
-                          fixedSize: const Size(double.infinity, 30),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary),
+                        disabledBackgroundColor: Colors.transparent,
+                        disabledForegroundColor: Theme.of(context).disabledColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        fixedSize: const Size(double.infinity, 30),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
                       child: const Text(
                         'LOGIN',
                         style: TextStyle(color: AppColors.kWhite),
                       ),
                     )
                   ],
-                ));
-              },
-              loading: () => Center(
+                ),
+              )
+            : orderListener.ordersResponse.when(
+                initial: () => Center(
                   child: showButtonProgress(
-                      Theme.of(context).colorScheme.primary)),
-              completed: (_) {
+                    Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                loading: () => Center(
+                  child: showButtonProgress(
+                    Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                completed: (_) {
                 final data = orderListener.orders;
                 final orderHistory = data
                     .where((e) => e.orderDispatched || e.orderRejected)
@@ -292,17 +279,17 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
                         },
                         child: const Text("Try Again"))
                   ],
-                ),
+                  )
+                  
+                
               ),
-            );
-          },
-        ),
+            ),
       ),
     );
   }
 
   Widget buildSearchFilterWidget(BuildContext context) {
-    final orderProvider = notifier(context);
+    final orderProvider = context.read<OrderProvider>();
 
     return Row(
       children: [

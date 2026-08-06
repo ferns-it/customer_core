@@ -786,6 +786,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
                                               await authProvider
                                                   .logoutUser()
                                                   .then((_) {
+                                                authProvider.clearValues();
                                                 Navigator.pop(context);
                                                 context
                                                     .read<UserProvider>()

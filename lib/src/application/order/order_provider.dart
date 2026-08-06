@@ -69,7 +69,10 @@ class OrderProvider extends ChangeNotifier with BaseController {
 
   Future<void> fetchAllOrders({String? year}) async {
     final isLogged = await checkUserIsLogged();
-    if (!isLogged) return;
+    if (!isLogged) {
+      clearData();
+      return;
+    }
 
     _ordersResponse = APIResponse.loading();
     notifyListeners();
@@ -93,6 +96,8 @@ class OrderProvider extends ChangeNotifier with BaseController {
 
   void clearData() {
     _ordersResponse = APIResponse.initial();
+    _filteredOrders = [];
+    searchController.clear();
     notifyListeners();
   }
 

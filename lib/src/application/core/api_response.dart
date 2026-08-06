@@ -33,6 +33,11 @@ class APIResponse<T> {
   APIResponse.error(this.message, {this.exception})
       : status = APIResponseStatus.error;
 
+  bool get isInitial => status == APIResponseStatus.initial;
+  bool get isLoading => status == APIResponseStatus.loading;
+  bool get isCompleted => status == APIResponseStatus.completed;
+  bool get isError => status == APIResponseStatus.error;
+
   R when<R>({
     required R Function() initial,
     required R Function() loading,

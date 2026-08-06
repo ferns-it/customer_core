@@ -397,8 +397,9 @@ class AuthProvider extends ChangeNotifier with BaseController {
     }
 
     await sharedPrefsRepository.deleteGuestID();
-
-    return await sharedPrefsRepository.deleteUserData();
+    final result = await sharedPrefsRepository.deleteUserData();
+    clearValues();
+    return result;
   }
 
   void clearValues({bool registerControllersOnly = false}) {

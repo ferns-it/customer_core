@@ -70,6 +70,13 @@ class PaymentProvider extends ChangeNotifier with BaseController {
   Future<void> _doPaymentWithStripe({
     required void Function(String transactionId) onPaymentSuccess,
   }) async {
+    if (Stripe.publishableKey.isEmpty) {
+      log("Stripe Error: Stripe.publishableKey is empty!", name: "STRIPE-ERROR");
+      AlertDialogs.showError(
+          "Stripe key is missing. Please configure keyConfig.stripeKey properly.");
+      return;
+    }
+
     if (_clientSecret != null && transactionId != null) {
       await Stripe.instance.initPaymentSheet(
 

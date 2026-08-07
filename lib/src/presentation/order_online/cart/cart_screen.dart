@@ -347,6 +347,12 @@ class _CartScreenState extends State<CartScreen>
     final authProvider = context.read<AuthProvider>();
     final storeSettings = shopListener.storeSettings.data;
     final smsRequired = storeSettings?.smsVerification == "Enabled";
+    final isHomeDeliveryEnabled =
+        storeSettings?.deliveryInfo?.homeDelivery != null &&
+            storeSettings?.deliveryInfo?.homeDelivery == '1';
+    final isTakeAwayEnabled =
+        storeSettings?.deliveryInfo?.takeAway != null &&
+            storeSettings?.deliveryInfo?.takeAway == '1';
 
     return Visibility(
       visible: !cartListener.isCartEmpty &&
@@ -447,8 +453,14 @@ class _CartScreenState extends State<CartScreen>
                                         );
 
                                         cartProvider.onChangeAddress(address);
-                                        cartProvider.onChangeOrderType(
-                                            OrderType.delivery);
+                                        if (!isHomeDeliveryEnabled &&
+                                            isTakeAwayEnabled) {
+                                          cartProvider.onChangeOrderType(
+                                              OrderType.takeaway);
+                                        } else {
+                                          cartProvider.onChangeOrderType(
+                                              OrderType.delivery);
+                                        }
                                         cartProvider.jumpToPage(1);
                                         return;
                                       }
@@ -996,6 +1008,13 @@ class _CartScreenState extends State<CartScreen>
         builder: (context) {
           final userListener = context.watch<UserProvider>();
           final cartListener = context.watch<CartProvider>();
+          final storeSettings = context.read<ShopProvider>().storeSettings.data;
+          final isHomeDeliveryEnabled =
+              storeSettings?.deliveryInfo?.homeDelivery != null &&
+                  storeSettings?.deliveryInfo?.homeDelivery == '1';
+          final isTakeAwayEnabled =
+              storeSettings?.deliveryInfo?.takeAway != null &&
+                  storeSettings?.deliveryInfo?.takeAway == '1';
 
           return Theme(
             data: quickSandTextTheme(context),
@@ -1110,6 +1129,18 @@ class _CartScreenState extends State<CartScreen>
                                               context
                                                   .read<CartProvider>()
                                                   .onChangeAddress(address);
+                                              if (!isHomeDeliveryEnabled &&
+                                                  isTakeAwayEnabled) {
+                                                context
+                                                    .read<CartProvider>()
+                                                    .onChangeOrderType(
+                                                        OrderType.takeaway);
+                                              } else {
+                                                context
+                                                    .read<CartProvider>()
+                                                    .onChangeOrderType(
+                                                        OrderType.delivery);
+                                              }
                                             },
                                             // title: Text(
                                             //   address.addressTitle ?? "",

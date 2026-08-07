@@ -42,10 +42,33 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final cartListener = context.watch<CartProvider>();
     final userListener = context.watch<UserProvider>();
     final userProvider = context.read<UserProvider>();
-    final themeListener = context.watch<ThemeProvider>();
+    final cartProvider = context.read<CartProvider>();
+    final shopListener = context.watch<ShopProvider>();
     const outlinedBorder = OutlineInputBorder(
       borderSide: BorderSide(color: Colors.transparent),
     );
+
+    final isHomeDeliveryEnabled =
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery != null &&
+            shopListener.storeSettings.data?.deliveryInfo?.homeDelivery == '1';
+    final isTakeAwayEnabled =
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway != null &&
+            shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
+
+    if (!isHomeDeliveryEnabled &&
+        isTakeAwayEnabled &&
+        cartListener.selectedOrderType != OrderType.takeaway) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        cartProvider.onChangeOrderType(OrderType.takeaway);
+        cartProvider.clearCalculatedDeliveryDetails();
+      });
+    } else if (isHomeDeliveryEnabled &&
+        !isTakeAwayEnabled &&
+        cartListener.selectedOrderType != OrderType.delivery) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        cartProvider.onChangeOrderType(OrderType.delivery);
+      });
+    }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final taxGroup = cartListener.selectedOrderType == OrderType.delivery

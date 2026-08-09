@@ -480,9 +480,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   } else if (authListener.currentRegStage ==
                       RegStage.otpPhone) {
-                    authProvider.updateCurrentRegStage(
-                      RegStage.otpEmail,
-                    );
+                    if (authProvider.emailRequired) {
+                      authProvider.updateCurrentRegStage(
+                        RegStage.otpEmail,
+                      );
+                    } else {
+                      authProvider.updateCurrentRegStage(
+                        RegStage.contact,
+                      );
+                    }
                   } else if (authListener.currentRegStage ==
                       RegStage.register) {
                     if (authProvider.smsRequired &&
@@ -793,12 +799,8 @@ class _LoginScreenState extends State<LoginScreen> {
             authProvider.updateCurrentRegStage(RegStage.otpEmail);
             startTimer();
           } else if (!authProvider.emailRequired && authProvider.smsRequired) {
-            // Case 2: Only SMS enabled
-            final countryCode =
-                context.read<ShopProvider>().selectedCountry?.code;
-            await authProvider.sendPhoneOtpForInline(countryCode: countryCode);
+            // Case 2: Only SMS enabled - Navigate to phone OTP stage; OTP is sent when user clicks "Send OTP"
             authProvider.updateCurrentRegStage(RegStage.otpPhone);
-            startTimer();
           }
         } finally {
           authProvider.setContactLoading(false);
@@ -923,15 +925,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 startTimer();
                 await authProvider.sendEmailOtpForInline();
               } else if (authProvider.smsRequired) {
-                // Only SMS enabled
+                // Only SMS enabled - Navigate to phone OTP stage; OTP is sent when user clicks "Send OTP"
                 authProvider.updateCurrentRegStage(
                   RegStage.otpPhone,
                 );
-                startTimer();
-                final countryCode =
-                    context.read<ShopProvider>().selectedCountry?.code;
-                await authProvider.sendPhoneOtpForInline(
-                    countryCode: countryCode);
               }
             },
             child: const Text(
@@ -1283,7 +1280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         RegStage.otpCombined,
                       );
                     } else {
-                      await Future.delayed(const Duration(seconds: 20));
+                      await Future.delayed(const Duration(milliseconds: 500));
                       // No SMS verification required
                       authProvider.updateCurrentRegStage(
                         RegStage.register,
@@ -1912,7 +1909,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (verified) {
       print("Phone verified successfully, moving to register...");
       // Auto-move to register screen after a brief delay
-      await Future.delayed(const Duration(seconds: 20));
+      await Future.delayed(const Duration(milliseconds: 500));
       if (context.mounted) {
         authProvider.updateCurrentRegStage(RegStage.register);
       }

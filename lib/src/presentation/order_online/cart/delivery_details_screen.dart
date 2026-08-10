@@ -1462,12 +1462,17 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                                                   : () async {
                                                                                       final currentContext = context; // Store context
 
-                                                                                      await userListener.deleteUserAddress(address.uaID.toString());
-                                                                                      // cartListener.selectedAddressSecondary = null;
-
-                                                                                      cartListener.clearSelectedAddressSecondary();
+                                                                                      final isDeleted = await userListener.deleteUserAddress(address.uaID.toString());
 
                                                                                       if (currentContext.mounted) {
+                                                                                        if (isDeleted) {
+                                                                                          if (cartListener.selectedAddress?.uaID == address.uaID) {
+                                                                                            currentContext.read<CartProvider>().clearSelectedAddress();
+                                                                                          } else {
+                                                                                            currentContext.read<CartProvider>().clearSelectedAddressSecondary();
+                                                                                          }
+                                                                                        }
+
                                                                                         Navigator.of(currentContext).pop();
 
                                                                                         currentContext.read<UserProvider>().getAddressList();

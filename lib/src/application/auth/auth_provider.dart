@@ -706,9 +706,9 @@ class AuthProvider extends ChangeNotifier with BaseController {
   }
 
   /// Verify phone OTP for inline flow
-  Future<bool> verifyPhoneOtpForInline() async {
+  Future<bool> verifyPhoneOtpForInline({String? countryCode}) async {
     _phoneOtpError = '';
-    final result = await verifySmsOtp();
+    final result = await verifySmsOtp(countryCode: countryCode);
     if (result) {
       _phoneOtpVerified = true;
       phoneVerified = true;
@@ -722,7 +722,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
   }
 
   /// Verify SMS OTP via the OTP provider
-  Future<bool> verifySmsOtp() async {
+  Future<bool> verifySmsOtp({String? countryCode}) async {
     try {
       _verifyOtpLoading = true;
       notifyListeners();
@@ -730,7 +730,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
       final result = await otpProvider.verifyPhoneOtp(
         purpose: OtpPurpose.signup,
         phone: registerUserPhoneController.text,
-        countryCode: AppConfig.instance.country.dialCode,
+        countryCode: countryCode ?? AppConfig.instance.country.dialCode,
         otp: phoneOtpController.text,
         userID: _userData?.user.userID ?? '',
         userType: 'Registered',

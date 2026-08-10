@@ -107,6 +107,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     startTimer();
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ShopProvider>().setDefaultCountry();
+      }
+    });
   }
 
   @override
@@ -437,10 +442,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           .copyWith(color: AppColors.kWhite),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
+                          context.read<ShopProvider>().setDefaultCountry();
                           authProvider
                               .onChangeSelectedAuthView(AuthView.register);
                           authProvider.clearValues();
-                          // context.router.push(const RegisterScreenRoute());
                         },
                     ),
                   ],
@@ -830,7 +835,8 @@ class _LoginScreenState extends State<LoginScreen> {
           AlertDialogs.showError("Please enter the phone OTP");
           return;
         }
-        final verified = await authProvider.verifyPhoneOtpForInline();
+        final phoneCountryCode = context.read<ShopProvider>().selectedCountry?.code;
+        final verified = await authProvider.verifyPhoneOtpForInline(countryCode: phoneCountryCode);
         if (verified) {
           AlertDialogs.showSuccess("Phone verified successfully!");
           authProvider.updateCurrentRegStage(RegStage.register);
@@ -840,7 +846,8 @@ class _LoginScreenState extends State<LoginScreen> {
       case RegStage.register:
         final validated = authProvider.validateRegisterForm2();
         if (validated) {
-          final registered = await authProvider.registerUser();
+          final regCountryCode = context.read<ShopProvider>().selectedCountry?.code;
+          final registered = await authProvider.registerUser(countryCode: regCountryCode);
           if (registered) {
             AlertDialogs.showSuccess('Account Created Successfully');
             authProvider.loginUserNameController.text =
@@ -1675,12 +1682,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     enableActiveFill: true,
                     keyboardType: TextInputType.number,
                     readOnly: bothEnabled && !authProvider.emailOtpVerified,
-                    onCompleted: (v) async {
-                      // Auto-verify when ONLY phone is enabled OR when both are enabled
-                      if (onlyPhone || bothEnabled) {
-                        _onAutoVerifyPhoneOtp(authProvider, context);
-                      }
-                    },
+                    onCompleted: (v) {},
                     onChanged: (value) {},
                     appContext: context,
                     autoDisposeControllers: false,
@@ -1714,36 +1716,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                // Only show resend timer for single phone OTP flow
-                // if (!bothEnabled) ...[
-                //   if (seconds != null &&
-                //       seconds > 0 &&
-                //       !authProvider.phoneOtpVerified)
-                //     Text(
-                //       "Resend OTP in $seconds seconds",
-                //       style: context.customTextTheme.text14W700
-                //           .copyWith(color: AppColors.kWhite),
-                //     )
-                //   else if (!authProvider.phoneOtpVerified)
-                //     TextButton.icon(
-                //       iconAlignment: IconAlignment.end,
-                //       onPressed: () async {
-                //         final result = await authProvider.sendPhoneOtpForInline();
-                //         if (result) {
-                //           AlertDialogs.showSuccess("OTP sent successfully");
-                //           startTimer();
-                //         }
-                //       },
-                //       icon: authProvider.sendOtpLoading
-                //           ? const CupertinoActivityIndicator(color: AppColors.kWhite)
-                //           : const SizedBox.shrink(),
-                //       label: Text(
-                //         'Resend OTP',
-                //         style: context.customTextTheme.text14W700
-                //             .copyWith(color: AppColors.kWhite),
-                //       ),
-                //     ),
-                // ],
                 if (authProvider.phoneOtpSent &&
                     snapshot.data! > 0 &&
                     !authProvider.phoneOtpVerified)
@@ -1783,47 +1755,89 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
                             Theme.of(context).colorScheme.primary),
-                        foregroundColor: WidgetStatePropertyAll(Colors.white),
+                        foregroundColor: const WidgetStatePropertyAll(Colors.white),
                         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)))),
-                    onPressed: () async {
-                      if (authProvider.phoneOtpVerified) {
-                        authProvider.updateCurrentRegStage(
-                          RegStage.register,
-                        );
-                        return;
-                      }
-                      final available =
-                          await authProvider.checkUserAlreadyRegistered();
-                      if (!available) {
-                        if (authProvider.verifyResponse?.isPartialUser ==
-                            true) {
-                          _showLinkDialog(context, authProvider);
-                        } else {
-                          AlertDialogs.showError(
-                            authProvider.verifyResponse?.message ??
-                                "User already exists",
-                          );
-                        }
-                        return;
-                      }
-                      // Send OTP
-                      final countryCode = shopProvider.selectedCountry?.code;
-                      final sent = await authProvider.sendPhoneOtpForInline(
-                          countryCode: countryCode);
-                      if (sent) {
-                        AlertDialogs.showSuccess("OTP sent successfully");
-                        authProvider.disableMobileEdit();
-                        startTimer();
-                      } else {
-                        AlertDialogs.showError(
-                          "Failed to send OTP. Please try again.",
-                        );
-                      }
-                    },
-                    child: Text(
-                      authProvider.phoneOtpVerified ? "Continue" : "Send OTP",
-                    ),
+                    onPressed: (authProvider.sendOtpLoading ||
+                            authProvider.verifyOtpLoading)
+                        ? null
+                        : () async {
+                            if (authProvider.phoneOtpVerified) {
+                              authProvider.updateCurrentRegStage(
+                                RegStage.register,
+                              );
+                              return;
+                            }
+
+                            if (authProvider.phoneOtpSent &&
+                                !authProvider.isEditingMobile) {
+                              final otpText =
+                                  authProvider.phoneOtpController.text.trim();
+                              if (otpText.isEmpty) {
+                                AlertDialogs.showError(
+                                    "Please enter the phone OTP");
+                                return;
+                              }
+                              if (otpText.length < 6) {
+                                AlertDialogs.showError(
+                                    "Please enter a valid 6-digit OTP");
+                                return;
+                              }
+                              final verified =
+                                  await authProvider.verifyPhoneOtpForInline(
+                                      countryCode:
+                                          shopProvider.selectedCountry?.code);
+                              if (verified) {
+                                AlertDialogs.showSuccess(
+                                    "Phone verified successfully!");
+                                authProvider.updateCurrentRegStage(
+                                    RegStage.register);
+                              }
+                              return;
+                            }
+
+                            final available =
+                                await authProvider.checkUserAlreadyRegistered();
+                            if (!context.mounted) return;
+                            if (!available) {
+                              if (authProvider.verifyResponse?.isPartialUser ==
+                                  true) {
+                                _showLinkDialog(context, authProvider);
+                              } else {
+                                AlertDialogs.showError(
+                                  authProvider.verifyResponse?.message ??
+                                      "User already exists",
+                                );
+                              }
+                              return;
+                            }
+                            // Send OTP
+                            final countryCode =
+                                shopProvider.selectedCountry?.code;
+                            final sent =
+                                await authProvider.sendPhoneOtpForInline(
+                                    countryCode: countryCode);
+                            if (sent) {
+                              AlertDialogs.showSuccess(
+                                  "OTP sent successfully");
+                              authProvider.disableMobileEdit();
+                              startTimer();
+                            } else {
+                              AlertDialogs.showError(
+                                "Failed to send OTP. Please try again.",
+                              );
+                            }
+                          },
+                    child: (authProvider.sendOtpLoading ||
+                            authProvider.verifyOtpLoading)
+                        ? showButtonProgress(Colors.white)
+                        : Text(
+                            (authProvider.phoneOtpVerified ||
+                                    (authProvider.phoneOtpSent &&
+                                        !authProvider.isEditingMobile))
+                                ? "Verify and Continue"
+                                : "Send OTP",
+                          ),
                   ),
                 ),
                 verticalSpaceMedium,
@@ -1853,7 +1867,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.white),
+                        backgroundColor: const WidgetStatePropertyAll(Colors.white),
                         foregroundColor: WidgetStatePropertyAll(
                             Theme.of(context).colorScheme.primary),
                         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
@@ -1864,21 +1878,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text("Verify later"),
                   ),
                 ),
-                // if (!bothEnabled && authProvider.phoneOtpVerified)
-                //   ElevatedButton(
-                //     style: ButtonStyle(
-                //         backgroundColor: WidgetStatePropertyAll(
-                //             Theme.of(context).colorScheme.primary),
-                //         foregroundColor: WidgetStatePropertyAll(Colors.white),
-                //         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                //             borderRadius: BorderRadius.circular(10)))),
-                //     onPressed: () {
-                //       authProvider.updateCurrentRegStage(
-                //         RegStage.register,
-                //       );
-                //     },
-                //     child: Text("Continue"),
-                //   )
               ],
             );
           });
@@ -1896,26 +1895,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     // For both-enabled flow (called from email widget), no timer needed
     return buildPhoneContent(null);
-  }
-
-  Future<void> _onAutoVerifyPhoneOtp(
-      AuthProvider authProvider, BuildContext context) async {
-    if (authProvider.phoneOtpController.text.isEmpty) return;
-
-    print("Verifying phone OTP: ${authProvider.phoneOtpController.text}");
-    final verified = await authProvider.verifyPhoneOtpForInline();
-    print("Phone OTP verification result: $verified");
-
-    if (verified) {
-      print("Phone verified successfully, moving to register...");
-      // Auto-move to register screen after a brief delay
-      await Future.delayed(const Duration(milliseconds: 500));
-      if (context.mounted) {
-        authProvider.updateCurrentRegStage(RegStage.register);
-      }
-    } else {
-      print("Phone OTP verification failed");
-    }
   }
 
   Widget _forgotEmailForm(AuthProvider authProvider, AuthProvider authListener,

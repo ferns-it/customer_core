@@ -537,9 +537,9 @@ class StoreDeliverySettingsInfo {
           map['shopPostcode'] != null ? map['shopPostcode'] as String : null,
       currencyType:
           map['currencyType'] != null ? map['currencyType'] as String : null,
-      takeAway: map['takeAway'] != null ? map['takeAway'] as String : null,
+      takeAway: map['takeAway'] != null ? map['takeAway'].toString() : null,
       homeDelivery:
-          map['homeDelivery'] != null ? map['homeDelivery'] as String : null,
+          map['homeDelivery'] != null ? map['homeDelivery'].toString() : null,
       shopOpen_temp_off: map['shopOpen_temp_off'] != null
           ? map['shopOpen_temp_off'] as String
           : null,

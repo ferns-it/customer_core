@@ -350,9 +350,8 @@ class _CartScreenState extends State<CartScreen>
     final isHomeDeliveryEnabled =
         storeSettings?.deliveryInfo?.homeDelivery != null &&
             storeSettings?.deliveryInfo?.homeDelivery == '1';
-    final isTakeAwayEnabled =
-        storeSettings?.deliveryInfo?.takeAway != null &&
-            storeSettings?.deliveryInfo?.takeAway == '1';
+    final isTakeAwayEnabled = storeSettings?.deliveryInfo?.takeAway != null &&
+        storeSettings?.deliveryInfo?.takeAway == '1';
 
     return Visibility(
       visible: !cartListener.isCartEmpty &&
@@ -1578,7 +1577,7 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
   final userProvider = context.read<UserProvider>();
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
-
+  String countryCode = '';
   authProvider.registerUserPhoneController.clear();
 
   return await showDialog<bool>(
@@ -1716,6 +1715,30 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                             ),
                           ),
                         ),
+                        validator: (value) {
+                          final phone = value?.trim() ?? '';
+                          if (phone.isEmpty) {
+                            AlertDialogs.showError(
+                                "Please enter your mobile number",
+                                context: context);
+                          }
+                          if (countryCode == "+91") {
+                            if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
+                              AlertDialogs.showError(
+                                  "Enter a valid Indian mobile number",
+                                  context: context);
+                              return "";
+                            }
+                          } else if (countryCode == "+44") {
+                            if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
+                              AlertDialogs.showError(
+                                  "Enter a valid UK mobile number",
+                                  context: context);
+                              return "";
+                            }
+                          }
+                          return '';
+                        },
                       ),
                       //   ],
                       // ),
@@ -1754,8 +1777,9 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                     onPressed: isLoading
                         ? null
                         : () async {
-                            // if (!formKey.currentState!.validate()) return;
-
+                            if (!formKey.currentState!.validate()) {
+                              return;
+                            }
                             setDialogState(() => isLoading = true);
 
                             final success =
@@ -1833,6 +1857,7 @@ class _MobileVerificationDialogContentState
     extends State<_MobileVerificationDialogContent> {
   final phoneController = TextEditingController();
   final otpController = TextEditingController();
+  final _otpFormKey = GlobalKey<FormState>();
   bool otpSent = false;
   String countryCode = '';
 
@@ -1903,154 +1928,183 @@ class _MobileVerificationDialogContentState
           ],
         ],
       ),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (!otpSent)
-              Row(
-                children: [
-                  Flexible(
-                    flex: 23,
-                    child: Container(
-                      height: 50,
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.kGray3),
-                        borderRadius: BorderRadius.circular(10),
+      content: Form(
+        key: _otpFormKey,
+        child: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!otpSent)
+                  Row(
+                    children: [
+                      Flexible(
+                        flex: 23,
+                        child: Container(
+                          height: 50,
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.kGray3),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<SmsAvailableCountriesData>(
+                              value: shopProvider.selectedCountry,
+                              isDense: true,
+                              dropdownColor: Colors.white,
+                              icon: const Icon(Icons.arrow_drop_down),
+                              selectedItemBuilder: (context) {
+                                return shopProvider.smsCountries.map((country) {
+                                  return Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        countryCodeToEmoji(country.iso ?? ""),
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        country.code ?? "",
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  );
+                                }).toList();
+                              },
+                              items: shopProvider.smsCountries.map((country) {
+                                return DropdownMenuItem(
+                                  value: country,
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        countryCodeToEmoji(country.iso ?? ""),
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        country.code ?? "",
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  shopProvider.updateSelectedCountry(value);
+                                  setState(() {
+                                    countryCode = value.code ??
+                                        AppConfig.instance.country.dialCode;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ),
                       ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<SmsAvailableCountriesData>(
-                          value: shopProvider.selectedCountry,
-                          isDense: true,
-                          dropdownColor: Colors.white,
-                          icon: const Icon(Icons.arrow_drop_down),
-                          selectedItemBuilder: (context) {
-                            return shopProvider.smsCountries.map((country) {
-                              return Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    countryCodeToEmoji(country.iso ?? ""),
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    country.code ?? "",
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                ],
-                              );
-                            }).toList();
-                          },
-                          items: shopProvider.smsCountries.map((country) {
-                            return DropdownMenuItem(
-                              value: country,
-                              child: Row(
-                                children: [
-                                  Text(
-                                    countryCodeToEmoji(country.iso ?? ""),
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    country.code ?? "",
-                                    style: const TextStyle(color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              shopProvider.updateSelectedCountry(value);
-                              setState(() {
-                                countryCode = value.code ??
-                                    AppConfig.instance.country.dialCode;
-                              });
+                      const SizedBox(width: 8),
+                      Flexible(
+                        flex: 40,
+                        child: TextFormField(
+                          controller: phoneController,
+                          keyboardType: TextInputType.phone,
+                          // autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: InputDecoration(
+                            labelStyle: TextStyle(color: Colors.grey),
+                            labelText: 'Mobile Number',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          validator: (value) {
+                            final phone = value?.trim() ?? '';
+                            if (phone.isEmpty) {
+                              AlertDialogs.showError(
+                                  "Please enter your mobile number",
+                                  context: context);
                             }
+                            if (countryCode == "+91") {
+                              if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
+                                AlertDialogs.showError(
+                                    "Enter a valid Indian mobile number",
+                                    context: context);
+                                return "";
+                              }
+                            } else if (countryCode == "+44") {
+                              if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
+                                AlertDialogs.showError(
+                                    "Enter a valid UK mobile number",
+                                    context: context);
+                                return "";
+                              }
+                            }
+                            return '';
                           },
                         ),
-                      ),
-                    ),
+                      )
+                    ],
+                  )
+                else ...[
+                  Text(
+                    "Enter the OTP sent to $countryCode ${phoneController.text}",
+                    textAlign: TextAlign.center,
+                    style: context.customTextTheme.text14W500,
                   ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    flex: 40,
-                    child: TextFormField(
-                      controller: phoneController,
-                      keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        labelStyle: TextStyle(color: Colors.grey),
-                        labelText: 'Mobile Number',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                  verticalSpaceRegular,
+                  PinCodeTextField(
+                    length: 6,
+                    obscureText: false,
+                    animationType: AnimationType.scale,
+                    pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.box,
+                      borderRadius: BorderRadius.circular(10.0),
+                      activeColor: AppColors.kBlack2,
+                      inactiveColor: AppColors.kBlack2,
+                      inactiveFillColor: AppColors.kOffWhite3,
+                      activeFillColor: AppColors.kOffWhite3,
+                      selectedColor: AppColors.kBlack2,
+                      selectedFillColor: AppColors.kOffWhite3,
+                      fieldHeight: MediaQuery.of(context).size.height / 20,
+                      fieldWidth: MediaQuery.of(context).size.width / 11,
+                      fieldOuterPadding:
+                          const EdgeInsets.symmetric(horizontal: 2),
                     ),
+                    controller: otpController,
+                    showCursor: false,
+                    animationDuration: const Duration(milliseconds: 300),
+                    enableActiveFill: true,
+                    keyboardType: TextInputType.phone,
+                    onCompleted: (v) {},
+                    onChanged: (value) {},
+                    appContext: context,
+                    autoDisposeControllers: false,
                   ),
+                  if (otpListener.canResend)
+                    TextButton(
+                      onPressed: otpListener.loading
+                          ? null
+                          : () async {
+                              await otpProvider.sendPhoneOtp(
+                                phone: phoneController.text.trim(),
+                                countryCode: countryCode,
+                                purpose: OtpPurpose.phoneVerification,
+                              );
+                            },
+                      child: const Text("Resend OTP"),
+                    )
+                  else
+                    Text(
+                      "Resend OTP in ${otpListener.seconds} seconds",
+                      style: context.customTextTheme.text12W500
+                          .copyWith(color: AppColors.kGray3),
+                    ),
                 ],
-              )
-            else ...[
-              Text(
-                "Enter the OTP sent to $countryCode ${phoneController.text}",
-                textAlign: TextAlign.center,
-                style: context.customTextTheme.text14W500,
-              ),
-              verticalSpaceRegular,
-              PinCodeTextField(
-                length: 6,
-                obscureText: false,
-                animationType: AnimationType.scale,
-                pinTheme: PinTheme(
-                  shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(10.0),
-                  activeColor: AppColors.kBlack2,
-                  inactiveColor: AppColors.kBlack2,
-                  inactiveFillColor: AppColors.kOffWhite3,
-                  activeFillColor: AppColors.kOffWhite3,
-                  selectedColor: AppColors.kBlack2,
-                  selectedFillColor: AppColors.kOffWhite3,
-                  fieldHeight: MediaQuery.of(context).size.height / 20,
-                  fieldWidth: MediaQuery.of(context).size.width / 11,
-                  fieldOuterPadding: const EdgeInsets.symmetric(horizontal: 2),
-                ),
-                controller: otpController,
-                showCursor: false,
-                animationDuration: const Duration(milliseconds: 300),
-                enableActiveFill: true,
-                keyboardType: TextInputType.phone,
-                onCompleted: (v) {},
-                onChanged: (value) {},
-                appContext: context,
-                autoDisposeControllers: false,
-              ),
-              if (otpListener.canResend)
-                TextButton(
-                  onPressed: otpListener.loading
-                      ? null
-                      : () async {
-                          await otpProvider.sendPhoneOtp(
-                            phone: phoneController.text.trim(),
-                            countryCode: countryCode,
-                            purpose: OtpPurpose.phoneVerification,
-                          );
-                        },
-                  child: const Text("Resend OTP"),
-                )
-              else
-                Text(
-                  "Resend OTP in ${otpListener.seconds} seconds",
-                  style: context.customTextTheme.text12W500
-                      .copyWith(color: AppColors.kGray3),
-                ),
-            ],
-            verticalSpaceSmall,
-            if (otpListener.loading)
-              const Center(child: CircularProgressIndicator()),
-          ],
-        ),
+                verticalSpaceSmall,
+                if (otpListener.loading)
+                  const Center(child: CircularProgressIndicator()),
+              ],
+            )),
       ),
       actions: [
         TextButton(
@@ -2074,12 +2128,10 @@ class _MobileVerificationDialogContentState
               : () async {
                   if (!otpSent) {
                     // Step 1: Send OTP
-                    final rawPhone = phoneController.text.trim();
-                    if (rawPhone.isEmpty) {
-                      AlertDialogs.showError("Please enter your mobile number",
-                          context: context);
+                    if (!_otpFormKey.currentState!.validate()) {
                       return;
                     }
+                    final rawPhone = phoneController.text.trim();
                     final fullPhone = "$countryCode$rawPhone";
                     final sent = await otpProvider.sendPhoneOtp(
                       phone: fullPhone,

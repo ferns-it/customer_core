@@ -774,7 +774,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         shopListener.storeSettings.data?.deliveryInfo?.takeAway != null &&
             shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
 
-    if (isTakeAwayEnabled && isHomeDeliveryEnabled) {
+    // If both are enabled, show both options
+    if (isHomeDeliveryEnabled && isTakeAwayEnabled) {
       return ListTileTheme(
         enableFeedback: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -811,12 +812,6 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                   ),
                 ),
                 onTap: () {
-                  final isEnabled = shopListener
-                      .storeSettings.data?.deliveryInfo?.homeDelivery;
-                  if (isEnabled == null || isEnabled == '0') {
-                    AlertDialogs.showInfo("Home delivery not available");
-                    return;
-                  }
                   cartProvider.onChangeOrderType(
                     OrderType.delivery,
                   );
@@ -870,7 +865,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
           ],
         ),
       );
-    } else if (isTakeAwayEnabled) {
+    } else if (isTakeAwayEnabled && !isHomeDeliveryEnabled) {
+      // Only takeaway is enabled
       return ListTile(
         contentPadding: EdgeInsets.zero,
         minLeadingWidth: 5,
@@ -883,10 +879,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         ),
         subtitle: Text(
           'We\'re serving takeaway orders only',
-          style: context.customTextTheme.text14W500,
+          style: context.customTextTheme.text14W500
+              .copyWith(color: context.customTextTheme.color),
         ),
       );
-    } else if (isHomeDeliveryEnabled) {
+    } else if (!isTakeAwayEnabled && isHomeDeliveryEnabled) {
+      // Only home delivery is enabled
       return ListTile(
         contentPadding: EdgeInsets.zero,
         minLeadingWidth: 5,
@@ -899,7 +897,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         ),
         subtitle: Text(
           'We\'re serving home delivery orders only',
-          style: context.customTextTheme.text14W500,
+          style: context.customTextTheme.text14W500
+              .copyWith(color: context.customTextTheme.color),
         ),
       );
     }

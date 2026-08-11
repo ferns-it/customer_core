@@ -351,189 +351,232 @@ class ProductDetailsTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(10)),
       child: Stack(
         children: [
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                isPlaceHolderUrl
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 35.0, bottom: 45.0),
-                        child:
-                            Assets.lib.assets.images.noimage.image(height: 60),
-                      )
-                    : ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
-                          bottomLeft: Radius.circular(8),
-                          bottomRight: Radius.circular(8),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(0.0),
-                          child: CachedNetworkImage(
-                            // height: 130,
-                            imageUrl: product.photo ?? '',
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  isPlaceHolderUrl
+                      ? Padding(
+                          padding:
+                              const EdgeInsets.only(top: 35.0, bottom: 45.0),
+                          child: Assets.lib.assets.images.noimage
+                              .image(height: 60),
+                        )
+                      : ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            topRight: Radius.circular(8),
+                            bottomLeft: Radius.circular(8),
+                            bottomRight: Radius.circular(8),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(0.0),
+                            child: CachedNetworkImage(
+                              // height: 130,
+                              imageUrl: product.photo ?? '',
 
-                            errorWidget: (context, url, error) => Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 35.0, bottom: 45.0),
-                              child: Assets.lib.assets.images.noimage.image(),
+                              errorWidget: (context, url, error) => Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 35.0, bottom: 45.0),
+                                child: Assets.lib.assets.images.noimage.image(),
+                              ),
+                              // fit: BoxFit.cover,
                             ),
-                            // fit: BoxFit.cover,
                           ),
                         ),
-                      ),
-                verticalSpaceSmall,
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  child: Text(
-                    product.name ?? '',
-                    style: context.customTextTheme.text14W700.copyWith(
-                      color: context.customTextTheme.color,
+                  verticalSpaceSmall,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            product.name ?? '',
+                            style: context.customTextTheme.text14W700.copyWith(
+                              color: context.customTextTheme.color,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (spiceLevel != null &&
+                                _isSpiceLevelApplicable(spiceLevel)) ...[
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  if (spiceLevelIcon != null &&
+                                      spiceLevelIcon.isNotEmpty)
+                                    Text(
+                                      spiceLevelIcon,
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.red),
+                                    ),
+                                  horizontalSpaceTiny,
+                                  Text(
+                                    spiceLevel,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ]
+                          ],
+                        ),
+                      ],
                     ),
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
                   ),
-                ),
-                Wrap(
-                  spacing: 2,
-                  runSpacing: 4,
-                  children: [
-                    ...allergens.take(4).map(
-                          (e) => Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.grey.shade800
-                                  : Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              e,
-                              style: TextStyle(
-                                fontSize: 8,
-                                color: context.customTextTheme.color,
+                  verticalSpaceSmall,
+                  Wrap(
+                    spacing: 2,
+                    runSpacing: 4,
+                    children: [
+                      ...allergens.take(4).map(
+                            (e) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey.shade800
+                                    : Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                e,
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  color: context.customTextTheme.color,
+                                ),
                               ),
                             ),
                           ),
+                      if (allergens.length > 4)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.grey.shade800
+                                    : Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '+${allergens.length - 4}',
+                            style: TextStyle(
+                              fontSize: 8,
+                              color: context.customTextTheme.color,
+                            ),
+                          ),
                         ),
-                    if (allergens.length > 4)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey.shade800
-                              : Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '+${allergens.length - 4}',
-                          style: TextStyle(
-                            fontSize: 8,
+                    ],
+                  ),
+                  verticalSpaceSmall,
+                  // Row(
+                  //   mainAxisSize: MainAxisSize.min,
+                  //   children: [
+                  //     if (spiceLevel != null &&
+                  //         _isSpiceLevelApplicable(spiceLevel)) ...[
+                  //       Row(
+                  //         crossAxisAlignment: CrossAxisAlignment.center,
+                  //         children: [
+                  //           if (spiceLevelIcon != null &&
+                  //               spiceLevelIcon.isNotEmpty)
+                  //             Text(
+                  //               spiceLevelIcon,
+                  //               style: TextStyle(fontSize: 12, color: Colors.red),
+                  //             ),
+                  //           horizontalSpaceTiny,
+                  //           Text(
+                  //             spiceLevel,
+                  //             style: TextStyle(
+                  //               fontSize: 11,
+                  //               fontWeight: FontWeight.bold,
+                  //               color: Colors.black,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ]
+                  //   ],
+                  // ),
+                  product.isOfferPrice == 'Yes' &&
+                          product.offerPriceDetails?.currentOfferPrice != null
+                      ? RichText(
+                          text: TextSpan(
+                            text:
+                                "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
+                            style: TextStyle(
+                                color: context.customTextTheme.color,
+                                fontSize: 15),
+                            children: [
+                              TextSpan(
+                                text: product.price ?? '',
+                                style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                    decoration: TextDecoration.lineThrough),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Text(
+                          product.price ?? '',
+                          style: context.customTextTheme.text14W700.copyWith(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
                             color: context.customTextTheme.color,
                           ),
                         ),
-                      ),
-                  ],
-                ),
-                verticalSpaceSmall,
-                // Row(
-                //   mainAxisSize: MainAxisSize.min,
-                //   children: [
-                //     if (spiceLevel != null &&
-                //         _isSpiceLevelApplicable(spiceLevel)) ...[
-                //       Row(
-                //         crossAxisAlignment: CrossAxisAlignment.center,
-                //         children: [
-                //           if (spiceLevelIcon != null &&
-                //               spiceLevelIcon.isNotEmpty)
-                //             Text(
-                //               spiceLevelIcon,
-                //               style: TextStyle(fontSize: 12, color: Colors.red),
-                //             ),
-                //           horizontalSpaceTiny,
-                //           Text(
-                //             spiceLevel,
-                //             style: TextStyle(
-                //               fontSize: 11,
-                //               fontWeight: FontWeight.bold,
-                //               color: Colors.black,
-                //             ),
-                //           ),
-                //         ],
-                //       ),
-                //     ]
-                //   ],
-                // ),
-                product.isOfferPrice == 'Yes' &&
-                        product.offerPriceDetails?.currentOfferPrice != null
-                    ? RichText(
-                        text: TextSpan(
-                          text:
-                              "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
-                          style: TextStyle(
-                              color: context.customTextTheme.color,
-                              fontSize: 15),
-                          children: [
-                            TextSpan(
-                              text: product.price ?? '',
-                              style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.lineThrough),
+                  useSecondaryWidget
+                      ? SizedBox(
+                          height: 50, child: Center(child: secondaryWidget))
+                      : FilledButton(
+                          style: FilledButton.styleFrom(
+                              disabledBackgroundColor: Colors.transparent,
+                              disabledForegroundColor:
+                                  Theme.of(context).disabledColor,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0)),
+                              fixedSize: const Size(double.infinity, 30),
+                              side: BorderSide(
+                                  color: product.isAvailable == true
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.grey),
+                              backgroundColor: product.isAvailable == true
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.transparent),
+                          onPressed: product.isAvailable == true
+                              ? onPressAddBtn
+                              : null,
+                          child: Text(
+                            'Add to Cart',
+                            style: context.customTextTheme.text14W700.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: product.isAvailable == true
+                                  ? Theme.of(context).colorScheme.onSurface
+                                  : Theme.of(context).disabledColor,
                             ),
-                          ],
-                        ),
-                      )
-                    : Text(
-                        product.price ?? '',
-                        style: context.customTextTheme.text14W700.copyWith(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                          color: context.customTextTheme.color,
-                        ),
-                      ),
-                useSecondaryWidget
-                    ? SizedBox(
-                        height: 50, child: Center(child: secondaryWidget))
-                    : FilledButton(
-                        style: FilledButton.styleFrom(
-                            disabledBackgroundColor: Colors.transparent,
-                            disabledForegroundColor:
-                                Theme.of(context).disabledColor,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0)),
-                            fixedSize: const Size(double.infinity, 30),
-                            side: BorderSide(
-                                color: product.isAvailable == true
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Colors.grey),
-                            backgroundColor: product.isAvailable == true
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.transparent),
-                        onPressed:
-                            product.isAvailable == true ? onPressAddBtn : null,
-                        child: Text(
-                          'Add to Cart',
-                          style: context.customTextTheme.text14W700.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: product.isAvailable == true
-                                ? Theme.of(context).colorScheme.onSurface
-                                : Theme.of(context).disabledColor,
                           ),
                         ),
-                      ),
-                // verticalSpaceSmall,
-              ],
+                  // verticalSpaceSmall,
+                ],
+              ),
             ),
           ),
           Visibility(
@@ -578,51 +621,51 @@ class ProductDetailsTile extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            left: 8,
-            top: 120,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (spiceLevel != null &&
-                    _isSpiceLevelApplicable(spiceLevel)) ...[
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(0.12),
-                            blurRadius: 10,
-                            offset: Offset(0, 3))
-                      ],
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (spiceLevelIcon != null && spiceLevelIcon.isNotEmpty)
-                          Text(
-                            spiceLevelIcon,
-                            style: TextStyle(fontSize: 12, color: Colors.red),
-                          ),
-                        horizontalSpaceTiny,
-                        Text(
-                          spiceLevel,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                            color: context.customTextTheme.color,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ]
-              ],
-            ),
-          ),
+          // Positioned(
+          //   left: 8,
+          //   top: 120,
+          //   child: Row(
+          //     mainAxisSize: MainAxisSize.min,
+          //     children: [
+          //       if (spiceLevel != null &&
+          //           _isSpiceLevelApplicable(spiceLevel)) ...[
+          //         Container(
+          //           padding:
+          //               const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          //           decoration: BoxDecoration(
+          //             boxShadow: [
+          //               BoxShadow(
+          //                   color: Colors.black.withOpacity(0.12),
+          //                   blurRadius: 10,
+          //                   offset: Offset(0, 3))
+          //             ],
+          //             color: Colors.white,
+          //             borderRadius: BorderRadius.circular(8),
+          //           ),
+          //           child: Row(
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             children: [
+          //               if (spiceLevelIcon != null && spiceLevelIcon.isNotEmpty)
+          //                 Text(
+          //                   spiceLevelIcon,
+          //                   style: TextStyle(fontSize: 12, color: Colors.red),
+          //                 ),
+          //               horizontalSpaceTiny,
+          //               Text(
+          //                 spiceLevel,
+          //                 style: TextStyle(
+          //                   fontWeight: FontWeight.bold,
+          //                   fontSize: 11,
+          //                   color: context.customTextTheme.color,
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //       ]
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );

@@ -815,8 +815,10 @@ class _LoginScreenState extends State<LoginScreen> {
           AlertDialogs.showError("Please enter the phone OTP");
           return;
         }
-        final phoneCountryCode = context.read<ShopProvider>().selectedCountry?.code;
-        final verified = await authProvider.verifyPhoneOtpForInline(countryCode: phoneCountryCode);
+        final phoneCountryCode =
+            context.read<ShopProvider>().selectedCountry?.code;
+        final verified = await authProvider.verifyPhoneOtpForInline(
+            countryCode: phoneCountryCode);
         if (verified) {
           AlertDialogs.showSuccess("Phone verified successfully!");
           authProvider.updateCurrentRegStage(RegStage.register);
@@ -826,8 +828,10 @@ class _LoginScreenState extends State<LoginScreen> {
       case RegStage.register:
         final validated = authProvider.validateRegisterForm2();
         if (validated) {
-          final regCountryCode = context.read<ShopProvider>().selectedCountry?.code;
-          final registered = await authProvider.registerUser(countryCode: regCountryCode);
+          final regCountryCode =
+              context.read<ShopProvider>().selectedCountry?.code;
+          final registered =
+              await authProvider.registerUser(countryCode: regCountryCode);
           if (registered) {
             AlertDialogs.showSuccess('Account Created Successfully');
             authProvider.loginUserNameController.text =
@@ -1734,50 +1738,49 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
                             Theme.of(context).colorScheme.primary),
-                        foregroundColor: const WidgetStatePropertyAll(Colors.white),
+                        foregroundColor:
+                            const WidgetStatePropertyAll(Colors.white),
                         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)))),
-<<<<<<< HEAD
-                    onPressed: () async {
-                      // Already verified → continue to the next page
-                      if (authProvider.phoneOtpVerified) {
-                        authProvider.updateCurrentRegStage(
-                          RegStage.register,
-                        );
-                        return;
-                      }
-                      final available =
-                          await authProvider.checkUserAlreadyRegistered();
-                      if (!available) {
-                        if (authProvider.verifyResponse?.isPartialUser ==
-                            true) {
-                          _showLinkDialog(context, authProvider);
-                        } else {
-                          AlertDialogs.showError(
-                            authProvider.verifyResponse?.message ??
-                                "User already exists",
-                          );
-                        }
-                        return;
-                      }
-                      // Send OTP
-                      final countryCode = shopProvider.selectedCountry?.code;
-                      final sent = await authProvider.sendPhoneOtpForInline(
-                          countryCode: countryCode);
-                      if (sent) {
-                        AlertDialogs.showSuccess("OTP sent successfully");
-                        authProvider.disableMobileEdit();
-                        startTimer();
-                      } else {
-                        AlertDialogs.showError(
-                          "Failed to send OTP. Please try again.",
-                        );
-                      }
-                    },
-                    child: Text(
-                      authProvider.phoneOtpVerified ? "Continue" : "Send OTP",
-                    ),
-=======
+                    // onPressed: () async {
+                    //   // Already verified → continue to the next page
+                    //   if (authProvider.phoneOtpVerified) {
+                    //     authProvider.updateCurrentRegStage(
+                    //       RegStage.register,
+                    //     );
+                    //     return;
+                    //   }
+                    //   final available =
+                    //       await authProvider.checkUserAlreadyRegistered();
+                    //   if (!available) {
+                    //     if (authProvider.verifyResponse?.isPartialUser ==
+                    //         true) {
+                    //       _showLinkDialog(context, authProvider);
+                    //     } else {
+                    //       AlertDialogs.showError(
+                    //         authProvider.verifyResponse?.message ??
+                    //             "User already exists",
+                    //       );
+                    //     }
+                    //     return;
+                    //   }
+                    //   // Send OTP
+                    //   final countryCode = shopProvider.selectedCountry?.code;
+                    //   final sent = await authProvider.sendPhoneOtpForInline(
+                    //       countryCode: countryCode);
+                    //   if (sent) {
+                    //     AlertDialogs.showSuccess("OTP sent successfully");
+                    //     authProvider.disableMobileEdit();
+                    //     startTimer();
+                    //   } else {
+                    //     AlertDialogs.showError(
+                    //       "Failed to send OTP. Please try again.",
+                    //     );
+                    //   }
+                    // },
+                    // child: Text(
+                    //   authProvider.phoneOtpVerified ? "Continue" : "Send OTP",
+                    // ),
                     onPressed: (authProvider.sendOtpLoading ||
                             authProvider.verifyOtpLoading)
                         ? null
@@ -1810,8 +1813,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (verified) {
                                 AlertDialogs.showSuccess(
                                     "Phone verified successfully!");
-                                authProvider.updateCurrentRegStage(
-                                    RegStage.register);
+                                authProvider
+                                    .updateCurrentRegStage(RegStage.register);
                               }
                               return;
                             }
@@ -1838,8 +1841,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 await authProvider.sendPhoneOtpForInline(
                                     countryCode: countryCode);
                             if (sent) {
-                              AlertDialogs.showSuccess(
-                                  "OTP sent successfully");
+                              AlertDialogs.showSuccess("OTP sent successfully");
                               authProvider.disableMobileEdit();
                               startTimer();
                             } else {
@@ -1858,7 +1860,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? "Verify and Continue"
                                 : "Send OTP",
                           ),
->>>>>>> b2ddf847c9a1da138d6184535ba2677a3e540c5f
                   ),
                 ),
                 verticalSpaceMedium,
@@ -1888,7 +1889,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                        backgroundColor: const WidgetStatePropertyAll(Colors.white),
+                        backgroundColor:
+                            const WidgetStatePropertyAll(Colors.white),
                         foregroundColor: WidgetStatePropertyAll(
                             Theme.of(context).colorScheme.primary),
                         shape: WidgetStatePropertyAll(RoundedRectangleBorder(

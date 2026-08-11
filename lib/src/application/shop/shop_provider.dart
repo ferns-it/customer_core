@@ -171,8 +171,21 @@ class ShopProvider extends ChangeNotifier with BaseController {
   void setDefaultCountry() {
     if (smsCountries.isEmpty) return;
 
+    // Prefer the store's country code from the settings API, falling back
+    // to the app-level configured dial code.
+    final settingsCountryCode = _storeSettings.data?.countryCode?.trim();
+    final defaultDialCode = (settingsCountryCode == null ||
+            settingsCountryCode.isEmpty)
+        ? AppConfig.instance.country.dialCode
+        : settingsCountryCode;
+
+    // Normalize to digits only so it matches whether the API returns "+91" or "91".
+    String normalizeDialCode(String? code) =>
+        (code ?? '').replaceAll(RegExp(r'[^0-9]'), '');
+
     selectedCountry = smsCountries.firstWhere(
-      (country) => country.code == AppConfig.instance.country.dialCode,
+      (country) =>
+          normalizeDialCode(country.code) == normalizeDialCode(defaultDialCode),
       orElse: () => smsCountries.first,
     );
 

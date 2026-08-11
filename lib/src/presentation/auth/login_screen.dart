@@ -59,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (phone.isEmpty) {
       return "Phone number is required";
     }
-
     if (countryCode == "+91") {
       if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
         return "Enter a valid Indian mobile number";
@@ -69,25 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
         return "Enter a valid UK mobile number";
       }
     }
-
     return '';
   }
-
-  // String _validateEmailField(String email) {
-  //   if (email.isEmpty) {
-  //     return "Email is required";
-  //   }
-
-  //   final emailRegex = RegExp(
-  //     r'^[a-zA-Z0-9]+([._%+-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+([.-]?[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$',
-  //   );
-
-  //   if (!emailRegex.hasMatch(email)) {
-  //     return "Enter a valid email address";
-  //   }
-
-  //   return '';
-  // }
 
   void startTimer() {
     _timer?.cancel();
@@ -118,8 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final authProvider = notifier(context);
-    // final authListener = listener(context);
     final authProvider = context.read<AuthProvider>();
     final authListener = context.watch<AuthProvider>();
     final homeProvider = context.read<HomeProvider>();
@@ -1381,7 +1361,6 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (context, snapshot) {
             return Column(
               children: [
-                // Phone verification header with icon
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -1787,6 +1766,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         shape: WidgetStatePropertyAll(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)))),
                     onPressed: () async {
+                      // Already verified → continue to the next page
                       if (authProvider.phoneOtpVerified) {
                         authProvider.updateCurrentRegStage(
                           RegStage.register,

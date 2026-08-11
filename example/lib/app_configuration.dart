@@ -6,7 +6,7 @@ final appConfig = AppConfig(
   shopName: 'Le Arabia',
   shopId: '1',
   // shopId: '93',
-  country: Country.ind,
+  country: Country.uk,
   env: AppEnv.dev,
   shopIdentifier: 'le-arabia',
   // shopIdentifier: 'brew--chew-',

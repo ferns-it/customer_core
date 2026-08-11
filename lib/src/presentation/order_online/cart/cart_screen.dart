@@ -2020,23 +2020,15 @@ class _MobileVerificationDialogContentState
                           validator: (value) {
                             final phone = value?.trim() ?? '';
                             if (phone.isEmpty) {
-                              AlertDialogs.showError(
-                                  "Please enter your mobile number",
-                                  context: context);
+                              return "Please enter your mobile number";
                             }
                             if (countryCode == "+91") {
                               if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
-                                AlertDialogs.showError(
-                                    "Enter a valid Indian mobile number",
-                                    context: context);
-                                return "";
+                                return "Enter a valid Indian mobile number";
                               }
                             } else if (countryCode == "+44") {
                               if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
-                                AlertDialogs.showError(
-                                    "Enter a valid UK mobile number",
-                                    context: context);
-                                return "";
+                                return "Enter a valid UK mobile number";
                               }
                             }
                             return '';
@@ -2056,6 +2048,7 @@ class _MobileVerificationDialogContentState
                     length: 6,
                     obscureText: false,
                     animationType: AnimationType.scale,
+                    textStyle: TextStyle(color: AppColors.kBlack2),
                     pinTheme: PinTheme(
                       shape: PinCodeFieldShape.box,
                       borderRadius: BorderRadius.circular(10.0),
@@ -2128,9 +2121,9 @@ class _MobileVerificationDialogContentState
               : () async {
                   if (!otpSent) {
                     // Step 1: Send OTP
-                    if (!_otpFormKey.currentState!.validate()) {
-                      return;
-                    }
+                    // if (!_otpFormKey.currentState!.validate()) {
+                    //   return;
+                    // }
                     final rawPhone = phoneController.text.trim();
                     final fullPhone = "$countryCode$rawPhone";
                     final sent = await otpProvider.sendPhoneOtp(

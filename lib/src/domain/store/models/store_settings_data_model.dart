@@ -7,6 +7,7 @@ class StoreSettingsDataModel {
   final String? id;
   final String? name;
   final String? email;
+  final String? countryCode;
   final bool? available;
   final String? shopStatus;
   final String? mobile;
@@ -33,6 +34,7 @@ class StoreSettingsDataModel {
     this.id,
     this.name,
     this.email,
+    this.countryCode,
     this.available,
     this.shopStatus,
     this.mobile,
@@ -60,6 +62,7 @@ class StoreSettingsDataModel {
     String? id,
     String? name,
     String? email,
+    String? countryCode,
     bool? available,
     String? shopStatus,
     String? mobile,
@@ -86,6 +89,7 @@ class StoreSettingsDataModel {
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
+      countryCode: countryCode ?? this.countryCode,
       available: available ?? this.available,
       shopStatus: shopStatus ?? this.shopStatus,
       mobile: mobile ?? this.mobile,
@@ -117,6 +121,7 @@ class StoreSettingsDataModel {
       'id': id,
       'name': name,
       'email': email,
+      'countryCode': countryCode,
       'available': available,
       'shopStatus': shopStatus,
       'mobile': mobile,
@@ -147,6 +152,8 @@ class StoreSettingsDataModel {
       id: map['id'] != null ? map['id'] as String : null,
       name: map['name'] != null ? map['name'] as String : null,
       email: map['email'] != null ? map['email'] as String : null,
+      countryCode:
+          map['countryCode'] != null ? map['countryCode'] as String : null,
       available: map['available'] != null ? map['available'] as bool : null,
       shopStatus:
           map['shopStatus'] != null ? map['shopStatus'] as String : null,
@@ -207,7 +214,7 @@ class StoreSettingsDataModel {
 
   @override
   String toString() {
-    return 'StoreSettingsDataModel(id: $id, name: $name, email: $email, available: $available, shopStatus: $shopStatus, mobile: $mobile, image: $image, deliveryInfo: $deliveryInfo, themeTitle: $themeTitle, themeBanner: $themeBanner, themeLogo: $themeLogo, primaryColor: $primaryColor, SecondaryColor: $SecondaryColor, buttonColor: $buttonColor, buttonHoverColor: $buttonHoverColor, linkColor: $linkColor, linkHoverColor: $linkHoverColor, headerColor: $headerColor, footerColor: $footerColor, tableReservationSettings: $tableReservationSettings, hash: $hash,smsAvailableCountries: $smsAvailableCountries)';
+    return 'StoreSettingsDataModel(id: $id, name: $name, email: $email,countryCode:$countryCode, available: $available, shopStatus: $shopStatus, mobile: $mobile, image: $image, deliveryInfo: $deliveryInfo, themeTitle: $themeTitle, themeBanner: $themeBanner, themeLogo: $themeLogo, primaryColor: $primaryColor, SecondaryColor: $SecondaryColor, buttonColor: $buttonColor, buttonHoverColor: $buttonHoverColor, linkColor: $linkColor, linkHoverColor: $linkHoverColor, headerColor: $headerColor, footerColor: $footerColor, tableReservationSettings: $tableReservationSettings, hash: $hash,smsAvailableCountries: $smsAvailableCountries)';
   }
 
   @override
@@ -217,6 +224,7 @@ class StoreSettingsDataModel {
     return other.id == id &&
         other.name == name &&
         other.email == email &&
+        other.countryCode == countryCode &&
         other.available == available &&
         other.shopStatus == shopStatus &&
         other.mobile == mobile &&
@@ -245,6 +253,7 @@ class StoreSettingsDataModel {
     return id.hashCode ^
         name.hashCode ^
         email.hashCode ^
+        countryCode.hashCode ^
         available.hashCode ^
         shopStatus.hashCode ^
         mobile.hashCode ^

@@ -1867,26 +1867,55 @@ class _MobileVerificationDialogContentState
     final userProvider = context.read<UserProvider>();
     final shopProvider = context.read<ShopProvider>();
 
-    phoneController.text = userProvider.userData?.user.userMobileActual ?? '';
+    final user = userProvider.userData?.user;
+    phoneController.text = user?.userMobileActual ?? user?.userMobile ?? '';
 
-    // Use the country code from the login response if available
-    final userCountryCode = userProvider.userData?.user.countryCode;
-    if (userCountryCode != null && userCountryCode.isNotEmpty) {
-      // Find the matching country from the available SMS countries
-      final matchingCountry = shopProvider.smsCountries
+    // Use the country code from the login response if available, or infer from user profile / selected country
+    final rawCountryCode = user?.countryCode?.trim() ?? '';
+    final formattedCode = user?.formattedCountryCode.trim() ?? '';
+    final mobile = (user?.userMobileActual?.trim().isNotEmpty == true
+            ? user!.userMobileActual!
+            : user?.userMobile?.trim() ?? '')
+        .trim();
+
+    SmsAvailableCountriesData? matchingCountry;
+
+    // 1. Try matching using countryCode or formattedCountryCode
+    final targetCode =
+        rawCountryCode.isNotEmpty ? rawCountryCode : formattedCode;
+    if (targetCode.isNotEmpty) {
+      final cleanTarget = targetCode.replaceAll('+', '').toLowerCase();
+      matchingCountry = shopProvider.smsCountries
           .cast<SmsAvailableCountriesData?>()
           .firstWhere(
-            (c) => c!.code == userCountryCode,
-            orElse: () => null,
-          );
-      if (matchingCountry != null) {
-        shopProvider.updateSelectedCountry(matchingCountry);
-        countryCode =
-            matchingCountry.code ?? AppConfig.instance.country.dialCode;
-      } else {
-        countryCode = shopProvider.selectedCountry?.code ??
-            AppConfig.instance.country.dialCode;
-      }
+        (c) {
+          if (c == null) return false;
+          final cCode = (c.code ?? '').replaceAll('+', '').toLowerCase().trim();
+          final cIso = (c.iso ?? '').toLowerCase().trim();
+          return cCode == cleanTarget || cIso == cleanTarget;
+        },
+        orElse: () => null,
+      );
+    }
+
+    // 2. If no match yet, try matching against mobile number prefix
+    if (matchingCountry == null && mobile.isNotEmpty) {
+      final cleanMobile = mobile.replaceAll('+', '').trim();
+      matchingCountry = shopProvider.smsCountries
+          .cast<SmsAvailableCountriesData?>()
+          .firstWhere(
+        (c) {
+          if (c == null) return false;
+          final cCode = (c.code ?? '').replaceAll('+', '').toLowerCase().trim();
+          return cCode.isNotEmpty && cleanMobile.startsWith(cCode);
+        },
+        orElse: () => null,
+      );
+    }
+
+    if (matchingCountry != null) {
+      shopProvider.updateSelectedCountry(matchingCountry);
+      countryCode = matchingCountry.code ?? AppConfig.instance.country.dialCode;
     } else {
       countryCode = shopProvider.selectedCountry?.code ??
           AppConfig.instance.country.dialCode;

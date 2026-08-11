@@ -26,6 +26,9 @@ class ShopProvider extends ChangeNotifier with BaseController {
 
   APIResponse<StoreSettingsDataModel> get storeSettings => _storeSettings;
 
+  Map<String, String>? get spiceLevelIcons =>
+      storeSettings.data?.producctUISettings?.spicelevelIcons;
+
   APIResponse<StoreDeliverySlotModel> _deliverySlots = APIResponse.initial();
 
   APIResponse<StoreDeliverySlotModel> get deliverySlots => _deliverySlots;

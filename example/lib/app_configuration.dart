@@ -16,7 +16,7 @@ final appConfig = AppConfig(
   buildIdentifier: 'co.uk.learabia.app',
   fireBaseProjectId: 'customerapp-6d5f7',
   themeMode: AppThemeMode.system,
-  isCategoryImageEnabled: false,
+  isCategoryImageEnabled: true,
   // applicationName: 'Urban Spice',
   // shopName: 'Urban Spice',
   // shopId: '76',

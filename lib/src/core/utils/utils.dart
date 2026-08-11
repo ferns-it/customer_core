@@ -13,7 +13,23 @@ class Utils {
     final result = parse(data.body?.text).documentElement?.text;
     return result ?? '';
   }
-
+//  static String stripHtml(String html) {
+//       return html
+//           .replaceAll(
+//             RegExp(r'<br\s*/?>', caseSensitive: false),
+//             '\n',
+//           )
+//           .replaceAll(
+//             RegExp(r'</p>', caseSensitive: false),
+//             '\n',
+//           )
+//           .replaceAll(
+//             RegExp(r'<[^>]*>'),
+//             '',
+//           )
+//           .replaceAll('&nbsp;', ' ')
+//           .trim();
+//     }
   static String removeExtraSpaces(String input) {
     return input.replaceAll(RegExp(r'\s+'), ' ').trim();
   }

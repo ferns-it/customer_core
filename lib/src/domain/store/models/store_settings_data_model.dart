@@ -25,6 +25,7 @@ class StoreSettingsDataModel {
   final String? headerColor;
   final String? footerColor;
   final StoreTableReservationSettings? tableReservationSettings;
+  final StoreProductUISettings? producctUISettings;
   final String? hash;
   final String? smsVerification;
   final String? emailVerification;
@@ -52,6 +53,7 @@ class StoreSettingsDataModel {
     this.headerColor,
     this.footerColor,
     this.tableReservationSettings,
+    this.producctUISettings,
     this.hash,
     this.smsVerification,
     this.emailVerification,
@@ -80,6 +82,7 @@ class StoreSettingsDataModel {
     String? headerColor,
     String? footerColor,
     StoreTableReservationSettings? tableReservationSettings,
+    StoreProductUISettings? producctUISettings,
     String? hash,
     String? smsVerification,
     String? emailVerification,
@@ -108,6 +111,7 @@ class StoreSettingsDataModel {
       footerColor: footerColor ?? this.footerColor,
       tableReservationSettings:
           tableReservationSettings ?? this.tableReservationSettings,
+      producctUISettings: producctUISettings ?? this.producctUISettings,
       hash: hash ?? this.hash,
       smsVerification: smsVerification ?? this.smsVerification,
       emailVerification: emailVerification ?? this.emailVerification,
@@ -139,6 +143,7 @@ class StoreSettingsDataModel {
       'headerColor': headerColor,
       'footerColor': footerColor,
       'tableReservationSettings': tableReservationSettings?.toMap(),
+      'producctUISettings': producctUISettings?.toMap(),
       'hash': hash,
       'smsVerification': smsVerification,
       'emailVerification': emailVerification,
@@ -190,6 +195,10 @@ class StoreSettingsDataModel {
           ? StoreTableReservationSettings.fromMap(
               map['tableReservationSettings'] as Map<String, dynamic>)
           : null,
+      producctUISettings: map['producctUISettings'] != null
+          ? StoreProductUISettings.fromMap(
+              map['producctUISettings'] as Map<String, dynamic>)
+          : null,
       hash: map['hash'] != null ? map['hash'] as String : null,
       smsVerification: map['smsVerification'] != null
           ? map['smsVerification'] as String
@@ -214,7 +223,7 @@ class StoreSettingsDataModel {
 
   @override
   String toString() {
-    return 'StoreSettingsDataModel(id: $id, name: $name, email: $email,countryCode:$countryCode, available: $available, shopStatus: $shopStatus, mobile: $mobile, image: $image, deliveryInfo: $deliveryInfo, themeTitle: $themeTitle, themeBanner: $themeBanner, themeLogo: $themeLogo, primaryColor: $primaryColor, SecondaryColor: $SecondaryColor, buttonColor: $buttonColor, buttonHoverColor: $buttonHoverColor, linkColor: $linkColor, linkHoverColor: $linkHoverColor, headerColor: $headerColor, footerColor: $footerColor, tableReservationSettings: $tableReservationSettings, hash: $hash,smsAvailableCountries: $smsAvailableCountries)';
+    return 'StoreSettingsDataModel(id: $id, name: $name, email: $email,countryCode:$countryCode, available: $available, shopStatus: $shopStatus, mobile: $mobile, image: $image, deliveryInfo: $deliveryInfo, themeTitle: $themeTitle, themeBanner: $themeBanner, themeLogo: $themeLogo, primaryColor: $primaryColor, SecondaryColor: $SecondaryColor, buttonColor: $buttonColor, buttonHoverColor: $buttonHoverColor, linkColor: $linkColor, linkHoverColor: $linkHoverColor, headerColor: $headerColor, footerColor: $footerColor, tableReservationSettings: $tableReservationSettings, producctUISettings: $producctUISettings, hash: $hash,smsAvailableCountries: $smsAvailableCountries)';
   }
 
   @override
@@ -242,6 +251,7 @@ class StoreSettingsDataModel {
         other.headerColor == headerColor &&
         other.footerColor == footerColor &&
         other.tableReservationSettings == tableReservationSettings &&
+        other.producctUISettings == producctUISettings &&
         other.hash == hash &&
         other.smsVerification == smsVerification &&
         other.emailVerification == emailVerification &&
@@ -271,6 +281,7 @@ class StoreSettingsDataModel {
         headerColor.hashCode ^
         footerColor.hashCode ^
         tableReservationSettings.hashCode ^
+        producctUISettings.hashCode ^
         hash.hashCode ^
         smsVerification.hashCode ^
         emailVerification.hashCode ^
@@ -793,6 +804,57 @@ class StoreTableReservationSettings {
   @override
   int get hashCode =>
       haveAdvance.hashCode ^ advanceAmount.hashCode ^ advanceType.hashCode;
+}
+
+class StoreProductUISettings {
+  final Map<String, String>? spicelevelIcons;
+
+  const StoreProductUISettings({
+    this.spicelevelIcons,
+  });
+
+  StoreProductUISettings copyWith({
+    Map<String, String>? spicelevelIcons,
+  }) {
+    return StoreProductUISettings(
+      spicelevelIcons: spicelevelIcons ?? this.spicelevelIcons,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'spicelevelIcons': spicelevelIcons,
+    };
+  }
+
+  factory StoreProductUISettings.fromMap(Map<String, dynamic> map) {
+    return StoreProductUISettings(
+      spicelevelIcons: map['spicelevelIcons'] != null
+          ? Map<String, String>.from(
+              map['spicelevelIcons'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory StoreProductUISettings.fromJson(String source) =>
+      StoreProductUISettings.fromMap(
+          json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() =>
+      'StoreProductUISettings(spicelevelIcons: $spicelevelIcons)';
+
+  @override
+  bool operator ==(covariant StoreProductUISettings other) {
+    if (identical(this, other)) return true;
+
+    return mapEquals(other.spicelevelIcons, spicelevelIcons);
+  }
+
+  @override
+  int get hashCode => spicelevelIcons.hashCode;
 }
 
 class SmsAvailableCountriesData {

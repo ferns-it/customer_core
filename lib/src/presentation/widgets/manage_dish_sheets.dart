@@ -140,6 +140,12 @@ class DishDetailBottomSheet extends StatelessWidget {
                       ],
                     ),
                   ),
+                  verticalSpaceRegular,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: _IngredientsWidget(product: product),
+                  ),
+
                   _OrderSectionWidget(
                     product: product,
                     onRequestOrderDish: onRequestOrderDish,
@@ -349,6 +355,8 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
                       : const SizedBox.shrink(),
                   _DescriptionWidget(product: product),
                   verticalSpaceSmall,
+                  _IngredientsWidget(product: product),
+                  verticalSpaceSmall,
                   Flexible(
                     flex: 2,
                     child: ListView(
@@ -497,6 +505,38 @@ class _DescriptionWidget extends StatelessWidget {
             ),
           )
         : const SizedBox.shrink();
+  }
+}
+
+class _IngredientsWidget extends StatelessWidget {
+  final ProductDataModel product;
+
+  const _IngredientsWidget({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    return product.ingredients != null && product.ingredients!.isNotEmpty
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 0.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ingredients',
+                    style: context.customTextTheme.text16W600,
+                  ),
+                  verticalSpaceSmall,
+                  Text(
+                    Utils.removeHtmlTags(product.ingredients ?? 'N/A'),
+                    style: const TextStyle(fontSize: 13, height: 0.8),
+                  )
+                ],
+              ),
+            ),
+          )
+        : SizedBox.shrink();
   }
 }
 

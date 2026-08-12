@@ -1,5 +1,6 @@
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/application/theme/theme_provider.dart';
+import 'package:customer_core/src/core/global/global_variable.dart';
 import 'package:customer_core/src/core/theme/app_theme.dart';
 import 'package:customer_core/src/presentation/widgets/connectivity_wrapper.dart';
 import 'package:customer_core/theme/customer_theme_override.dart';
@@ -34,6 +35,7 @@ class _CustomerAppState extends State<CustomerApp> {
   void initState() {
     super.initState();
     appRouter = AppRouter();
+    GlobalVariable.router = appRouter;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!initialized) {
         DependencyRegistrar.initializeAllProviders(context);

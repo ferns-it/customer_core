@@ -3,8 +3,8 @@ import 'package:customer_core/gen/assets.gen.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/rendering.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
+import 'package:customer_core/src/application/notification/notification_provider.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
-import 'package:customer_core/src/infrastructure/notification/notification_shared_prefs_repo.dart';
 import 'package:customer_core/src/infrastructure/store/recent_search_product_prefs.dart';
 import 'package:customer_core/src/presentation/widgets/animated_search_bar.dart';
 
@@ -43,7 +43,6 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
   late ScrollController _scrollController;
-  int notificationCount = 0;
 
   // final isNewView = true;
   final List<String> imageUrlsForBanner = UiConfig.instance.bannerImages;
@@ -66,13 +65,6 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
           _setupTabController(productProvider.categories);
         });
       }
-      NotificationSharedPrefs.getNotification().then(
-        (value) {
-          setState(() {
-            notificationCount = value.length;
-          });
-        },
-      );
     });
   }
 
@@ -122,10 +114,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     final cartProvider = context.watch<CartProvider>();
     final promotionListner = context.watch<PromotionsProvider>();
 
-    // final shopProvider = context.read<ShopProvider>();
-    // final shopListener = context.watch<ShopProvider>();
     final hideThreshold = context.screenHeight * 0.15; // 10%
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final notificationCount =
+        context.watch<NotificationProvider>().notifications.length;
 
     return PopScope(
         onPopInvokedWithResult: (_, __) {
@@ -843,7 +836,6 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                       ],
                     ),
                     verticalSpaceSmall,
-
                     TabBar(
                       onTap: (index) async {
                         final category =
@@ -1052,7 +1044,6 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
           topRight: Radius.circular(20),
         )),
         builder: (context) {
-          
           return AddDishBottomSheet(
             product: product,
           );

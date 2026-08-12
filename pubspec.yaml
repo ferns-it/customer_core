@@ -11,7 +11,6 @@ dependencies:
   auto_route: ^9.2.2
   firebase_crashlytics: ^5.2.0
   connectivity_plus: ^6.0.0
-  awesome_notifications: ^0.9.3
   cached_network_image: ^3.4.1
   calendar_date_picker2: ^1.1.7
   carousel_slider: ^5.0.0

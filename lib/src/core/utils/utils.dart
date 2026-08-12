@@ -30,6 +30,23 @@ class Utils {
 //           .replaceAll('&nbsp;', ' ')
 //           .trim();
 //     }
+ static bool isSpiceLevelApplicable(String? spiceLevel) {
+    if (spiceLevel == null) return false;
+    final normalized = spiceLevel.trim().toLowerCase();
+    if (normalized.isEmpty) return false;
+
+    const notApplicableValues = {
+      'not applicable',
+      'n/a',
+      'na',
+      'none',
+      'nil',
+      '-',
+      '0',
+    };
+
+    return !notApplicableValues.contains(normalized);
+  }
   static String removeExtraSpaces(String input) {
     return input.replaceAll(RegExp(r'\s+'), ' ').trim();
   }

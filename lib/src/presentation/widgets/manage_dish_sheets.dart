@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:dartx/dartx.dart';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -428,11 +429,57 @@ class _ProductNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      (product.name ?? "").capitalize(),
-      style: context.customTextTheme.text20W600.copyWith(
-        color: context.customTextTheme.color,
-      ),
+    final spiceLevel = product.spiceLevel;
+    final spiceLevelIcon =
+        context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          (product.name ?? "").capitalize(),
+          style: context.customTextTheme.text20W600.copyWith(
+            color: context.customTextTheme.color,
+          ),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (spiceLevel != null &&
+                Utils.isSpiceLevelApplicable(spiceLevel)) ...[
+              Container(
+                decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(0.12), blurRadius: 6)
+                    ],
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.all(4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (spiceLevelIcon != null && spiceLevelIcon.isNotEmpty)
+                      Text(
+                        spiceLevelIcon,
+                        style: TextStyle(fontSize: 12, color: Colors.red),
+                      ),
+                    horizontalSpaceTiny,
+                    Text(
+                      spiceLevel,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: context.customTextTheme.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ]
+          ],
+        ),
+      ],
     );
   }
 }

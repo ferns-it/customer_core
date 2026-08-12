@@ -356,13 +356,13 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
                       : const SizedBox.shrink(),
                   _DescriptionWidget(product: product),
                   verticalSpaceSmall,
-                  _IngredientsWidget(product: product),
-                  verticalSpaceSmall,
                   Flexible(
                     flex: 2,
                     child: ListView(
                       shrinkWrap: true,
                       children: [
+                        _IngredientsWidget(product: product),
+                        verticalSpaceSmall,
                         _FoodVariationSection(product),
                         verticalSpaceRegular,
                         _FoodAddonsSection(product),

@@ -161,14 +161,90 @@ class DishDetailBottomSheet extends StatelessWidget {
   }
 }
 
-class AddDishBottomSheet extends GetProviderView<CartProvider> {
+class AddDishBottomSheet extends StatefulWidget {
   final ProductDataModel product;
 
   const AddDishBottomSheet({super.key, required this.product});
 
   @override
+  State<AddDishBottomSheet> createState() => _AddDishBottomSheetState();
+}
+
+class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
+  final ScrollController _scrollController = ScrollController();
+  final _variationKey = GlobalKey();
+  late final List<GlobalKey> _masterAddonKeys;
+
+  ProductDataModel get product => widget.product;
+
+  @override
+  void initState() {
+    super.initState();
+    _masterAddonKeys =
+        List.generate(product.masterAddons.length, (_) => GlobalKey());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Returns the [GlobalKey] of the first required section that is not
+  /// satisfied, or `null` when every required section is satisfied.
+  GlobalKey? _firstInvalidSectionKey(CartProvider cart) {
+    // Variation section is required whenever the product offers multiple
+    // variations and none has been selected yet.
+    if (product.hasMultipleVariation && cart.selectedItemVariation == null) {
+      return _variationKey;
+    }
+
+    for (var i = 0; i < product.masterAddons.length; i++) {
+      final modifier = product.masterAddons[i];
+      final minimumRequired =
+          int.tryParse(modifier.minimumRequired ?? '') ?? 0;
+      final maximumRequired =
+          int.tryParse(modifier.maximumRequired ?? '') ?? 0;
+
+      // No min/max constraint means this section is not required.
+      if (minimumRequired == 0 && maximumRequired == 0) continue;
+
+      final selectedModifier = cart.selectedMasterAddons.firstOrNullWhere(
+        (e) => e.id == modifier.id,
+      );
+      final selectedCount = selectedModifier?.options.length ?? 0;
+
+      if (selectedCount < minimumRequired) return _masterAddonKeys[i];
+      if (maximumRequired != 0 && selectedCount > maximumRequired) {
+        return _masterAddonKeys[i];
+      }
+    }
+
+    return null;
+  }
+
+  /// Scrolls the sheet to the first invalid required section.
+  /// Returns `true` when such a section exists (and add-to-cart should be
+  /// blocked), `false` when everything required is satisfied.
+  bool _scrollToFirstInvalidSection(CartProvider cart) {
+    final key = _firstInvalidSectionKey(cart);
+    if (key == null) return false;
+
+    final sectionContext = key.currentContext;
+    if (sectionContext == null) return false;
+
+    Scrollable.ensureVisible(
+      sectionContext,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOutCubic,
+      alignment: 0.1,
+    );
+    return true;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final cartListener = listener(context);
+    final cartListener = context.watch<CartProvider>();
     final allergens = product.selectedAllergensList;
 
     final baseTextTheme = Theme.of(context).textTheme;
@@ -359,18 +435,28 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
                   Flexible(
                     flex: 2,
                     child: ListView(
+                      controller: _scrollController,
                       shrinkWrap: true,
                       children: [
                         _IngredientsWidget(product: product),
                         verticalSpaceSmall,
-                        _FoodVariationSection(product),
+                        _FoodVariationSection(product, key: _variationKey),
                         verticalSpaceRegular,
-                        _FoodAddonsSection(product),
+                        _FoodAddonsSection(
+                          product,
+                          addonKeys: _masterAddonKeys,
+                        ),
                       ],
                     ),
                   ),
                   verticalSpaceSmall,
-                  Center(child: AddToCartButton(product)),
+                  Center(
+                    child: AddToCartButton(
+                      product,
+                      onValidationFailed: () =>
+                          _scrollToFirstInvalidSection(cartListener),
+                    ),
+                  ),
                   verticalSpaceTiny,
                   SizedBox(height: bottomInset > 0 ? bottomInset : 0)
                 ],
@@ -680,7 +766,7 @@ class _ProductPriceWidget extends StatelessWidget {
 
 // ADD DISH WIDGETS
 class _FoodVariationSection extends GetProviderView<CartProvider> {
-  const _FoodVariationSection(this.item);
+  const _FoodVariationSection(this.item, {super.key});
 
   final ProductDataModel item;
 
@@ -762,18 +848,6 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
                       color: context.customTextTheme.color,
                     ),
                   ),
-            // subtitle: Text(
-            //   (variation.offerPriceEnabled == 'Yes'
-            //               ? variation.offerPriceDetails?.currentOfferPrice
-            //                   ?.offerPriceFormatted
-            //               : variation.name ?? "")
-            //           ?.capitalize() ??
-            //       '',
-            //   style: context.customTextTheme.text14W500.copyWith(
-            //     color:
-            //         themeListener.isDarkMode ? Colors.white : AppColors.kBlack,
-            //   ),
-            // ),
             fillColor: WidgetStateProperty.resolveWith<Color>((states) {
               if (states.contains(WidgetState.selected)) {
                 return Theme.of(context).colorScheme.primary; // selected color
@@ -792,9 +866,10 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
 }
 
 class _FoodAddonsSection extends GetProviderView<CartProvider> {
-  const _FoodAddonsSection(this.item);
+  const _FoodAddonsSection(this.item, {super.key, this.addonKeys});
 
   final ProductDataModel item;
+  final List<Key?>? addonKeys;
 
   @override
   Widget build(BuildContext context) {
@@ -805,8 +880,9 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
     return Column(
       children: [
         Column(
-          children: item.masterAddons.map((modifier) {
+          children: item.masterAddons.mapIndexed((index, modifier) {
             return Column(
+              key: addonKeys?[index],
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -920,9 +996,14 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
 }
 
 class AddToCartButton extends GetProviderView<CartProvider> {
-  const AddToCartButton(this.product, {super.key});
+  const AddToCartButton(this.product, {super.key, this.onValidationFailed});
 
   final ProductDataModel product;
+
+  /// Called when a required section is not satisfied. It should scroll the
+  /// sheet to the first invalid required section. Returns `true` when such a
+  /// section exists (so add-to-cart is blocked), `false` otherwise.
+  final bool Function()? onValidationFailed;
 
   @override
   Widget build(BuildContext context) {
@@ -950,7 +1031,8 @@ class AddToCartButton extends GetProviderView<CartProvider> {
               }
               final validationResult =
                   cartProvider.validateRequiredModifiers(product);
-              if (validationResult) {
+              final hasInvalidSection = onValidationFailed?.call() ?? false;
+              if (validationResult && !hasInvalidSection) {
                 cartProvider.addItemToCart(isGuest: !isLogged).then((added) {
                   if (added) {
                     cartProvider.clearSelectedAddressSecondary();

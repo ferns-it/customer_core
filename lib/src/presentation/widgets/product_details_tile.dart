@@ -122,9 +122,15 @@ class ProductDetailsTile extends StatelessWidget {
                               Container(
                                 decoration: BoxDecoration(
                                     boxShadow: [
+                                      // BoxShadow(
+                                      //     color: Colors.black.withOpacity(0.12),
+                                      //     blurRadius: 6)
                                       BoxShadow(
-                                          color: Colors.black.withOpacity(0.12),
-                                          blurRadius: 6)
+                                        color: Colors.black.withOpacity(0.10),
+                                        blurRadius: 4,
+                                        spreadRadius: 0,
+                                        offset: const Offset(0, 2),
+                                      ),
                                     ],
                                     color: Theme.of(context).cardColor,
                                     borderRadius: BorderRadius.circular(10)),
@@ -135,10 +141,20 @@ class ProductDetailsTile extends StatelessWidget {
                                   children: [
                                     if (spiceLevelIcon != null &&
                                         spiceLevelIcon.isNotEmpty)
+                                      // Text(
+                                      //   spiceLevelIcon,
+                                      //   style: TextStyle(
+                                      //       fontSize: 12, color: Colors.red),
+                                      // ),
                                       Text(
-                                        spiceLevelIcon,
-                                        style: TextStyle(
-                                            fontSize: 12, color: Colors.red),
+                                        ['Medium', 'Hot', 'Extra Hot']
+                                                .contains(spiceLevel)
+                                            ? '🌶️'
+                                            : spiceLevelIcon,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.red,
+                                        ),
                                       ),
                                     horizontalSpaceTiny,
                                     Text(
@@ -212,36 +228,44 @@ class ProductDetailsTile extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      product.isOfferPrice == 'Yes' &&
-                              product.offerPriceDetails?.currentOfferPrice !=
-                                  null
-                          ? RichText(
-                              text: TextSpan(
-                                text:
-                                    "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
-                                style: TextStyle(
-                                    color: context.customTextTheme.color,
-                                    fontSize: 15),
-                                children: [
-                                  TextSpan(
-                                    text: product.price ?? '',
-                                    style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 14,
-                                        decoration: TextDecoration.lineThrough),
-                                  ),
-                                ],
+                      Expanded(
+                        child: product.isOfferPrice == 'Yes' &&
+                                product.offerPriceDetails?.currentOfferPrice !=
+                                    null
+                            ? RichText(
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                text: TextSpan(
+                                  text:
+                                      "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
+                                  style: TextStyle(
+                                      color: context.customTextTheme.color,
+                                      fontSize: 15),
+                                  children: [
+                                    TextSpan(
+                                      text: product.price ?? '',
+                                      style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                          decoration:
+                                              TextDecoration.lineThrough),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Text(
+                                product.price ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style:
+                                    context.customTextTheme.text14W700.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1,
+                                  color: context.customTextTheme.color,
+                                ),
                               ),
-                            )
-                          : Text(
-                              product.price ?? '',
-                              style:
-                                  context.customTextTheme.text14W700.copyWith(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
-                                color: context.customTextTheme.color,
-                              ),
-                            ),
+                      ),
+                      horizontalSpaceSmall,
                       useSecondaryWidget
                           ? SizedBox(
                               height: 50, child: Center(child: secondaryWidget))
@@ -256,8 +280,7 @@ class ProductDetailsTile extends StatelessWidget {
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(5.0)),
-                                      fixedSize:
-                                          const Size(double.infinity, 30),
+                                      fixedSize: const Size(80, 30),
                                       side: BorderSide(
                                           color: product.isAvailable == true
                                               ? Theme.of(context)
@@ -274,12 +297,13 @@ class ProductDetailsTile extends StatelessWidget {
                                       ? onPressAddBtn
                                       : null,
                                   child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(
-                                        Icons.add,
-                                        size: 16,
-                                      ),
-                                      horizontalSpaceTiny,
+                                      // Icon(
+                                      //   Icons.add,
+                                      //   size: 16,
+                                      // ),
+                                      // horizontalSpaceTiny,
                                       Text(
                                         'Add',
                                         style: context

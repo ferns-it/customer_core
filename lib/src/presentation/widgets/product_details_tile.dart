@@ -110,7 +110,7 @@ class ProductDetailsTile extends StatelessWidget {
                             style: context.customTextTheme.text14W700.copyWith(
                               color: context.customTextTheme.color,
                             ),
-                            maxLines: 3,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),

@@ -80,6 +80,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final taxAmount = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.amountFormatted?.taxTotalAmount
         : cartListener.takeAwayDetails?.amountFormatted?.taxTotalAmount;
+    final taxDetails = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.taxDetails
+        : cartListener.takeAwayDetails?.taxDetails;
 
     final subTotal =
         cartListener.cartDetailsModel?.cartTotal?.cartTotalPrice_NormalDisplay;
@@ -695,7 +698,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                 ),
                               )
                             : SizedBox.shrink()),
-                    if (isTaxApplied == true || taxAmount != null) ...[
+                    if ((isTaxApplied == true || taxAmount != null) &&
+                        (taxDetails?.isNotEmpty ?? false)) ...[
                       verticalSpaceTiny,
                       isTaxApplied == true
                           ? _SummaryRow(

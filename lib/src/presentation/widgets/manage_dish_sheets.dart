@@ -519,12 +519,17 @@ class _ProductNameWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          (product.name ?? "").capitalize(),
-          style: context.customTextTheme.text20W600.copyWith(
-            color: context.customTextTheme.color,
+        Expanded(
+          child: Text(
+            (product.name ?? "").capitalize(),
+            style: context.customTextTheme.text20W600.copyWith(
+              color: context.customTextTheme.color,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
+        horizontalSpaceSmall,
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -543,7 +548,7 @@ class _ProductNameWidget extends StatelessWidget {
                       ),
                     ],
                     color: Utils.spiceLevelColor(context, spiceLevel)
-                        ,
+                        .withOpacity(0.7),
                     borderRadius: BorderRadius.circular(10)),
                 padding: EdgeInsets.all(4),
                 child: Row(
@@ -568,10 +573,10 @@ class _ProductNameWidget extends StatelessWidget {
                     Text(
                       spiceLevel,
                       style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: context.customTextTheme.color,
-                      ),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color:
+                              Utils.spiceLevelTextColor(context, spiceLevel)),
                     ),
                   ],
                 ),

@@ -68,7 +68,7 @@ class ProductDetailsTile extends StatelessWidget {
       child: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(0.0),
             child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -100,230 +100,248 @@ class ProductDetailsTile extends StatelessWidget {
                         ),
                   verticalSpaceSmall,
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            product.name ?? '',
-                            style: context.customTextTheme.text14W700.copyWith(
-                              color: context.customTextTheme.color,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
                         Row(
-                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            if (spiceLevel != null &&
-                                Utils.isSpiceLevelApplicable(spiceLevel)) ...[
-                              Container(
-                                decoration: BoxDecoration(
-                                    boxShadow: [
-                                      // BoxShadow(
-                                      //     color: Colors.black.withOpacity(0.12),
-                                      //     blurRadius: 6)
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.10),
-                                        blurRadius: 4,
-                                        spreadRadius: 0,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                    color: Utils.spiceLevelColor(
-                                        context, spiceLevel),
-                                    borderRadius: BorderRadius.circular(10)),
-                                padding: EdgeInsets.all(4),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    if (spiceLevelIcon != null &&
-                                        spiceLevelIcon.isNotEmpty)
-                                      // Text(
-                                      //   spiceLevelIcon,
-                                      //   style: TextStyle(
-                                      //       fontSize: 12, color: Colors.red),
-                                      // ),
-                                      Text(
-                                        ['Medium', 'Hot', 'Extra Hot']
-                                                .contains(spiceLevel)
-                                            ? '🌶️'
-                                            : spiceLevelIcon,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.red,
+                            Expanded(
+                              child: Text(
+                                product.name ?? '',
+                                style:
+                                    context.customTextTheme.text14W700.copyWith(
+                                  color: context.customTextTheme.color,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (spiceLevel != null &&
+                                    Utils.isSpiceLevelApplicable(
+                                        spiceLevel)) ...[
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        boxShadow: [
+                                          // BoxShadow(
+                                          //     color: Colors.black.withOpacity(0.12),
+                                          //     blurRadius: 6)
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.10),
+                                            blurRadius: 4,
+                                            spreadRadius: 0,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                        color: Utils.spiceLevelColor(
+                                                context, spiceLevel)
+                                            .withOpacity(0.7),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    padding: EdgeInsets.only(
+                                        top: 2, left: 4, right: 4, bottom: 2),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        if (spiceLevelIcon != null &&
+                                            spiceLevelIcon.isNotEmpty)
+                                          // Text(
+                                          //   spiceLevelIcon,
+                                          //   style: TextStyle(
+                                          //       fontSize: 12, color: Colors.red),
+                                          // ),
+                                          Text(
+                                            ['Medium', 'Hot', 'Extra Hot']
+                                                    .contains(spiceLevel)
+                                                ? '🌶️'
+                                                : spiceLevelIcon,
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.red),
+                                          ),
+                                        horizontalSpaceTiny,
+                                        Text(
+                                          spiceLevel,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: Utils.spiceLevelTextColor(
+                                                context, spiceLevel),
+                                          ),
                                         ),
-                                      ),
-                                    horizontalSpaceTiny,
-                                    Text(
-                                      spiceLevel,
+                                      ],
+                                    ),
+                                  ),
+                                ]
+                              ],
+                            ),
+                          ],
+                        ),
+                        verticalSpaceSmall,
+                        Wrap(
+                          spacing: 2,
+                          runSpacing: 4,
+                          children: [
+                            ...allergens.take(4).map(
+                                  (e) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.grey.shade800
+                                          : Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      e,
                                       style: TextStyle(
-                                        fontSize: 11,
+                                          fontSize: 8,
+                                          color: context.customTextTheme.color,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                            if (allergens.length > 4)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey.shade800
+                                      : Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '+${allergens.length - 4}',
+                                  style: TextStyle(
+                                    fontSize: 8,
+                                    color: context.customTextTheme.color,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        verticalSpaceSmall,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: product.isOfferPrice == 'Yes' &&
+                                      product.offerPriceDetails
+                                              ?.currentOfferPrice !=
+                                          null
+                                  ? RichText(
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      text: TextSpan(
+                                        text:
+                                            "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
+                                        style: TextStyle(
+                                            color:
+                                                context.customTextTheme.color,
+                                            fontSize: 15),
+                                        children: [
+                                          TextSpan(
+                                            text: product.price ?? '',
+                                            style: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14,
+                                                decoration:
+                                                    TextDecoration.lineThrough),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Text(
+                                      product.price ?? '',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: context.customTextTheme.text14W700
+                                          .copyWith(
                                         fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
                                         color: context.customTextTheme.color,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ]
+                            ),
+                            horizontalSpaceSmall,
+                            useSecondaryWidget
+                                ? SizedBox(
+                                    height: 50,
+                                    child: Center(child: secondaryWidget))
+                                : SizedBox(
+                                    height: 30,
+                                    child: FilledButton(
+                                        style: FilledButton.styleFrom(
+                                            disabledBackgroundColor:
+                                                Colors.transparent,
+                                            disabledForegroundColor:
+                                                Theme.of(context).disabledColor,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5.0)),
+                                            fixedSize: const Size(80, 30),
+                                            side: BorderSide(
+                                                color:
+                                                    product.isAvailable == true
+                                                        ? Theme.of(context)
+                                                            .colorScheme
+                                                            .primary
+                                                        : Colors.grey),
+                                            backgroundColor:
+                                                product.isAvailable == true
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .primary
+                                                    : Colors.transparent),
+                                        onPressed: product.isAvailable == true
+                                            ? onPressAddBtn
+                                            : null,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            // Icon(
+                                            //   Icons.add,
+                                            //   size: 16,
+                                            // ),
+                                            // horizontalSpaceTiny,
+                                            Text(
+                                              'Add',
+                                              style: context
+                                                  .customTextTheme.text14W700
+                                                  .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color:
+                                                    product.isAvailable == true
+                                                        ? Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface
+                                                        : Theme.of(context)
+                                                            .disabledColor,
+                                              ),
+                                            ),
+                                          ],
+                                        )),
+                                  ),
                           ],
                         ),
+                        verticalSpaceSmall,
                       ],
                     ),
-                  ),
-                  verticalSpaceSmall,
-                  Wrap(
-                    spacing: 2,
-                    runSpacing: 4,
-                    children: [
-                      ...allergens.take(4).map(
-                            (e) => Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.grey.shade800
-                                    : Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                e,
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  color: context.customTextTheme.color,
-                                ),
-                              ),
-                            ),
-                          ),
-                      if (allergens.length > 4)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.grey.shade800
-                                    : Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '+${allergens.length - 4}',
-                            style: TextStyle(
-                              fontSize: 8,
-                              color: context.customTextTheme.color,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  verticalSpaceSmall,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: product.isOfferPrice == 'Yes' &&
-                                product.offerPriceDetails?.currentOfferPrice !=
-                                    null
-                            ? RichText(
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                text: TextSpan(
-                                  text:
-                                      "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
-                                  style: TextStyle(
-                                      color: context.customTextTheme.color,
-                                      fontSize: 15),
-                                  children: [
-                                    TextSpan(
-                                      text: product.price ?? '',
-                                      style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 14,
-                                          decoration:
-                                              TextDecoration.lineThrough),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Text(
-                                product.price ?? '',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style:
-                                    context.customTextTheme.text14W700.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
-                                  color: context.customTextTheme.color,
-                                ),
-                              ),
-                      ),
-                      horizontalSpaceSmall,
-                      useSecondaryWidget
-                          ? SizedBox(
-                              height: 50, child: Center(child: secondaryWidget))
-                          : SizedBox(
-                              height: 30,
-                              child: FilledButton(
-                                  style: FilledButton.styleFrom(
-                                      disabledBackgroundColor:
-                                          Colors.transparent,
-                                      disabledForegroundColor:
-                                          Theme.of(context).disabledColor,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5.0)),
-                                      fixedSize: const Size(80, 30),
-                                      side: BorderSide(
-                                          color: product.isAvailable == true
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                              : Colors.grey),
-                                      backgroundColor:
-                                          product.isAvailable == true
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                              : Colors.transparent),
-                                  onPressed: product.isAvailable == true
-                                      ? onPressAddBtn
-                                      : null,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // Icon(
-                                      //   Icons.add,
-                                      //   size: 16,
-                                      // ),
-                                      // horizontalSpaceTiny,
-                                      Text(
-                                        'Add',
-                                        style: context
-                                            .customTextTheme.text14W700
-                                            .copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: product.isAvailable == true
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface
-                                              : Theme.of(context).disabledColor,
-                                        ),
-                                      ),
-                                    ],
-                                  )),
-                            ),
-                    ],
-                  ),
-                  verticalSpaceSmall,
+                  )
                 ],
               ),
             ),

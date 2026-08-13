@@ -543,7 +543,7 @@ class _ProductNameWidget extends StatelessWidget {
                       ),
                     ],
                     color: Utils.spiceLevelColor(context, spiceLevel)
-                        .withOpacity(0.25),
+                        ,
                     borderRadius: BorderRadius.circular(10)),
                 padding: EdgeInsets.all(4),
                 child: Row(

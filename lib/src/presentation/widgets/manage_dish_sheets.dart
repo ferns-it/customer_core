@@ -201,10 +201,8 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
 
     for (var i = 0; i < product.masterAddons.length; i++) {
       final modifier = product.masterAddons[i];
-      final minimumRequired =
-          int.tryParse(modifier.minimumRequired ?? '') ?? 0;
-      final maximumRequired =
-          int.tryParse(modifier.maximumRequired ?? '') ?? 0;
+      final minimumRequired = int.tryParse(modifier.minimumRequired ?? '') ?? 0;
+      final maximumRequired = int.tryParse(modifier.maximumRequired ?? '') ?? 0;
 
       // No min/max constraint means this section is not required.
       if (minimumRequired == 0 && maximumRequired == 0) continue;
@@ -535,10 +533,17 @@ class _ProductNameWidget extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                     boxShadow: [
+                      // BoxShadow(
+                      //     color: Colors.black.withOpacity(0.12), blurRadius: 6)
                       BoxShadow(
-                          color: Colors.black.withOpacity(0.12), blurRadius: 6)
+                        color: Colors.black.withOpacity(0.10),
+                        blurRadius: 4,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 2),
+                      ),
                     ],
-                    color: Theme.of(context).cardColor,
+                    color: Utils.spiceLevelColor(context, spiceLevel)
+                        .withOpacity(0.25),
                     borderRadius: BorderRadius.circular(10)),
                 padding: EdgeInsets.all(4),
                 child: Row(
@@ -547,9 +552,18 @@ class _ProductNameWidget extends StatelessWidget {
                   children: [
                     if (spiceLevelIcon != null && spiceLevelIcon.isNotEmpty)
                       Text(
-                        spiceLevelIcon,
-                        style: TextStyle(fontSize: 12, color: Colors.red),
+                        ['Medium', 'Hot', 'Extra Hot'].contains(spiceLevel)
+                            ? '🌶️'
+                            : spiceLevelIcon,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.red,
+                        ),
                       ),
+                    // Text(
+                    //   spiceLevelIcon,
+                    //   style: TextStyle(fontSize: 12, color: Colors.red),
+                    // ),
                     horizontalSpaceTiny,
                     Text(
                       spiceLevel,
@@ -813,14 +827,12 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
           return RadioListTile(
             value: cartListener.selectedItemVariation == variation,
             groupValue: true,
-
             title: Text(
               (variation.name ?? "").capitalize(),
               style: context.customTextTheme.text14W600.copyWith(
                 color: context.customTextTheme.color,
               ),
             ),
-
             subtitle: variation.offerPriceEnabled == 'Yes' &&
                     variation.offerPriceDetails?.currentOfferPrice != null
                 ? RichText(
@@ -854,7 +866,6 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
               }
               return Colors.grey; // 👈 unselected color
             }),
-
             controlAffinity: ListTileControlAffinity.trailing,
             onChanged: (_) => cartProvider.onChangeVariation(variation),
             visualDensity: VisualDensity.compact,

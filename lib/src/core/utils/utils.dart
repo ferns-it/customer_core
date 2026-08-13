@@ -1,6 +1,8 @@
 import 'dart:math';
+import 'dart:ui';
 
 
+import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
 
 import 'dart:math' as math;
@@ -46,6 +48,23 @@ class Utils {
     };
 
     return !notApplicableValues.contains(normalized);
+  }
+  static Color spiceLevelColor(BuildContext context, String? spiceLevel) {
+    if (spiceLevel == null) return Theme.of(context).cardColor;
+    switch (spiceLevel.trim().toLowerCase()) {
+      case 'not spicy':
+        return const Color(0xFFE8F5E9); // Soft green
+      case 'mild':
+        return const Color(0xFFFFF8E1); // Soft yellow
+      case 'medium':
+        return const Color(0xFFFFE8C2); // Soft orange
+      case 'hot':
+        return const Color(0xFFFFD6D6); // Soft red
+      case 'extra hot':
+        return const Color(0xFFFFB8B8); // Stronger red
+      default:
+        return Theme.of(context).cardColor;
+    }
   }
   static String removeExtraSpaces(String input) {
     return input.replaceAll(RegExp(r'\s+'), ' ').trim();

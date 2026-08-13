@@ -132,7 +132,8 @@ class ProductDetailsTile extends StatelessWidget {
                                         offset: const Offset(0, 2),
                                       ),
                                     ],
-                                    color: Theme.of(context).cardColor,
+                                    color: Utils.spiceLevelColor(
+                                        context, spiceLevel),
                                     borderRadius: BorderRadius.circular(10)),
                                 padding: EdgeInsets.all(4),
                                 child: Row(

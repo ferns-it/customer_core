@@ -1863,44 +1863,50 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 verticalSpaceMedium,
-                Row(
-                  children: [
-                    const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
-                    horizontalSpaceMedium,
-                    Text(
-                      'OR',
-                      style: context.customTextTheme.text12W600
-                          .copyWith(color: AppColors.kGray),
-                    ),
-                    horizontalSpaceMedium,
-                    const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
-                  ],
-                ),
+                !authProvider.phoneOtpSent
+                    ? Row(
+                        children: [
+                          const Flexible(
+                              child: Divider(
+                            thickness: 2,
+                            color: AppColors.kGray,
+                          )),
+                          horizontalSpaceMedium,
+                          Text(
+                            'OR',
+                            style: context.customTextTheme.text12W600
+                                .copyWith(color: AppColors.kGray),
+                          ),
+                          horizontalSpaceMedium,
+                          const Flexible(
+                              child: Divider(
+                            thickness: 2,
+                            color: AppColors.kGray,
+                          )),
+                        ],
+                      )
+                    : SizedBox.shrink(),
                 verticalSpaceMedium,
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor:
-                            const WidgetStatePropertyAll(Colors.white),
-                        foregroundColor: WidgetStatePropertyAll(
-                            Theme.of(context).colorScheme.primary),
-                        shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)))),
-                    onPressed: () {
-                      authProvider.skipMobileVerification();
-                    },
-                    child: const Text("Verify later"),
-                  ),
-                ),
+                !authProvider.phoneOtpSent
+                    ? SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  const WidgetStatePropertyAll(Colors.white),
+                              foregroundColor: WidgetStatePropertyAll(
+                                  Theme.of(context).colorScheme.primary),
+                              shape: WidgetStatePropertyAll(
+                                  RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(10)))),
+                          onPressed: () {
+                            authProvider.skipMobileVerification();
+                          },
+                          child: const Text("Verify later"),
+                        ),
+                      )
+                    : SizedBox.shrink()
               ],
             );
           });

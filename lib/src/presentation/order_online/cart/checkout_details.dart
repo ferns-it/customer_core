@@ -49,6 +49,9 @@ class CheckoutDetailsScreen extends StatelessWidget {
     final taxDetails = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.taxDetails
         : cartListener.takeAwayDetails?.taxDetails;
+    final hasTaxAmount = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.hasTax
+        : cartListener.takeAwayDetails?.hasTax;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -682,7 +685,8 @@ class CheckoutDetailsScreen extends StatelessWidget {
                           ),
                         )
                       : SizedBox.shrink()),
-              if ((isTaxApplied == true || taxAmount != null) &&
+              if (isTaxApplied == true &&
+                  hasTaxAmount == true &&
                   (taxDetails?.isNotEmpty ?? false)) ...[
                 verticalSpaceTiny,
                 isTaxApplied == true

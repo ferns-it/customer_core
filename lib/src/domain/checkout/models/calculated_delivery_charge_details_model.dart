@@ -289,6 +289,19 @@ class CalculatedDeliveryChargeDetailsModel {
   }
 
   bool get isTaxAppliedBool => isTaxApplied == 'Yes';
+  bool get hasTax {
+    final tax = taxTotalAmount;
+
+    if (tax == null || tax.trim().isEmpty) {
+      return false;
+    }
+
+    final amount = double.tryParse(
+      tax.replaceAll(RegExp(r'[^0-9.]'), ''),
+    );
+
+    return amount != null && amount > 0;
+  }
 }
 
 class DeliveryFeeGeneralData {
@@ -498,8 +511,9 @@ class DeliveryFeeDeliverySettings {
               ? (map["maxDeliveryRadius"] as int).toDouble()
               : map["maxDeliveryRadius"]
           : null,
-      ratePerMile:
-          map['ratePerMile'] != null ? map['ratePerMile'] as double : null,
+      ratePerMile: map['ratePerMile'] != null
+          ? (map['ratePerMile'] as num).toDouble()
+          : null,
       deliveryChargeType: map['deliveryChargeType'] != null
           ? map['deliveryChargeType'] as String
           : null,

@@ -7,6 +7,7 @@ import 'package:dartx/dartx.dart';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -399,9 +400,8 @@ class _CartScreenState extends State<CartScreen>
                                     final result = await Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => LoginScreen(
-                                            showBackButton: true,
-                                          ),
+                                          builder: (context) =>
+                                              LoginScreen(showBackButton: true),
                                         ));
                                     if (result == true) {
                                       await cartProvider.transferCart();
@@ -1577,7 +1577,9 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
   final userProvider = context.read<UserProvider>();
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
-  String countryCode = '';
+  final shopProvider = context.read<ShopProvider>();
+  String countryCode =
+      shopProvider.selectedCountry?.code ?? AppConfig.instance.country.dialCode;
   authProvider.registerUserPhoneController.clear();
 
   return await showDialog<bool>(
@@ -1592,9 +1594,19 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                 ),
                 title: Column(
                   children: [
-                    Text(
-                      "Add Mobile Number",
-                      style: context.customTextTheme.text18W600,
+                    verticalSpaceSmall,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.phone_android_rounded,
+                            color: Theme.of(context).colorScheme.primary),
+                        horizontalSpaceSmall,
+                        Text(
+                          "Add Mobile Number",
+                          style: context.customTextTheme.text18W600,
+                        ),
+                      ],
                     ),
                     verticalSpaceSmall,
                     Text(
@@ -1701,40 +1713,110 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                       TextFormField(
                         controller: authProvider.registerUserPhoneController,
                         keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.done,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(11),
+                        ],
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
                         decoration: InputDecoration(
                           // hintStyle: TextStyle(color: Colors.grey),
-                          labelStyle: TextStyle(color: Colors.grey),
+                          labelStyle: const TextStyle(color: Colors.grey),
                           labelText: 'Mobile Number',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderSide: BorderSide(color: AppColors.kGray3),
+                          ),
+                          enabledBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderSide: BorderSide(color: AppColors.kGray3),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 1.5,
+                            ),
+                          ),
+                          errorBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderSide:
+                                BorderSide(color: AppColors.kRed, width: 1.2),
+                          ),
+                          focusedErrorBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderSide:
+                                BorderSide(color: AppColors.kRed, width: 1.5),
+                          ),
+                          prefix: DropdownButtonHideUnderline(
+                            child: DropdownButton<SmsAvailableCountriesData>(
+                              value: shopProvider.selectedCountry,
+                              isDense: true,
+                              dropdownColor: Colors.white,
+                              icon: const Icon(Icons.arrow_drop_down),
+                              underline: const SizedBox.shrink(),
+                              selectedItemBuilder: (context) {
+                                return shopProvider.smsCountries.map((country) {
+                                  return Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        countryCodeToEmoji(country.iso ?? ""),
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        country.code ?? "",
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  );
+                                }).toList();
+                              },
+                              items: shopProvider.smsCountries.map((country) {
+                                return DropdownMenuItem(
+                                  value: country,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        countryCodeToEmoji(country.iso ?? ""),
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        country.code ?? "",
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  shopProvider.updateSelectedCountry(value);
+                                  setDialogState(() {
+                                    countryCode = value.code ??
+                                        AppConfig.instance.country.dialCode;
+                                  });
+                                }
+                              },
                             ),
                           ),
                         ),
                         validator: (value) {
                           final phone = value?.trim() ?? '';
                           if (phone.isEmpty) {
-                            AlertDialogs.showError(
-                                "Please enter your mobile number",
-                                context: context);
+                            return "Please enter your mobile number";
                           }
                           if (countryCode == "+91") {
                             if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
-                              AlertDialogs.showError(
-                                  "Enter a valid Indian mobile number",
-                                  context: context);
-                              return "";
+                              return "Enter a valid Indian mobile number";
                             }
                           } else if (countryCode == "+44") {
                             if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
-                              AlertDialogs.showError(
-                                  "Enter a valid UK mobile number",
-                                  context: context);
-                              return "";
+                              return "Enter a valid UK mobile number";
                             }
                           }
                           return '';
@@ -1943,9 +2025,19 @@ class _MobileVerificationDialogContentState
       ),
       title: Column(
         children: [
-          Text(
-            "Mobile Verification",
-            style: context.customTextTheme.text18W600,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              verticalSpaceSmall,
+              Icon(Icons.phone_android_rounded,
+                  color: Theme.of(context).colorScheme.primary),
+              horizontalSpaceSmall,
+              Text(
+                "Mobile Verification",
+                style: context.customTextTheme.text18W600,
+              ),
+            ],
           ),
           if (!otpSent) ...[
             verticalSpaceTiny,
@@ -1965,106 +2057,115 @@ class _MobileVerificationDialogContentState
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (!otpSent)
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 23,
-                        child: Container(
-                          height: 50,
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: AppColors.kGray3),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<SmsAvailableCountriesData>(
-                              value: shopProvider.selectedCountry,
-                              isDense: true,
-                              dropdownColor: Colors.white,
-                              icon: const Icon(Icons.arrow_drop_down),
-                              selectedItemBuilder: (context) {
-                                return shopProvider.smsCountries.map((country) {
-                                  return Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        countryCodeToEmoji(country.iso ?? ""),
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        country.code ?? "",
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    ],
-                                  );
-                                }).toList();
-                              },
-                              items: shopProvider.smsCountries.map((country) {
-                                return DropdownMenuItem(
-                                  value: country,
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        countryCodeToEmoji(country.iso ?? ""),
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        country.code ?? "",
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  shopProvider.updateSelectedCountry(value);
-                                  setState(() {
-                                    countryCode = value.code ??
-                                        AppConfig.instance.country.dialCode;
-                                  });
-                                }
-                              },
-                            ),
-                          ),
+                  TextFormField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(11),
+                    ],
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: InputDecoration(
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      labelText: 'Mobile Number',
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderSide: BorderSide(color: AppColors.kGray3),
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderSide: BorderSide(color: AppColors.kGray3),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 1.5,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        flex: 40,
-                        child: TextFormField(
-                          controller: phoneController,
-                          keyboardType: TextInputType.phone,
-                          // autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: InputDecoration(
-                            labelStyle: TextStyle(color: Colors.grey),
-                            labelText: 'Mobile Number',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          validator: (value) {
-                            final phone = value?.trim() ?? '';
-                            if (phone.isEmpty) {
-                              return "Please enter your mobile number";
+                      errorBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            BorderSide(color: AppColors.kRed, width: 1.2),
+                      ),
+                      focusedErrorBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            BorderSide(color: AppColors.kRed, width: 1.5),
+                      ),
+                      prefix: DropdownButtonHideUnderline(
+                        child: DropdownButton<SmsAvailableCountriesData>(
+                          value: shopProvider.selectedCountry,
+                          isDense: true,
+                          dropdownColor: Colors.white,
+                          icon: const Icon(Icons.arrow_drop_down),
+                          underline: const SizedBox.shrink(),
+                          selectedItemBuilder: (context) {
+                            return shopProvider.smsCountries.map((country) {
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    countryCodeToEmoji(country.iso ?? ""),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    country.code ?? "",
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              );
+                            }).toList();
+                          },
+                          items: shopProvider.smsCountries.map((country) {
+                            return DropdownMenuItem(
+                              value: country,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    countryCodeToEmoji(country.iso ?? ""),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    country.code ?? "",
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              shopProvider.updateSelectedCountry(value);
+                              setState(() {
+                                countryCode = value.code ??
+                                    AppConfig.instance.country.dialCode;
+                              });
                             }
-                            if (countryCode == "+91") {
-                              if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
-                                return "Enter a valid Indian mobile number";
-                              }
-                            } else if (countryCode == "+44") {
-                              if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
-                                return "Enter a valid UK mobile number";
-                              }
-                            }
-                            return '';
                           },
                         ),
-                      )
-                    ],
+                      ),
+                    ),
+                    validator: (value) {
+                      final phone = value?.trim() ?? '';
+                      if (phone.isEmpty) {
+                        return "Please enter your mobile number";
+                      }
+                      if (countryCode == "+91") {
+                        if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
+                          return "Enter a valid Indian mobile number";
+                        }
+                      } else if (countryCode == "+44") {
+                        if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
+                          return "Enter a valid UK mobile number";
+                        }
+                      }
+                      return '';
+                    },
                   )
                 else ...[
                   Text(

@@ -342,6 +342,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (logged) {
                               AlertDialogs.showSuccess("Login successfully!");
                               if (widget.showBackButton) {
+                                homeProvider.onChangeCurrentPage(0);
                                 Navigator.pop(context, true);
                                 context.read<UserProvider>().getUserData();
                                 context
@@ -351,7 +352,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 return;
                               }
 
-                              homeProvider.onChangeCurrentPage(0);
                               DependencyRegistrar.initializeAllProviders(
                                   context);
                               await Future.delayed(const Duration(seconds: 1),

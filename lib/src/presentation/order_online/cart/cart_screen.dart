@@ -348,20 +348,30 @@ class _CartScreenState extends State<CartScreen>
     final authProvider = context.read<AuthProvider>();
     final storeSettings = shopListener.storeSettings.data;
     final smsRequired = storeSettings?.smsVerification == "Enabled";
-    final isHomeDeliveryEnabled =
+
+    final isTakeAwayTempEnabled =
+        storeSettings?.deliveryInfo?.takeAway_temp_off != null &&
+            storeSettings?.deliveryInfo?.takeAway_temp_off == 'No';
+    final isHomeDeliveryTempEnabled =
+        storeSettings?.deliveryInfo?.homeDelivery_temp_off != null &&
+            storeSettings?.deliveryInfo?.homeDelivery_temp_off == 'No';
+    final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
         storeSettings?.deliveryInfo?.homeDelivery != null &&
-            storeSettings?.deliveryInfo?.homeDelivery == '1';
-    final isTakeAwayEnabled = storeSettings?.deliveryInfo?.takeAway != null &&
+        storeSettings?.deliveryInfo?.homeDelivery == '1';
+    final isTakeAwayEnabled = isTakeAwayTempEnabled &&
+        storeSettings?.deliveryInfo?.takeAway != null &&
         storeSettings?.deliveryInfo?.takeAway == '1';
+    final isShopTempClosed =
+        storeSettings?.deliveryInfo?.shopOpen_temp_off == 'Yes';
+    final isShopClosed = isShopTempClosed &&
+        cartListener.cartDetailsModel?.paymentOptions?.shopStatus == 'closed';
 
     return Visibility(
       visible: !cartListener.isCartEmpty &&
           !(cartListener.cartTransferring ||
               cartListener.deliveryOrTakeAwayChargeCalculating ||
               userListener.isUserAddressListLoading),
-      child: cartListener.cartDetailsModel?.paymentOptions?.shopStatus ==
-                  'closed' &&
-              !cartListener.isCartEmpty
+      child: isShopClosed && !cartListener.isCartEmpty
           ? _buildShopClosed()
           : Visibility(
               visible: MediaQuery.of(context).viewInsets.bottom == 0,
@@ -1008,13 +1018,19 @@ class _CartScreenState extends State<CartScreen>
           final userListener = context.watch<UserProvider>();
           final cartListener = context.watch<CartProvider>();
           final storeSettings = context.read<ShopProvider>().storeSettings.data;
-          final isHomeDeliveryEnabled =
-              storeSettings?.deliveryInfo?.homeDelivery != null &&
-                  storeSettings?.deliveryInfo?.homeDelivery == '1';
-          final isTakeAwayEnabled =
-              storeSettings?.deliveryInfo?.takeAway != null &&
-                  storeSettings?.deliveryInfo?.takeAway == '1';
 
+          final isTakeAwayTempEnabled =
+              storeSettings?.deliveryInfo?.takeAway_temp_off != null &&
+                  storeSettings?.deliveryInfo?.takeAway_temp_off == 'No';
+          final isHomeDeliveryTempEnabled =
+              storeSettings?.deliveryInfo?.homeDelivery_temp_off != null &&
+                  storeSettings?.deliveryInfo?.homeDelivery_temp_off == 'No';
+          final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
+              storeSettings?.deliveryInfo?.homeDelivery != null &&
+              storeSettings?.deliveryInfo?.homeDelivery == '1';
+          final isTakeAwayEnabled = isTakeAwayTempEnabled &&
+              storeSettings?.deliveryInfo?.takeAway != null &&
+              storeSettings?.deliveryInfo?.takeAway == '1';
           return Theme(
             data: quickSandTextTheme(context),
             child: Column(

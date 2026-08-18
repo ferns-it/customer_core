@@ -1,5 +1,6 @@
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
+import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/rendering.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
@@ -231,6 +232,14 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     final cartProvider = context.watch<CartProvider>();
     final productProvider = context.read<ProductsProvider>();
     final productListener = context.read<ProductsProvider>();
+    final cartListener = context.watch<CartProvider>();
+    final shopListener = context.read<ShopProvider>();
+
+    final storeSettings = shopListener.storeSettings.data;
+    final isShopTempClosed =
+        storeSettings?.deliveryInfo?.shopOpen_temp_off == 'Yes';
+    final isShopClosed = isShopTempClosed &&
+        cartListener.cartDetailsModel?.paymentOptions?.shopStatus == 'closed';
 
     return SingleChildScrollView(
       controller: _scrollController,
@@ -238,10 +247,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           Visibility(
-            visible:
-                cartProvider.cartDetailsModel?.paymentOptions?.shopStatus ==
-                        'closed' &&
-                    cartProvider.cartItems.isNotEmpty,
+            visible: isShopClosed && cartProvider.cartItems.isNotEmpty,
             child: MaterialBanner(
               content: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -48,12 +48,24 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
       borderSide: BorderSide(color: Colors.transparent),
     );
 
-    final isHomeDeliveryEnabled =
-        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery != null &&
-            shopListener.storeSettings.data?.deliveryInfo?.homeDelivery == '1';
-    final isTakeAwayEnabled =
+    // Check the temporary flags first, then the normal flags
+    final isTakeAwayTempEnabled =
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway_temp_off !=
+                null &&
+            shopListener.storeSettings.data?.deliveryInfo?.takeAway_temp_off ==
+                'No';
+    final isHomeDeliveryTempEnabled = shopListener
+                .storeSettings.data?.deliveryInfo?.homeDelivery_temp_off !=
+            null &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery_temp_off ==
+            'No';
+
+    final isTakeAwayEnabled = isTakeAwayTempEnabled &&
         shopListener.storeSettings.data?.deliveryInfo?.takeAway != null &&
-            shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
+    final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery != null &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery == '1';
 
     if (!isHomeDeliveryEnabled &&
         isTakeAwayEnabled &&
@@ -773,12 +785,24 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final cartListener = context.watch<CartProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final isHomeDeliveryEnabled =
-        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery != null &&
-            shopListener.storeSettings.data?.deliveryInfo?.homeDelivery == '1';
-    final isTakeAwayEnabled =
+    // Check the temporary flags first, then the normal flags
+    final isTakeAwayTempEnabled =
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway_temp_off !=
+                null &&
+            shopListener.storeSettings.data?.deliveryInfo?.takeAway_temp_off ==
+                'No';
+    final isHomeDeliveryTempEnabled = shopListener
+                .storeSettings.data?.deliveryInfo?.homeDelivery_temp_off !=
+            null &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery_temp_off ==
+            'No';
+
+    final isTakeAwayEnabled = isTakeAwayTempEnabled &&
         shopListener.storeSettings.data?.deliveryInfo?.takeAway != null &&
-            shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
+    final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery != null &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery == '1';
 
     // If both are enabled, show both options
     if (isHomeDeliveryEnabled && isTakeAwayEnabled) {
@@ -856,9 +880,15 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                   ),
                 ),
                 onTap: () {
+                  // Check the temporary takeaway flag first, then the normal one
+                  final isTempEnabled = shopListener
+                          .storeSettings.data?.deliveryInfo?.takeAway_temp_off ==
+                      'No';
                   final isEnabled =
                       shopListener.storeSettings.data?.deliveryInfo?.takeAway;
-                  if (isEnabled == null || isEnabled == '0') {
+                  if (!isTempEnabled ||
+                      isEnabled == null ||
+                      isEnabled == '0') {
                     AlertDialogs.showInfo("Takeaway not available");
                     return;
                   }

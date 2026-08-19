@@ -84,7 +84,7 @@ class _CartScreenState extends State<CartScreen>
       child: Theme(
         data: Theme.of(context).copyWith(
           textTheme: GoogleFonts.quicksandTextTheme(),
-          cardTheme: const CardTheme(
+          cardTheme: const CardThemeData(
             margin: EdgeInsets.zero,
             color: AppColors.kWhite,
             elevation: 0,

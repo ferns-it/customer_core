@@ -581,7 +581,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            "Our Featured Products",
+            "Our Featured Dishes",
             style: context.customTextTheme.text16W600,
           ),
         ),
@@ -681,7 +681,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
-            "Popular Products",
+            "Popular Dishes",
             style: context.customTextTheme.text16W600,
           ),
         ),

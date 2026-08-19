@@ -441,9 +441,10 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                           ),
                         )
                       : SizedBox.shrink()),
-              if (isTaxApplicable &&
-                  orderDetails.taxTotalAmount !=
-                      '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}') ...[
+              if (isTaxApplicable
+                  // && orderDetails.taxTotalAmount !=
+                  // '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                  ) ...[
                 verticalSpaceTiny,
                 _SummaryRow(
                     label: 'VAT ',

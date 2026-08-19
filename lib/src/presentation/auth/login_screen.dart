@@ -526,7 +526,7 @@ class _LoginScreenState extends State<LoginScreen> {
               verticalSpaceMedium,
               _buildRegisterContent(authProvider, context, authListener),
               verticalSpaceRegular,
-              _buildRegisterActionButton(authProvider, context, authListener),
+              _buildRegisterActionButton(authProvider, context, authListener,homeProvider),
               verticalSpaceLarge,
               Visibility(
                 visible: authListener.currentRegStage == RegStage.contact,
@@ -658,7 +658,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildRegisterActionButton(AuthProvider authProvider,
-      BuildContext context, AuthProvider authListener) {
+      BuildContext context, AuthProvider authListener,HomeProvider homeProvider) {
     if (authListener.currentRegStage == RegStage.otpCombined) {
       return const SizedBox.shrink();
     }
@@ -701,7 +701,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return InkWell(
       onTap: authListener.registerLoading || authListener.loginLoading
           ? null
-          : () => _onRegisterButtonTap(authProvider, context, authListener),
+          : () => _onRegisterButtonTap(authProvider, context, authListener,homeProvider),
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -744,7 +744,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _onRegisterButtonTap(AuthProvider authProvider,
-      BuildContext context, AuthProvider authListener) async {
+      BuildContext context, AuthProvider authListener, HomeProvider homeProvider) async {
     switch (authListener.currentRegStage) {
       case RegStage.contact:
         final phoneValid = authProvider.validatePhoneForm();
@@ -841,12 +841,24 @@ class _LoginScreenState extends State<LoginScreen> {
             final loggedIn = await authProvider.loginUser();
             if (loggedIn) {
               if (widget.showBackButton) {
-                Navigator.pop(context, true);
+                // Dialog opened from home/profile -> return to the home screen
+                homeProvider.onChangeCurrentPage(0);
                 context.read<UserProvider>().getUserData();
                 context.read<CartProvider>().checkUserIsLogged();
+                Navigator.pop(context, true);
+                return;
               }
+
+              // Full registration flow -> move to the home screen
+              DependencyRegistrar.initializeAllProviders(context);
+              await Future.delayed(const Duration(seconds: 1), () {
+                context.router.replaceAll([
+                  const OrderOnlineScreenRoute(),
+                ]).then((_) {
+                  authProvider.clearValues();
+                });
+              });
               authProvider.initializeRegistrationFlow();
-              authProvider.clearValues();
               authProvider.onChangeSelectedAuthView(AuthView.login);
             }
           } else {

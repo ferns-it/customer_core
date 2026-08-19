@@ -2291,7 +2291,7 @@ class _MobileVerificationDialogContentState
                     final rawPhone = phoneController.text.trim();
                     final fullPhone = "$countryCode$rawPhone";
                     final isValid = await otpProvider.verifyPhoneOtp(
-                        phone: fullPhone,
+                        phone: rawPhone,
                         countryCode: countryCode,
                         purpose: OtpPurpose.phoneVerification,
                         otp: otp,

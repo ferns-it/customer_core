@@ -686,7 +686,6 @@ class CheckoutDetailsScreen extends StatelessWidget {
                         )
                       : SizedBox.shrink()),
               if (isTaxApplied == true &&
-                  hasTaxAmount == true &&
                   (taxDetails?.isNotEmpty ?? false)) ...[
                 verticalSpaceTiny,
                 isTaxApplied == true
@@ -696,8 +695,9 @@ class CheckoutDetailsScreen extends StatelessWidget {
                             '${AppConfig.instance.country.symbol}0.00',
                         style: context.customTextTheme.text16W600
                             .copyWith(color: context.customTextTheme.color),
-                        infoWidget: taxAmount !=
-                                '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                        infoWidget: hasTaxAmount == true
+                            // taxAmount !=
+                            //         '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
                             ? Tooltip(
                                 decoration: BoxDecoration(
                                   color: context.customTextTheme.color,

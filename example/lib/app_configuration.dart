@@ -29,7 +29,7 @@ final appConfig = AppConfig(
   // buildIdentifier: 'co.uk.urbanspice.app',
   // fireBaseProjectId: 'customerapp-6d5f7',
   // themeMode: AppThemeMode.system,
-  // isCategoryImageEnabled: false,
+  // isCategoryImageEnabled: true,
 );
 final uiConfig = UiConfig(
   logo: 'assets/images/urban spice logo.png',

@@ -95,7 +95,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final taxDetails = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.taxDetails
         : cartListener.takeAwayDetails?.taxDetails;
-    final hasTaxAmount = cartListener.selectedOrderType == OrderType.delivery
+    final hasTaxAmount = 
+    cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.hasTax
         : cartListener.takeAwayDetails?.hasTax;
 
@@ -713,7 +714,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                 ),
                               )
                             : SizedBox.shrink()),
-                    if (isTaxApplied == true && hasTaxAmount == true) ...[
+                    if (isTaxApplied == true) ...[
                       verticalSpaceTiny,
                       isTaxApplied == true
                           ? _SummaryRow(
@@ -723,8 +724,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                               style: context.customTextTheme.text16W600
                                   .copyWith(
                                       color: context.customTextTheme.color),
-                              infoWidget: taxAmount !=
-                                      '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                              infoWidget: hasTaxAmount == true
+                                  //  taxAmount !=
+                                  //         '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
                                   ? Tooltip(
                                       decoration: BoxDecoration(
                                         color: context.customTextTheme.color,
@@ -881,14 +883,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                 ),
                 onTap: () {
                   // Check the temporary takeaway flag first, then the normal one
-                  final isTempEnabled = shopListener
-                          .storeSettings.data?.deliveryInfo?.takeAway_temp_off ==
+                  final isTempEnabled = shopListener.storeSettings.data
+                          ?.deliveryInfo?.takeAway_temp_off ==
                       'No';
                   final isEnabled =
                       shopListener.storeSettings.data?.deliveryInfo?.takeAway;
-                  if (!isTempEnabled ||
-                      isEnabled == null ||
-                      isEnabled == '0') {
+                  if (!isTempEnabled || isEnabled == null || isEnabled == '0') {
                     AlertDialogs.showInfo("Takeaway not available");
                     return;
                   }

@@ -44,59 +44,86 @@ class DishDetailBottomSheet extends StatelessWidget {
         children: <Widget>[
           const RoundedCloseIcon(),
           verticalSpaceRegular,
-          Theme(
-            data: Theme.of(context).copyWith(
-              textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
-                displayColor: AppColors.kBlack2,
-                bodyColor: AppColors.kBlack2,
-              ),
-            ),
-            child: Container(
-              padding: const EdgeInsetsDirectional.symmetric(
-                  // vertical: 10,
-                  // horizontal: 15,
+          Flexible(
+            child: SingleChildScrollView(
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  textTheme:
+                      GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+                    displayColor: AppColors.kBlack2,
+                    bodyColor: AppColors.kBlack2,
                   ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
                 ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // verticalSpaceTiny,
-                  AppConfig.instance.isCategoryImageEnabled == true
-                      ? _ProductImageWidget(product: product)
-                      : SizedBox.shrink(),
-                  verticalSpaceRegular,
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: _ProductNameWidget(product: product),
+                child: Container(
+                  padding: const EdgeInsetsDirectional.symmetric(
+                      // vertical: 10,
+                      // horizontal: 15,
+                      ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
                   ),
-                  // _RatingAndTimeWidget(product: product),
-                  product.description != null && product.description!.isNotEmpty
-                      ? verticalSpaceSmall
-                      : const SizedBox.shrink(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: _DescriptionWidget(product: product),
-                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // verticalSpaceTiny,
+                      AppConfig.instance.isCategoryImageEnabled == true
+                          ? _ProductImageWidget(product: product)
+                          : SizedBox.shrink(),
+                      verticalSpaceRegular,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: _ProductNameWidget(product: product),
+                      ),
+                      // _RatingAndTimeWidget(product: product),
+                      product.description != null &&
+                              product.description!.isNotEmpty
+                          ? verticalSpaceSmall
+                          : const SizedBox.shrink(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: _DescriptionWidget(product: product),
+                      ),
 
-                  product.description != null && product.description!.isNotEmpty
-                      ? verticalSpaceRegular
-                      : const SizedBox.shrink(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Wrap(
-                      spacing: 2,
-                      runSpacing: 4,
-                      children: [
-                        ...allergens.take(4).map(
-                              (e) => Container(
+                      product.description != null &&
+                              product.description!.isNotEmpty
+                          ? verticalSpaceRegular
+                          : const SizedBox.shrink(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Wrap(
+                          spacing: 2,
+                          runSpacing: 4,
+                          children: [
+                            ...allergens.take(4).map(
+                                  (e) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.grey.shade800
+                                          : AppColors.kGray3.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      e,
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        color: context.customTextTheme.color,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            if (allergens.length > 4)
+                              Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 4,
@@ -109,49 +136,29 @@ class DishDetailBottomSheet extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  e,
+                                  '+${allergens.length - 4}',
                                   style: TextStyle(
                                     fontSize: 8,
                                     color: context.customTextTheme.color,
                                   ),
                                 ),
                               ),
-                            ),
-                        if (allergens.length > 4)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.grey.shade800
-                                  : AppColors.kGray3.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '+${allergens.length - 4}',
-                              style: TextStyle(
-                                fontSize: 8,
-                                color: context.customTextTheme.color,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  verticalSpaceRegular,
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: _IngredientsWidget(product: product),
-                  ),
+                          ],
+                        ),
+                      ),
+                      verticalSpaceRegular,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: _IngredientsWidget(product: product),
+                      ),
 
-                  _OrderSectionWidget(
-                    product: product,
-                    onRequestOrderDish: onRequestOrderDish,
+                      _OrderSectionWidget(
+                        product: product,
+                        onRequestOrderDish: onRequestOrderDish,
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -682,7 +689,7 @@ class _IngredientsWidget extends StatelessWidget {
                   verticalSpaceSmall,
                   Text(
                     Utils.removeHtmlTags(product.ingredients ?? 'N/A'),
-                    style: const TextStyle(fontSize: 13, height: 0.8),
+                    style: const TextStyle(fontSize: 13, height: 1.4),
                   )
                 ],
               ),

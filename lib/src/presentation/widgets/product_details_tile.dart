@@ -74,8 +74,8 @@ class ProductDetailsTile extends StatelessWidget {
                   ? Padding(
                       padding: const EdgeInsets.only(top: 35.0, bottom: 45.0),
                       child: Center(
-                        child: Assets.lib.assets.images.noimage
-                            .image(height: 60),
+                        child:
+                            Assets.lib.assets.images.noimage.image(height: 60),
                       ),
                     )
                   : ClipRRect(
@@ -87,8 +87,7 @@ class ProductDetailsTile extends StatelessWidget {
                           padding:
                               const EdgeInsets.only(top: 35.0, bottom: 45.0),
                           child: Center(
-                              child:
-                                  Assets.lib.assets.images.noimage.image()),
+                              child: Assets.lib.assets.images.noimage.image()),
                         ),
                       ),
                     ),
@@ -104,8 +103,7 @@ class ProductDetailsTile extends StatelessWidget {
                         Expanded(
                           child: Text(
                             product.name ?? '',
-                            style:
-                                context.customTextTheme.text14W700.copyWith(
+                            style: context.customTextTheme.text14W700.copyWith(
                               color: context.customTextTheme.color,
                             ),
                             maxLines: 2,
@@ -138,8 +136,7 @@ class ProductDetailsTile extends StatelessWidget {
                                     top: 2, left: 4, right: 4, bottom: 2),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     if (spiceLevelIcon != null &&
                                         spiceLevelIcon.isNotEmpty)
@@ -234,8 +231,7 @@ class ProductDetailsTile extends StatelessWidget {
                                           ?.currentOfferPrice !=
                                       null
                               ? Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     FittedBox(
                                       fit: BoxFit.scaleDown,
@@ -245,8 +241,7 @@ class ProductDetailsTile extends StatelessWidget {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          color:
-                                              context.customTextTheme.color,
+                                          color: context.customTextTheme.color,
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -271,8 +266,7 @@ class ProductDetailsTile extends StatelessWidget {
                                     child: Text(
                                       product.price ?? '',
                                       maxLines: 1,
-                                      style: context
-                                          .customTextTheme.text14W700
+                                      style: context.customTextTheme.text14W700
                                           .copyWith(
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.5,
@@ -284,21 +278,18 @@ class ProductDetailsTile extends StatelessWidget {
                         ),
                         horizontalSpaceSmall,
                         useSecondaryWidget
-                            ? SizedBox(
-                                width: 55,
-                                height: 50,
-                                child: Center(child: secondaryWidget))
+                            ? Center(child: secondaryWidget)
                             : SizedBox(
                                 height: 30,
                                 child: FilledButton(
                                     style: FilledButton.styleFrom(
-                                        disabledBackgroundColor:
-                                            Colors.transparent,
+                                        disabledBackgroundColor: Colors
+                                            .transparent,
                                         disabledForegroundColor:
                                             Theme.of(context).disabledColor,
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(5.0)),
+                                                BorderRadius.circular(8.0)),
                                         fixedSize: const Size(80, 30),
                                         side: BorderSide(
                                             color: product.isAvailable == true

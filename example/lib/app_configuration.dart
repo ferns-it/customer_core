@@ -7,7 +7,7 @@ final appConfig = AppConfig(
   shopId: '1',
   // shopId: '93',
   country: Country.uk,
-  env: AppEnv.dev,
+  env: AppEnv.prod,
   shopIdentifier: 'le-arabia',
   // shopIdentifier: 'brew--chew-',
   shopInfoEmail: 'info@learabia.co.uk',
@@ -45,6 +45,5 @@ final keyConfig = KeyConfig(
     secretKey: dotenv.env['SECRETKEY'] ?? '',
     fpSecretKey: dotenv.env['FPSECRETKEY'] ?? '',
     reservationSecretKey: dotenv.env['RESERVATIONSECRETKEY'] ?? '',
-    stripeKey: dotenv.env['STRIPEKEY'] ?? '');
-    // stripeKey:"pk_test_BEdMOuu01og3dXu6tF86DdAe00Nb6Sb37J");
-    
+    // stripeKey: dotenv.env['STRIPEKEY'] ?? '');
+    stripeKey: "pk_test_BEdMOuu01og3dXu6tF86DdAe00Nb6Sb37J");

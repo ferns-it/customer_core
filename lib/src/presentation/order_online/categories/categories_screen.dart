@@ -129,8 +129,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
   Widget build(BuildContext context) {
     final productListener = context.watch<ProductsProvider>();
     final productProvider = context.read<ProductsProvider>();
-    final cartProvider = context.read<CartProvider>();
-    final cartListener = context.read<CartProvider>();
+    final cartProvider = context.watch<CartProvider>();
+    final cartListener = context.watch<CartProvider>();
     final homeProvider = context.read<HomeProvider>();
     final userProvider = context.read<UserProvider>();
     // final products = productProvider.productsList;

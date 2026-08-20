@@ -309,33 +309,6 @@ class _CartScreenState extends State<CartScreen>
     );
   }
 
-  Widget _buildShopClosed() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 0),
-      decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(15.0),
-          border: Border.all(color: Colors.red.shade700)
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: Colors.black.withOpacity(0.3), // Shadow color
-          //     blurRadius: 4, // Softness of the shadow
-          //     spreadRadius: 0.3, // How much the shadow extends
-          //     offset: const Offset(0, 2), // Position of the shadow (x, y)
-          //   ),
-          // ],
-          ),
-      height: 60,
-      width: context.screenWidth * 0.9,
-      child: Center(
-        child: Text(
-          "Sorry, We're closed now",
-          style: TextStyle(color: Colors.red.shade700),
-        ),
-      ),
-    );
-  }
-
   Widget _buildFloatingActionButton(BuildContext context) {
     final cartListener = context.watch<CartProvider>();
     final cartProvider = context.read<CartProvider>();
@@ -363,249 +336,381 @@ class _CartScreenState extends State<CartScreen>
         storeSettings?.deliveryInfo?.takeAway == '1';
     final isShopTempClosed =
         storeSettings?.deliveryInfo?.shopOpen_temp_off == 'Yes';
-    final isShopClosed = isShopTempClosed &&
+    final isShopClosed =
         cartListener.cartDetailsModel?.paymentOptions?.shopStatus == 'closed';
+    final isShopClosedInactive =
+        (isShopClosed && !cartListener.isCartEmpty) || isShopTempClosed;
 
     return Visibility(
       visible: !cartListener.isCartEmpty &&
           !(cartListener.cartTransferring ||
               cartListener.deliveryOrTakeAwayChargeCalculating ||
               userListener.isUserAddressListLoading),
-      child: isShopClosed && !cartListener.isCartEmpty
-          ? _buildShopClosed()
-          : Visibility(
-              visible: MediaQuery.of(context).viewInsets.bottom == 0,
-              child: Container(
-                  margin: const EdgeInsets.only(bottom: 0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.kCardBackground2
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(15.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3), // Shadow color
-                        blurRadius: 4, // Softness of the shadow
-                        spreadRadius: 0.3, // How much the shadow extends
-                        offset:
-                            const Offset(0, 2), // Position of the shadow (x, y)
-                      ),
-                    ],
-                  ),
-                  height: 60,
-                  width: context.screenWidth * 0.9,
-                  child: cartListener.tabController.index == 0
-                      ? Row(
-                          children: [
-                            Expanded(
-                                child: _buildTotalAmountWidget(
-                                    "${cartListener.cartDetailsModel?.cartTotal?.cartTotalPriceDisplay}")),
-                            Expanded(
-                              child: InkWell(
-                                onTap: () async {
-                                  final isLogged =
-                                      await cartProvider.checkUserIsLogged();
-                                  if (!isLogged) {
-                                    // context.router.push(LoginScreenRoute());
-                                    final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              LoginScreen(showBackButton: true),
-                                        ));
-                                    if (result == true) {
-                                      await cartProvider.transferCart();
-                                      await context
-                                          .read<UserProvider>()
-                                          .getAddressList()
-                                          .then(
-                                        (_) {
-                                          final addressList =
-                                              Provider.of<UserProvider>(context,
-                                                      listen: false)
-                                                  .userAddressList;
-                                          if (addressList.isNotEmpty) {
-                                            final address = addressList.first;
+      child: Visibility(
+        visible: MediaQuery.of(context).viewInsets.bottom == 0,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.kCardBackground2
+                : Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3), // Shadow color
+                blurRadius: 4, // Softness of the shadow
+                spreadRadius: 0.3, // How much the shadow extends
+                offset: const Offset(0, 2), // Position of the shadow (x, y)
+              ),
+            ],
+          ),
+          height: 60,
+          width: context.screenWidth * 0.9,
+          child: cartListener.tabController.index == 0
+              ? Row(
+                  children: [
+                    Expanded(
+                        child: _buildTotalAmountWidget(
+                            "${cartListener.cartDetailsModel?.cartTotal?.cartTotalPriceDisplay}")),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          if (isShopClosedInactive) {
+                            AlertDialogs.showError(
+                                "Shop is temporarily closed. Please try again later.",
+                                context: context);
+                            return;
+                          }
+                          final isLogged =
+                              await cartProvider.checkUserIsLogged();
+                          if (!isLogged) {
+                            // context.router.push(LoginScreenRoute());
+                            final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      LoginScreen(showBackButton: true),
+                                ));
+                            if (result == true) {
+                              await cartProvider.transferCart();
+                              await context
+                                  .read<UserProvider>()
+                                  .getAddressList()
+                                  .then(
+                                (_) {
+                                  final addressList = Provider.of<UserProvider>(
+                                          context,
+                                          listen: false)
+                                      .userAddressList;
+                                  if (addressList.isNotEmpty) {
+                                    final address = addressList.first;
 
-                                            cartProvider
-                                                .onChangeAddress(address);
-                                            cartProvider.onChangeOrderType(
-                                                OrderType.delivery);
+                                    cartProvider.onChangeAddress(address);
+                                    cartProvider
+                                        .onChangeOrderType(OrderType.delivery);
 
-                                            // cartProvider
-                                            //     .calculateDeliveryCharge();
-                                            cartProvider.jumpToPage(1);
-                                            return;
-                                          }
-                                        },
-                                      ).catchError((e) {
-                                        setState(() {});
-                                      });
-                                    }
+                                    // cartProvider
+                                    //     .calculateDeliveryCharge();
+                                    cartProvider.jumpToPage(1);
                                     return;
                                   }
-                                  cartProvider.jumpToPage(1);
-                                  shopListener.clearSelectedDeliverySlot();
-                                  await context
-                                      .read<UserProvider>()
-                                      .getAddressList()
-                                      .then(
-                                    (_) {
-                                      final addressList =
-                                          Provider.of<UserProvider>(context,
-                                                  listen: false)
-                                              .userAddressList;
-                                      if (addressList.isNotEmpty) {
-                                        final address = addressList.firstWhere(
-                                          (element) => element.dDefault == '1',
-                                          orElse: () => addressList.first,
-                                        );
+                                },
+                              ).catchError((e) {
+                                setState(() {});
+                              });
+                            }
+                            return;
+                          }
+                          cartProvider.jumpToPage(1);
+                          shopListener.clearSelectedDeliverySlot();
+                          await context
+                              .read<UserProvider>()
+                              .getAddressList()
+                              .then(
+                            (_) {
+                              final addressList = Provider.of<UserProvider>(
+                                      context,
+                                      listen: false)
+                                  .userAddressList;
+                              if (addressList.isNotEmpty) {
+                                final address = addressList.firstWhere(
+                                  (element) => element.dDefault == '1',
+                                  orElse: () => addressList.first,
+                                );
 
-                                        cartProvider.onChangeAddress(address);
-                                        if (!isHomeDeliveryEnabled &&
-                                            isTakeAwayEnabled) {
-                                          cartProvider.onChangeOrderType(
-                                              OrderType.takeaway);
-                                        } else {
-                                          cartProvider.onChangeOrderType(
-                                              OrderType.delivery);
-                                        }
-                                        cartProvider.jumpToPage(1);
+                                cartProvider.onChangeAddress(address);
+                                if (!isHomeDeliveryEnabled &&
+                                    isTakeAwayEnabled) {
+                                  cartProvider
+                                      .onChangeOrderType(OrderType.takeaway);
+                                } else {
+                                  cartProvider
+                                      .onChangeOrderType(OrderType.delivery);
+                                }
+                                cartProvider.jumpToPage(1);
+                                return;
+                              }
+                            },
+                          ).catchError((e) {
+                            setState(() {});
+                          });
+                        },
+                        child: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(10.0)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  FluentIcons.cart_24_filled,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                                horizontalSpaceSmall,
+                                Text("Checkout",
+                                    style: context.customTextTheme.text14W700
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface)),
+                              ],
+                            )),
+                      ),
+                    ),
+                    horizontalSpaceSmall,
+                  ],
+                )
+              : cartListener.tabController.index == 1
+                  ? Row(
+                      children: [
+                        Expanded(
+                            child: _buildTotalAmountWidget(
+                                "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
+                        Expanded(
+                          child: InkWell(
+                            onTap: cartProvider.createOrderPending
+                                ? null
+                                : () async {
+                                    // Validate address / delivery charges first
+                                    if (cartListener.selectedOrderType ==
+                                        OrderType.delivery) {
+                                      final validated =
+                                          await cartProvider.validateAddress();
+                                      if (!validated) return;
+                                    } else {
+                                      if (cartListener.selectedPickUpTime ==
+                                          null) {
+                                        AlertDialogs.showError(
+                                            "Please select pickup time",
+                                            context: context);
                                         return;
                                       }
-                                    },
-                                  ).catchError((e) {
-                                    setState(() {});
-                                  });
-                                },
-                                child: Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          FluentIcons.cart_24_filled,
+                                      // ensure takeaway calculations present
+                                      final ok =
+                                          cartProvider.validateInputData();
+                                      if (!ok) return;
+                                    }
+
+                                    if (cartListener.selectedPaymentMethod ==
+                                            PaymentMethod.card &&
+                                        cartListener.totalAmount <
+                                            shopListener
+                                                .onlinePaymentMinAmount) {
+                                      AlertDialogs.showError(
+                                          "Minimum amount for the card payment is ￡${shopListener.onlinePaymentMinAmount}, Please choose another payment option",
+                                          context: context);
+                                      return;
+                                    }
+
+                                    // Skip mobile verification for card payments
+                                    if (cartListener.selectedPaymentMethod !=
+                                        PaymentMethod.card) {
+                                      final user = userProvider.userData?.user;
+
+                                      // SMS verification disabled but no phone number
+                                      if (!smsRequired &&
+                                          (user?.userMobile == '0' ||
+                                              user!.userMobile!
+                                                  .trim()
+                                                  .isEmpty)) {
+                                        final phoneAdded =
+                                            await mobileNumberDialog(context);
+
+                                        if (!phoneAdded) return;
+
+                                        cartProvider.jumpToPage(2);
+                                        return;
+                                      }
+
+                                      // SMS verification enabled
+                                      if (smsRequired &&
+                                          user?.isMobileVerified != "Yes") {
+                                        final verified =
+                                            await mobileVerificationDialog(
+                                                context);
+
+                                        if (!verified) return;
+
+                                        cartProvider.jumpToPage(2);
+                                        return;
+                                      }
+                                    }
+
+                                    cartProvider.jumpToPage(2);
+                                  },
+                            child: Container(
+                                height: 40,
+                                decoration: BoxDecoration(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      FluentIcons.check_24_regular,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                    horizontalSpaceSmall,
+                                    Text("Confirm",
+                                        style: context
+                                            .customTextTheme.text14W700
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface)),
+                                  ],
+                                )),
+                          ),
+                        ),
+                        horizontalSpaceSmall,
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                            child: _buildTotalAmountWidget(
+                                "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
+                        Expanded(
+                          child: InkWell(
+                            onTap: cartListener.createOrderPending
+                                ? null
+                                : () async {
+                                    // Validate address / delivery charges before payment
+                                    if (cartProvider.selectedOrderType ==
+                                        OrderType.delivery) {
+                                      final validated =
+                                          await cartProvider.validateAddress();
+                                      if (!validated) return;
+                                    } else {
+                                      final ok =
+                                          cartProvider.validateInputData();
+                                      if (!ok) return;
+                                    }
+
+                                    if (cartProvider.selectedPaymentMethod ==
+                                        PaymentMethod.card) {
+                                      paymentProvider.createPaymentIntent(
+                                          deliveryType:
+                                              cartProvider.selectedOrderType ==
+                                                      OrderType.delivery
+                                                  ? "door_delivery"
+                                                  : "store_pickup",
+                                          postCode:
+                                              cartProvider.selectedOrderType ==
+                                                      OrderType.delivery
+                                                  ? cartProvider.selectedAddress
+                                                          ?.postcode ??
+                                                      ""
+                                                  : "",
+                                          pickupTime: cartProvider
+                                                      .selectedOrderType ==
+                                                  OrderType.takeaway
+                                              ? cartProvider.selectedPickUpTime
+                                                      ?.toIso8601String() ??
+                                                  ''
+                                              : '',
+                                          cartProvider.calculatedDiscount,
+                                          cartProvider.calculatedDeliveryFee,
+                                          onPaymentSuccess: (transactionId) {
+                                        cartProvider
+                                            .createOrder(
+                                                tID: transactionId,
+                                                deliveryDate: shopListener
+                                                    .formattedSelectedDate,
+                                                deliverySlot:
+                                                    "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}")
+                                            .then((created) {
+                                          if (created) {
+                                            Future.delayed(
+                                                const Duration(seconds: 2), () {
+                                              cartProvider.resetValues();
+
+                                              context.replaceRoute(
+                                                  const SuccessScreenRoute());
+                                            });
+                                          }
+                                        });
+                                      });
+                                      return;
+                                    }
+
+                                    cartProvider
+                                        .createOrder(
+                                            deliveryDate: shopListener
+                                                .formattedSelectedDateForPayload,
+                                            deliverySlot:
+                                                "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}")
+                                        .then((created) {
+                                      if (created) {
+                                        context.replaceRoute(
+                                            const SuccessScreenRoute());
+
+                                        cartProvider.resetValues();
+                                        // orderProvider.fetchAllOrders();
+                                        cartProvider
+                                            .clearSelectedAddressSecondary();
+                                        cartProvider.clearSelectedAddress();
+                                      }
+                                    });
+                                    await orderProvider.fetchAllOrders();
+                                  },
+                            child: Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              child: cartListener.createOrderPending
+                                  ? Center(
+                                      child: SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
                                           color: Theme.of(context)
                                               .colorScheme
                                               .onSurface,
                                         ),
-                                        horizontalSpaceSmall,
-                                        Text("Checkout",
-                                            style: context
-                                                .customTextTheme.text14W700
-                                                .copyWith(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurface)),
-                                      ],
-                                    )),
-                              ),
-                            ),
-                            horizontalSpaceSmall,
-                          ],
-                        )
-                      : cartListener.tabController.index == 1
-                          ? Row(
-                              children: [
-                                Expanded(
-                                    child: _buildTotalAmountWidget(
-                                        "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: cartProvider.createOrderPending
-                                        ? null
-                                        : () async {
-                                            // Validate address / delivery charges first
-                                            if (cartListener
-                                                    .selectedOrderType ==
-                                                OrderType.delivery) {
-                                              final validated =
-                                                  await cartProvider
-                                                      .validateAddress();
-                                              if (!validated) return;
-                                            } else {
-                                              if (cartListener
-                                                      .selectedPickUpTime ==
-                                                  null) {
-                                                AlertDialogs.showError(
-                                                    "Please select pickup time",
-                                                    context: context);
-                                                return;
-                                              }
-                                              // ensure takeaway calculations present
-                                              final ok = cartProvider
-                                                  .validateInputData();
-                                              if (!ok) return;
-                                            }
-
-                                            if (cartListener
-                                                        .selectedPaymentMethod ==
-                                                    PaymentMethod.card &&
-                                                cartListener.totalAmount <
-                                                    shopListener
-                                                        .onlinePaymentMinAmount) {
-                                              AlertDialogs.showError(
-                                                  "Minimum amount for the card payment is ￡${shopListener.onlinePaymentMinAmount}, Please choose another payment option",
-                                                  context: context);
-                                              return;
-                                            }
-
-                                            // Skip mobile verification for card payments
-                                            if (cartListener
-                                                    .selectedPaymentMethod !=
-                                                PaymentMethod.card) {
-                                              final user =
-                                                  userProvider.userData?.user;
-
-                                              // SMS verification disabled but no phone number
-                                              if (!smsRequired &&
-                                                  (user?.userMobile == '0' ||
-                                                      user!.userMobile!
-                                                          .trim()
-                                                          .isEmpty)) {
-                                                final phoneAdded =
-                                                    await mobileNumberDialog(
-                                                        context);
-
-                                                if (!phoneAdded) return;
-
-                                                cartProvider.jumpToPage(2);
-                                                return;
-                                              }
-
-                                              // SMS verification enabled
-                                              if (smsRequired &&
-                                                  user?.isMobileVerified !=
-                                                      "Yes") {
-                                                final verified =
-                                                    await mobileVerificationDialog(
-                                                        context);
-
-                                                if (!verified) return;
-
-                                                cartProvider.jumpToPage(2);
-                                                return;
-                                              }
-                                            }
-
-                                            cartProvider.jumpToPage(2);
-                                          },
-                                    child: Container(
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                            borderRadius:
-                                                BorderRadius.circular(10.0)),
-                                        child: Row(
+                                      ),
+                                    )
+                                  : paymentListener.creatingPaymentIntent
+                                      ? Center(
+                                          child: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
+                                          ),
+                                        )
+                                      : Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
@@ -616,7 +721,7 @@ class _CartScreenState extends State<CartScreen>
                                                   .onSurface,
                                             ),
                                             horizontalSpaceSmall,
-                                            Text("Confirm",
+                                            Text("Pay",
                                                 style: context
                                                     .customTextTheme.text14W700
                                                     .copyWith(
@@ -624,179 +729,15 @@ class _CartScreenState extends State<CartScreen>
                                                             .colorScheme
                                                             .onSurface)),
                                           ],
-                                        )),
-                                  ),
-                                ),
-                                horizontalSpaceSmall,
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Expanded(
-                                    child: _buildTotalAmountWidget(
-                                        "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: cartListener.createOrderPending
-                                        ? null
-                                        : () async {
-                                            // Validate address / delivery charges before payment
-                                            if (cartProvider
-                                                    .selectedOrderType ==
-                                                OrderType.delivery) {
-                                              final validated =
-                                                  await cartProvider
-                                                      .validateAddress();
-                                              if (!validated) return;
-                                            } else {
-                                              final ok = cartProvider
-                                                  .validateInputData();
-                                              if (!ok) return;
-                                            }
-
-                                            if (cartProvider
-                                                    .selectedPaymentMethod ==
-                                                PaymentMethod.card) {
-                                              paymentProvider.createPaymentIntent(
-                                                  deliveryType:
-                                                      cartProvider.selectedOrderType ==
-                                                              OrderType.delivery
-                                                          ? "door_delivery"
-                                                          : "store_pickup",
-                                                  postCode: cartProvider
-                                                              .selectedOrderType ==
-                                                          OrderType.delivery
-                                                      ? cartProvider
-                                                              .selectedAddress
-                                                              ?.postcode ??
-                                                          ""
-                                                      : "",
-                                                  pickupTime: cartProvider
-                                                              .selectedOrderType ==
-                                                          OrderType.takeaway
-                                                      ? cartProvider
-                                                              .selectedPickUpTime
-                                                              ?.toIso8601String() ??
-                                                          ''
-                                                      : '',
-                                                  cartProvider
-                                                      .calculatedDiscount,
-                                                  cartProvider.calculatedDeliveryFee,
-                                                  onPaymentSuccess:
-                                                      (transactionId) {
-                                                cartProvider
-                                                    .createOrder(
-                                                        tID: transactionId,
-                                                        deliveryDate: shopListener
-                                                            .formattedSelectedDate,
-                                                        deliverySlot:
-                                                            "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}")
-                                                    .then((created) {
-                                                  if (created) {
-                                                    Future.delayed(
-                                                        const Duration(
-                                                            seconds: 2), () {
-                                                      cartProvider
-                                                          .resetValues();
-
-                                                      context.replaceRoute(
-                                                          const SuccessScreenRoute());
-                                                    });
-                                                  }
-                                                });
-                                              });
-                                              return;
-                                            }
-
-                                            cartProvider
-                                                .createOrder(
-                                                    deliveryDate: shopListener
-                                                        .formattedSelectedDateForPayload,
-                                                    deliverySlot:
-                                                        "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}")
-                                                .then((created) {
-                                              if (created) {
-                                                context.replaceRoute(
-                                                    const SuccessScreenRoute());
-
-                                                cartProvider.resetValues();
-                                                // orderProvider.fetchAllOrders();
-                                                cartProvider
-                                                    .clearSelectedAddressSecondary();
-                                                cartProvider
-                                                    .clearSelectedAddress();
-                                              }
-                                            });
-                                            await orderProvider
-                                                .fetchAllOrders();
-                                          },
-                                    child: Container(
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0)),
-                                      child: cartListener.createOrderPending
-                                          ? Center(
-                                              child: SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                                ),
-                                              ),
-                                            )
-                                          : paymentListener
-                                                  .creatingPaymentIntent
-                                              ? Center(
-                                                  child: SizedBox(
-                                                    height: 20,
-                                                    width: 20,
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface,
-                                                    ),
-                                                  ),
-                                                )
-                                              : Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                      FluentIcons
-                                                          .check_24_regular,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface,
-                                                    ),
-                                                    horizontalSpaceSmall,
-                                                    Text("Pay",
-                                                        style: context
-                                                            .customTextTheme
-                                                            .text14W700
-                                                            .copyWith(
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .colorScheme
-                                                                    .onSurface)),
-                                                  ],
-                                                ),
-                                    ),
-                                  ),
-                                ),
-                                horizontalSpaceSmall,
-                              ],
-                            )),
-            ),
+                                        ),
+                            ),
+                          ),
+                        ),
+                        horizontalSpaceSmall,
+                      ],
+                    ),
+        ),
+      ),
     );
   }
 

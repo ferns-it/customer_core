@@ -751,8 +751,6 @@ class CartProvider extends ChangeNotifier with BaseController {
       notifyListeners();
       final userData = await sharedPrefsRepository.getUserData();
       final userID = userData?.user.userID;
-      await clearCart();
-
       final response =
           await cartRepo.transferCart(guestID: guestID, userID: userID);
       return response.fold(
@@ -760,7 +758,9 @@ class CartProvider extends ChangeNotifier with BaseController {
           AlertDialogs.showError(exception.message);
           return false;
         },
-        (result) {
+        (result) async {
+      
+          await listCartItems();
           return true;
         },
       );

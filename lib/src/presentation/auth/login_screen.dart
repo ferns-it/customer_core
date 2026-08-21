@@ -526,7 +526,8 @@ class _LoginScreenState extends State<LoginScreen> {
               verticalSpaceMedium,
               _buildRegisterContent(authProvider, context, authListener),
               verticalSpaceRegular,
-              _buildRegisterActionButton(authProvider, context, authListener,homeProvider),
+              _buildRegisterActionButton(
+                  authProvider, context, authListener, homeProvider),
               verticalSpaceLarge,
               Visibility(
                 visible: authListener.currentRegStage == RegStage.contact,
@@ -657,8 +658,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Widget _buildRegisterActionButton(AuthProvider authProvider,
-      BuildContext context, AuthProvider authListener,HomeProvider homeProvider) {
+  Widget _buildRegisterActionButton(
+      AuthProvider authProvider,
+      BuildContext context,
+      AuthProvider authListener,
+      HomeProvider homeProvider) {
     if (authListener.currentRegStage == RegStage.otpCombined) {
       return const SizedBox.shrink();
     }
@@ -701,7 +705,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return InkWell(
       onTap: authListener.registerLoading || authListener.loginLoading
           ? null
-          : () => _onRegisterButtonTap(authProvider, context, authListener,homeProvider),
+          : () => _onRegisterButtonTap(
+              authProvider, context, authListener, homeProvider),
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -743,8 +748,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _onRegisterButtonTap(AuthProvider authProvider,
-      BuildContext context, AuthProvider authListener, HomeProvider homeProvider) async {
+  Future<void> _onRegisterButtonTap(
+      AuthProvider authProvider,
+      BuildContext context,
+      AuthProvider authListener,
+      HomeProvider homeProvider) async {
     switch (authListener.currentRegStage) {
       case RegStage.contact:
         final phoneValid = authProvider.validatePhoneForm();
@@ -793,6 +801,12 @@ class _LoginScreenState extends State<LoginScreen> {
         break;
 
       case RegStage.otpEmail:
+        // If email is already verified, the "Continue" button moves to the
+        // next screen.
+        if (authProvider.emailOtpVerified) {
+          authProvider.updateCurrentRegStage(RegStage.register);
+          return;
+        }
         if (authProvider.emailOtpController.text.isEmpty) {
           AlertDialogs.showError("Please enter the email OTP");
           return;
@@ -800,11 +814,7 @@ class _LoginScreenState extends State<LoginScreen> {
         bool verified = await authProvider.verifyEmailOtpForInline();
         if (verified) {
           AlertDialogs.showSuccess("Email verified successfully!");
-          if (verified) {
-            authProvider.updateCurrentRegStage(
-              RegStage.register,
-            );
-          }
+          authProvider.updateCurrentRegStage(RegStage.register);
         } else {
           // Error is set inline in the widget - no need for snackbar
         }
@@ -1281,12 +1291,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       _streamController.add(0);
                       authProvider.updateCurrentRegStage(
                         RegStage.otpCombined,
-                      );
-                    } else {
-                      await Future.delayed(const Duration(milliseconds: 500));
-                      // No SMS verification required
-                      authProvider.updateCurrentRegStage(
-                        RegStage.register,
                       );
                     }
                   }

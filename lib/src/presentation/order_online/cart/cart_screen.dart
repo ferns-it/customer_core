@@ -2214,7 +2214,7 @@ class _MobileVerificationDialogContentState
                     final rawPhone = phoneController.text.trim();
                     final fullPhone = "$countryCode$rawPhone";
                     final sent = await otpProvider.sendPhoneOtp(
-                      phone: fullPhone,
+                      phone: rawPhone,
                       countryCode: countryCode,
                       purpose: OtpPurpose.phoneVerification,
                     );

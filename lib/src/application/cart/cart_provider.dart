@@ -492,6 +492,18 @@ class CartProvider extends ChangeNotifier with BaseController {
     return _userData;
   }
 
+  /// Clears all in-memory cart/session state (items, totals, login flag,
+  /// guest id) so a previously logged-in user's cart/favourites never leak
+  /// into the next user session. Use on logout.
+  void resetSessionData() {
+    _isUserLoggedIn = false;
+    _userData = null;
+    _cartDetailsModel = null;
+    _guestID = null;
+    _validatedCouponDetails = null;
+    resetValues();
+  }
+
   Future<void> listAllOffers() async {
     try {
       final isLogged = await checkUserIsLogged();
@@ -879,13 +891,15 @@ class CartProvider extends ChangeNotifier with BaseController {
     final totalPriceWithModifiers =
         totalItemPrice + (newQty * itemModifiersTotalInPaisa);
     final productTotalPriceFormatted =
-        totalPriceWithModifiers / AppConfig.instance.country.currencyDivisor;
+        totalItemPrice / AppConfig.instance.country.currencyDivisor;
     final updatedAmountDetails = _scaleAmountDetailsForQty(
       amountDetails: item.amountDetails,
       previousQty: prevQty,
       newQty: newQty,
     );
 
+    // Keep the locally computed (gross) total here; the authoritative,
+    // offer-aware amounts come from the server via the _updateQty refresh.
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
       quantity: newQty,
@@ -986,13 +1000,15 @@ class CartProvider extends ChangeNotifier with BaseController {
     final totalPriceWithModifiers =
         totalItemPrice + (newQty * itemModifiersTotalInPaisa);
     final productTotalPriceFormatted =
-        totalPriceWithModifiers / AppConfig.instance.country.currencyDivisor;
+        totalItemPrice / AppConfig.instance.country.currencyDivisor;
     final updatedAmountDetails = _scaleAmountDetailsForQty(
       amountDetails: item.amountDetails,
       previousQty: prevQty1,
       newQty: newQty,
     );
 
+    // Keep the locally computed (gross) total here; the authoritative,
+    // offer-aware amounts come from the server via the _updateQty refresh.
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
       quantity: newQty,
@@ -1116,7 +1132,10 @@ class CartProvider extends ChangeNotifier with BaseController {
     final response = await cartRepo.updateCartItem(cartItem.cartID!, payload,
         isGuest: !isLogged, guestID: _guestID, userID: userData?.user.userID);
     response.fold(() {
-      // listCartItems();
+      // Refresh the cart with server-authoritative amounts after a quantity
+      // change so the displayed totals update immediately & correctly
+      // (offers/addons/rounding are computed on the server).
+      listCartItems();
     }, (error) {
       AlertDialogs.showError(error.message);
     });

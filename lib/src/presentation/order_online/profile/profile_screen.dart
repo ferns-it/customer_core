@@ -44,6 +44,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
     final orderListener = listener2<OrderProvider>(context);
     final cartProvider = context.read<CartProvider>();
     final cartListener = context.watch<CartProvider>();
+    final productProvider = context.read<ProductsProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SafeArea(
@@ -180,6 +181,12 @@ class ProfileScreen extends GetProviderView<UserProvider> {
                                 if (cartListener.cartItems.isNotEmpty) {
                                   await cartProvider.transferCart();
                                 }
+                                // Refresh the newly logged-in user's own cart
+                                // and featured favourites so stale data from a
+                                // previous user is replaced immediately.
+                                await cartProvider.listCartItems();
+                                await productProvider
+                                    .getFeaturedPopularProducts();
                               }
                             },
                             style: FilledButton.styleFrom(
@@ -801,6 +808,16 @@ class ProfileScreen extends GetProviderView<UserProvider> {
                                                     context
                                                         .read<OrderProvider>()
                                                         .clearData();
+                                                    // Clear the in-memory cart
+                                                    // and favourite state of the
+                                                    // logged-out user so the next
+                                                    // user/guest doesn't see it.
+                                                    context
+                                                        .read<ProductsProvider>()
+                                                        .resetSessionData();
+                                                    context
+                                                        .read<CartProvider>()
+                                                        .resetSessionData();
                                                     context
                                                         .read<CartProvider>()
                                                         .checkUserIsLogged();

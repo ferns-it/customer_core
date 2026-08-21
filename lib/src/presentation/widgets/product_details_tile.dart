@@ -247,15 +247,19 @@ class ProductDetailsTile extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    Text(
-                                      product.price ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 14,
-                                          decoration:
-                                              TextDecoration.lineThrough),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        product.price ?? '',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 14,
+                                            decoration:
+                                                TextDecoration.lineThrough),
+                                      ),
                                     ),
                                   ],
                                 )

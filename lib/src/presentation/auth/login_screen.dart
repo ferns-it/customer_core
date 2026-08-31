@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Center(
         child: ListView(
       children: [
-        Image.asset(UiConfig.instance.logo, height: 125),
+        Image.asset(UiConfig.instance.logoWithoutBackground, height: 125),
         verticalSpaceMedium,
         ClipRRect(
             borderRadius: BorderRadius.circular(12.0),

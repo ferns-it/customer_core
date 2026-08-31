@@ -34,6 +34,7 @@ final appConfig = AppConfig(
 final uiConfig = UiConfig(
   logo: 'assets/images/urban spice logo.png',
   bgImage: 'assets/images/urban spicebg.png',
+  logoWithoutBackground:'assets/images/urban spicebg.png',
   bannerImages: [
     "assets/images/banner1.png",
     "assets/images/banner2.png",

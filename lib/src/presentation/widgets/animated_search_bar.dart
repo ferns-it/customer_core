@@ -1,3 +1,4 @@
+import 'package:customer_core/customer_core.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 
@@ -5,11 +6,11 @@ class AnimatedSearchBar extends StatefulWidget {
   const AnimatedSearchBar({
     super.key,
     this.onTap,
-    this.words = const ["foods", "fruits", "drinks", "snacks"],
+    this.words,
   });
 
   final void Function()? onTap;
-  final List<String> words;
+  final List<String>? words;
 
   @override
   State<AnimatedSearchBar> createState() => _AnimatedSearchBarState();
@@ -17,6 +18,11 @@ class AnimatedSearchBar extends StatefulWidget {
 
 class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
   int index = 0;
+
+  late final List<String> _words = widget.words ??
+      (AppConfig.instance.businessType == BusinessType.restaurant
+          ? const ["foods", "fruits", "drinks", "snacks"]
+          : const ["salmon", "prawns", "tuna", "crab"]);
 
   @override
   void initState() {
@@ -27,7 +33,7 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
   void _startRotation() {
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
-      setState(() => index = (index + 1) % widget.words.length);
+      setState(() => index = (index + 1) % _words.length);
       _startRotation();
     });
   }
@@ -57,8 +63,8 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> {
                 transitionBuilder: (child, animation) =>
                     FadeTransition(opacity: animation, child: child),
                 child: Text(
-                  'Search for "${widget.words[index]}"',
-                  key: ValueKey(widget.words[index]),
+                  'Search for "${_words[index]}"',
+                  key: ValueKey(_words[index]),
                   style: TextStyle(
                       color: Theme.of(context).brightness == Brightness.dark
                           ? Colors.white

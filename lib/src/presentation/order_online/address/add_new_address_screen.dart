@@ -1,4 +1,5 @@
 import 'package:auto_route/annotations.dart';
+import 'package:customer_core/customer_core.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/user/user_provider.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
@@ -175,7 +176,10 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                 padding: const EdgeInsets.only(left: 10),
                 child: buildTextField(
                   context: context,
-                  title: 'County',
+                  title:
+                      AppConfig.instance.businessType == BusinessType.restaurant
+                          ? 'County'
+                          : 'District',
                   optional: 'Optional',
                   hintText: 'County',
                   controller: userProvider.countyTxtController,

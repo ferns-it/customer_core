@@ -646,7 +646,9 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            "Our Featured Dishes",
+            AppConfig.instance.businessType == BusinessType.restaurant
+                ? "Our Featured Dishes"
+                : "Today's Catch",
             style: context.customTextTheme.text16W600,
           ),
         ),
@@ -746,7 +748,9 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
-            "Popular Dishes",
+            AppConfig.instance.businessType == BusinessType.restaurant
+                ? "Popular Dishes"
+                : "Popular Catches",
             style: context.customTextTheme.text16W600,
           ),
         ),

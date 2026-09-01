@@ -568,7 +568,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
         color: AppColors.kGray,
       ),
       title: Text(
-        'Favourite Products',
+        'Favourites',
         style: context.customTextTheme.text14W500
             .copyWith(color: context.customTextTheme.color),
       ),
@@ -813,7 +813,8 @@ class ProfileScreen extends GetProviderView<UserProvider> {
                                                     // logged-out user so the next
                                                     // user/guest doesn't see it.
                                                     context
-                                                        .read<ProductsProvider>()
+                                                        .read<
+                                                            ProductsProvider>()
                                                         .resetSessionData();
                                                     context
                                                         .read<CartProvider>()

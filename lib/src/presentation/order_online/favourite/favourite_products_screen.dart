@@ -26,7 +26,7 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
     final cartListener = context.watch<CartProvider>();
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Favourite Products'),
+          title: const Text('Favourites'),
           actions: [
             Visibility(
               visible: cartListener.cartItems.isNotEmpty,
@@ -60,7 +60,7 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
             final products = data.favouriteList?.productList ?? [];
             if (products.isEmpty) {
               return const Center(
-                child: Text("No Favourite Products"),
+                child: Text("No Favourites"),
               );
             }
             return AlignedGridView.count(
@@ -100,10 +100,11 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
                   useSecondaryWidget: isExist,
                   onPressFavouriteBtn: () async {
                     if (product.isFavourite) {
-                      await productListner
-                          .removeFavourite(product.favouriteID!, context.read<SearchProvider>());
+                      await productListner.removeFavourite(
+                          product.favouriteID!, context.read<SearchProvider>());
                     } else {
-                      await productListner.addFavourite(product.pID!, context.read<SearchProvider>());
+                      await productListner.addFavourite(
+                          product.pID!, context.read<SearchProvider>());
                     }
                   },
                   onPressed: () {

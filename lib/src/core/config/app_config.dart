@@ -1,8 +1,8 @@
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/core/config/business_type.dart';
 
 class AppConfig {
   static late AppConfig instance;
-
   final String applicationName;
   final String shopName;
   final String shopId;
@@ -14,10 +14,10 @@ class AppConfig {
   final String? fcmTopicId;
   final String fireBaseProjectId;
   final AppEnv env;
-
   final Country country;
   final AppThemeMode themeMode;
   final bool isCategoryImageEnabled;
+  final BusinessType businessType;
 
   AppConfig({
     required this.applicationName,
@@ -33,6 +33,7 @@ class AppConfig {
     required this.fireBaseProjectId,
     required this.env,
     this.isCategoryImageEnabled = true,
+    this.businessType = BusinessType.restaurant,
     this.themeMode = AppThemeMode.system,
   });
 }

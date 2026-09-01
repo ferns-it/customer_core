@@ -10,6 +10,7 @@ export 'src/application/core/dependency_registrar.dart';
 export 'src/core/routes/routes.dart';
 export 'src/core/routes/routes.gr.dart';
 export 'src/customer_initializer.dart';
+export 'src/core/config/business_type.dart';
 
 // library customer_core;
 

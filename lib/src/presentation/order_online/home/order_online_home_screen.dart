@@ -595,7 +595,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                         },
                                         onIncrementQty: () {
                                           cartProvider
-                                              .incrementCartItemQty(cartIndex);
+                                              .incrementCartItemQtyWithStockCheck(
+                                                  cartIndex, product);
                                           cartProvider
                                               .clearSelectedAddressSecondary();
                                           cartProvider.clearSelectedAddress();
@@ -703,7 +704,9 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                   cartProvider.clearSelectedAddress();
                                 },
                                 onIncrementQty: () {
-                                  cartProvider.incrementCartItemQty(cartIndex);
+                                  cartProvider
+                                      .incrementCartItemQtyWithStockCheck(
+                                          cartIndex, product);
                                   cartProvider.clearSelectedAddressSecondary();
                                   cartProvider.clearSelectedAddress();
                                 }),
@@ -810,7 +813,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       },
                                       onIncrementQty: () {
                                         cartProvider
-                                            .incrementCartItemQty(cartIndex);
+                                            .incrementCartItemQtyWithStockCheck(
+                                                cartIndex, product);
                                         cartProvider
                                             .clearSelectedAddressSecondary();
                                         cartProvider.clearSelectedAddress();
@@ -1388,7 +1392,8 @@ class __SearchResultsState extends State<_SearchResults> {
                         secondaryWidget: QtyCounterButton2(
                           qty: productQtyUpdated,
                           onIncrementQty: () {
-                            cartProvider.incrementCartItemQty(cartIndex);
+                            cartProvider.incrementCartItemQtyWithStockCheck(
+                                cartIndex, product);
                           },
                           onDecrementQty: () {
                             cartProvider.decrementCartItemQty(cartIndex);

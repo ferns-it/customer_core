@@ -89,6 +89,7 @@ class ProductDataModel {
   final String? favouriteID;
   final String? pID;
   final bool? isAvailable;
+  final ProductStockDetails? stock;
   final String? productType;
   final String? online;
   final String? dining;
@@ -116,6 +117,7 @@ class ProductDataModel {
     this.favouriteID,
     this.pID,
     this.isAvailable,
+    this.stock,
     this.productType,
     this.online,
     this.dining,
@@ -144,6 +146,7 @@ class ProductDataModel {
     String? favouriteID,
     String? pID,
     bool? isAvailable,
+    ProductStockDetails? stock,
     String? productType,
     String? online,
     String? dining,
@@ -170,6 +173,7 @@ class ProductDataModel {
     return ProductDataModel(
         favouriteID: favouriteID ?? this.favouriteID,
         pID: pID ?? this.pID,
+        stock: stock ?? this.stock,
         isAvailable: isAvailable ?? this.isAvailable,
         productType: productType ?? this.productType,
         online: online ?? this.online,
@@ -200,6 +204,7 @@ class ProductDataModel {
       'favouriteID': favouriteID,
       'pID': pID,
       'isAvailable': isAvailable,
+      'stock': stock?.toMap(),
       'productType': productType,
       'online': online,
       'dining': dining,
@@ -231,6 +236,9 @@ class ProductDataModel {
       pID: map['pID'] != null ? map['pID'] as String : null,
       isAvailable:
           map['isAvailable'] != null ? map['isAvailable'] as bool : null,
+      stock: map['stock'] != null
+          ? ProductStockDetails.fromMap(map['stock'] as Map<String, dynamic>)
+          : null,
       productType:
           map['productType'] != null ? map['productType'] as String : null,
       online: map['online'] != null ? map['online'] as String : null,
@@ -299,7 +307,7 @@ class ProductDataModel {
 
   @override
   String toString() {
-    return 'ProductDataModel(favouriteID: $favouriteID,pID: $pID, isAvailable: $isAvailable,productType: $productType, online: $online, dining: $dining, activeStatus: $activeStatus, isMeal: $isMeal, name: $name, availability: $availability, price: $price,photo: $photo,type: $type,description: $description, priceValue: $priceValue, variations: $variations, hasMultipleVariation: $hasMultipleVariation, addons: $addons, hasAddons: $hasAddons, hasMasterAddons: $hasMasterAddons, masterAddons: $masterAddons, isFavourite: $isFavourite, isOfferPrice: $isOfferPrice, offerPriceDetails: $offerPriceDetails)';
+    return 'ProductDataModel(favouriteID: $favouriteID,pID: $pID, isAvailable: $isAvailable,stock:$stock,productType:$productType,online:$online, dining: $dining, activeStatus: $activeStatus, isMeal: $isMeal, name: $name, availability: $availability, price: $price,photo: $photo,type: $type,description: $description, priceValue: $priceValue, variations: $variations, hasMultipleVariation: $hasMultipleVariation, addons: $addons, hasAddons: $hasAddons, hasMasterAddons: $hasMasterAddons, masterAddons: $masterAddons, isFavourite: $isFavourite, isOfferPrice: $isOfferPrice, offerPriceDetails: $offerPriceDetails)';
   }
 
   @override
@@ -309,6 +317,7 @@ class ProductDataModel {
     return other.favouriteID == favouriteID &&
         other.pID == pID &&
         other.isAvailable == isAvailable &&
+        other.stock == stock &&
         other.productType == productType &&
         other.online == online &&
         other.dining == dining &&
@@ -337,6 +346,7 @@ class ProductDataModel {
     return favouriteID.hashCode ^
         pID.hashCode ^
         isAvailable.hashCode ^
+        stock.hashCode ^
         productType.hashCode ^
         online.hashCode ^
         dining.hashCode ^
@@ -398,6 +408,60 @@ class ProductDataModel {
     }
     return null;
   }
+}
+
+class ProductStockDetails {
+  final bool? activated;
+  final int? availableStock;
+  ProductStockDetails({
+    this.activated,
+    this.availableStock,
+  });
+
+  ProductStockDetails copyWith({
+    bool? activated,
+    int? availableStock,
+  }) {
+    return ProductStockDetails(
+      activated: activated ?? this.activated,
+      availableStock: availableStock ?? this.availableStock,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'activated': activated,
+      'availableStock': availableStock,
+    };
+  }
+
+  factory ProductStockDetails.fromMap(Map<String, dynamic> map) {
+    return ProductStockDetails(
+      activated: map['activated'] != null ? map['activated'] as bool : null,
+      availableStock:
+          map['availableStock'] != null ? map['availableStock'] as int : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory ProductStockDetails.fromJson(String source) =>
+      ProductStockDetails.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() =>
+      'ProductStockDetails(activated: $activated, availableStock: $availableStock)';
+
+  @override
+  bool operator ==(covariant ProductStockDetails other) {
+    if (identical(this, other)) return true;
+
+    return other.activated == activated &&
+        other.availableStock == availableStock;
+  }
+
+  @override
+  int get hashCode => activated.hashCode ^ availableStock.hashCode;
 }
 
 class ProductVariationDataModel {

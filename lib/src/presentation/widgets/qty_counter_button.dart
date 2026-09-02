@@ -127,6 +127,7 @@ class QtyCounterButton2 extends StatefulWidget {
     this.qty = 0,
     this.previousQty = -1,
     this.gap,
+    this.maxQty,
   });
 
   final VoidCallback? onDecrementQty;
@@ -135,15 +136,17 @@ class QtyCounterButton2 extends StatefulWidget {
   final bool hideDefaultAddBtn;
   final int qty, previousQty;
 
+  /// Optional maximum quantity allowed by the +/- stepper (e.g. fish stock
+  /// limit). When set and [qty] reaches it, the '+' button is disabled.
+  final int? maxQty;
+
   @override
   State<QtyCounterButton2> createState() => _QtyCounterButton2State();
 }
 
 class _QtyCounterButton2State extends State<QtyCounterButton2> {
-  // late int _previousQty;
   bool _isAnimating = false;
 
-  // @override
   void _updateQty({required bool isIncrement}) {
     if (_isAnimating) return;
 
@@ -162,15 +165,21 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
   }
 
   void incrementQty() {
+    if (widget.maxQty != null && widget.qty >= widget.maxQty!) return;
     _updateQty(isIncrement: true);
   }
 
   void decrementQty() {
+    if (widget.qty <= 1) return;
     _updateQty(isIncrement: false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDecrementDisabled = widget.qty <= 1;
+    final isIncrementDisabled =
+        widget.maxQty != null && widget.qty >= widget.maxQty!;
+
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: ConstrainedBox(
@@ -180,7 +189,14 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
           mainAxisSize: MainAxisSize.min,
           children: [
             InkWell(
+              // Keep onTap non-null so a disabled button (qty <= 1) still
+              // consumes the tap instead of letting it fall through to the
+              // parent tile's InkWell (which would open the details sheet).
               onTap: decrementQty,
+              splashColor:
+                  isDecrementDisabled ? Colors.transparent : null,
+              highlightColor:
+                  isDecrementDisabled ? Colors.transparent : null,
               child: Container(
                 width: 30,
                 height: 30,
@@ -192,7 +208,9 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
                     )),
                 child: Icon(
                   Icons.remove_rounded,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: isDecrementDisabled
+                      ? Theme.of(context).disabledColor
+                      : Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -203,12 +221,20 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
               ),
             ),
             InkWell(
+              // Keep onTap non-null (the guard lives inside incrementQty) so a
+              // disabled button doesn't let the tap fall through to the parent.
               onTap: incrementQty,
+              splashColor:
+                  isIncrementDisabled ? Colors.transparent : null,
+              highlightColor:
+                  isIncrementDisabled ? Colors.transparent : null,
               child: Container(
                 width: 30,
                 height: 30,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: isIncrementDisabled
+                      ? Theme.of(context).disabledColor
+                      : Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Icon(

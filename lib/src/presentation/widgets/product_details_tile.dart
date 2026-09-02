@@ -9,6 +9,7 @@ import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:customer_core/src/domain/store/models/product_details_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
+import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -61,6 +62,16 @@ class ProductDetailsTile extends StatelessWidget {
     final spiceLevel = product.spiceLevel;
     final spiceLevelIcon =
         context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
+    final cartProvider = context.watch<CartProvider>();
+    final isFishStockEnabled =
+        AppConfig.instance.businessType == BusinessType.fish &&
+            product.stock?.activated == true;
+    final availableStock = isFishStockEnabled
+        ? cartProvider.getRemainingFishStock(product)
+        : product.stock?.availableStock ?? 0;
+    final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
+    final isProductUnavailable =
+        product.isAvailable == false || isProductOutOfStock;
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Stack(
@@ -221,7 +232,68 @@ class ProductDetailsTile extends StatelessWidget {
                           ),
                       ],
                     ),
-                    verticalSpaceSmall,
+                    if (isFishStockEnabled)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isProductOutOfStock
+                                ? Colors.red.shade50
+                                : availableStock <= 5
+                                    ? Colors.orange.shade50
+                                    : Colors.green.shade50,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: isProductOutOfStock
+                                  ? Colors.red.shade200
+                                  : availableStock <= 5
+                                      ? Colors.orange.shade200
+                                      : Colors.green.shade200,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isProductOutOfStock
+                                    ? FluentIcons.box_24_regular
+                                    : availableStock <= 5
+                                        ? FluentIcons.warning_24_regular
+                                        : FluentIcons
+                                            .checkmark_circle_24_regular,
+                                size: 12,
+                                color: isProductOutOfStock
+                                    ? Colors.red.shade700
+                                    : availableStock <= 5
+                                        ? Colors.orange.shade700
+                                        : Colors.green.shade700,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                isProductOutOfStock
+                                    ? 'Out of stock'
+                                    : availableStock <= 5
+                                        ? 'Only $availableStock left'
+                                        : '$availableStock in stock',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: isProductOutOfStock
+                                      ? Colors.red.shade700
+                                      : availableStock <= 5
+                                          ? Colors.orange.shade700
+                                          : Colors.green.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    if (isFishStockEnabled) verticalSpaceTiny,
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -287,8 +359,8 @@ class ProductDetailsTile extends StatelessWidget {
                                 height: 30,
                                 child: FilledButton(
                                     style: FilledButton.styleFrom(
-                                        disabledBackgroundColor: Colors
-                                            .transparent,
+                                        disabledBackgroundColor:
+                                            Colors.transparent,
                                         disabledForegroundColor:
                                             Theme.of(context).disabledColor,
                                         shape: RoundedRectangleBorder(
@@ -296,40 +368,34 @@ class ProductDetailsTile extends StatelessWidget {
                                                 BorderRadius.circular(8.0)),
                                         fixedSize: const Size(80, 30),
                                         side: BorderSide(
-                                            color: product.isAvailable == true
-                                                ? Theme.of(context)
+                                            color: isProductUnavailable
+                                                ? Colors.grey
+                                                : Theme.of(context)
                                                     .colorScheme
-                                                    .primary
-                                                : Colors.grey),
-                                        backgroundColor:
-                                            product.isAvailable == true
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                : Colors.transparent),
-                                    onPressed: product.isAvailable == true
-                                        ? onPressAddBtn
-                                        : null,
+                                                    .primary),
+                                        backgroundColor: isProductUnavailable
+                                            ? Colors.transparent
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .primary),
+                                    onPressed: isProductUnavailable
+                                        ? null
+                                        : onPressAddBtn,
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        // Icon(
-                                        //   Icons.add,
-                                        //   size: 16,
-                                        // ),
-                                        // horizontalSpaceTiny,
                                         Text(
                                           'Add',
                                           style: context
                                               .customTextTheme.text14W700
                                               .copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color: product.isAvailable == true
+                                            color: isProductUnavailable
                                                 ? Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface
+                                                    .disabledColor
                                                 : Theme.of(context)
-                                                    .disabledColor,
+                                                    .colorScheme
+                                                    .onSurface,
                                           ),
                                         ),
                                       ],
@@ -369,51 +435,6 @@ class ProductDetailsTile extends StatelessWidget {
               ),
             ),
           ),
-          // Positioned(
-          //   left: 8,
-          //   top: 120,
-          //   child: Row(
-          //     mainAxisSize: MainAxisSize.min,
-          //     children: [
-          //       if (spiceLevel != null &&
-          //           _isSpiceLevelApplicable(spiceLevel)) ...[
-          //         Container(
-          //           padding:
-          //               const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          //           decoration: BoxDecoration(
-          //             boxShadow: [
-          //               BoxShadow(
-          //                   color: Colors.black.withOpacity(0.12),
-          //                   blurRadius: 10,
-          //                   offset: Offset(0, 3))
-          //             ],
-          //             color: Colors.white,
-          //             borderRadius: BorderRadius.circular(8),
-          //           ),
-          //           child: Row(
-          //             crossAxisAlignment: CrossAxisAlignment.center,
-          //             children: [
-          //               if (spiceLevelIcon != null && spiceLevelIcon.isNotEmpty)
-          //                 Text(
-          //                   spiceLevelIcon,
-          //                   style: TextStyle(fontSize: 12, color: Colors.red),
-          //                 ),
-          //               horizontalSpaceTiny,
-          //               Text(
-          //                 spiceLevel,
-          //                 style: TextStyle(
-          //                   fontWeight: FontWeight.bold,
-          //                   fontSize: 11,
-          //                   color: context.customTextTheme.color,
-          //                 ),
-          //               ),
-          //             ],
-          //           ),
-          //         ),
-          //       ]
-          //     ],
-          //   ),
-          // ),
         ],
       ),
     );
@@ -424,6 +445,16 @@ class ProductDetailsTile extends StatelessWidget {
     final spiceLevel = product.spiceLevel;
     final spiceLevelIcon =
         context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
+    final isFishStockEnabled =
+        AppConfig.instance.businessType == BusinessType.fish &&
+            product.stock?.activated == true;
+    final cartProvider = context.watch<CartProvider>();
+    final availableStock = isFishStockEnabled
+        ? cartProvider.getRemainingFishStock(product)
+        : product.stock?.availableStock ?? 0;
+    final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
+    final isProductUnavailable =
+        product.isAvailable == false || isProductOutOfStock;
     return Card(
       color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -555,6 +586,65 @@ class ProductDetailsTile extends StatelessWidget {
                     verticalSpaceSmall,
                   ],
                   verticalSpaceSmall,
+                  if (isFishStockEnabled) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isProductOutOfStock
+                            ? Colors.red.shade50
+                            : availableStock <= 5
+                                ? Colors.orange.shade50
+                                : Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: isProductOutOfStock
+                              ? Colors.red.shade200
+                              : availableStock <= 5
+                                  ? Colors.orange.shade200
+                                  : Colors.green.shade200,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isProductOutOfStock
+                                ? FluentIcons.box_24_regular
+                                : availableStock <= 5
+                                    ? FluentIcons.warning_24_regular
+                                    : FluentIcons.checkmark_circle_24_regular,
+                            size: 12,
+                            color: isProductOutOfStock
+                                ? Colors.red.shade700
+                                : availableStock <= 5
+                                    ? Colors.orange.shade700
+                                    : Colors.green.shade700,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            isProductOutOfStock
+                                ? 'Out of stock'
+                                : availableStock <= 5
+                                    ? 'Only $availableStock left'
+                                    : '$availableStock in stock',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: isProductOutOfStock
+                                  ? Colors.red.shade700
+                                  : availableStock <= 5
+                                      ? Colors.orange.shade700
+                                      : Colors.green.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    verticalSpaceTiny,
+                  ],
                   product.isOfferPrice == 'Yes' &&
                           product.offerPriceDetails?.currentOfferPrice != null
                       ? RichText(
@@ -598,27 +688,26 @@ class ProductDetailsTile extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(5.0)),
                                 fixedSize: const Size(double.infinity, 30),
                                 side: BorderSide(
-                                    color: product.isAvailable == true
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Colors.grey),
-                                backgroundColor: product.isAvailable == true
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Colors.transparent),
-                            onPressed: product.isAvailable == true
-                                ? onPressAddBtn
-                                : null,
-                            child:
-                                // Icon(Icons.shopping_cart)
-                                Text(
-                              'Add to Cart',
+                                    color: isProductUnavailable
+                                        ? Colors.grey
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                backgroundColor: isProductUnavailable
+                                    ? Colors.transparent
+                                    : Theme.of(context).colorScheme.primary),
+                            onPressed:
+                                isProductUnavailable ? null : onPressAddBtn,
+                            child: Text(
+                              isProductOutOfStock ? 'Sold Out' : 'Add to Cart',
                               style: context.customTextTheme.text14W700
                                   .copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: product.isAvailable == true
-                                          ? Theme.of(context)
+                                      color: isProductUnavailable
+                                          ? Theme.of(context).disabledColor
+                                          : Theme.of(context)
                                               .colorScheme
-                                              .onSurface
-                                          : Theme.of(context).disabledColor,
+                                              .onSurface,
                                       fontSize: 12),
                             ),
                           ),

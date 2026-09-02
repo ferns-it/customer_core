@@ -684,10 +684,31 @@ class CartProvider extends ChangeNotifier with BaseController {
     return true;
   }
 
-  Future<bool> addItemToCart({bool isGuest = false}) async {
+  Future<bool> addItemToCart({
+    ProductDataModel? product,
+    bool isGuest = false,
+  }) async {
     try {
       if (_selectedItemId == null || _selectedItemVariation == null) {
         return false;
+      }
+
+      final maxQty = product != null &&
+              AppConfig.instance.businessType == BusinessType.fish &&
+              product.stock?.activated == true
+          // Clamp to the REMAINING addable stock (stock minus what's already
+          // in the cart), not the absolute availableStock, otherwise a product
+          // with stock 4 & 2 already in cart would wrongly allow qty up to 4.
+          ? getRemainingFishStock(product)
+          : null;
+
+      if (maxQty != null && maxQty <= 0) {
+        return false;
+      }
+
+      if (maxQty != null && _selectedItemQty > maxQty) {
+        _selectedItemQty = maxQty;
+        notifyListeners();
       }
 
       _addItemLoading = true;
@@ -759,7 +780,6 @@ class CartProvider extends ChangeNotifier with BaseController {
           return false;
         },
         (result) async {
-      
           await listCartItems();
           return true;
         },
@@ -775,6 +795,41 @@ class CartProvider extends ChangeNotifier with BaseController {
               (value) => value.buffer.asUint8List(),
             ),
       );
+
+  /// Get the total quantity of a product currently in cart
+  int getTotalCartQtyForProduct(String productId) {
+    int totalQty = 0;
+    for (var item in cartItems) {
+      if (item.pID == productId) {
+        totalQty += item.quantity ?? 0;
+      }
+    }
+    return totalQty;
+  }
+
+  /// Get the remaining stock for a fish product after subtracting cart quantity
+  int getRemainingFishStock(ProductDataModel product) {
+    if (AppConfig.instance.businessType != BusinessType.fish ||
+        product.stock?.activated != true) {
+      return product.stock?.availableStock ?? 0;
+    }
+
+    final totalInCart = getTotalCartQtyForProduct(product.pID ?? '');
+    final originalStock = product.stock?.availableStock ?? 0;
+    final remaining = originalStock - totalInCart;
+    return remaining > 0 ? remaining : 0;
+  }
+
+  /// Increment cart item quantity with automatic fish stock validation
+  Future<bool> incrementCartItemQtyWithStockCheck(
+      int index, ProductDataModel product) async {
+    if (AppConfig.instance.businessType == BusinessType.fish &&
+        product.stock?.activated == true) {
+      final remainingStock = getRemainingFishStock(product);
+      return incrementCartItemQty(index, remainingStock: remainingStock);
+    }
+    return incrementCartItemQty(index);
+  }
 
   Future<void> listCartItems() async {
     try {
@@ -839,10 +894,24 @@ class CartProvider extends ChangeNotifier with BaseController {
     }
   }
 
-  Future<bool> incrementCartItemQty(int index) async {
+  Future<bool> incrementCartItemQty(int index, {int? remainingStock}) async {
     if (_cartDetailsModel == null || _cartDeleteLoading == true) return false;
     final locatedCartItem = cartItems.elementAt(index);
     final newQty = (locatedCartItem.quantity ?? 0) + 1;
+
+    // Validate stock for fish products.
+    // `remainingStock` is the number of units that can STILL be added on top
+    // of what's already in the cart (see getRemainingFishStock), NOT the
+    // absolute max quantity. Therefore an increment is allowed while any
+    // stock remains: newQty must not exceed the current line quantity plus
+    // the remaining units. Comparing newQty against remainingStock directly
+    // would wrongly block the + button, e.g. stock=4, 2 already in cart,
+    // tapping + -> newQty=3 but 3 > remaining(2), even though total (3) <= 4.
+    final currentItemQty = locatedCartItem.quantity ?? 0;
+    if (remainingStock != null && newQty > currentItemQty + remainingStock) {
+      AlertDialogs.showError('Sorry, this item is currently out of stock.');
+      return false;
+    }
 
     _updateQty(locatedCartItem, newQty);
 

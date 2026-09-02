@@ -151,7 +151,7 @@ class DishDetailBottomSheet extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                         child: _IngredientsWidget(product: product),
                       ),
-
+                    
                       _OrderSectionWidget(
                         product: product,
                         onRequestOrderDish: onRequestOrderDish,
@@ -252,6 +252,19 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
     final cartListener = context.watch<CartProvider>();
     final allergens = product.selectedAllergensList;
 
+    final isFishStockEnabled =
+        AppConfig.instance.businessType == BusinessType.fish &&
+            product.stock?.activated == true;
+    // Units of this product that can still be added on top of what's already
+    // in the cart (getRemainingFishStock subtracts cart quantity). This is
+    // shown as-is in the stock badge — consistent with the product tile — and
+    // is NOT reduced by the quantity selected in this sheet. Otherwise, with
+    // stock 4 and 2 in cart, reopening the sheet at qty 1 would misleadingly
+    // show "Only 1 left" (2 - 1) when 2 units are actually still available.
+    final remainingStock = isFishStockEnabled
+        ? cartListener.getRemainingFishStock(product)
+        : 0;
+
     final baseTextTheme = Theme.of(context).textTheme;
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
 
@@ -312,6 +325,7 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                 maxHeight: context.screenHeight * 0.8,
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   verticalSpaceTiny,
@@ -421,12 +435,21 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                     ],
                   ),
                   verticalSpaceSmall,
+                  if (isFishStockEnabled) ...[
+                    const SizedBox(height: 6),
+                    _FishStockStatusWidget(
+                      product: product,
+                      availableStock: remainingStock,
+                    ),
+                  ],
+                  verticalSpaceSmall,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _ProductPriceWidget(product: product),
                       QtyCounterButton2(
                         qty: cartListener.selectedItemQty,
+                        maxQty: isFishStockEnabled ? remainingStock : null,
                         onIncrementQty: cartListener.incrementQty,
                         onDecrementQty: cartListener.decrementQty,
                       ),
@@ -710,6 +733,22 @@ class _OrderSectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cartProvider = context.read<CartProvider>();
+    final cartListener = context.watch<CartProvider>();
+    final isFishStockEnabled =
+        AppConfig.instance.businessType == BusinessType.fish &&
+            product.stock?.activated == true;
+    final availableStock =
+        isFishStockEnabled ? cartProvider.getRemainingFishStock(product) : 0;
+    final isOutOfStock = isFishStockEnabled && availableStock <= 0;
+    final hasInsufficientStock =
+        isFishStockEnabled && cartListener.selectedItemQty > availableStock;
+    final isAddDisabled =
+        product.isAvailable == false || isOutOfStock || hasInsufficientStock;
+    final navigator = Navigator.of(context);
+    final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
+    final isProductUnavailable =
+        product.isAvailable == false || isProductOutOfStock;
     return Padding(
       padding: const EdgeInsets.all(15.0).copyWith(bottom: 40),
       child: Row(
@@ -717,7 +756,7 @@ class _OrderSectionWidget extends StatelessWidget {
         children: [
           _ProductPriceWidget(product: product),
           InkWell(
-            onTap: product.isAvailable == false
+            onTap: isProductUnavailable
                 ? null
                 : () {
                     Navigator.pop(context);
@@ -726,7 +765,7 @@ class _OrderSectionWidget extends StatelessWidget {
             child: Container(
               height: 40.0,
               decoration: BoxDecoration(
-                color: product.isAvailable == false
+                color: isProductUnavailable
                     ? AppColors.kGray
                     : Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(10.0),
@@ -734,7 +773,7 @@ class _OrderSectionWidget extends StatelessWidget {
               width: context.screenWidth * 0.4,
               child: Center(
                 child: Text(
-                  product.isAvailable == false ? 'Not Available' : 'Order Now',
+                  isProductUnavailable ? 'Not Available' : 'Order Now',
                   style: context.customTextTheme.text14W600
                       .copyWith(color: AppColors.kWhite),
                 ),
@@ -1033,7 +1072,16 @@ class AddToCartButton extends GetProviderView<CartProvider> {
     final cartProvider = notifier(context);
     final cartListener = listener(context);
     final authProvider = notifier2<AuthProvider>(context);
-    final authListener = listener2<AuthProvider>(context);
+
+    final isFishStockEnabled =
+        AppConfig.instance.businessType == BusinessType.fish &&
+            product.stock?.activated == true;
+    final remainingStock = isFishStockEnabled
+        ? cartProvider.getRemainingFishStock(product)
+        : null;
+    final isOutOfStock = isFishStockEnabled && (remainingStock ?? 0) <= 0;
+    final isAddDisabled = product.isAvailable == false || isOutOfStock;
+
     return FilledButton.icon(
       style: FilledButton.styleFrom(
         shape: RoundedRectangleBorder(
@@ -1041,7 +1089,7 @@ class AddToCartButton extends GetProviderView<CartProvider> {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      onPressed: product.isAvailable == false
+      onPressed: isAddDisabled
           ? null
           : () async {
               final isLogged = await authProvider.checkUserIsLogged();
@@ -1056,7 +1104,9 @@ class AddToCartButton extends GetProviderView<CartProvider> {
                   cartProvider.validateRequiredModifiers(product);
               final hasInvalidSection = onValidationFailed?.call() ?? false;
               if (validationResult && !hasInvalidSection) {
-                cartProvider.addItemToCart(isGuest: !isLogged).then((added) {
+                cartProvider
+                    .addItemToCart(product: product, isGuest: !isLogged)
+                    .then((added) {
                   if (added) {
                     cartProvider.clearSelectedAddressSecondary();
                     cartProvider.clearSelectedAddress();
@@ -1074,68 +1124,78 @@ class AddToCartButton extends GetProviderView<CartProvider> {
             ),
       label: !cartListener.addItemLoading
           ? Text(
-              product.isAvailable == false ? 'Not Available' : 'Add To Cart',
+              isOutOfStock
+                  ? 'Out of Stock'
+                  : product.isAvailable == false
+                      ? 'Not Available'
+                      : 'Add To Cart',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             )
           : showButtonProgress(Theme.of(context).colorScheme.onSurface),
     );
-    // return SwipeButton(
-    //   thumb: const Icon(
-    //     FluentIcons.cart_24_filled,
-    //     color: AppColors.kBlack3,
-    //   ),
-    //   activeTrackColor: AppColors.kBlack3,
-    //   inactiveThumbColor: AppColors.kWhite,
-    //   thumbPadding: const EdgeInsets.all(2),
-    //   activeThumbColor: AppColors.kWhite,
-    //   width: cartListener.addItemLoading
-    //       ? context.widthPx * 0.6
-    //       : context.widthPx * 0.7,
-    //   inactiveTrackColor: AppColors.kGray6,
-    //   enabled: !cartListener.addItemLoading,
-    //   onSwipe: () {
-    //     final validationResult =
-    //         cartProvider.validateRequiredModifiers(product);
-    //     if (validationResult) {
-    //       cartProvider.addItemToCart().then((added) {
-    //         if (added) {
-    //           Navigator.pop(context);
-    //           cartProvider.resetValues();
-    //         }
-    //       });
-    //     }
-    //   },
-    //   child: cartListener.addItemLoading
-    //       ? showButtonProgress()
-    //       : Padding(
-    //           padding: EdgeInsets.only(
-    //             left: context.widthPx * 0.15,
-    //             right: context.widthPx * 0.05,
-    //           ),
-    //           child: Row(
-    //             mainAxisSize: MainAxisSize.min,
-    //             children: <Widget>[
-    //               Text(
-    //                 "${AppConfig.instance.country.symbol}${cartListener.selectedItemPrice}",
-    //                 style: context.customTextTheme.text20W600
-    //                     .copyWith(color: AppColors.kWhite),
-    //               ),
-    //               const Spacer(),
-    //               Text(
-    //                 "Add To Cart",
-    //                 style: context.customTextTheme.text18W600.copyWith(
-    //                   color: AppColors.kWhite,
-    //                 ),
-    //               ),
-    //               horizontalSpaceTiny,
-    //               const Icon(
-    //                 Icons.arrow_forward_ios,
-    //                 color: AppColors.kWhite,
-    //                 size: 20.0,
-    //               )
-    //             ],
-    //           ),
-    //         ),
-    // );
+  }
+}
+
+class _FishStockStatusWidget extends StatelessWidget {
+  const _FishStockStatusWidget({
+    required this.product,
+    required this.availableStock,
+  });
+
+  final ProductDataModel product;
+  final int availableStock;
+
+  @override
+  Widget build(BuildContext context) {
+    final isOutOfStock = availableStock <= 0;
+    final isLowStock = !isOutOfStock && availableStock <= 5;
+
+    final color = isOutOfStock
+        ? Colors.red.shade50
+        : isLowStock
+            ? Colors.orange.shade50
+            : Colors.green.shade50;
+    final borderColor = isOutOfStock
+        ? Colors.red.shade200
+        : isLowStock
+            ? Colors.orange.shade200
+            : Colors.green.shade200;
+    final textColor = isOutOfStock
+        ? Colors.red.shade700
+        : isLowStock
+            ? Colors.orange.shade700
+            : Colors.green.shade700;
+    final icon = isOutOfStock
+        ? FluentIcons.box_24_regular
+        : isLowStock
+            ? FluentIcons.warning_24_regular
+            : FluentIcons.checkmark_circle_24_regular;
+
+    final label = isOutOfStock
+        ? 'Out of stock'
+        : isLowStock
+            ? 'Only $availableStock left'
+            : '$availableStock in stock';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color,
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: textColor),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style:
+                context.customTextTheme.text12W600.copyWith(color: textColor),
+          ),
+        ],
+      ),
+    );
   }
 }

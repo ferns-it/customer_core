@@ -35,7 +35,7 @@ class StockStatusWidget extends StatelessWidget {
         ? FluentIcons.box_24_regular
         : availableStock <= 5
             ? FluentIcons.warning_24_regular
-            : FluentIcons.checkmark_circle_24_regular;
+            : FluentIcons.box_24_regular;
 
     final String text = isProductOutOfStock
         ? 'Out of stock'

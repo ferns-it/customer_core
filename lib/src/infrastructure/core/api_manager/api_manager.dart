@@ -83,8 +83,8 @@ class APIManager {
 
       final accessToken = jsonDecode(response)["token"];
       final expireAt = jsonDecode(response)["expireAt"];
-      await UserSharedPrefsRepo()
-          .saveUserData(userData.copyWith(token: accessToken, expireAt: expireAt));
+      await UserSharedPrefsRepo().saveUserData(
+          userData.copyWith(token: accessToken, expireAt: expireAt));
       auth = accessToken;
     }
 
@@ -136,6 +136,7 @@ class APIManager {
 
       if (jsonData["error"] ?? false) {
         final errorMessage = _getErrorMessage(jsonData);
+        final errorData = _extractErrorMessagePayload(jsonData);
         return handler.reject(
           DioException(
             requestOptions: response.requestOptions,
@@ -144,6 +145,7 @@ class APIManager {
             error: _mapDioExceptionTypeToAppException(
               DioExceptionType.badResponse,
               errorMessage,
+              errorData: errorData,
             ),
           ),
         );
@@ -197,6 +199,27 @@ class APIManager {
         "Something went wrong!";
   }
 
+  /// Decodes a raw HTTP error payload that may arrive either as a JSON string
+  /// or as an already-decoded map.
+  static Map<String, dynamic>? _decodePayload(Object? data) {
+    try {
+      final decoded = data is String ? jsonDecode(data) : data;
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Extracts the `errorMessage.data` object (when present) that
+  /// delivery-related endpoints attach to their error payloads.
+  static Map<String, dynamic>? _extractErrorMessagePayload(
+      Map<String, dynamic>? jsonData) {
+    final errorMessage = jsonData?["errorMessage"];
+    if (errorMessage is! Map<String, dynamic>) return null;
+    final data = errorMessage["data"];
+    return data is Map<String, dynamic> ? data : null;
+  }
+
   static void errorResponseHandler(
     DioException dioError,
     ErrorInterceptorHandler handler,
@@ -206,7 +229,9 @@ class APIManager {
     if (res == null) return;
 
     final status = res.statusCode;
+    final payload = _decodePayload(res.data);
     final (message, reason) = parseResponse(res.data);
+    final errorData = _extractErrorMessagePayload(payload);
 
     if (status == 401 && message == "Expired token") {
       final repo = UserSharedPrefsRepo();
@@ -250,8 +275,11 @@ class APIManager {
         ? Response(requestOptions: dioError.requestOptions, data: reason)
         : res;
 
-    final exception =
-        _mapDioExceptionTypeToAppException(dioError.type, message);
+    final exception = _mapDioExceptionTypeToAppException(
+      dioError.type,
+      message,
+      errorData: errorData,
+    );
     handler.reject(DioException(
       requestOptions: dioError.requestOptions,
       error: exception,
@@ -262,7 +290,17 @@ class APIManager {
   }
 
   static AppExceptions _mapDioExceptionTypeToAppException(
-      DioExceptionType type, String? message) {
+    DioExceptionType type,
+    String? message, {
+    Map<String, dynamic>? errorData,
+  }) {
+    final deliveryDistanceData = DeliveryDistanceErrorData.tryParse(errorData);
+    if (deliveryDistanceData != null) {
+      return DeliveryNotServiceableException(
+        message: message,
+        distanceData: deliveryDistanceData,
+      );
+    }
     switch (type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:

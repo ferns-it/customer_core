@@ -182,7 +182,7 @@ class ProductDetailsTile extends StatelessWidget {
                         ),
                       ],
                     ),
-                    verticalSpaceSmall,
+                    verticalSpaceTiny,
                     Wrap(
                       spacing: 2,
                       runSpacing: 4,
@@ -232,12 +232,15 @@ class ProductDetailsTile extends StatelessWidget {
                           ),
                       ],
                     ),
-                    if (isFishStockEnabled)
+                    verticalSpaceTiny,
+                    if (isFishStockEnabled) ...[
                       StockStatusWidget(
                         isProductOutOfStock: isProductOutOfStock,
                         availableStock: availableStock,
                       ),
-                    if (isFishStockEnabled) verticalSpaceTiny,
+                      verticalSpaceTiny,
+                    ],
+                    verticalSpaceSmall,
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

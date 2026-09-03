@@ -2328,7 +2328,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Form(
       key: authProvider.phoneFormKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      autovalidateMode: AutovalidateMode.disabled,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: CustomTextField(
@@ -2339,6 +2339,9 @@ class _LoginScreenState extends State<LoginScreen> {
           keyboardType: TextInputType.phone,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(
+              shopProvider.selectedCountry?.code == "+91" ? 10 : 12,
+            ),
           ],
           textInputAction: TextInputAction.done,
           prefixIcon: Container(
@@ -2391,6 +2394,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 }).toList(),
                 onChanged: (value) {
                   if (value != null) {
+                    final oldCountryCode = shopProvider.selectedCountry?.code;
+                    final newCountryCode = value.code;
+
+                    if (oldCountryCode != newCountryCode) {
+                      authProvider.registerUserPhoneController.clear();
+                      authProvider.phoneFormKey.currentState?.reset();
+                    }
                     shopProvider.updateSelectedCountry(value);
                   }
                 },
@@ -2426,7 +2436,7 @@ class _LoginScreenState extends State<LoginScreen> {
       AuthProvider authListener) {
     return Form(
       key: authProvider.emailFormKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      autovalidateMode: AutovalidateMode.disabled,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: CustomTextField(

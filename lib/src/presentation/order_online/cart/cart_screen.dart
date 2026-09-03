@@ -1673,9 +1673,13 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                         textInputAction: TextInputAction.done,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(11),
+                          LengthLimitingTextInputFormatter(
+                            shopProvider.selectedCountry?.code == "+91"
+                                ? 10
+                                : 12,
+                          ),
                         ],
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        autovalidateMode: AutovalidateMode.disabled,
                         decoration: InputDecoration(
                           // hintStyle: TextStyle(color: Colors.grey),
                           labelStyle: const TextStyle(color: Colors.grey),
@@ -1752,6 +1756,16 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                               }).toList(),
                               onChanged: (value) {
                                 if (value != null) {
+                                  final oldCountryCode =
+                                      shopProvider.selectedCountry?.code;
+                                  final newCountryCode = value.code;
+
+                                  if (oldCountryCode != newCountryCode) {
+                                    authProvider.registerUserPhoneController
+                                        .clear();
+                                    authProvider.phoneFormKey.currentState
+                                        ?.reset();
+                                  }
                                   shopProvider.updateSelectedCountry(value);
                                   setDialogState(() {
                                     countryCode = value.code ??
@@ -2020,9 +2034,11 @@ class _MobileVerificationDialogContentState
                     textInputAction: TextInputAction.done,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(11),
+                      LengthLimitingTextInputFormatter(
+                        shopProvider.selectedCountry?.code == "+91" ? 10 : 12,
+                      ),
                     ],
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    autovalidateMode: AutovalidateMode.disabled,
                     decoration: InputDecoration(
                       labelStyle: const TextStyle(color: Colors.grey),
                       labelText: 'Mobile Number',
@@ -2097,6 +2113,15 @@ class _MobileVerificationDialogContentState
                           }).toList(),
                           onChanged: (value) {
                             if (value != null) {
+                              final oldCountryCode =
+                                  shopProvider.selectedCountry?.code;
+                              final newCountryCode = value.code;
+
+                              if (oldCountryCode != newCountryCode) {
+                                authProvider.registerUserPhoneController
+                                    .clear();
+                                authProvider.phoneFormKey.currentState?.reset();
+                              }
                               shopProvider.updateSelectedCountry(value);
                               setState(() {
                                 countryCode = value.code ??

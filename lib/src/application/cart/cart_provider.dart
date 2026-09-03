@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
 import 'package:customer_core/src/core/constants/app_identifiers.dart';
+import 'package:customer_core/src/infrastructure/core/failures/app_exceptions.dart';
 import 'package:customer_core/src/domain/cart/i_cart_repo.dart';
 import 'package:customer_core/src/domain/checkout/models/calculate_take_away_details.dart';
 import 'package:customer_core/src/domain/offer/i_offer_repo.dart';
@@ -743,7 +744,6 @@ class CartProvider extends ChangeNotifier with BaseController {
         ),
       );
       final userData = await getUserData();
-
       final result = await cartRepo.addCartItem(
           payload, isGuest, guestID, userData?.user.userID);
 
@@ -813,18 +813,12 @@ class CartProvider extends ChangeNotifier with BaseController {
         product.stock?.activated != true) {
       return product.stock?.availableStock ?? 0;
     }
-
     final totalInCart = getTotalCartQtyForProduct(product.pID ?? '');
     final originalStock = product.stock?.availableStock ?? 0;
     final remaining = originalStock - totalInCart;
     return remaining > 0 ? remaining : 0;
   }
 
-  /// Increment cart item quantity with automatic fish stock validation
-  ///
-  /// [product] is optional: when the product can't be resolved from the
-  /// current product list (e.g. the cart screen), the increment falls back
-  /// to the legacy behaviour without stock validation.
   Future<bool> incrementCartItemQtyWithStockCheck(int index,
       [ProductDataModel? product]) async {
     if (AppConfig.instance.businessType == BusinessType.fish &&
@@ -1311,9 +1305,22 @@ class CartProvider extends ChangeNotifier with BaseController {
         shopID: AppIdentifiers.kShopId,
         destinationPostCode: destinationPostCode,
       );
-
       return response.fold((error) {
-        AlertDialogs.showError(error.message);
+        if (error is DeliveryNotServiceableException) {
+          final data = error.distanceData;
+          final distanceType = data?.distanceType;
+          final unit = (distanceType?.trim().isNotEmpty ?? false)
+              ? ' ${distanceType!.trim()}'
+              : '';
+          AlertDialogs.showError(
+            '${error.message}\n'
+            'Calibrated distance: '
+            '${data?.calibratedDistance ?? data?.distanceInKm ?? 'N/A'}$unit\n'
+            'Maximum delivery radius: ${data?.maxDeliveryRadius}$unit',
+          );
+        } else {
+          AlertDialogs.showError(error.message);
+        }
         return false;
       }, (result) {
         _deliveryDetails = result;

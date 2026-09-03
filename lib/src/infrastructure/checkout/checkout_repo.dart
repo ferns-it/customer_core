@@ -44,6 +44,7 @@ class CheckoutRepo implements ICheckoutRepo {
       if (response == null) return Left(InternalServerErrorException());
       return Right(CalculatedDeliveryChargeDetailsModel.fromJson(response));
     } on DioException catch (e) {
+      print("error response:${e.response}");
       return Left(e.error is AppExceptions
           ? e.error as AppExceptions
           : InternalServerErrorException());

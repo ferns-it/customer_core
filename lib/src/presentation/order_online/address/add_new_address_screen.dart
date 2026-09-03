@@ -165,8 +165,12 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                   title: 'Postcode *',
                   hintText: 'Postcode',
                   controller: userProvider.postCodeTxtController,
-                  validator: (value) =>
-                      Utils.commonValidator(value, '*required'),
+                  // validator: (value) =>
+                  //     Utils.commonValidator(value, '*required'),
+                  validator: (value) => Utils.postcodeValidator(
+                    value,
+                    AppConfig.instance.country,
+                  ),
                 ),
               ),
             ),

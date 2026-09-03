@@ -674,8 +674,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                           final product = products.elementAt(index);
                           final isExist =
                               cartProvider.isProductExist(product.pID);
-                          final productQtyUpdated =
-                              cartProvider.getProductQuantity(product.pID);
+                          // final productQtyUpdated =
+                          //     cartProvider.getProductQuantity(product.pID);
                           final cartIndex =
                               cartProvider.getProductCartIndex(product.pID);
 

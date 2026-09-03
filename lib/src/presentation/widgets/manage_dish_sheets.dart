@@ -113,6 +113,7 @@ class DishDetailBottomSheet extends StatelessWidget {
                         ),
                         verticalSpaceTiny,
                       ],
+                      verticalSpaceSmall,
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                         child: Wrap(

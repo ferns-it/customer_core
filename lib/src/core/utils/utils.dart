@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:customer_core/customer_core.dart';
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
 
@@ -147,6 +148,30 @@ class Utils {
     if (value.isEmpty) {
       return error;
     }
+    return null;
+  }
+
+  static String? postcodeValidator(String? value, Country country) {
+    if (value == null || value.trim().isEmpty) {
+      return '*required';
+    }
+
+    final postcode = value.trim();
+
+    if (country == Country.ind) {
+      if (!RegExp(r'^[1-9][0-9]{5}$').hasMatch(postcode)) {
+        return 'Enter a valid Indian PIN';
+      }
+    } else if (country == Country.uk) {
+      final ukPostcode = postcode.toUpperCase();
+
+      if (!RegExp(
+        r'^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$',
+      ).hasMatch(ukPostcode)) {
+        return 'Enter a valid UK postcode';
+      }
+    }
+
     return null;
   }
 

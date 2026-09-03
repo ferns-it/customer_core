@@ -41,7 +41,7 @@ class CustomTextField extends StatelessWidget {
       textInputAction: textInputAction,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters ?? [],
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      autovalidateMode: AutovalidateMode.disabled,
       validator: validator,
       obscureText: obscureText ?? false,
       decoration: InputDecoration(

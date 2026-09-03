@@ -93,17 +93,6 @@ class DishDetailBottomSheet extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                         child: _ProductNameWidget(product: product),
                       ),
-
-                      if (isFishStockEnabled) ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          child: StockStatusWidget(
-                            isProductOutOfStock: isProductOutOfStock,
-                            availableStock: availableStock,
-                          ),
-                        ),
-                        verticalSpaceTiny,
-                      ],
                       // _RatingAndTimeWidget(product: product),
                       if (product.description != null &&
                           product.description!.isNotEmpty) ...[
@@ -112,7 +101,17 @@ class DishDetailBottomSheet extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 15.0),
                           child: _DescriptionWidget(product: product),
                         ),
-                        verticalSpaceRegular,
+                      ],
+                      if (isFishStockEnabled) ...[
+                        verticalSpaceSmall,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: StockStatusWidget(
+                            isProductOutOfStock: isProductOutOfStock,
+                            availableStock: availableStock,
+                          ),
+                        ),
+                        verticalSpaceTiny,
                       ],
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -452,13 +451,14 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                             ),
                     ],
                   ),
-                  verticalSpaceSmall,
-                  if (isFishStockEnabled)
+                  if (isFishStockEnabled) ...[
+                    verticalSpaceSmall,
                     StockStatusWidget(
                       isProductOutOfStock: isProductOutOfStock,
                       availableStock: availableStock,
                     ),
-                  if (isFishStockEnabled) verticalSpaceTiny,
+                    verticalSpaceTiny,
+                  ],
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

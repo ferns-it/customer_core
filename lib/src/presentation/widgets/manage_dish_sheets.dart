@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
+import 'package:customer_core/src/presentation/widgets/stock_status_widget.dart';
 import 'package:dartx/dartx.dart';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -33,8 +34,20 @@ class DishDetailBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cartListener = context.watch<CartProvider>();
     final baseTextTheme = Theme.of(context).textTheme;
     final allergens = product.selectedAllergensList;
+    final isFishStockEnabled =
+        AppConfig.instance.businessType == BusinessType.fish &&
+            product.stock?.activated == true;
+    final remainingStock =
+        isFishStockEnabled ? cartListener.getRemainingFishStock(product) : 0;
+    final availableStock = isFishStockEnabled
+        ? (remainingStock - cartListener.selectedItemQty > 0
+            ? remainingStock - cartListener.selectedItemQty
+            : 0)
+        : product.stock?.availableStock ?? 0;
+    final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
 
     return SafeArea(
       bottom: false,
@@ -80,20 +93,27 @@ class DishDetailBottomSheet extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                         child: _ProductNameWidget(product: product),
                       ),
-                      // _RatingAndTimeWidget(product: product),
-                      product.description != null &&
-                              product.description!.isNotEmpty
-                          ? verticalSpaceSmall
-                          : const SizedBox.shrink(),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: _DescriptionWidget(product: product),
-                      ),
 
-                      product.description != null &&
-                              product.description!.isNotEmpty
-                          ? verticalSpaceRegular
-                          : const SizedBox.shrink(),
+                      if (isFishStockEnabled) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: StockStatusWidget(
+                            isProductOutOfStock: isProductOutOfStock,
+                            availableStock: availableStock,
+                          ),
+                        ),
+                        verticalSpaceTiny,
+                      ],
+                      // _RatingAndTimeWidget(product: product),
+                      if (product.description != null &&
+                          product.description!.isNotEmpty) ...[
+                        verticalSpaceSmall,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: _DescriptionWidget(product: product),
+                        ),
+                        verticalSpaceRegular,
+                      ],
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                         child: Wrap(
@@ -151,7 +171,6 @@ class DishDetailBottomSheet extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                         child: _IngredientsWidget(product: product),
                       ),
-                    
                       _OrderSectionWidget(
                         product: product,
                         onRequestOrderDish: onRequestOrderDish,
@@ -251,19 +270,18 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
   Widget build(BuildContext context) {
     final cartListener = context.watch<CartProvider>();
     final allergens = product.selectedAllergensList;
-
+    final cartProvider = context.watch<CartProvider>();
     final isFishStockEnabled =
         AppConfig.instance.businessType == BusinessType.fish &&
             product.stock?.activated == true;
-    // Units of this product that can still be added on top of what's already
-    // in the cart (getRemainingFishStock subtracts cart quantity). This is
-    // shown as-is in the stock badge — consistent with the product tile — and
-    // is NOT reduced by the quantity selected in this sheet. Otherwise, with
-    // stock 4 and 2 in cart, reopening the sheet at qty 1 would misleadingly
-    // show "Only 1 left" (2 - 1) when 2 units are actually still available.
-    final remainingStock = isFishStockEnabled
-        ? cartListener.getRemainingFishStock(product)
-        : 0;
+    final remainingStock =
+        isFishStockEnabled ? cartListener.getRemainingFishStock(product) : 0;
+    final availableStock = isFishStockEnabled
+        ? (remainingStock - cartListener.selectedItemQty > 0
+            ? remainingStock - cartListener.selectedItemQty
+            : 0)
+        : product.stock?.availableStock ?? 0;
+    final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
 
     final baseTextTheme = Theme.of(context).textTheme;
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
@@ -435,14 +453,12 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                     ],
                   ),
                   verticalSpaceSmall,
-                  if (isFishStockEnabled) ...[
-                    const SizedBox(height: 6),
-                    _FishStockStatusWidget(
-                      product: product,
-                      availableStock: remainingStock,
+                  if (isFishStockEnabled)
+                    StockStatusWidget(
+                      isProductOutOfStock: isProductOutOfStock,
+                      availableStock: availableStock,
                     ),
-                  ],
-                  verticalSpaceSmall,
+                  if (isFishStockEnabled) verticalSpaceTiny,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -450,8 +466,12 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                       QtyCounterButton2(
                         qty: cartListener.selectedItemQty,
                         maxQty: isFishStockEnabled ? remainingStock : null,
-                        onIncrementQty: cartListener.incrementQty,
-                        onDecrementQty: cartListener.decrementQty,
+                        onIncrementQty: () {
+                          cartProvider.incrementQty();
+                        },
+                        onDecrementQty: () {
+                          cartProvider.decrementQty();
+                        },
                       ),
                     ],
                   ),
@@ -1061,10 +1081,6 @@ class AddToCartButton extends GetProviderView<CartProvider> {
   const AddToCartButton(this.product, {super.key, this.onValidationFailed});
 
   final ProductDataModel product;
-
-  /// Called when a required section is not satisfied. It should scroll the
-  /// sheet to the first invalid required section. Returns `true` when such a
-  /// section exists (so add-to-cart is blocked), `false` otherwise.
   final bool Function()? onValidationFailed;
 
   @override
@@ -1076,9 +1092,8 @@ class AddToCartButton extends GetProviderView<CartProvider> {
     final isFishStockEnabled =
         AppConfig.instance.businessType == BusinessType.fish &&
             product.stock?.activated == true;
-    final remainingStock = isFishStockEnabled
-        ? cartProvider.getRemainingFishStock(product)
-        : null;
+    final remainingStock =
+        isFishStockEnabled ? cartProvider.getRemainingFishStock(product) : null;
     final isOutOfStock = isFishStockEnabled && (remainingStock ?? 0) <= 0;
     final isAddDisabled = product.isAvailable == false || isOutOfStock;
 
@@ -1124,78 +1139,10 @@ class AddToCartButton extends GetProviderView<CartProvider> {
             ),
       label: !cartListener.addItemLoading
           ? Text(
-              isOutOfStock
-                  ? 'Out of Stock'
-                  : product.isAvailable == false
-                      ? 'Not Available'
-                      : 'Add To Cart',
+              product.isAvailable == false ? 'Not Available' : 'Add To Cart',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             )
           : showButtonProgress(Theme.of(context).colorScheme.onSurface),
-    );
-  }
-}
-
-class _FishStockStatusWidget extends StatelessWidget {
-  const _FishStockStatusWidget({
-    required this.product,
-    required this.availableStock,
-  });
-
-  final ProductDataModel product;
-  final int availableStock;
-
-  @override
-  Widget build(BuildContext context) {
-    final isOutOfStock = availableStock <= 0;
-    final isLowStock = !isOutOfStock && availableStock <= 5;
-
-    final color = isOutOfStock
-        ? Colors.red.shade50
-        : isLowStock
-            ? Colors.orange.shade50
-            : Colors.green.shade50;
-    final borderColor = isOutOfStock
-        ? Colors.red.shade200
-        : isLowStock
-            ? Colors.orange.shade200
-            : Colors.green.shade200;
-    final textColor = isOutOfStock
-        ? Colors.red.shade700
-        : isLowStock
-            ? Colors.orange.shade700
-            : Colors.green.shade700;
-    final icon = isOutOfStock
-        ? FluentIcons.box_24_regular
-        : isLowStock
-            ? FluentIcons.warning_24_regular
-            : FluentIcons.checkmark_circle_24_regular;
-
-    final label = isOutOfStock
-        ? 'Out of stock'
-        : isLowStock
-            ? 'Only $availableStock left'
-            : '$availableStock in stock';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color,
-        border: Border.all(color: borderColor),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: textColor),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style:
-                context.customTextTheme.text12W600.copyWith(color: textColor),
-          ),
-        ],
-      ),
     );
   }
 }

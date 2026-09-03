@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
 import 'package:customer_core/src/core/utils/utils.dart';
+import 'package:customer_core/src/presentation/widgets/stock_status_widget.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
@@ -49,11 +50,10 @@ class ProductDetailsTile extends StatelessWidget {
         ),
       ),
       child: InkWell(
-        onTap: onPressed,
-        child: AppConfig.instance.isCategoryImageEnabled
-            ? buildTileView2(context, isPlaceHolderUrl)
-            : buildTileView3(context),
-      ),
+          onTap: onPressed,
+          child: AppConfig.instance.isCategoryImageEnabled
+              ? buildTileView2(context, isPlaceHolderUrl)
+              : buildTileView3(context)),
     );
   }
 
@@ -233,65 +233,9 @@ class ProductDetailsTile extends StatelessWidget {
                       ],
                     ),
                     if (isFishStockEnabled)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isProductOutOfStock
-                                ? Colors.red.shade50
-                                : availableStock <= 5
-                                    ? Colors.orange.shade50
-                                    : Colors.green.shade50,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: isProductOutOfStock
-                                  ? Colors.red.shade200
-                                  : availableStock <= 5
-                                      ? Colors.orange.shade200
-                                      : Colors.green.shade200,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                isProductOutOfStock
-                                    ? FluentIcons.box_24_regular
-                                    : availableStock <= 5
-                                        ? FluentIcons.warning_24_regular
-                                        : FluentIcons
-                                            .checkmark_circle_24_regular,
-                                size: 12,
-                                color: isProductOutOfStock
-                                    ? Colors.red.shade700
-                                    : availableStock <= 5
-                                        ? Colors.orange.shade700
-                                        : Colors.green.shade700,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                isProductOutOfStock
-                                    ? 'Out of stock'
-                                    : availableStock <= 5
-                                        ? 'Only $availableStock left'
-                                        : '$availableStock in stock',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: isProductOutOfStock
-                                      ? Colors.red.shade700
-                                      : availableStock <= 5
-                                          ? Colors.orange.shade700
-                                          : Colors.green.shade700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      StockStatusWidget(
+                        isProductOutOfStock: isProductOutOfStock,
+                        availableStock: availableStock,
                       ),
                     if (isFishStockEnabled) verticalSpaceTiny,
                     Row(
@@ -586,65 +530,12 @@ class ProductDetailsTile extends StatelessWidget {
                     verticalSpaceSmall,
                   ],
                   verticalSpaceSmall,
-                  if (isFishStockEnabled) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isProductOutOfStock
-                            ? Colors.red.shade50
-                            : availableStock <= 5
-                                ? Colors.orange.shade50
-                                : Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(
-                          color: isProductOutOfStock
-                              ? Colors.red.shade200
-                              : availableStock <= 5
-                                  ? Colors.orange.shade200
-                                  : Colors.green.shade200,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isProductOutOfStock
-                                ? FluentIcons.box_24_regular
-                                : availableStock <= 5
-                                    ? FluentIcons.warning_24_regular
-                                    : FluentIcons.checkmark_circle_24_regular,
-                            size: 12,
-                            color: isProductOutOfStock
-                                ? Colors.red.shade700
-                                : availableStock <= 5
-                                    ? Colors.orange.shade700
-                                    : Colors.green.shade700,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            isProductOutOfStock
-                                ? 'Out of stock'
-                                : availableStock <= 5
-                                    ? 'Only $availableStock left'
-                                    : '$availableStock in stock',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: isProductOutOfStock
-                                  ? Colors.red.shade700
-                                  : availableStock <= 5
-                                      ? Colors.orange.shade700
-                                      : Colors.green.shade700,
-                            ),
-                          ),
-                        ],
-                      ),
+                  if (isFishStockEnabled)
+                    StockStatusWidget(
+                      isProductOutOfStock: isProductOutOfStock,
+                      availableStock: availableStock,
                     ),
-                    verticalSpaceTiny,
-                  ],
+                  if (isFishStockEnabled) verticalSpaceTiny,
                   product.isOfferPrice == 'Yes' &&
                           product.offerPriceDetails?.currentOfferPrice != null
                       ? RichText(

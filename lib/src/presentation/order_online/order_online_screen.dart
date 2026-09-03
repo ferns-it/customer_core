@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:auto_route/auto_route.dart';
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
+import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:customer_core/src/application/home/home_provider.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
@@ -246,32 +247,75 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text("TOTAL",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: AppColors.kGray,
-                                            fontWeight: FontWeight.w600,
-                                          )),
                                   Text(
-                                    cartListener.totalCartItems > 0
-                                        ? '${AppConfig.instance.country.symbol} ${cartListener.cartTotalPrice!.toStringAsFixed(AppConfig.instance.country.decimalPlaces)} | ${cartListener.totalCartItems} item(s)'
-                                        : '${AppConfig.instance.country.symbol} 0.00',
+                                    "TOTAL",
                                     style: Theme.of(context)
                                         .textTheme
-                                        .bodyLarge
+                                        .bodySmall
                                         ?.copyWith(
+                                          color: AppColors.kGray,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      cartListener.totalCartItems > 0
+                                          ? '${AppConfig.instance.country.symbol} ${cartListener.cartTotalPrice!.toStringAsFixed(AppConfig.instance.country.decimalPlaces)} | ${cartListener.totalCartItems} item(s)'
+                                          : '${AppConfig.instance.country.symbol} 0.00',
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.copyWith(
                                             fontWeight: FontWeight.w700,
                                             color:
                                                 Theme.of(context).brightness ==
                                                         Brightness.dark
                                                     ? Colors.white
-                                                    : null),
+                                                    : null,
+                                          ),
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
+                            // Expanded(
+                            //   child: Column(
+                            //     crossAxisAlignment: CrossAxisAlignment.start,
+                            //     mainAxisSize: MainAxisSize.min,
+                            //     children: [
+                            //       Text("TOTAL",
+                            //           style: Theme.of(context)
+                            //               .textTheme
+                            //               .bodySmall
+                            //               ?.copyWith(
+                            //                 color: AppColors.kGray,
+                            //                 fontWeight: FontWeight.w600,
+                            //               )),
+                            //       Text(
+                            //         maxLines: 1,
+                            //         softWrap: false,
+                            //         cartListener.totalCartItems > 0
+                            //             ? '${AppConfig.instance.country.symbol} ${cartListener.cartTotalPrice!.toStringAsFixed(AppConfig.instance.country.decimalPlaces)} | ${cartListener.totalCartItems} item(s)'
+                            //             : '${AppConfig.instance.country.symbol} 0.00',
+                            //         style: Theme.of(context)
+                            //             .textTheme
+                            //             .bodyLarge
+                            //             ?.copyWith(
+                            //                 fontWeight: FontWeight.w700,
+                            //                 color:
+                            //                     Theme.of(context).brightness ==
+                            //                             Brightness.dark
+                            //                         ? Colors.white
+                            //                         : null),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
+                            horizontalSpaceSmall,
                             FilledButton(
                               style: FilledButton.styleFrom(
                                 backgroundColor:

@@ -135,9 +135,6 @@ class QtyCounterButton2 extends StatefulWidget {
   final Widget? gap;
   final bool hideDefaultAddBtn;
   final int qty, previousQty;
-
-  /// Optional maximum quantity allowed by the +/- stepper (e.g. fish stock
-  /// limit). When set and [qty] reaches it, the '+' button is disabled.
   final int? maxQty;
 
   @override
@@ -170,7 +167,6 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
   }
 
   void decrementQty() {
-    if (widget.qty <= 1) return;
     _updateQty(isIncrement: false);
   }
 
@@ -189,14 +185,9 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
           mainAxisSize: MainAxisSize.min,
           children: [
             InkWell(
-              // Keep onTap non-null so a disabled button (qty <= 1) still
-              // consumes the tap instead of letting it fall through to the
-              // parent tile's InkWell (which would open the details sheet).
               onTap: decrementQty,
-              splashColor:
-                  isDecrementDisabled ? Colors.transparent : null,
-              highlightColor:
-                  isDecrementDisabled ? Colors.transparent : null,
+              splashColor: isDecrementDisabled ? Colors.transparent : null,
+              highlightColor: isDecrementDisabled ? Colors.transparent : null,
               child: Container(
                 width: 30,
                 height: 30,
@@ -221,13 +212,9 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
               ),
             ),
             InkWell(
-              // Keep onTap non-null (the guard lives inside incrementQty) so a
-              // disabled button doesn't let the tap fall through to the parent.
               onTap: incrementQty,
-              splashColor:
-                  isIncrementDisabled ? Colors.transparent : null,
-              highlightColor:
-                  isIncrementDisabled ? Colors.transparent : null,
+              splashColor: isIncrementDisabled ? Colors.transparent : null,
+              highlightColor: isIncrementDisabled ? Colors.transparent : null,
               child: Container(
                 width: 30,
                 height: 30,

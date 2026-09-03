@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
@@ -28,6 +29,7 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
     // final userListener = context.watch<UserProvider>();
     // final userProvider = context.read<UserProvider>();
     final shopProvider = context.read<ShopProvider>();
+    final productProvider = context.read<ProductsProvider>();
     // final shopListener = context.watch<ShopProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -59,6 +61,10 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
               itemCount: cartListener.cartItems.length,
               itemBuilder: (context, index) {
                 final product = cartListener.cartItems.elementAt(index);
+
+                final cartIndex = cartProvider.getProductCartIndex(product.pID);
+                final cartProduct = productProvider.productsList
+                    .firstOrNullWhere((p) => p.pID == product.pID);
                 return Dismissible(
                   background: Container(
                     padding: const EdgeInsets.only(right: 10.0),
@@ -406,8 +412,8 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                               cartProvider.clearSelectedAddress();
                               shopProvider.clearSelectedDeliverySlot();
                               cartProvider.clearDiscountValue();
-
-                              await cartProvider.incrementCartItemQty(index);
+                              await cartProvider.incrementCartItemQtyWithStockCheck(
+                                  cartIndex, cartProduct);
                               if (mounted) setState(() {});
                             }),
                         horizontalSpaceRegular

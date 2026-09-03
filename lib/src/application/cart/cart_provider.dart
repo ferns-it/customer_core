@@ -821,11 +821,15 @@ class CartProvider extends ChangeNotifier with BaseController {
   }
 
   /// Increment cart item quantity with automatic fish stock validation
-  Future<bool> incrementCartItemQtyWithStockCheck(
-      int index, ProductDataModel product) async {
+  ///
+  /// [product] is optional: when the product can't be resolved from the
+  /// current product list (e.g. the cart screen), the increment falls back
+  /// to the legacy behaviour without stock validation.
+  Future<bool> incrementCartItemQtyWithStockCheck(int index,
+      [ProductDataModel? product]) async {
     if (AppConfig.instance.businessType == BusinessType.fish &&
-        product.stock?.activated == true) {
-      final remainingStock = getRemainingFishStock(product);
+        product?.stock?.activated == true) {
+      final remainingStock = getRemainingFishStock(product!);
       return incrementCartItemQty(index, remainingStock: remainingStock);
     }
     return incrementCartItemQty(index);
@@ -898,15 +902,6 @@ class CartProvider extends ChangeNotifier with BaseController {
     if (_cartDetailsModel == null || _cartDeleteLoading == true) return false;
     final locatedCartItem = cartItems.elementAt(index);
     final newQty = (locatedCartItem.quantity ?? 0) + 1;
-
-    // Validate stock for fish products.
-    // `remainingStock` is the number of units that can STILL be added on top
-    // of what's already in the cart (see getRemainingFishStock), NOT the
-    // absolute max quantity. Therefore an increment is allowed while any
-    // stock remains: newQty must not exceed the current line quantity plus
-    // the remaining units. Comparing newQty against remainingStock directly
-    // would wrongly block the + button, e.g. stock=4, 2 already in cart,
-    // tapping + -> newQty=3 but 3 > remaining(2), even though total (3) <= 4.
     final currentItemQty = locatedCartItem.quantity ?? 0;
     if (remainingStock != null && newQty > currentItemQty + remainingStock) {
       AlertDialogs.showError('Sorry, this item is currently out of stock.');

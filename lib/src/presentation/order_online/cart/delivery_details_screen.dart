@@ -95,8 +95,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final taxDetails = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.taxDetails
         : cartListener.takeAwayDetails?.taxDetails;
-    final hasTaxAmount = 
-    cartListener.selectedOrderType == OrderType.delivery
+    final hasTaxAmount = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.hasTax
         : cartListener.takeAwayDetails?.hasTax;
 
@@ -118,6 +117,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         cartListener.deliveryDetails?.amountFormatted?.deliveryDiscount;
     final takeawayDiscount =
         cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount;
+    final isIndianUser =
+        userListener.userData?.user.isIndianUser ?? cartListener.isIndianUser;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -303,136 +304,6 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                     ),
                   ),
                 ),
-
-              // verticalSpaceSmall,
-              // Visibility(
-              //   visible: false,
-              //   child: Padding(
-              //     padding: const EdgeInsets.symmetric(
-              //       vertical: 16.0,
-              //       horizontal: 0.0,
-              //     ),
-              //     child: shopListener.selectedDate == null &&
-              //             shopListener.selectedDeliverySlot == null
-              //         ? InkWell(
-              //             onTap: () async {
-              //               shopProvider.onChangeOnSelectedDeliverySlot(null);
-
-              //               shopProvider.fetchShopDeliverySlots();
-
-              //               final selectedDate = await showDatePicker(
-              //                 context: context,
-              //                 initialDate: DateTime.now(),
-              //                 firstDate: DateTime.now(),
-              //                 lastDate: DateTime(2100),
-              //                 builder: (context, child) {
-              //                   return Theme(
-              //                     data: Theme.of(context).copyWith(
-              //                       colorScheme: const ColorScheme.light(
-              //                         primary: Theme.of(context).colorScheme.primary,
-              //                       ),
-              //                     ),
-              //                     child: child!,
-              //                   );
-              //                 },
-              //               );
-              //               if (selectedDate != null) {
-              //                 shopProvider.onChangeSelectedDate(selectedDate);
-              //                 await showSlotChooseSheet(context, shopProvider);
-              //               }
-              //             },
-              //             child: Row(
-              //               mainAxisSize: MainAxisSize.min,
-              //               mainAxisAlignment: MainAxisAlignment.start,
-              //               children: [
-              //                 const Icon(FluentIcons.calendar_clock_24_regular),
-              //                 const SizedBox(width: 8.0),
-              //                 // Add space between icon and text
-              //                 Flexible(
-              //                   child: Text(
-              //                     "Select Delivery Date & Time",
-              //                     style: context.customTextTheme.text16W600,
-              //                   ),
-              //                 ),
-              //               ],
-              //             ),
-              //           )
-              //         : Row(
-              //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //             crossAxisAlignment: CrossAxisAlignment.start,
-              //             children: [
-              //               Row(
-              //                 crossAxisAlignment: CrossAxisAlignment.start,
-              //                 children: [
-              //                   const Icon(FluentIcons.calendar_clock_24_regular),
-              //                   horizontalSpaceSmall,
-              //                   // Text(
-              //                   //     '${DateFormat.jm(shopListener.selectedDate)}'),
-
-              //                   Column(
-              //                     crossAxisAlignment: CrossAxisAlignment.start,
-              //                     children: [
-              //                       Text(
-              //                         'Delivery Date & Time',
-              //                         style: context.customTextTheme.text16W700,
-              //                       ),
-              //                       Text(
-              //                         shopListener.formattedSelectedDate,
-              //                         style: context.customTextTheme.text16W500,
-              //                       ),
-              //                       verticalSpaceTiny,
-              //                       shopListener.selectedDeliverySlot != null
-              //                           ? Text(
-              //                               "${shopListener.selectedDeliverySlot?.openingTime} - ${shopListener.selectedDeliverySlot?.closingTime}",
-              //                               style: context
-              //                                   .customTextTheme.text14W600,
-              //                             )
-              //                           : Text(
-              //                               'Not Selected',
-              //                               style: context
-              //                                   .customTextTheme.text14W400
-              //                                   .copyWith(
-              //                                       color: Colors.red.shade700),
-              //                             ),
-              //                     ],
-              //                   )
-              //                 ],
-              //               ),
-              //               InkWell(
-              //                   onTap: () async {
-              //                     shopProvider
-              //                         .onChangeOnSelectedDeliverySlot(null);
-              //                     shopProvider.fetchShopDeliverySlots();
-
-              //                     final selectedDate = await showDatePicker(
-              //                       context: context,
-              //                       initialDate: DateTime.now(),
-              //                       firstDate: DateTime.now(),
-              //                       lastDate: DateTime(2100),
-              //                       builder: (context, child) {
-              //                         return Theme(
-              //                           data: Theme.of(context).copyWith(
-              //                             colorScheme: const ColorScheme.light(
-              //                               primary: Theme.of(context).colorScheme.primary,
-              //                             ),
-              //                           ),
-              //                           child: child!,
-              //                         );
-              //                       },
-              //                     );
-              //                     if (selectedDate != null) {
-              //                       shopProvider
-              //                           .onChangeSelectedDate(selectedDate);
-              //                       await showSlotChooseSheet(
-              //                           context, shopProvider);
-              //                     }
-              //                   },
-              //                   child: Text('CHANGE',
-              //                       style: context.customTextTheme.text14W600)),
-              //             ],
-              //           ),
-              //   ),
-              // ),
               Card(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Padding(
@@ -541,65 +412,66 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                             ),
                           ),
                           horizontalSpaceRegular,
-                          Expanded(
-                            child: RadioListTile(
-                              visualDensity: VisualDensity.compact,
-                              selected: cartListener.selectedPaymentMethod ==
-                                  PaymentMethod.card,
+                          if (cartListener.isStripeEnabled || !isIndianUser)
+                            Expanded(
+                              child: RadioListTile(
+                                visualDensity: VisualDensity.compact,
+                                selected: cartListener.selectedPaymentMethod ==
+                                    PaymentMethod.card,
 
-                              selectedTileColor:
-                                  cartListener.selectedPaymentMethod ==
-                                          PaymentMethod.card
-                                      ? null
-                                      : AppColors.kWhite,
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: cartListener.selectedPaymentMethod ==
-                                          PaymentMethod.card
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Colors.grey,
-                                  width: 1.0,
+                                selectedTileColor:
+                                    cartListener.selectedPaymentMethod ==
+                                            PaymentMethod.card
+                                        ? null
+                                        : AppColors.kWhite,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: cartListener.selectedPaymentMethod ==
+                                            PaymentMethod.card
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Colors.grey,
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              // leading: Assets.icons.takeAway.image(
-                              //     height: 34.0,
-                              //     color: cartListener.selectedPaymentMethod ==
-                              //             PaymentMethod.card
-                              //         ? AppColors.kBlack2
-                              //         : AppColors.kGray2),
-                              title: Text(
-                                "Card",
-                                style:
-                                    context.customTextTheme.text14W600.copyWith(
-                                  color: cartListener.selectedPaymentMethod ==
-                                          PaymentMethod.card
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Colors.grey,
+                                // leading: Assets.icons.takeAway.image(
+                                //     height: 34.0,
+                                //     color: cartListener.selectedPaymentMethod ==
+                                //             PaymentMethod.card
+                                //         ? AppColors.kBlack2
+                                //         : AppColors.kGray2),
+                                title: Text(
+                                  "Card",
+                                  style: context.customTextTheme.text14W600
+                                      .copyWith(
+                                    color: cartListener.selectedPaymentMethod ==
+                                            PaymentMethod.card
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Colors.grey,
+                                  ),
                                 ),
+                                value: PaymentMethod.card,
+
+                                groupValue: cartListener.selectedPaymentMethod,
+                                activeColor:
+                                    Theme.of(context).colorScheme.primary,
+
+                                onChanged: (_) {
+                                  final isIndianUser = userListener
+                                          .userData?.user.isIndianUser ??
+                                      cartListener.isIndianUser;
+                                  if (!cartListener.isStripeEnabled ||
+                                      isIndianUser) {
+                                    AlertDialogs.showError(
+                                        'Card payment not available');
+                                    return;
+                                  }
+
+                                  cartListener.onChangePaymentMethod(
+                                      PaymentMethod.card);
+                                },
                               ),
-                              value: PaymentMethod.card,
-
-                              groupValue: cartListener.selectedPaymentMethod,
-                              activeColor:
-                                  Theme.of(context).colorScheme.primary,
-
-                              onChanged: (_) {
-                                final isIndianUser =
-                                    userListener.userData?.user.isIndianUser ??
-                                        cartListener.isIndianUser;
-                                if (!cartListener.isStripeEnabled ||
-                                    isIndianUser) {
-                                  AlertDialogs.showError(
-                                      'Card payment not available');
-                                  return;
-                                }
-
-                                cartListener
-                                    .onChangePaymentMethod(PaymentMethod.card);
-                              },
                             ),
-                          ),
                         ],
                       ),
                     ),

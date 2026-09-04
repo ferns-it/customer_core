@@ -504,6 +504,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
               //     ),
               //   ],
               // ),
+
               Container(
                 // height: context.heightPx * 0.3,
                 width: double.infinity,

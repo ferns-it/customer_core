@@ -1314,9 +1314,9 @@ class CartProvider extends ChangeNotifier with BaseController {
               : '';
           AlertDialogs.showError(
             '${error.message}\n'
-            'Calibrated distance: '
-            '${data?.calibratedDistance ?? data?.distanceInKm ?? 'N/A'}$unit\n'
-            'Maximum delivery radius: ${data?.maxDeliveryRadius}$unit',
+            'Your distance is '
+            '${data?.calibratedDistance ?? data?.distanceInKm ?? 'N/A'}$unit,'
+            ' while our delivery area covers up to ${data?.maxDeliveryRadius}$unit',
           );
         } else {
           AlertDialogs.showError(error.message);

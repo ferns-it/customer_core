@@ -42,11 +42,8 @@ class DishDetailBottomSheet extends StatelessWidget {
             product.stock?.activated == true;
     final remainingStock =
         isFishStockEnabled ? cartListener.getRemainingFishStock(product) : 0;
-    final availableStock = isFishStockEnabled
-        ? (remainingStock - cartListener.selectedItemQty > 0
-            ? remainingStock - cartListener.selectedItemQty
-            : 0)
-        : product.stock?.availableStock ?? 0;
+    final availableStock =
+        isFishStockEnabled ? remainingStock : product.stock?.availableStock ?? 0;
     final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
 
     return SafeArea(
@@ -84,7 +81,6 @@ class DishDetailBottomSheet extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // verticalSpaceTiny,
                       AppConfig.instance.isCategoryImageEnabled == true
                           ? _ProductImageWidget(product: product)
                           : SizedBox.shrink(),
@@ -93,7 +89,6 @@ class DishDetailBottomSheet extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
                         child: _ProductNameWidget(product: product),
                       ),
-                      // _RatingAndTimeWidget(product: product),
                       if (product.description != null &&
                           product.description!.isNotEmpty) ...[
                         verticalSpaceSmall,
@@ -246,10 +241,6 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
 
     return null;
   }
-
-  /// Scrolls the sheet to the first invalid required section.
-  /// Returns `true` when such a section exists (and add-to-cart should be
-  /// blocked), `false` when everything required is satisfied.
   bool _scrollToFirstInvalidSection(CartProvider cart) {
     final key = _firstInvalidSectionKey(cart);
     if (key == null) return false;
@@ -281,8 +272,7 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
             ? remainingStock - cartListener.selectedItemQty
             : 0)
         : product.stock?.availableStock ?? 0;
-    final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
-
+    final isProductOutOfStock = isFishStockEnabled && remainingStock <= 0;
     final baseTextTheme = Theme.of(context).textTheme;
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
 
@@ -589,8 +579,6 @@ class _ProductNameWidget extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                     boxShadow: [
-                      // BoxShadow(
-                      //     color: Colors.black.withOpacity(0.12), blurRadius: 6)
                       BoxShadow(
                         color: Colors.black.withOpacity(0.10),
                         blurRadius: 4,
@@ -616,10 +604,6 @@ class _ProductNameWidget extends StatelessWidget {
                           color: Colors.red,
                         ),
                       ),
-                    // Text(
-                    //   spiceLevelIcon,
-                    //   style: TextStyle(fontSize: 12, color: Colors.red),
-                    // ),
                     horizontalSpaceTiny,
                     Text(
                       spiceLevel,
@@ -639,48 +623,6 @@ class _ProductNameWidget extends StatelessWidget {
     );
   }
 }
-
-// class _RatingAndTimeWidget extends StatelessWidget {
-//   final ProductDataModel product;
-
-//   const _RatingAndTimeWidget({required this.product});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       mainAxisAlignment: MainAxisAlignment.start,
-//       children: [
-//         const Icon(
-//           Icons.star,
-//           color: AppColors.kSunRiseOrange,
-//           size: 16,
-//         ),
-//         horizontalSpaceTiny,
-//         Text(
-//           '4.5',
-//           style: context.customTextTheme.text14W700
-//               .copyWith(color: AppColors.kGray),
-//         ),
-//         horizontalSpaceSmall,
-//         const Icon(
-//           Icons.history,
-//           size: 16,
-//         ),
-//         horizontalSpaceTiny,
-//         Text(
-//           '26 mins',
-//           style: context.customTextTheme.text14W700
-//               .copyWith(color: AppColors.kGray),
-//         ),
-//         horizontalSpaceSmall,
-//         product.type == "veg"
-//             ? Assets.icons.veg.svg()
-//             : Assets.icons.nonVeg.svg(),
-//       ],
-//     );
-//   }
-// }
-
 class _DescriptionWidget extends StatelessWidget {
   final ProductDataModel product;
 
@@ -755,18 +697,11 @@ class _OrderSectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cartProvider = context.read<CartProvider>();
-    final cartListener = context.watch<CartProvider>();
     final isFishStockEnabled =
         AppConfig.instance.businessType == BusinessType.fish &&
             product.stock?.activated == true;
     final availableStock =
         isFishStockEnabled ? cartProvider.getRemainingFishStock(product) : 0;
-    final isOutOfStock = isFishStockEnabled && availableStock <= 0;
-    final hasInsufficientStock =
-        isFishStockEnabled && cartListener.selectedItemQty > availableStock;
-    final isAddDisabled =
-        product.isAvailable == false || isOutOfStock || hasInsufficientStock;
-    final navigator = Navigator.of(context);
     final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
     final isProductUnavailable =
         product.isAvailable == false || isProductOutOfStock;
@@ -860,8 +795,6 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
   Widget build(BuildContext context) {
     final cartProvider = notifier(context);
     final cartListener = listener(context);
-    final themeListener = context.watch<ThemeProvider>();
-
     if (!item.hasMultipleVariation) {
       return const SizedBox.shrink();
     }
@@ -958,8 +891,6 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final cartProvider = notifier(context);
-    final themeListener = context.watch<ThemeProvider>();
-
     return Column(
       children: [
         Column(

@@ -142,6 +142,7 @@ class QtyCounterButton2 extends StatefulWidget {
     this.previousQty = -1,
     this.gap,
     this.maxQty,
+    this.allowDecrementAtMinimum = false,
   });
 
   final VoidCallback? onDecrementQty;
@@ -150,6 +151,7 @@ class QtyCounterButton2 extends StatefulWidget {
   final bool hideDefaultAddBtn;
   final int qty, previousQty;
   final int? maxQty;
+  final bool allowDecrementAtMinimum;
 
   @override
   State<QtyCounterButton2> createState() => _QtyCounterButton2State();
@@ -179,25 +181,14 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
     _isAnimating = true;
     HapticFeedback.lightImpact();
 
-    final nextQty = isIncrement ? _displayQty + 1 : _displayQty - 1;
-    final isDecrementDisabled = _displayQty <= 1;
+    final isDecrementDisabled =
+        widget.allowDecrementAtMinimum ? _displayQty <= 0 : _displayQty <= 1;
     final isIncrementDisabled =
         widget.maxQty != null && _displayQty >= widget.maxQty!;
-
     if (isIncrement && !isIncrementDisabled) {
-      setState(() {
-        _displayQty = nextQty;
-      });
-      if (widget.onIncrementQty != null) {
-        widget.onIncrementQty!();
-      }
+      if (widget.onIncrementQty != null) widget.onIncrementQty!();
     } else if (!isIncrement && !isDecrementDisabled) {
-      setState(() {
-        _displayQty = nextQty;
-      });
-      if (widget.onDecrementQty != null) {
-        widget.onDecrementQty!();
-      }
+      if (widget.onDecrementQty != null) widget.onDecrementQty!();
     }
 
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -206,7 +197,7 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
   }
 
   void incrementQty() {
-    if (widget.maxQty != null && widget.qty >= widget.maxQty!) return;
+    if (widget.maxQty != null && _displayQty >= widget.maxQty!) return;
     _updateQty(isIncrement: true);
   }
 
@@ -216,7 +207,8 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
 
   @override
   Widget build(BuildContext context) {
-    final isDecrementDisabled = _displayQty <= 1;
+    final isDecrementDisabled =
+        widget.allowDecrementAtMinimum ? _displayQty <= 0 : _displayQty <= 1;
     final isIncrementDisabled =
         widget.maxQty != null && _displayQty >= widget.maxQty!;
 

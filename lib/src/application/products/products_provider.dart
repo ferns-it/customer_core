@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
+import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
@@ -41,6 +42,13 @@ class ProductsProvider extends ChangeNotifier with BaseController {
 
   List<ProductDataModel> get productsList =>
       _productsListAPIResponse.data ?? [];
+
+  ProductDataModel overlayStockFromProductsList(ProductDataModel product) {
+    if (product.pID == null) return product;
+    final source = productsList.firstOrNullWhere((p) => p.pID == product.pID);
+    if (source == null || source.stock == null) return product;
+    return product.copyWith(stock: source.stock);
+  }
 
   List<ProductDataModel> _productsCollection = [];
 
@@ -648,17 +656,12 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     _productsCollection.clear();
     // _selectedFoodType = FoodType.nonVeg;
   }
-
-  /// Removes the previously logged-in user's favourite marks from all in-memory
-  /// product lists so they don't leak into the next user/session (e.g. after a
-  /// logout followed by another login).
   void resetSessionData() {
     List<ProductDataModel> stripFavourites(List<ProductDataModel> products) =>
         products
-            .map((p) =>
-                (p.isFavourite || (p.favouriteID?.isNotEmpty ?? false))
-                    ? p.copyWith(isFavourite: false, favouriteID: '')
-                    : p)
+            .map((p) => (p.isFavourite || (p.favouriteID?.isNotEmpty ?? false))
+                ? p.copyWith(isFavourite: false, favouriteID: '')
+                : p)
             .toList();
 
     _favouriteProductResponse = APIResponse.initial();

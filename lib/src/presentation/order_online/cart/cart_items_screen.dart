@@ -123,14 +123,12 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: context
-                                                    .customTextTheme.text16W700
-                                                    .copyWith(
-                                                        fontSize: 14,
-                                                        color: context
-                                                            .customTextTheme
-                                                            .color),
-                                              ),
-                                              product.amountDetails
+                                                  .customTextTheme.text16W700
+                                                  .copyWith(
+                                                    fontSize: 14,
+                                                    color: context
+                                                      .customTextTheme.color),),
+                                                product.amountDetails
                                                           ?.isOfferApplied ==
                                                       true
                                                   ? Row(children: [
@@ -398,6 +396,9 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                         ),
                         const Spacer(),
                         QtyCounterButton2(
+                            maxQty: AppConfig.instance.businessType == BusinessType.fish && cartProduct?.stock?.activated == true
+                                ? (product.quantity ?? 0) + cartProvider.getRemainingFishStock(cartProduct!)
+                                : null,
                             onDecrementQty: () async {
                               cartProvider.clearSelectedAddressSecondary();
                               cartProvider.clearSelectedAddress();
@@ -412,8 +413,9 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                               cartProvider.clearSelectedAddress();
                               shopProvider.clearSelectedDeliverySlot();
                               cartProvider.clearDiscountValue();
-                              await cartProvider.incrementCartItemQtyWithStockCheck(
-                                  cartIndex, cartProduct);
+                              await cartProvider
+                                  .incrementCartItemQtyWithStockCheck(
+                                      cartIndex, cartProduct);
                               if (mounted) setState(() {});
                             }),
                         horizontalSpaceRegular

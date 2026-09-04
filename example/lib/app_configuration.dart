@@ -5,7 +5,6 @@ final appConfig = AppConfig(
   applicationName: 'Le Arabia Customer',
   shopName: 'Le Arabia',
   shopId: '95',
-  // shopId: '93',
   country: Country.ind,
   env: AppEnv.prod,
   shopIdentifier: 'le-arabia',
@@ -35,7 +34,7 @@ final appConfig = AppConfig(
 final uiConfig = UiConfig(
   logo: 'assets/images/urban spice logo.png',
   bgImage: 'assets/images/urban spicebg.png',
-  logoWithoutBackground: 'assets/images/urban spicebg.png',
+  logoWithoutBackground: 'assets/images/urban spice logo.png',
   bannerImages: [
     "assets/images/banner1.png",
     "assets/images/banner2.png",

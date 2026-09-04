@@ -561,9 +561,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       .productsListRandom
                                       .getRange(8, 12)
                                       .elementAt(index);
-                                  final isExist =
-                                      cartProvider.isProductExist(product.pID);
-                                  final productQtyUpdated = cartProvider
+                                  final isExist = context
+                                      .watch<CartProvider>()
+                                      .isProductExist(product.pID);
+                                  final productQtyUpdated = context
+                                      .watch<CartProvider>()
                                       .getProductQuantity(product.pID);
                                   final cartIndex = cartProvider
                                       .getProductCartIndex(product.pID);
@@ -586,6 +588,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                     },
                                     secondaryWidget: QtyCounterButton2(
                                         qty: productQtyUpdated,
+                                        allowDecrementAtMinimum: true,
                                         onDecrementQty: () {
                                           cartProvider
                                               .decrementCartItemQty(cartIndex);
@@ -698,6 +701,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                             secondaryWidget: QtyCounterButton2(
                                 qty: cartProvider
                                     .getProductQuantity(product.pID),
+                                allowDecrementAtMinimum: true,
                                 onDecrementQty: () {
                                   cartProvider.decrementCartItemQty(cartIndex);
                                   cartProvider.clearSelectedAddressSecondary();
@@ -779,9 +783,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               shrinkWrap: true,
                               itemBuilder: (context, index) {
                                 final product = products.elementAt(index);
-                                final isExist =
-                                    cartProvider.isProductExist(product.pID);
-                                final productQtyUpdated = cartProvider
+                                final isExist = context
+                                    .watch<CartProvider>()
+                                    .isProductExist(product.pID);
+                                final productQtyUpdated = context
+                                    .watch<CartProvider>()
                                     .getProductQuantity(product.pID);
                                 final cartIndex = cartProvider
                                     .getProductCartIndex(product.pID);
@@ -804,6 +810,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                   },
                                   secondaryWidget: QtyCounterButton2(
                                       qty: productQtyUpdated,
+                                      allowDecrementAtMinimum: true,
                                       onDecrementQty: () {
                                         cartProvider
                                             .decrementCartItemQty(cartIndex);
@@ -1357,10 +1364,14 @@ class __SearchResultsState extends State<_SearchResults> {
                     final cartIndex =
                         cartProvider.getProductCartIndex(product.pID);
 
-                    return ProductDetailsTile(product,
+                    final stockAwareProduct = context
+                        .read<ProductsProvider>()
+                        .overlayStockFromProductsList(product);
+
+                    return ProductDetailsTile(stockAwareProduct,
                         showFavIcon: cartListener.isUserLoggedIn,
                         onPressed: () {
-                          showItemDetailsBottomSheet(product);
+                          showItemDetailsBottomSheet(stockAwareProduct);
                         },
                         useSecondaryWidget: isExist,
                         onPressFavouriteBtn: () async {
@@ -1387,13 +1398,14 @@ class __SearchResultsState extends State<_SearchResults> {
                           //     cartProvider.resetValues();
                           //   }
                           // });
-                          showAddItemBottomSheet(product);
+                          showAddItemBottomSheet(stockAwareProduct);
                         },
                         secondaryWidget: QtyCounterButton2(
                           qty: productQtyUpdated,
+                          allowDecrementAtMinimum: true,
                           onIncrementQty: () {
                             cartProvider.incrementCartItemQtyWithStockCheck(
-                                cartIndex, product);
+                                cartIndex, stockAwareProduct);
                           },
                           onDecrementQty: () {
                             cartProvider.decrementCartItemQty(cartIndex);

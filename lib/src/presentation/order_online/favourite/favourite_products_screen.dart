@@ -73,27 +73,34 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
                 final product = productListner
                     .favouriteProductResponse.data?.favouriteList?.productList
                     .elementAt(index);
-                final isExist = cartProvider.isProductExist(product?.pID);
-                final productQtyUpdated =
-                    cartProvider.getProductQuantity(product?.pID);
+                final isExist =
+                    context.watch<CartProvider>().isProductExist(product?.pID);
+                final productQtyUpdated = context
+                    .watch<CartProvider>()
+                    .getProductQuantity(product?.pID);
                 final cartIndex =
                     cartProvider.getProductCartIndex(product?.pID);
                 if (product == null) {
                   return const SizedBox.shrink();
                 }
 
+                final stockAwareProduct =
+                    productProvider.overlayStockFromProductsList(product);
+
                 return ProductDetailsTile(
                   showFavIcon: cartListener.isUserLoggedIn,
-                  product,
+                  stockAwareProduct,
                   secondaryWidget: QtyCounterButton2(
                       qty: productQtyUpdated,
+                      allowDecrementAtMinimum: true,
                       onDecrementQty: () {
                         cartProvider.decrementCartItemQty(cartIndex);
                         cartProvider.clearSelectedAddressSecondary();
                         cartProvider.clearSelectedAddress();
                       },
                       onIncrementQty: () {
-                        cartProvider.incrementCartItemQty(cartIndex);
+                        cartProvider.incrementCartItemQtyWithStockCheck(
+                            cartIndex, stockAwareProduct);
                         cartProvider.clearSelectedAddressSecondary();
                         cartProvider.clearSelectedAddress();
                       }),
@@ -108,7 +115,7 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
                     }
                   },
                   onPressed: () {
-                    showItemDetailsBottomSheet(product, context);
+                    showItemDetailsBottomSheet(stockAwareProduct, context);
                   },
                   onPressAddBtn: () {
                     if (product.pID == null) return;
@@ -123,7 +130,7 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
                     //     cartProvider.resetValues();
                     //   }
                     // });
-                    showAddItemBottomSheet(product, context);
+                    showAddItemBottomSheet(stockAwareProduct, context);
                   },
                 );
               },

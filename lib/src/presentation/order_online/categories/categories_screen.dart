@@ -441,10 +441,12 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                               }
                               final product =
                                   productListener.productsList.elementAt(index);
-                              final isExist =
-                                  cartProvider.isProductExist(product.pID);
-                              final productQtyUpdated =
-                                  cartProvider.getProductQuantity(product.pID);
+                              final isExist = context
+                                  .watch<CartProvider>()
+                                  .isProductExist(product.pID);
+                              final productQtyUpdated = context
+                                  .watch<CartProvider>()
+                                  .getProductQuantity(product.pID);
                               final cartIndex =
                                   cartProvider.getProductCartIndex(product.pID);
                               return ProductDetailsTile(
@@ -452,6 +454,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                 product,
                                 secondaryWidget: QtyCounterButton2(
                                     qty: productQtyUpdated,
+                                    allowDecrementAtMinimum: true,
                                     onDecrementQty: () {
                                       cartProvider
                                           .decrementCartItemQty(cartIndex);
@@ -462,7 +465,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                     },
                                     onIncrementQty: () {
                                       cartProvider
-                                          .incrementCartItemQty(cartIndex);
+                                          .incrementCartItemQtyWithStockCheck(
+                                              cartIndex, product);
                                       cartProvider
                                           .clearSelectedAddressSecondary();
                                       cartProvider.clearSelectedAddress();

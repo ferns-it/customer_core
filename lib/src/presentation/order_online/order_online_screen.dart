@@ -384,7 +384,7 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
 
   Widget buildDeleteConfirmUI(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.black

@@ -296,6 +296,7 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
             controller: controller,
             onChanged: (value) {},
             decoration: InputDecoration(
+              errorMaxLines: 2,
               label: Text(hintText),
               labelStyle: context.customTextTheme.text14W500
                   .copyWith(color: AppColors.kGray),

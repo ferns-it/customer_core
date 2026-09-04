@@ -61,21 +61,14 @@ class _CartScreenState extends State<CartScreen>
   Widget build(BuildContext context) {
     final cartProvider = context.read<CartProvider>();
     final cartListener = context.watch<CartProvider>();
-    final paymentProvider = context.read<PaymentProvider>();
-
     final shopProvider = context.read<ShopProvider>();
-    final shopListener = context.watch<ShopProvider>();
-
-    final orderProvider = context.read<OrderProvider>();
-
-    final userListener = context.read<UserProvider>();
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isCartInProgress = cartListener.cartLoading ||
+        cartListener.cartTransferring ||
+        cartListener.deliveryOrTakeAwayChargeCalculating ||
+        cartListener.isClearCartProgress;
 
-    // const outlinedBorder = OutlineInputBorder(
-    //   borderSide: BorderSide(color: Colors.transparent),
-    // );
-
+    final showEmptyCartState = cartListener.isCartEmpty && !isCartInProgress;
     return PopScope(
       // ignore: deprecated_member_use
       onPopInvoked: (_) {
@@ -99,7 +92,7 @@ class _CartScreenState extends State<CartScreen>
           bottomSheet: _buildBottomSheet(
               cartListener, context, cartProvider, shopProvider),
           floatingActionButton: _buildFloatingActionButton(context),
-          body: cartListener.isCartEmpty
+          body: showEmptyCartState
               ? _buildIsEmptyWidget(context)
               : Stack(
                   children: [
@@ -188,7 +181,8 @@ class _CartScreenState extends State<CartScreen>
                       builder: (context, value, value2, child) => Visibility(
                         visible: value.cartTransferring ||
                             value2.isUserAddressListLoading ||
-                            value.deliveryOrTakeAwayChargeCalculating,
+                            value.deliveryOrTakeAwayChargeCalculating ||
+                            (value.cartLoading && value.isCartEmpty),
                         child: Positioned.fill(
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10),

@@ -356,6 +356,10 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   bool get cartTransferring => _cartTransferring;
 
+  int _cartRequestVersion = 0;
+
+  int _nextCartRequestVersion() => ++_cartRequestVersion;
+
   int _selectedCartTabbarIndex = 0;
   int get selectedCartTabbarIndex => _selectedCartTabbarIndex;
 
@@ -829,7 +833,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     return incrementCartItemQty(index);
   }
 
-  Future<void> listCartItems() async {
+  Future<void> listCartItems({int? requestVersion}) async {
+    final activeVersion = requestVersion ?? _nextCartRequestVersion();
     try {
       final isLogged = await checkUserIsLogged();
       if (!isLogged) {
@@ -839,7 +844,9 @@ class CartProvider extends ChangeNotifier with BaseController {
         }
       }
       _cartLoading = true;
-      notifyListeners();
+      if (activeVersion == _cartRequestVersion) {
+        notifyListeners();
+      }
       final userData = await getUserData();
 
       final response = await cartRepo.listCartItems(
@@ -847,6 +854,7 @@ class CartProvider extends ChangeNotifier with BaseController {
       response.fold((exception) {
         log(exception.toString());
       }, (result) {
+        if (activeVersion != _cartRequestVersion) return;
         _cartDetailsModel = result;
         if (isIndianUser && _selectedPaymentMethod == PaymentMethod.card) {
           _selectedPaymentMethod = PaymentMethod.cash;
@@ -854,8 +862,10 @@ class CartProvider extends ChangeNotifier with BaseController {
         notifyListeners();
       });
     } finally {
-      _cartLoading = false;
-      notifyListeners();
+      if (activeVersion == _cartRequestVersion) {
+        _cartLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -902,7 +912,8 @@ class CartProvider extends ChangeNotifier with BaseController {
       return false;
     }
 
-    _updateQty(locatedCartItem, newQty);
+    final mutationVersion = _nextCartRequestVersion();
+    _updateQty(locatedCartItem, newQty, requestVersion: mutationVersion);
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
@@ -1011,7 +1022,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     }
     final newQty = prevQty - 1;
 
-    _updateQty(locatedCartItem, newQty);
+    final mutationVersion = _nextCartRequestVersion();
+    _updateQty(locatedCartItem, newQty, requestVersion: mutationVersion);
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
@@ -1168,11 +1180,13 @@ class CartProvider extends ChangeNotifier with BaseController {
     );
   }
 
-  void _updateQty(CartItemDataModel cartItem, int newQty) async {
+  void _updateQty(CartItemDataModel cartItem, int newQty,
+      {int? requestVersion}) async {
     if (cartItem.pID == null || cartItem.cartID == null) {
       AlertDialogs.showError("Invalid cart item");
       return;
     }
+    final activeVersion = requestVersion ?? _nextCartRequestVersion();
     final isLogged = await checkUserIsLogged();
     if (!isLogged) {
       if (_guestID == null) {
@@ -1190,12 +1204,12 @@ class CartProvider extends ChangeNotifier with BaseController {
     final response = await cartRepo.updateCartItem(cartItem.cartID!, payload,
         isGuest: !isLogged, guestID: _guestID, userID: userData?.user.userID);
     response.fold(() {
-      // Refresh the cart with server-authoritative amounts after a quantity
-      // change so the displayed totals update immediately & correctly
-      // (offers/addons/rounding are computed on the server).
-      listCartItems();
+      if (activeVersion != _cartRequestVersion) return;
+      listCartItems(requestVersion: activeVersion);
     }, (error) {
-      AlertDialogs.showError(error.message);
+      if (activeVersion == _cartRequestVersion) {
+        AlertDialogs.showError(error.message);
+      }
     });
   }
 

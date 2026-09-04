@@ -160,7 +160,7 @@ class Utils {
 
     if (country == Country.ind) {
       if (!RegExp(r'^[1-9][0-9]{5}$').hasMatch(postcode)) {
-        return 'Enter a valid Indian PIN';
+        return 'Enter a valid Indian postcode';
       }
     } else if (country == Country.uk) {
       final ukPostcode = postcode.toUpperCase();

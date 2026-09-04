@@ -28,18 +28,32 @@ class QtyCounterButton extends StatefulWidget {
 class _QtyCounterButtonState extends State<QtyCounterButton> {
   // late int _previousQty;
   bool _isAnimating = false;
+  late int _displayQty;
 
-  // @override
-  // void initState() {
-  //   _previousQty = widget.previousQty;
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    _displayQty = widget.qty;
+  }
+
+  @override
+  void didUpdateWidget(covariant QtyCounterButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.qty != widget.qty) {
+      _displayQty = widget.qty;
+    }
+  }
 
   void _updateQty({required bool isIncrement}) {
     if (_isAnimating) return;
 
     _isAnimating = true;
     HapticFeedback.vibrate();
+
+    final nextQty = isIncrement ? _displayQty + 1 : _displayQty - 1;
+    setState(() {
+      _displayQty = nextQty;
+    });
 
     if (isIncrement && widget.onIncrementQty != null) {
       widget.onIncrementQty!();
@@ -91,7 +105,7 @@ class _QtyCounterButtonState extends State<QtyCounterButton> {
               ),
             ),
             Text(
-              "${widget.qty}",
+              "$_displayQty",
               style: context.customTextTheme.text14W700.copyWith(
                 color: Colors.white,
               ),
@@ -143,6 +157,21 @@ class QtyCounterButton2 extends StatefulWidget {
 
 class _QtyCounterButton2State extends State<QtyCounterButton2> {
   bool _isAnimating = false;
+  late int _displayQty;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayQty = widget.qty;
+  }
+
+  @override
+  void didUpdateWidget(covariant QtyCounterButton2 oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.qty != widget.qty) {
+      _displayQty = widget.qty;
+    }
+  }
 
   void _updateQty({required bool isIncrement}) {
     if (_isAnimating) return;
@@ -150,10 +179,25 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
     _isAnimating = true;
     HapticFeedback.lightImpact();
 
-    if (isIncrement && widget.onIncrementQty != null) {
-      widget.onIncrementQty!();
-    } else if (!isIncrement && widget.onDecrementQty != null) {
-      widget.onDecrementQty!();
+    final nextQty = isIncrement ? _displayQty + 1 : _displayQty - 1;
+    final isDecrementDisabled = _displayQty <= 1;
+    final isIncrementDisabled =
+        widget.maxQty != null && _displayQty >= widget.maxQty!;
+
+    if (isIncrement && !isIncrementDisabled) {
+      setState(() {
+        _displayQty = nextQty;
+      });
+      if (widget.onIncrementQty != null) {
+        widget.onIncrementQty!();
+      }
+    } else if (!isIncrement && !isDecrementDisabled) {
+      setState(() {
+        _displayQty = nextQty;
+      });
+      if (widget.onDecrementQty != null) {
+        widget.onDecrementQty!();
+      }
     }
 
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -172,9 +216,9 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
 
   @override
   Widget build(BuildContext context) {
-    final isDecrementDisabled = widget.qty <= 1;
+    final isDecrementDisabled = _displayQty <= 1;
     final isIncrementDisabled =
-        widget.maxQty != null && widget.qty >= widget.maxQty!;
+        widget.maxQty != null && _displayQty >= widget.maxQty!;
 
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -185,7 +229,7 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
           mainAxisSize: MainAxisSize.min,
           children: [
             InkWell(
-              onTap: decrementQty,
+              onTap: isDecrementDisabled ? null : decrementQty,
               splashColor: isDecrementDisabled ? Colors.transparent : null,
               highlightColor: isDecrementDisabled ? Colors.transparent : null,
               child: Container(
@@ -206,13 +250,13 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
               ),
             ),
             Text(
-              "${widget.qty}",
+              "$_displayQty",
               style: context.customTextTheme.text14W700.copyWith(
                 color: context.customTextTheme.color,
               ),
             ),
             InkWell(
-              onTap: incrementQty,
+              onTap: isIncrementDisabled ? null : incrementQty,
               splashColor: isIncrementDisabled ? Colors.transparent : null,
               highlightColor: isIncrementDisabled ? Colors.transparent : null,
               child: Container(

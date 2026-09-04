@@ -334,16 +334,19 @@ class ProfileScreen extends GetProviderView<UserProvider> {
             return orderProvider.getActiveOrders.isEmpty
                 ? _buildNoOrderWidget(context)
                 : SingleChildScrollView(
-                    child: Column(
-                      children: orderProvider.getActiveOrders
-                          .map((e) => InkWell(
-                              onTap: () {
-                                orderProvider.updateViewOrderId(e.orderID!);
-                                context.router
-                                    .push(const ViewOrderScreenRoute());
-                              },
-                              child: historyOrderCard2(e, context)))
-                          .toList(),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 50.0),
+                      child: Column(
+                        children: orderProvider.getActiveOrders
+                            .map((e) => InkWell(
+                                onTap: () {
+                                  orderProvider.updateViewOrderId(e.orderID!);
+                                  context.router
+                                      .push(const ViewOrderScreenRoute());
+                                },
+                                child: historyOrderCard2(e, context)))
+                            .toList(),
+                      ),
                     ),
                   );
           },

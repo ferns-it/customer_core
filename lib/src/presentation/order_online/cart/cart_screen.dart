@@ -147,8 +147,9 @@ class _CartScreenState extends State<CartScreen>
                                   cartProvider.onchangeCartTabbarIndex(value);
                                 },
                                 controller: cartProvider.tabController,
-                                labelColor:
-                                    Theme.of(context).colorScheme.primary,
+                                labelColor: isDark
+                                    ? AppColors.kWhite
+                                    : Theme.of(context).colorScheme.primary,
                                 labelStyle: const TextStyle(
                                     fontWeight: FontWeight.w600),
                                 unselectedLabelColor: Colors.grey.shade400,
@@ -1679,7 +1680,7 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                                 : 12,
                           ),
                         ],
-                        autovalidateMode: AutovalidateMode.disabled,
+                        autovalidateMode: AutovalidateMode.onUnfocus,
                         decoration: InputDecoration(
                           // hintStyle: TextStyle(color: Colors.grey),
                           labelStyle: const TextStyle(color: Colors.grey),
@@ -2038,7 +2039,7 @@ class _MobileVerificationDialogContentState
                         shopProvider.selectedCountry?.code == "+91" ? 10 : 12,
                       ),
                     ],
-                    autovalidateMode: AutovalidateMode.disabled,
+                    autovalidateMode: AutovalidateMode.onUnfocus,
                     decoration: InputDecoration(
                       labelStyle: const TextStyle(color: Colors.grey),
                       labelText: 'Mobile Number',

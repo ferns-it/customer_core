@@ -16,7 +16,8 @@ class CustomTextField extends StatelessWidget {
       this.onChanged,
       this.obscureText,
       this.textColor,
-      this.fillColor});
+      this.fillColor,
+      this.enabled});
 
   final Widget? prefixIcon;
   final Widget? suffixIcon;
@@ -30,9 +31,11 @@ class CustomTextField extends StatelessWidget {
   void Function(String)? onChanged;
   final Color? fillColor;
   final Color? textColor;
+  final bool? enabled;
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      enabled: enabled ?? true,
       style: TextStyle(
         color: textColor ?? AppColors.kBlack,
       ),
@@ -41,7 +44,7 @@ class CustomTextField extends StatelessWidget {
       textInputAction: textInputAction,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters ?? [],
-      autovalidateMode: AutovalidateMode.disabled,
+      autovalidateMode: AutovalidateMode.onUnfocus,
       validator: validator,
       obscureText: obscureText ?? false,
       decoration: InputDecoration(

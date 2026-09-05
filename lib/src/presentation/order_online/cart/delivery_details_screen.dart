@@ -392,14 +392,19 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                     context.customTextTheme.text14W600.copyWith(
                                   color: cartListener.selectedPaymentMethod ==
                                           PaymentMethod.cash
-                                      ? Theme.of(context).colorScheme.primary
+                                      ? isDark
+                                          ? AppColors.kWhite
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .primary
                                       : Colors.grey,
                                 ),
                               ),
                               value: PaymentMethod.cash,
                               groupValue: cartListener.selectedPaymentMethod,
-                              activeColor:
-                                  Theme.of(context).colorScheme.primary,
+                              activeColor: isDark
+                                  ? AppColors.kWhite
+                                  : Theme.of(context).colorScheme.primary,
                               onChanged: (_) {
                                 if (!cartListener.isCODEnabled) {
                                   AlertDialogs.showInfo(
@@ -446,7 +451,11 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                       .copyWith(
                                     color: cartListener.selectedPaymentMethod ==
                                             PaymentMethod.card
-                                        ? Theme.of(context).colorScheme.primary
+                                        ? isDark
+                                            ? AppColors.kWhite
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .primary
                                         : Colors.grey,
                                   ),
                                 ),
@@ -706,13 +715,17 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                 leading: Assets.lib.assets.icons.fastDelivery.image(
                     height: 34.0,
                     color: cartListener.selectedOrderType == OrderType.delivery
-                        ? Theme.of(context).colorScheme.primary
+                        ? isDark
+                            ? AppColors.kWhite
+                            : Theme.of(context).colorScheme.primary
                         : Colors.grey),
                 title: Text(
                   "Delivery",
                   style: context.customTextTheme.text14W600.copyWith(
                     color: cartListener.selectedOrderType == OrderType.delivery
-                        ? Theme.of(context).colorScheme.primary
+                        ? isDark
+                            ? AppColors.kWhite
+                            : Theme.of(context).colorScheme.primary
                         : Colors.grey,
                   ),
                 ),
@@ -744,13 +757,17 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                 leading: Assets.lib.assets.icons.takeAway.image(
                     height: 34.0,
                     color: cartListener.selectedOrderType == OrderType.takeaway
-                        ? Theme.of(context).colorScheme.primary
+                        ? isDark
+                            ? AppColors.kWhite
+                            : Theme.of(context).colorScheme.primary
                         : Colors.grey),
                 title: Text(
                   "Take Away",
                   style: context.customTextTheme.text14W600.copyWith(
                     color: cartListener.selectedOrderType == OrderType.takeaway
-                        ? Theme.of(context).colorScheme.primary
+                        ? isDark
+                            ? AppColors.kWhite
+                            : Theme.of(context).colorScheme.primary
                         : Colors.grey,
                   ),
                 ),
@@ -795,10 +812,23 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     } else if (!isTakeAwayEnabled && isHomeDeliveryEnabled) {
       // Only home delivery is enabled
       return ListTile(
+        visualDensity: VisualDensity.compact,
         contentPadding: EdgeInsets.zero,
         minLeadingWidth: 5,
-        leading: Assets.lib.assets.icons.fastDelivery
-            .image(height: 23, color: isDark ? Colors.white : null),
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: cartListener.selectedOrderType == OrderType.takeaway
+                ? Theme.of(context).colorScheme.primary
+                : Colors.grey,
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 6),
+          child: Assets.lib.assets.icons.fastDelivery
+              .image(height: 23, color: isDark ? Colors.white : null),
+        ),
         title: Text(
           "Home Delivery",
           style: context.customTextTheme.text16W600

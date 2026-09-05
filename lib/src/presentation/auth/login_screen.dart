@@ -2442,6 +2442,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: CustomTextField(
           textColor: AppColors.kWhite,
           fillColor: Colors.white.withOpacity(0.1),
+          enabled: !authListener.contactLoading,
           controller: authProvider.registerUserEmailController,
           hintText: "Email Address",
           keyboardType: TextInputType.emailAddress,

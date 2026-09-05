@@ -1275,6 +1275,28 @@ class CartProvider extends ChangeNotifier with BaseController {
   void clearSelectedAddressSecondary() {
     _selectedAddressSecondary = null;
   }
+  void syncSelectedAddressWithLatestList(
+      List<UserAddressDataModel> addressList) {
+    UserAddressDataModel? refreshFromList(UserAddressDataModel? current) {
+      if (current == null) return null;
+      for (final address in addressList) {
+        if (address.uaID != null && address.uaID == current.uaID) {
+          return address;
+        }
+      }
+      return current;
+    }
+
+    final refreshedPrimary = refreshFromList(_selectedAddress);
+    final refreshedSecondary = refreshFromList(_selectedAddressSecondary);
+
+    if (!identical(refreshedPrimary, _selectedAddress) ||
+        !identical(refreshedSecondary, _selectedAddressSecondary)) {
+      _selectedAddress = refreshedPrimary;
+      _selectedAddressSecondary = refreshedSecondary;
+      notifyListeners();
+    }
+  }
 
   void onChangePickUpTime(DateTime time) {
     _selectedPickUpTime = time;

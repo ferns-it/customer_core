@@ -1,12 +1,14 @@
 import 'package:auto_route/annotations.dart';
 import 'package:customer_core/customer_core.dart';
 import 'package:flutter/material.dart';
+import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:customer_core/src/application/user/user_provider.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:customer_core/src/domain/user/models/user_address_list_data_model.dart';
 import 'package:customer_core/src/presentation/widgets/button_progress.dart';
 import 'package:customer_core/src/presentation/widgets/get_provider_view.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/utils/ui_utils.dart';
@@ -52,14 +54,15 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                         if (userProvider.newAddressFormKey.currentState
                                 ?.validate() ??
                             false) {
+                          final cartProvider = context.read<CartProvider>();
                           await userListener
                               .addOrUpdateUserAddress(address?.uaID)
                               .then((done) {
                             if (done) {
                               userProvider.clearAddressForm();
-                              // Address list is already refreshed inside
-                              // addOrUpdateUserAddress(), so avoid a duplicate
-                              // refresh here and keep the UI responsive.
+                              cartProvider.syncSelectedAddressWithLatestList(
+                                userListener.userAddressList,
+                              );
                               // ignore: use_build_context_synchronously
                               Navigator.pop(context);
                             }
@@ -167,6 +170,12 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                   controller: userProvider.postCodeTxtController,
                   // validator: (value) =>
                   //     Utils.commonValidator(value, '*required'),
+                  inputFormatters: AppConfig.instance.country == Country.ind
+                      ? [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(6),
+                        ]
+                      : null,
                   validator: (value) => Utils.postcodeValidator(
                     value,
                     AppConfig.instance.country,
@@ -185,7 +194,7 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                           ? 'County'
                           : 'District',
                   optional: 'Optional',
-                  hintText: 'County',
+                  hintText: 'District',
                   controller: userProvider.countyTxtController,
                   // validator: (value) =>
                   //     Utils.commonValidator(value, '*required'),
@@ -227,13 +236,14 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
             if (userLitsner.isAddingOrUpdatingUserAddress) return;
             if (userProvider.newAddressFormKey.currentState?.validate() ??
                 false) {
+              final cartProvider = context.read<CartProvider>();
               await userLitsner
                   .addOrUpdateUserAddress(address?.uaID)
                   .then((done) {
                 if (done) {
-                  // Address list is already refreshed inside
-                  // addOrUpdateUserAddress(), so avoid a duplicate
-                  // refresh here and keep the UI responsive.
+                  cartProvider.syncSelectedAddressWithLatestList(
+                    userLitsner.userAddressList,
+                  );
                   // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                   // ignore: use_build_context_synchronously
@@ -265,6 +275,7 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
     String? Function(String?)? validator,
     TextEditingController? controller,
     required BuildContext context,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,6 +306,7 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
             // style: const TextStyle(color: Colors.black),
             controller: controller,
             onChanged: (value) {},
+            inputFormatters: inputFormatters,
             decoration: InputDecoration(
               errorMaxLines: 2,
               label: Text(hintText),

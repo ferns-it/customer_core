@@ -95,14 +95,10 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
                       allowDecrementAtMinimum: true,
                       onDecrementQty: () {
                         cartProvider.decrementCartItemQty(cartIndex);
-                        cartProvider.clearSelectedAddressSecondary();
-                        cartProvider.clearSelectedAddress();
                       },
                       onIncrementQty: () {
                         cartProvider.incrementCartItemQtyWithStockCheck(
                             cartIndex, stockAwareProduct);
-                        cartProvider.clearSelectedAddressSecondary();
-                        cartProvider.clearSelectedAddress();
                       }),
                   useSecondaryWidget: isExist,
                   onPressFavouriteBtn: () async {

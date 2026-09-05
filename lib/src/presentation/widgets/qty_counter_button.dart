@@ -132,7 +132,16 @@ class _QtyCounterButtonState extends State<QtyCounterButton> {
   }
 }
 
-class QtyCounterButton2 extends StatefulWidget {
+/// Quantity stepper used across the home screen, favourites, search results,
+/// categories, cart items and the "manage dish" bottom sheet.
+///
+/// Kept intentionally stateless so it can never drift out of sync with the
+/// real value: [qty] is the single source of truth and is always rendered
+/// as-is. All consumers (CartProvider/TableProvider) notify their UI
+/// synchronously on tap, so the button always reflects the latest quantity
+/// without optimistic-update bugs or taps being silently dropped by an
+/// internal "animating" lock.
+class QtyCounterButton2 extends StatelessWidget {
   const QtyCounterButton2({
     super.key,
     this.onDecrementQty,
@@ -153,51 +162,21 @@ class QtyCounterButton2 extends StatefulWidget {
   final int? maxQty;
   final bool allowDecrementAtMinimum;
 
-  @override
-  State<QtyCounterButton2> createState() => _QtyCounterButton2State();
-}
-
-class _QtyCounterButton2State extends State<QtyCounterButton2> {
-  bool _isAnimating = false;
-  late int _displayQty;
-
-  @override
-  void initState() {
-    super.initState();
-    _displayQty = widget.qty;
-  }
-
-  @override
-  void didUpdateWidget(covariant QtyCounterButton2 oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.qty != widget.qty) {
-      _displayQty = widget.qty;
-    }
-  }
-
   void _updateQty({required bool isIncrement}) {
-    if (_isAnimating) return;
-
-    _isAnimating = true;
     HapticFeedback.lightImpact();
 
-    final isDecrementDisabled =
-        widget.allowDecrementAtMinimum ? _displayQty <= 0 : _displayQty <= 1;
-    final isIncrementDisabled =
-        widget.maxQty != null && _displayQty >= widget.maxQty!;
-    if (isIncrement && !isIncrementDisabled) {
-      if (widget.onIncrementQty != null) widget.onIncrementQty!();
-    } else if (!isIncrement && !isDecrementDisabled) {
-      if (widget.onDecrementQty != null) widget.onDecrementQty!();
-    }
+    final isDecrementDisabled = allowDecrementAtMinimum ? qty <= 0 : qty <= 1;
+    final isIncrementDisabled = maxQty != null && qty >= maxQty!;
 
-    Future.delayed(const Duration(milliseconds: 200), () {
-      _isAnimating = false;
-    });
+    if (isIncrement && !isIncrementDisabled) {
+      onIncrementQty?.call();
+    } else if (!isIncrement && !isDecrementDisabled) {
+      onDecrementQty?.call();
+    }
   }
 
   void incrementQty() {
-    if (widget.maxQty != null && _displayQty >= widget.maxQty!) return;
+    if (maxQty != null && qty >= maxQty!) return;
     _updateQty(isIncrement: true);
   }
 
@@ -207,10 +186,8 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
 
   @override
   Widget build(BuildContext context) {
-    final isDecrementDisabled =
-        widget.allowDecrementAtMinimum ? _displayQty <= 0 : _displayQty <= 1;
-    final isIncrementDisabled =
-        widget.maxQty != null && _displayQty >= widget.maxQty!;
+    final isDecrementDisabled = allowDecrementAtMinimum ? qty <= 0 : qty <= 1;
+    final isIncrementDisabled = maxQty != null && qty >= maxQty!;
 
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -242,7 +219,7 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
               ),
             ),
             Text(
-              "$_displayQty",
+              "$qty",
               style: context.customTextTheme.text14W700.copyWith(
                 color: context.customTextTheme.color,
               ),

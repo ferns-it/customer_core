@@ -123,12 +123,14 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: context
-                                                  .customTextTheme.text16W700
-                                                  .copyWith(
-                                                    fontSize: 14,
-                                                    color: context
-                                                      .customTextTheme.color),),
-                                                product.amountDetails
+                                                    .customTextTheme.text16W700
+                                                    .copyWith(
+                                                        fontSize: 14,
+                                                        color: context
+                                                            .customTextTheme
+                                                            .color),
+                                              ),
+                                              product.amountDetails
                                                           ?.isOfferApplied ==
                                                       true
                                                   ? Row(children: [
@@ -396,27 +398,29 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                         ),
                         const Spacer(),
                         QtyCounterButton2(
-                            maxQty: AppConfig.instance.businessType == BusinessType.fish && cartProduct?.stock?.activated == true
-                                ? (product.quantity ?? 0) + cartProvider.getRemainingFishStock(cartProduct!)
+                            // Allow tapping minus at qty 1 so the item is
+                            // removed/cleared from the cart (decrementCartItemQty
+                            // deletes the item when quantity is 1).
+                            allowDecrementAtMinimum: true,
+                            maxQty: AppConfig.instance.businessType ==
+                                        BusinessType.fish &&
+                                    cartProduct?.stock?.activated == true
+                                ? (product.quantity ?? 0) +
+                                    cartProvider
+                                        .getRemainingFishStock(cartProduct!)
                                 : null,
-                            onDecrementQty: () async {
-                              cartProvider.clearSelectedAddressSecondary();
-                              cartProvider.clearSelectedAddress();
+                            onDecrementQty: () {
+                              // The delivery address/discount invalidation is
+                              // handled centrally by CartProvider.
                               shopProvider.clearSelectedDeliverySlot();
-                              cartProvider.clearDiscountValue();
-                              await cartProvider.decrementCartItemQty(index);
+                              cartProvider.decrementCartItemQty(index);
                             },
                             previousQty: 0,
                             qty: product.quantity ?? 0,
-                            onIncrementQty: () async {
-                              cartProvider.clearSelectedAddressSecondary();
-                              cartProvider.clearSelectedAddress();
+                            onIncrementQty: () {
                               shopProvider.clearSelectedDeliverySlot();
-                              cartProvider.clearDiscountValue();
-                              await cartProvider
-                                  .incrementCartItemQtyWithStockCheck(
-                                      cartIndex, cartProduct);
-                              if (mounted) setState(() {});
+                              cartProvider.incrementCartItemQtyWithStockCheck(
+                                  cartIndex, cartProduct);
                             }),
                         horizontalSpaceRegular
                       ],

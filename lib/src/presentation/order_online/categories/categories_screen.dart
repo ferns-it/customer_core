@@ -458,19 +458,11 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                     onDecrementQty: () {
                                       cartProvider
                                           .decrementCartItemQty(cartIndex);
-                                      cartProvider
-                                          .clearSelectedAddressSecondary();
-                                      cartProvider.clearSelectedAddress();
-                                      setState(() {});
                                     },
                                     onIncrementQty: () {
                                       cartProvider
                                           .incrementCartItemQtyWithStockCheck(
                                               cartIndex, product);
-                                      cartProvider
-                                          .clearSelectedAddressSecondary();
-                                      cartProvider.clearSelectedAddress();
-                                      setState(() {});
                                     }),
                                 useSecondaryWidget: isExist,
                                 onPressed: () {

@@ -356,6 +356,15 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   bool get cartTransferring => _cartTransferring;
 
+  /// Monotonic counter used to discard stale cart responses. Every mutation
+  /// or refresh bumps the version, and only the response stamped with the
+  /// current version is allowed to notify listeners / replace the cart model.
+  /// This prevents an older, slower server response from overwriting a newer
+  /// quantity – which made the UI flicker back and forth during rapid +/- taps.
+  int _cartRequestVersion = 0;
+
+  int _nextCartRequestVersion() => ++_cartRequestVersion;
+
   int _selectedCartTabbarIndex = 0;
   int get selectedCartTabbarIndex => _selectedCartTabbarIndex;
 
@@ -452,6 +461,19 @@ class CartProvider extends ChangeNotifier with BaseController {
     _deliveryDetails = _deliveryDetails?.copyWith(deliveryDiscount: '0.00');
     _takeAwayDetails = _takeAwayDetails?.copyWith(takeAwayDiscount: '0.00');
     notifyListeners();
+  }
+
+  /// Called whenever the cart contents change (qty update / item removal) so
+  /// every screen follows the same workflow: the previously selected delivery
+  /// address and the applied discount are invalidated by the new cart state.
+  ///
+  /// The delivery-slot selection lives on [ShopProvider] and is cleared by the
+  /// UI layer (see the cart items screen) because the cart provider does not
+  /// depend on the shop provider.
+  void _clearStaleDeliverySelections() {
+    clearSelectedAddress();
+    clearSelectedAddressSecondary();
+    clearDiscountValue();
   }
 
   void onChangeGuestID(String? guestID) {
@@ -829,7 +851,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     return incrementCartItemQty(index);
   }
 
-  Future<void> listCartItems() async {
+  Future<void> listCartItems({int? requestVersion}) async {
+    final activeVersion = requestVersion ?? _nextCartRequestVersion();
     try {
       final isLogged = await checkUserIsLogged();
       if (!isLogged) {
@@ -839,7 +862,9 @@ class CartProvider extends ChangeNotifier with BaseController {
         }
       }
       _cartLoading = true;
-      notifyListeners();
+      if (activeVersion == _cartRequestVersion) {
+        notifyListeners();
+      }
       final userData = await getUserData();
 
       final response = await cartRepo.listCartItems(
@@ -847,6 +872,7 @@ class CartProvider extends ChangeNotifier with BaseController {
       response.fold((exception) {
         log(exception.toString());
       }, (result) {
+        if (activeVersion != _cartRequestVersion) return;
         _cartDetailsModel = result;
         if (isIndianUser && _selectedPaymentMethod == PaymentMethod.card) {
           _selectedPaymentMethod = PaymentMethod.cash;
@@ -854,8 +880,10 @@ class CartProvider extends ChangeNotifier with BaseController {
         notifyListeners();
       });
     } finally {
-      _cartLoading = false;
-      notifyListeners();
+      if (activeVersion == _cartRequestVersion) {
+        _cartLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -884,6 +912,9 @@ class CartProvider extends ChangeNotifier with BaseController {
         log(error.toString(), name: "removeCartItem");
         return false;
       });
+      if (deleteOrNot) {
+        _clearStaleDeliverySelections();
+      }
       await listCartItems();
       return deleteOrNot;
     } finally {
@@ -902,7 +933,8 @@ class CartProvider extends ChangeNotifier with BaseController {
       return false;
     }
 
-    _updateQty(locatedCartItem, newQty);
+    final mutationVersion = _nextCartRequestVersion();
+    _updateQty(locatedCartItem, newQty, requestVersion: mutationVersion);
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
@@ -998,6 +1030,7 @@ class CartProvider extends ChangeNotifier with BaseController {
       ),
     );
 
+    _clearStaleDeliverySelections();
     notifyListeners();
     return true;
   }
@@ -1011,7 +1044,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     }
     final newQty = prevQty - 1;
 
-    _updateQty(locatedCartItem, newQty);
+    final mutationVersion = _nextCartRequestVersion();
+    _updateQty(locatedCartItem, newQty, requestVersion: mutationVersion);
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
@@ -1107,9 +1141,7 @@ class CartProvider extends ChangeNotifier with BaseController {
       ),
     );
 
-    _selectedAddress = null;
-    _deliveryDetails = null;
-
+    _clearStaleDeliverySelections();
     notifyListeners();
     return true;
   }
@@ -1168,11 +1200,13 @@ class CartProvider extends ChangeNotifier with BaseController {
     );
   }
 
-  void _updateQty(CartItemDataModel cartItem, int newQty) async {
+  void _updateQty(CartItemDataModel cartItem, int newQty,
+      {int? requestVersion}) async {
     if (cartItem.pID == null || cartItem.cartID == null) {
       AlertDialogs.showError("Invalid cart item");
       return;
     }
+    final activeVersion = requestVersion ?? _nextCartRequestVersion();
     final isLogged = await checkUserIsLogged();
     if (!isLogged) {
       if (_guestID == null) {
@@ -1190,9 +1224,12 @@ class CartProvider extends ChangeNotifier with BaseController {
     final response = await cartRepo.updateCartItem(cartItem.cartID!, payload,
         isGuest: !isLogged, guestID: _guestID, userID: userData?.user.userID);
     response.fold(() {
-      listCartItems();
+      if (activeVersion != _cartRequestVersion) return;
+      listCartItems(requestVersion: activeVersion);
     }, (error) {
-      AlertDialogs.showError(error.message);
+      if (activeVersion == _cartRequestVersion) {
+        AlertDialogs.showError(error.message);
+      }
     });
   }
 

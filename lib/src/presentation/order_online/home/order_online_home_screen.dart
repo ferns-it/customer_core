@@ -592,17 +592,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                         onDecrementQty: () {
                                           cartProvider
                                               .decrementCartItemQty(cartIndex);
-                                          cartProvider
-                                              .clearSelectedAddressSecondary();
-                                          cartProvider.clearSelectedAddress();
                                         },
                                         onIncrementQty: () {
                                           cartProvider
                                               .incrementCartItemQtyWithStockCheck(
                                                   cartIndex, product);
-                                          cartProvider
-                                              .clearSelectedAddressSecondary();
-                                          cartProvider.clearSelectedAddress();
                                         }),
                                     useSecondaryWidget: isExist,
                                     onPressed: () {
@@ -704,15 +698,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                 allowDecrementAtMinimum: true,
                                 onDecrementQty: () {
                                   cartProvider.decrementCartItemQty(cartIndex);
-                                  cartProvider.clearSelectedAddressSecondary();
-                                  cartProvider.clearSelectedAddress();
                                 },
                                 onIncrementQty: () {
                                   cartProvider
                                       .incrementCartItemQtyWithStockCheck(
                                           cartIndex, product);
-                                  cartProvider.clearSelectedAddressSecondary();
-                                  cartProvider.clearSelectedAddress();
                                 }),
                             useSecondaryWidget: isExist,
                             onPressed: () {
@@ -814,17 +804,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       onDecrementQty: () {
                                         cartProvider
                                             .decrementCartItemQty(cartIndex);
-                                        cartProvider
-                                            .clearSelectedAddressSecondary();
-                                        cartProvider.clearSelectedAddress();
                                       },
                                       onIncrementQty: () {
                                         cartProvider
                                             .incrementCartItemQtyWithStockCheck(
                                                 cartIndex, product);
-                                        cartProvider
-                                            .clearSelectedAddressSecondary();
-                                        cartProvider.clearSelectedAddress();
                                       }),
                                   useSecondaryWidget: isExist,
                                   onPressed: () {

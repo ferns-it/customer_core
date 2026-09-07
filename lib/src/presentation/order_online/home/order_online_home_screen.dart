@@ -446,31 +446,75 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
   }
 
 //For banners
+  // Widget buildImageForBanners() {
+  //   return CarouselSlider(
+  //     options: CarouselOptions(
+  //       disableCenter: true,
+  //       height: MediaQuery.of(context).size.height * 0.15,
+  //       viewportFraction: 1,
+  //       enableInfiniteScroll: true,
+  //       autoPlayInterval: const Duration(seconds: 3),
+  //       autoPlay: true,
+  //       pauseAutoPlayOnTouch: true,
+  //       enlargeCenterPage: true,
+  //     ),
+  //     items: imageUrlsForBanner.map((imageUrl) {
+  //       return Container(
+  //         margin: const EdgeInsets.only(right: 10.0, left: 10.0),
+  //         decoration: BoxDecoration(
+  //           border: Border.all(color: Colors.grey.shade300),
+  //           borderRadius: BorderRadius.circular(20.0),
+  //         ),
+  //         child: ClipRRect(
+  //           borderRadius: BorderRadius.circular(20.0),
+  //           child: Image.asset(imageUrl, fit: BoxFit.cover),
+  //         ),
+  //       );
+  //     }).toList(),
+  //   );
+  // }
   Widget buildImageForBanners() {
-    return CarouselSlider(
-      options: CarouselOptions(
-        disableCenter: true,
-        height: MediaQuery.of(context).size.height * 0.15,
-        viewportFraction: 1,
-        enableInfiniteScroll: true,
-        autoPlayInterval: const Duration(seconds: 3),
-        autoPlay: true,
-        pauseAutoPlayOnTouch: true,
-        enlargeCenterPage: true,
-      ),
-      items: imageUrlsForBanner.map((imageUrl) {
-        return Container(
-          margin: const EdgeInsets.only(right: 10.0, left: 10.0),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(20.0),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Account for the horizontal margins.
+        final width = constraints.maxWidth - 20;
+
+        // Banner aspect ratio = 1944 / 624
+        final height = width * 624 / 1944;
+
+        return CarouselSlider(
+          options: CarouselOptions(
+            height: height,
+            disableCenter: true,
+            viewportFraction: 1,
+            enableInfiniteScroll: true,
+            autoPlayInterval: const Duration(seconds: 3),
+            autoPlay: true,
+            pauseAutoPlayOnTouch: true,
+            enlargeCenterPage: false,
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-            child: Image.asset(imageUrl, fit: BoxFit.cover),
-          ),
+          items: imageUrlsForBanner.map((imageUrl) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10.0),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey.shade300,
+                ),
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20.0),
+                child: Image.asset(
+                  imageUrl,
+                  width: double.infinity,
+                  height: height,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 
@@ -1219,12 +1263,6 @@ class ProductSearchDelegate extends SearchDelegate {
 
   @override
   Widget? buildLeading(BuildContext context) {
-    // return IconButton(
-    //   icon: const Icon(Icons.arrow_back_ios_rounded),
-    //   onPressed: () {
-    //     close(context, null);
-    //   },
-    // );
     return _buildCustomBackButton(context);
   }
 
@@ -1377,11 +1415,6 @@ class __SearchResultsState extends State<_SearchResults> {
                             );
                           }
                           cartProvider.updateSelectedItemId(product.pID!);
-                          // cartProvider.addItemToCart().then((added) {
-                          //   if (added) {
-                          //     cartProvider.resetValues();
-                          //   }
-                          // });
                           showAddItemBottomSheet(stockAwareProduct);
                         },
                         secondaryWidget: QtyCounterButton2(

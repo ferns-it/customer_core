@@ -29,7 +29,7 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
     // final userListener = context.watch<UserProvider>();
     // final userProvider = context.read<UserProvider>();
     final shopProvider = context.read<ShopProvider>();
-    final productProvider = context.read<ProductsProvider>();
+    final productProvider = context.watch<ProductsProvider>();
     // final shopListener = context.watch<ShopProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -63,8 +63,15 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                 final product = cartListener.cartItems.elementAt(index);
 
                 final cartIndex = cartProvider.getProductCartIndex(product.pID);
-                final cartProduct = productProvider.productsList
+                final cartProductMatch = productProvider.productsList
                     .firstOrNullWhere((p) => p.pID == product.pID);
+                // Overlay the freshest stock known app-wide so the qty
+                // counter's maxQty reflects stock refreshed on any screen
+                // (home, search, favourites), not the stale snapshot this
+                // list was built with.
+                final cartProduct = cartProductMatch == null
+                    ? null
+                    : productProvider.overlayStockFromProductsList(cartProductMatch);
                 return Dismissible(
                   background: Container(
                     padding: const EdgeInsets.only(right: 10.0),

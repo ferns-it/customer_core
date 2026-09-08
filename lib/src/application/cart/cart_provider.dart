@@ -774,8 +774,23 @@ class CartProvider extends ChangeNotifier with BaseController {
         notifyListeners();
         return true;
       }, (error) {
-        AlertDialogs.showError(error.message);
         log(error.toString(), name: "Add Cart Item");
+        if (!_isStaleProductDataError(error)) {
+          AlertDialogs.showError(error.message);
+          return false;
+        }
+        final maxQty = product != null &&
+                AppConfig.instance.businessType == BusinessType.fish &&
+                product.stock?.activated == true
+            ? getRemainingFishStock(product)
+            : null;
+        if (maxQty != null && _selectedItemQty > maxQty) {
+          _selectedItemQty = maxQty > 0 ? maxQty : 1;
+          notifyListeners();
+        }
+        AlertDialogs.showError(product != null
+            ? _staleProductDataErrorMessage(product)
+            : error.message);
         return false;
       });
 
@@ -839,6 +854,53 @@ class CartProvider extends ChangeNotifier with BaseController {
     final originalStock = product.stock?.availableStock ?? 0;
     final remaining = originalStock - totalInCart;
     return remaining > 0 ? remaining : 0;
+  }
+
+  /// Returns true when [error] means the backend rejected the request because
+  /// the product data cached in the app is no longer valid on the website —
+  /// e.g. the stock was consumed on another device, or the dish / variation /
+  /// addon options were changed in the shop admin. The FoodPage backend
+  /// reports those failures as a JSON-parse error ("Invalid JSON format..."),
+  /// which the API layer turns into a [FormatErrorException] (or a message
+  /// containing "invalid json"), so we replace that cryptic text with an
+  /// actionable one instead of showing it to the user verbatim.
+  bool _isStaleProductDataError(AppExceptions error) {
+    if (error is FormatErrorException) return true;
+    final message = error.message.trim().toLowerCase();
+    return message.contains('invalid json') ||
+        message.contains('json format') ||
+        message.contains('invalid response syntax') ||
+        message.contains('syntax and try again');
+  }
+
+  /// Builds the friendly message shown instead of the raw backend
+  /// "Invalid JSON format..." error when the cached product data is stale.
+  /// Includes the app's best-known available stock for the dish so the user
+  /// can see how many can actually be added.
+  String _staleProductDataErrorMessage(ProductDataModel product) {
+    const refreshHint =
+        'Stock may have changed on the website — please refresh the menu and try again.';
+    if (product.isAvailable == false) {
+      return 'This dish is currently unavailable. It may have been removed or '
+          'paused on the website. Please refresh the menu and try again.';
+    }
+    final isFishStockEnabled =
+        AppConfig.instance.businessType == BusinessType.fish &&
+            product.stock?.activated == true;
+    if (isFishStockEnabled) {
+      final remaining = getRemainingFishStock(product);
+      if (remaining <= 0) {
+        return 'Sorry, this dish is now out of stock. Please close this sheet, '
+            'refresh the menu, and try again.';
+      }
+      return 'Couldn’t add this dish. Refresh the menu and try again.';
+    }
+    final availableStock = product.stock?.availableStock;
+    if (availableStock != null) {
+      return 'Couldn’t add this dish. Available stock: $availableStock. '
+          '$refreshHint';
+    }
+    return 'Couldn’t add this dish. Refresh the menu and try again.';
   }
 
   Future<bool> incrementCartItemQtyWithStockCheck(int index,
@@ -1227,7 +1289,13 @@ class CartProvider extends ChangeNotifier with BaseController {
       if (activeVersion != _cartRequestVersion) return;
       listCartItems(requestVersion: activeVersion);
     }, (error) {
-      if (activeVersion == _cartRequestVersion) {
+      if (activeVersion != _cartRequestVersion) return;
+      log(error.toString(), name: "Update Cart Item");
+      if (_isStaleProductDataError(error)) {
+        listCartItems(requestVersion: activeVersion);
+        AlertDialogs.showError(
+            'Couldn’t update this dish. Stock may have changed. Please refresh and try again.');
+      } else {
         AlertDialogs.showError(error.message);
       }
     });
@@ -1275,6 +1343,7 @@ class CartProvider extends ChangeNotifier with BaseController {
   void clearSelectedAddressSecondary() {
     _selectedAddressSecondary = null;
   }
+
   void syncSelectedAddressWithLatestList(
       List<UserAddressDataModel> addressList) {
     UserAddressDataModel? refreshFromList(UserAddressDataModel? current) {

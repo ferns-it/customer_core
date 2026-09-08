@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/presentation/widgets/stock_status_widget.dart';
 import 'package:dartx/dartx.dart';
@@ -35,15 +36,19 @@ class DishDetailBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cartListener = context.watch<CartProvider>();
+    final productsProvider = context.watch<ProductsProvider>();
+    final freshProduct = productsProvider.overlayStockFromProductsList(product);
     final baseTextTheme = Theme.of(context).textTheme;
     final allergens = product.selectedAllergensList;
     final isFishStockEnabled =
         AppConfig.instance.businessType == BusinessType.fish &&
-            product.stock?.activated == true;
-    final remainingStock =
-        isFishStockEnabled ? cartListener.getRemainingFishStock(product) : 0;
-    final availableStock =
-        isFishStockEnabled ? remainingStock : product.stock?.availableStock ?? 0;
+            freshProduct.stock?.activated == true;
+    final remainingStock = isFishStockEnabled
+        ? cartListener.getRemainingFishStock(freshProduct)
+        : 0;
+    final availableStock = isFishStockEnabled
+        ? remainingStock
+        : freshProduct.stock?.availableStock ?? 0;
     final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
 
     return SafeArea(
@@ -167,7 +172,7 @@ class DishDetailBottomSheet extends StatelessWidget {
                         child: _IngredientsWidget(product: product),
                       ),
                       _OrderSectionWidget(
-                        product: product,
+                        product: freshProduct,
                         onRequestOrderDish: onRequestOrderDish,
                       ),
                     ],
@@ -210,12 +215,8 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
     _scrollController.dispose();
     super.dispose();
   }
-
-  /// Returns the [GlobalKey] of the first required section that is not
-  /// satisfied, or `null` when every required section is satisfied.
   GlobalKey? _firstInvalidSectionKey(CartProvider cart) {
-    // Variation section is required whenever the product offers multiple
-    // variations and none has been selected yet.
+
     if (product.hasMultipleVariation && cart.selectedItemVariation == null) {
       return _variationKey;
     }
@@ -262,16 +263,19 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
     final cartListener = context.watch<CartProvider>();
     final allergens = product.selectedAllergensList;
     final cartProvider = context.watch<CartProvider>();
+    final productsProvider = context.watch<ProductsProvider>();
+    final activeProduct = productsProvider.overlayStockFromProductsList(product);
     final isFishStockEnabled =
         AppConfig.instance.businessType == BusinessType.fish &&
-            product.stock?.activated == true;
-    final remainingStock =
-        isFishStockEnabled ? cartListener.getRemainingFishStock(product) : 0;
+            activeProduct.stock?.activated == true;
+    final remainingStock = isFishStockEnabled
+        ? cartListener.getRemainingFishStock(activeProduct)
+        : 0;
     final availableStock = isFishStockEnabled
         ? (remainingStock - cartListener.selectedItemQty > 0
             ? remainingStock - cartListener.selectedItemQty
             : 0)
-        : product.stock?.availableStock ?? 0;
+        : activeProduct.stock?.availableStock ?? 0;
     final isProductOutOfStock = isFishStockEnabled && remainingStock <= 0;
     final baseTextTheme = Theme.of(context).textTheme;
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
@@ -491,7 +495,7 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                   verticalSpaceSmall,
                   Center(
                     child: AddToCartButton(
-                      product,
+                      activeProduct,
                       onValidationFailed: () =>
                           _scrollToFirstInvalidSection(cartListener),
                     ),

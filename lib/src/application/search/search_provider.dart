@@ -47,6 +47,7 @@ class SearchProvider extends ChangeNotifier with BaseController {
         return error;
       }, (result) async {
         previousSearchKey = searchKey;
+        productsProvider.indexStockFrom(result);
         final favouriteList = productsProvider
                 .favouriteProductResponse.data?.favouriteList?.productList ??
             [];

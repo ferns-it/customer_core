@@ -45,6 +45,8 @@ class ProductsProvider extends ChangeNotifier with BaseController {
 
   ProductDataModel overlayStockFromProductsList(ProductDataModel product) {
     if (product.pID == null) return product;
+    final cachedStock = stockForID(product.pID);
+    if (cachedStock != null) return product.copyWith(stock: cachedStock);
     final source = productsList.firstOrNullWhere((p) => p.pID == product.pID);
     if (source == null || source.stock == null) return product;
     return product.copyWith(stock: source.stock);
@@ -81,6 +83,19 @@ class ProductsProvider extends ChangeNotifier with BaseController {
 
   int? get selectedCategoryIndex => _selectedCategoryIndex;
   final Map<String, List<ProductDataModel>> _cachedProducts = {};
+
+  final Map<String, ProductStockDetails> _productStockCache = {};
+  void indexStockFrom(Iterable<ProductDataModel> products) {
+    for (final product in products) {
+      if (product.pID != null && product.stock != null) {
+        _productStockCache[product.pID!] = product.stock!;
+      }
+    }
+  }
+
+  /// Latest stock known for a dish, or `null` if it has never been fetched.
+  ProductStockDetails? stockForID(String? pID) =>
+      pID == null ? null : _productStockCache[pID];
 
   int currentPageForPagination = 1;
   bool hasMoreProducts = true;
@@ -150,6 +165,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         //     .toList();
 
         final newProducts = result.dataList;
+        indexStockFrom(newProducts);
         if (newProducts.length < int.parse(numberOfProducts)) {
           hasMoreProducts = false;
           isFetchingProductsFromPagination = false;
@@ -253,6 +269,8 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       await getFavouriteProductList();
       final list = result.featuredProducts ?? [];
       final popularList = result.popularProducts ?? [];
+      indexStockFrom(list);
+      indexStockFrom(popularList);
       final favouriteList =
           favouriteProductResponse.data?.favouriteList?.productList ?? [];
       final favIdMap = {
@@ -297,6 +315,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       notifyListeners();
     }, (result) {
       final list = result.items;
+      indexStockFrom(list);
       final favouriteList =
           favouriteProductResponse.data?.favouriteList?.productList ?? [];
 
@@ -615,6 +634,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         notifyListeners();
       }, (favouriteList) {
         final list = favouriteList.favouriteList?.productList ?? [];
+        indexStockFrom(list);
         final modifiedList = list
             .map(
               (product) => product.copyWith(
@@ -654,6 +674,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     _productsListAPIResponse = APIResponse.initial();
     _categoriesListAPIResponse = APIResponse.initial();
     _productsCollection.clear();
+    _productStockCache.clear();
     // _selectedFoodType = FoodType.nonVeg;
   }
   void resetSessionData() {

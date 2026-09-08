@@ -11,6 +11,7 @@ import 'package:customer_core/src/domain/store/models/product_details_model.dart
 import 'package:google_fonts/google_fonts.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
+import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -63,12 +64,14 @@ class ProductDetailsTile extends StatelessWidget {
     final spiceLevelIcon =
         context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
     final cartProvider = context.watch<CartProvider>();
+    final productsProvider = context.watch<ProductsProvider>();
+    final freshProduct = productsProvider.overlayStockFromProductsList(product);
     final isFishStockEnabled =
         AppConfig.instance.businessType == BusinessType.fish &&
-            product.stock?.activated == true;
+            freshProduct.stock?.activated == true;
     final availableStock = isFishStockEnabled
-        ? cartProvider.getRemainingFishStock(product)
-        : product.stock?.availableStock ?? 0;
+        ? cartProvider.getRemainingFishStock(freshProduct)
+        : freshProduct.stock?.availableStock ?? 0;
     final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
     final isProductUnavailable =
         product.isAvailable == false || isProductOutOfStock;
@@ -392,13 +395,15 @@ class ProductDetailsTile extends StatelessWidget {
     final spiceLevel = product.spiceLevel;
     final spiceLevelIcon =
         context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
+    final cartProvider = context.watch<CartProvider>();
+    final productsProvider = context.watch<ProductsProvider>();
+    final freshProduct = productsProvider.overlayStockFromProductsList(product);
     final isFishStockEnabled =
         AppConfig.instance.businessType == BusinessType.fish &&
-            product.stock?.activated == true;
-    final cartProvider = context.watch<CartProvider>();
+            freshProduct.stock?.activated == true;
     final availableStock = isFishStockEnabled
-        ? cartProvider.getRemainingFishStock(product)
-        : product.stock?.availableStock ?? 0;
+        ? cartProvider.getRemainingFishStock(freshProduct)
+        : freshProduct.stock?.availableStock ?? 0;
     final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
     final isProductUnavailable =
         product.isAvailable == false || isProductOutOfStock;

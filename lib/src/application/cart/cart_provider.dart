@@ -1578,7 +1578,7 @@ class CartProvider extends ChangeNotifier with BaseController {
         transactionID: selectedPaymentMethod == PaymentMethod.cash ? '' : tID,
         paymentStatus: selectedPaymentMethod == PaymentMethod.cash ? '0' : '1',
         deliveryNotes: _deliveryNotes,
-        deliveryLocation: selectedAddress?.addressTitle,
+        deliveryLocation: selectedAddress?.postcode,
         deliveryDate: deliveryDate,
         deliverySlot: deliverySlot,
         customer: customerAddress,

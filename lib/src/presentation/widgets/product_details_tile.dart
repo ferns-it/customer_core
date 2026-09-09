@@ -102,6 +102,7 @@ class ProductDetailsTile extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
+                            softWrap: true,
                             product.name ?? '',
                             style: context.customTextTheme.text14W700.copyWith(
                               color: context.customTextTheme.color,

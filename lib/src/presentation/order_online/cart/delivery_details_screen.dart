@@ -982,6 +982,14 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                       textTheme: poppinsTextTheme(context).textTheme.copyWith(
                           bodySmall: const TextStyle(color: Colors.white)),
                       timePickerTheme: TimePickerThemeData(
+                          cancelButtonStyle: TextButton.styleFrom(
+                            foregroundColor:
+                                Theme.of(context).colorScheme.secondary,
+                          ),
+                          confirmButtonStyle: TextButton.styleFrom(
+                            foregroundColor:
+                                Theme.of(context).colorScheme.secondary,
+                          ),
                           helpTextStyle:
                               TextStyle(color: context.customTextTheme.color),
                           entryModeIconColor:
@@ -1312,8 +1320,10 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                   .lib.assets.icons.editIcon
                                                   .svg(
                                                       color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary),
+                                                                  .brightness ==
+                                                              Brightness.dark
+                                                          ? Colors.white
+                                                          : Colors.black),
                                             ),
                                             IconButton(
                                               onPressed: () {
@@ -1384,7 +1394,10 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                                                   color: Theme.of(context).colorScheme.primary,
                                                                                 ),
                                                                               ),
-                                                                              child: const Text('Cancel'),
+                                                                              child: Text(
+                                                                                'Cancel',
+                                                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                                                              ),
                                                                             ),
                                                                             const SizedBox(width: 10),
                                                                             ElevatedButton(
@@ -1451,8 +1464,10 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                               icon: Icon(
                                                 Icons.remove_circle_outline,
                                                 color: Theme.of(context)
-                                                    .colorScheme
-                                                    .secondary,
+                                                            .brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white
+                                                    : Colors.black,
                                               ),
                                             )
                                           ],
@@ -1506,7 +1521,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                       .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .primary),
+                                              .secondary),
                                 ),
                               )),
                               horizontalSpaceSmall,

@@ -135,7 +135,7 @@ class UserAddressScreen extends GetProviderView<UserProvider> {
                                                             FontWeight.bold,
                                                         color: Theme.of(context)
                                                             .colorScheme
-                                                            .primary),
+                                                            .secondary),
                                               ),
                                             ),
                                         ],

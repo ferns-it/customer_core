@@ -350,7 +350,10 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
           Visibility(
             visible: !productProvider.isFetchingProductsFromPagination,
             child: TextButton.icon(
-                icon: const Icon(Icons.arrow_forward),
+                icon: Icon(
+                  Icons.arrow_forward,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
                 iconAlignment: IconAlignment.end,
                 onPressed: () {
                   context.read<HomeProvider>().onChangeCurrentPage(1);
@@ -369,7 +372,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                     );
                   }
                 },
-                label: const Text("Explore More")),
+                label: Text(
+                  "Explore More",
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                )),
           ),
           verticalSpaceXLarge,
           verticalSpaceXLarge,
@@ -944,7 +951,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                             "See All",
                             style: context.customTextTheme.text16W600.copyWith(
                                 fontSize: 14,
-                                color: Theme.of(context).colorScheme.primary),
+                                color: Theme.of(context).colorScheme.secondary),
                           ),
                         ),
                       ],

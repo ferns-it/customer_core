@@ -76,6 +76,7 @@ class ProductDetailsTile extends StatelessWidget {
     final isProductUnavailable =
         product.isAvailable == false || isProductOutOfStock;
     return Card(
+      color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Stack(
         children: [

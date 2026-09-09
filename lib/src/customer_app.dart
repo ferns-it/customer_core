@@ -87,6 +87,7 @@ class _CustomerAppState extends State<CustomerApp> {
         colorScheme: baseLight.colorScheme.copyWith(
           primary: override.primary ?? baseLight.colorScheme.primary,
           onSurface: override.onSurface ?? baseLight.colorScheme.onSurface,
+          secondary: override.secondary ?? baseLight.colorScheme.secondary,
         ),
         disabledColor: override.disabledColor ?? baseLight.disabledColor,
       );
@@ -99,6 +100,7 @@ class _CustomerAppState extends State<CustomerApp> {
         colorScheme: baseDark.colorScheme.copyWith(
           primary: override.primary ?? baseDark.colorScheme.primary,
           onSurface: override.onSurface ?? baseDark.colorScheme.onSurface,
+          secondary: override.secondary ?? baseDark.colorScheme.secondary,
         ),
         disabledColor: override.disabledColor ?? baseDark.disabledColor,
       );

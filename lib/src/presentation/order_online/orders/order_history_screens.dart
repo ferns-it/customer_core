@@ -559,7 +559,7 @@ class OrderHistoryScreen extends GetProviderView<OrderProvider> {
   Color getColor(OrderStatus status, BuildContext context) {
     switch (status) {
       case OrderStatus.pending:
-        return Theme.of(context).colorScheme.primary;
+        return Theme.of(context).colorScheme.secondary;
       case OrderStatus.accepted:
         return Colors.green;
       case OrderStatus.dispatched:

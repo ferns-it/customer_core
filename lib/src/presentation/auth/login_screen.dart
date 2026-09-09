@@ -145,7 +145,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return Center(
         child: ListView(
       children: [
-        Image.asset(UiConfig.instance.logoWithoutBackground, height: 125),
+        Image.asset(
+          UiConfig.instance.logoWithoutBackground,
+          height: 125,
+        ),
         verticalSpaceMedium,
         ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
@@ -1977,7 +1980,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none),
             hintText: "Email",
-            hintStyle: TextStyle(color: Colors.grey)),
+            hintStyle: TextStyle(color: AppColors.kGray3)),
         name: 'email-address',
       ),
     );

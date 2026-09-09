@@ -786,7 +786,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
                                                           color:
                                                               Theme.of(context)
                                                                   .colorScheme
-                                                                  .primary),
+                                                                  .secondary),
                                                 ),
                                               ),
                                             ),
@@ -1123,7 +1123,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
             padding: const EdgeInsets.only(top: 4.0),
             child: Divider(
               color: order.orderAccepted || order.orderDispatched
-                  ? Theme.of(context).colorScheme.primary
+                  ? Theme.of(context).colorScheme.secondary
                   : Colors.grey.shade300,
               thickness: 1,
             ),
@@ -1138,7 +1138,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
             padding: const EdgeInsets.only(top: 4.0),
             child: Divider(
               color: order.orderDispatched
-                  ? Theme.of(context).colorScheme.primary
+                  ? Theme.of(context).colorScheme.secondary
                   : Colors.grey.shade300,
               thickness: 1,
             ),
@@ -1159,7 +1159,7 @@ class ProfileScreen extends GetProviderView<UserProvider> {
           Icon(
             Icons.adjust_rounded,
             color: completed
-                ? Theme.of(context).colorScheme.primary
+                ? Theme.of(context).colorScheme.secondary
                 : AppColors.kGray7,
             size: 22,
           ),

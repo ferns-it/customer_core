@@ -993,7 +993,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           helpTextStyle:
                               TextStyle(color: context.customTextTheme.color),
                           entryModeIconColor:
-                              Theme.of(context).colorScheme.primary,
+                              Theme.of(context).colorScheme.secondary,
                           dialTextColor: WidgetStateColor.resolveWith(
                             (states) {
                               if (states.contains(WidgetState.selected)) {
@@ -1026,15 +1026,15 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                           hourMinuteTextColor: WidgetStateColor.resolveWith(
                             (states) {
                               if (states.contains(WidgetState.selected)) {
-                                return Theme.of(context).colorScheme.surface;
+                                return Theme.of(context).colorScheme.onSurface;
                               }
-                              return Theme.of(context).colorScheme.primary;
+                              return Theme.of(context).colorScheme.secondary;
                             },
                           ),
                           dayPeriodTextColor: WidgetStateColor.resolveWith(
                             (states) {
                               if (states.contains(WidgetState.selected)) {
-                                return Theme.of(context).colorScheme.surface;
+                                return Theme.of(context).colorScheme.onSurface;
                               }
                               return Theme.of(context).colorScheme.secondary;
                             },

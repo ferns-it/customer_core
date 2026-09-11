@@ -151,18 +151,18 @@ class Utils {
     return null;
   }
 
-  static String? postcodeValidator(String? value, Country country) {
+  static String? postcodeValidator(String? value, String? country) {
     if (value == null || value.trim().isEmpty) {
       return '*required';
     }
 
     final postcode = value.trim();
 
-    if (country == Country.ind) {
+    if (country == '+91') {
       if (!RegExp(r'^[1-9][0-9]{5}$').hasMatch(postcode)) {
         return 'Enter a valid Indian postcode';
       }
-    } else if (country == Country.uk) {
+    } else if (country == '+44') {
       final ukPostcode = postcode.toUpperCase();
 
       if (!RegExp(

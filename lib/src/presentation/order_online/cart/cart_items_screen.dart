@@ -6,6 +6,7 @@ import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
+import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -409,8 +410,7 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                             // removed/cleared from the cart (decrementCartItemQty
                             // deletes the item when quantity is 1).
                             allowDecrementAtMinimum: true,
-                            maxQty: AppConfig.instance.businessType ==
-                                        BusinessType.fish &&
+                            maxQty: 
                                     cartProduct?.stock?.activated == true
                                 ? (product.quantity ?? 0) +
                                     cartProvider
@@ -428,6 +428,11 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                               shopProvider.clearSelectedDeliverySlot();
                               cartProvider.incrementCartItemQtyWithStockCheck(
                                   cartIndex, cartProduct);
+                            },
+                            onIncrementBlocked: () {
+                              AlertDialogs.showError(
+                                'Sorry, this item is currently out of stock.',
+                              );
                             }),
                         horizontalSpaceRegular
                       ],

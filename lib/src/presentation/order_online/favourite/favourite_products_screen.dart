@@ -6,6 +6,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
+import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/core/routes/routes.gr.dart';
 import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:customer_core/src/domain/store/models/product_details_model.dart';
@@ -99,6 +100,14 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
                       onIncrementQty: () {
                         cartProvider.incrementCartItemQtyWithStockCheck(
                             cartIndex, stockAwareProduct);
+                      },
+                      onIncrementBlocked: () {
+                        AlertDialogs.showError(
+                          productQtyUpdated > 0
+                              ? 'You have added the maximum available '
+                                  'quantity for this item.'
+                              : 'Sorry, this item is currently out of stock.',
+                        );
                       }),
                   useSecondaryWidget: isExist,
                   onPressFavouriteBtn: () async {

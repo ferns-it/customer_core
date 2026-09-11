@@ -66,9 +66,7 @@ class ProductDetailsTile extends StatelessWidget {
     final cartProvider = context.watch<CartProvider>();
     final productsProvider = context.watch<ProductsProvider>();
     final freshProduct = productsProvider.overlayStockFromProductsList(product);
-    final isFishStockEnabled =
-        AppConfig.instance.businessType == BusinessType.fish &&
-            freshProduct.stock?.activated == true;
+    final isFishStockEnabled = freshProduct.stock?.activated == true;
     final availableStock = isFishStockEnabled
         ? cartProvider.getRemainingFishStock(freshProduct)
         : freshProduct.stock?.availableStock ?? 0;
@@ -236,15 +234,13 @@ class ProductDetailsTile extends StatelessWidget {
                           ),
                       ],
                     ),
-                    verticalSpaceTiny,
                     if (isFishStockEnabled) ...[
-                      StockStatusWidget(
-                        isProductOutOfStock: isProductOutOfStock,
-                        availableStock: availableStock,
-                      ),
+                      verticalSpaceTiny,
+                      isProductOutOfStock
+                          ? StockStatusWidget()
+                          : SizedBox.shrink(),
                       verticalSpaceTiny,
                     ],
-                    verticalSpaceSmall,
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -336,7 +332,9 @@ class ProductDetailsTile extends StatelessWidget {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          'Add',
+                                          isProductOutOfStock
+                                              ? 'Sold Out'
+                                              : 'Add',
                                           style: context
                                               .customTextTheme.text14W700
                                               .copyWith(
@@ -399,9 +397,7 @@ class ProductDetailsTile extends StatelessWidget {
     final cartProvider = context.watch<CartProvider>();
     final productsProvider = context.watch<ProductsProvider>();
     final freshProduct = productsProvider.overlayStockFromProductsList(product);
-    final isFishStockEnabled =
-        AppConfig.instance.businessType == BusinessType.fish &&
-            freshProduct.stock?.activated == true;
+    final isFishStockEnabled = freshProduct.stock?.activated == true;
     final availableStock = isFishStockEnabled
         ? cartProvider.getRemainingFishStock(freshProduct)
         : freshProduct.stock?.availableStock ?? 0;
@@ -539,12 +535,12 @@ class ProductDetailsTile extends StatelessWidget {
                     verticalSpaceSmall,
                   ],
                   verticalSpaceSmall,
-                  if (isFishStockEnabled)
-                    StockStatusWidget(
-                      isProductOutOfStock: isProductOutOfStock,
-                      availableStock: availableStock,
-                    ),
-                  if (isFishStockEnabled) verticalSpaceTiny,
+                  if (isFishStockEnabled) ...[
+                    isProductOutOfStock
+                        ? StockStatusWidget()
+                        : SizedBox.shrink(),
+                    verticalSpaceTiny,
+                  ],
                   product.isOfferPrice == 'Yes' &&
                           product.offerPriceDetails?.currentOfferPrice != null
                       ? RichText(

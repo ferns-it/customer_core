@@ -11,6 +11,7 @@ import 'package:customer_core/src/application/auth/auth_provider.dart';
 import 'package:customer_core/src/application/theme/theme_provider.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
+import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:customer_core/src/core/utils/utils.dart';
 import 'package:customer_core/src/presentation/widgets/button_progress.dart';
@@ -41,7 +42,7 @@ class DishDetailBottomSheet extends StatelessWidget {
     final baseTextTheme = Theme.of(context).textTheme;
     final allergens = product.selectedAllergensList;
     final isFishStockEnabled =
-        AppConfig.instance.businessType == BusinessType.fish &&
+       
             freshProduct.stock?.activated == true;
     final remainingStock = isFishStockEnabled
         ? cartListener.getRemainingFishStock(freshProduct)
@@ -106,10 +107,9 @@ class DishDetailBottomSheet extends StatelessWidget {
                         verticalSpaceSmall,
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          child: StockStatusWidget(
-                            isProductOutOfStock: isProductOutOfStock,
-                            availableStock: availableStock,
-                          ),
+                          child: isProductOutOfStock
+                              ? StockStatusWidget()
+                              : SizedBox.shrink(),
                         ),
                         verticalSpaceTiny,
                       ],
@@ -215,8 +215,8 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
     _scrollController.dispose();
     super.dispose();
   }
-  GlobalKey? _firstInvalidSectionKey(CartProvider cart) {
 
+  GlobalKey? _firstInvalidSectionKey(CartProvider cart) {
     if (product.hasMultipleVariation && cart.selectedItemVariation == null) {
       return _variationKey;
     }
@@ -242,6 +242,7 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
 
     return null;
   }
+
   bool _scrollToFirstInvalidSection(CartProvider cart) {
     final key = _firstInvalidSectionKey(cart);
     if (key == null) return false;
@@ -266,7 +267,7 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
     final productsProvider = context.watch<ProductsProvider>();
     final activeProduct = productsProvider.overlayStockFromProductsList(product);
     final isFishStockEnabled =
-        AppConfig.instance.businessType == BusinessType.fish &&
+       
             activeProduct.stock?.activated == true;
     final remainingStock = isFishStockEnabled
         ? cartListener.getRemainingFishStock(activeProduct)
@@ -448,10 +449,9 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                   ),
                   if (isFishStockEnabled) ...[
                     verticalSpaceSmall,
-                    StockStatusWidget(
-                      isProductOutOfStock: isProductOutOfStock,
-                      availableStock: availableStock,
-                    ),
+                    isProductOutOfStock
+                        ? StockStatusWidget()
+                        : SizedBox.shrink(),
                     verticalSpaceTiny,
                   ],
                   Row(
@@ -466,6 +466,14 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                         },
                         onDecrementQty: () {
                           cartProvider.decrementQty();
+                        },
+                        onIncrementBlocked: () {
+                          AlertDialogs.showError(
+                            isProductOutOfStock
+                                ? 'Sorry, this item is currently out of stock.'
+                                : 'You have added the maximum available '
+                                    'quantity for this item.',
+                          );
                         },
                       ),
                     ],
@@ -627,6 +635,7 @@ class _ProductNameWidget extends StatelessWidget {
     );
   }
 }
+
 class _DescriptionWidget extends StatelessWidget {
   final ProductDataModel product;
 
@@ -702,7 +711,7 @@ class _OrderSectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final cartProvider = context.read<CartProvider>();
     final isFishStockEnabled =
-        AppConfig.instance.businessType == BusinessType.fish &&
+      
             product.stock?.activated == true;
     final availableStock =
         isFishStockEnabled ? cartProvider.getRemainingFishStock(product) : 0;
@@ -733,7 +742,11 @@ class _OrderSectionWidget extends StatelessWidget {
               width: context.screenWidth * 0.4,
               child: Center(
                 child: Text(
-                  isProductUnavailable ? 'Not Available' : 'Order Now',
+                  product.isAvailable == false
+                      ? 'Not Available'
+                      : isProductOutOfStock
+                          ? 'Out of Stock'
+                          : 'Order Now',
                   style: context.customTextTheme.text14W600
                       .copyWith(color: AppColors.kWhite),
                 ),
@@ -1026,7 +1039,7 @@ class AddToCartButton extends GetProviderView<CartProvider> {
     final authProvider = notifier2<AuthProvider>(context);
 
     final isFishStockEnabled =
-        AppConfig.instance.businessType == BusinessType.fish &&
+       
             product.stock?.activated == true;
     final remainingStock =
         isFishStockEnabled ? cartProvider.getRemainingFishStock(product) : null;
@@ -1075,7 +1088,11 @@ class AddToCartButton extends GetProviderView<CartProvider> {
             ),
       label: !cartListener.addItemLoading
           ? Text(
-              product.isAvailable == false ? 'Not Available' : 'Add To Cart',
+              product.isAvailable == false
+                  ? 'Not Available'
+                  : isOutOfStock
+                      ? 'Out of Stock'
+                      : 'Add To Cart',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             )
           : showButtonProgress(Theme.of(context).colorScheme.onSurface),

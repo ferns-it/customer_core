@@ -152,6 +152,7 @@ class QtyCounterButton2 extends StatelessWidget {
     this.gap,
     this.maxQty,
     this.allowDecrementAtMinimum = false,
+    this.onIncrementBlocked,
   });
 
   final VoidCallback? onDecrementQty;
@@ -161,6 +162,13 @@ class QtyCounterButton2 extends StatelessWidget {
   final int qty, previousQty;
   final int? maxQty;
   final bool allowDecrementAtMinimum;
+
+  /// Called when the increment button is tapped while it is disabled
+  /// ([qty] has reached [maxQty]). The button keeps its disabled look but
+  /// stays tappable so callers can explain why the quantity cannot be
+  /// increased (e.g. an "out of stock" alert). When null, the button is
+  /// fully inert as before.
+  final VoidCallback? onIncrementBlocked;
 
   void _updateQty({required bool isIncrement}) {
     HapticFeedback.lightImpact();
@@ -225,7 +233,10 @@ class QtyCounterButton2 extends StatelessWidget {
               ),
             ),
             InkWell(
-              onTap: isIncrementDisabled ? null : incrementQty,
+              // Keep the disabled increment button tappable so it can report
+              // taps via [onIncrementBlocked] (e.g. to show an out-of-stock
+              // alert) instead of silently swallowing them.
+              onTap: isIncrementDisabled ? onIncrementBlocked : incrementQty,
               splashColor: isIncrementDisabled ? Colors.transparent : null,
               highlightColor: isIncrementDisabled ? Colors.transparent : null,
               child: Container(

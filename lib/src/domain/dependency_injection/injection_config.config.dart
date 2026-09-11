@@ -101,16 +101,6 @@ extension GetItInjectableX on _i174.GetIt {
         ));
     gh.lazySingleton<_i333.IStoreRepo>(() => _i797.StoreRepo());
     gh.lazySingleton<_i304.IPromotionRepo>(() => _i1037.PromotionsRepo());
-    gh.lazySingleton<_i805.ProductsProvider>(() => _i805.ProductsProvider(
-          storeRepo: gh<_i333.IStoreRepo>(),
-          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
-        ));
-    gh.lazySingleton<_i437.CartProvider>(() => _i437.CartProvider(
-          cartRepo: gh<_i696.ICartRepo>(),
-          checkRepo: gh<_i706.ICheckoutRepo>(),
-          offerRepo: gh<_i94.IOfferRepo>(),
-          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
-        ));
     gh.lazySingleton<_i615.OtpProvider>(
         () => _i615.OtpProvider(otpRepo: gh<_i654.IOtpRepo>()));
     gh.lazySingleton<_i412.PaymentProvider>(
@@ -119,14 +109,26 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i663.ShopProvider(gh<_i333.IStoreRepo>()));
     gh.factory<_i184.PromotionsProvider>(
         () => _i184.PromotionsProvider(gh<_i304.IPromotionRepo>()));
-    gh.lazySingleton<_i553.SearchProvider>(() => _i553.SearchProvider(
-          searchRepo: gh<_i71.ISearchRepo>(),
-          productsProvider: gh<_i805.ProductsProvider>(),
+    gh.lazySingleton<_i805.ProductsProvider>(() => _i805.ProductsProvider(
+          storeRepo: gh<_i333.IStoreRepo>(),
+          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
+          shopProvider: gh<_i663.ShopProvider>(),
         ));
     gh.lazySingleton<_i993.AuthProvider>(() => _i993.AuthProvider(
           userRepository: gh<_i266.IUserRepo>(),
           sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
           otpProvider: gh<_i615.OtpProvider>(),
+        ));
+    gh.lazySingleton<_i437.CartProvider>(() => _i437.CartProvider(
+          cartRepo: gh<_i696.ICartRepo>(),
+          checkRepo: gh<_i706.ICheckoutRepo>(),
+          offerRepo: gh<_i94.IOfferRepo>(),
+          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
+          productsProvider: gh<_i805.ProductsProvider>(),
+        ));
+    gh.lazySingleton<_i553.SearchProvider>(() => _i553.SearchProvider(
+          searchRepo: gh<_i71.ISearchRepo>(),
+          productsProvider: gh<_i805.ProductsProvider>(),
         ));
     return this;
   }

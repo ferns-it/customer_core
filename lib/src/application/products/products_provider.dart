@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
+import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
@@ -23,10 +25,28 @@ import '../../domain/store/models/product_details_model.dart';
 class ProductsProvider extends ChangeNotifier with BaseController {
   final IStoreRepo storeRepo;
   final IUserSharedPrefsRepo sharedPrefsRepository;
+  final ShopProvider shopProvider;
 
-  ProductsProvider(
-      {required this.storeRepo, required this.sharedPrefsRepository});
+  ProductsProvider({
+    required this.storeRepo,
+    required this.sharedPrefsRepository,
+    required this.shopProvider,
+  });
   Random random = Random();
+
+  Timer? _stockResyncTimer;
+  void syncStockAfterCartChange() {
+    _stockResyncTimer?.cancel();
+    _stockResyncTimer = Timer(const Duration(milliseconds: 500), () {
+      getFeaturedPopularProducts(silent: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _stockResyncTimer?.cancel();
+    super.dispose();
+  }
 
   var _productsListAPIResponse = APIResponse<List<ProductDataModel>>.initial();
 
@@ -85,17 +105,45 @@ class ProductsProvider extends ChangeNotifier with BaseController {
   final Map<String, List<ProductDataModel>> _cachedProducts = {};
 
   final Map<String, ProductStockDetails> _productStockCache = {};
-  void indexStockFrom(Iterable<ProductDataModel> products) {
+  void indexStockFrom(
+    Iterable<ProductDataModel> products, {
+    bool overwriteExisting = true,
+  }) {
     for (final product in products) {
-      if (product.pID != null && product.stock != null) {
-        _productStockCache[product.pID!] = product.stock!;
+      final stock = product.stock;
+      if (product.pID == null || stock == null) continue;
+      // A stock entry without a countable amount carries no usable
+      // information - never let it erase or create a misleading cache entry.
+      if (stock.availableStock == null) continue;
+      if (!overwriteExisting) {
+        if (_productStockCache.containsKey(product.pID)) continue;
+        // Secondary sources must never introduce a sold-out state into the
+        // cache; only a positive countable amount is safe to fill with.
+        if (stock.availableStock! <= 0) continue;
       }
+      _productStockCache[product.pID!] = stock;
     }
   }
 
   /// Latest stock known for a dish, or `null` if it has never been fetched.
   ProductStockDetails? stockForID(String? pID) =>
       pID == null ? null : _productStockCache[pID];
+
+  ProductDataModel overlayStockFromSecondarySource(ProductDataModel product) {
+    if (product.pID == null) return product;
+    final cachedStock = stockForID(product.pID);
+    if (cachedStock != null) return product.copyWith(stock: cachedStock);
+    final stock = product.stock;
+    final isDegenerate = stock?.activated == true &&
+        (stock!.availableStock == null || stock.availableStock! <= 0);
+    if (isDegenerate) {
+      // "No stock information" instead of a false sold-out flag.
+      return product.copyWith(
+        stock: ProductStockDetails(activated: false),
+      );
+    }
+    return product;
+  }
 
   int currentPageForPagination = 1;
   bool hasMoreProducts = true;
@@ -194,7 +242,10 @@ class ProductsProvider extends ChangeNotifier with BaseController {
             favouriteID: favId ?? "",
           );
         }).toList();
-        _productsListAPIResponse = APIResponse.completed([...updatedList]);
+        // Hide unavailable / out-of-stock products when the settings API
+        // configures `listUnavailableProducts` as "Disabled".
+        _productsListAPIResponse =
+            APIResponse.completed(filterListableProducts(updatedList));
 
         if (isRandom) {
           final newProductsModified = newProducts.map((product) {
@@ -204,7 +255,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
               favouriteID: favId ?? "",
             );
           }).toList();
-          productsListRandom = newProductsModified;
+          productsListRandom = filterListableProducts(newProductsModified);
           productsListRandom.shuffle();
         }
 
@@ -254,9 +305,30 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     notifyListeners();
   }
 
-  Future<void> getFeaturedPopularProducts() async {
-    _featuredPopularProductsAPIResponse = APIResponse.loading();
-    notifyListeners();
+  bool isProductListable(ProductDataModel product) {
+    if (product.isAvailable == false) return false;
+    final stock = product.stock;
+    final availableStock = stock?.availableStock;
+    if (stock?.activated == true &&
+        availableStock != null &&
+        availableStock <= 0) {
+      return false;
+    }
+    return true;
+  }
+  List<ProductDataModel> filterListableProducts(
+      Iterable<ProductDataModel> products) {
+    if (shopProvider.canListUnavailableProducts) return products.toList();
+    return products.where(isProductListable).toList();
+  }
+  Future<void> getFeaturedPopularProducts({bool silent = false}) async {
+    if (shopProvider.storeSettings.data == null) {
+      await shopProvider.fetchStoreSettings();
+    }
+    if (!silent) {
+      _featuredPopularProductsAPIResponse = APIResponse.loading();
+      notifyListeners();
+    }
     final response = await storeRepo.getFeaturedPopularProducts(
         shopID: AppIdentifiers.kShopId);
     response.fold((error) {
@@ -291,7 +363,8 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         );
       }).toList();
       final newResult = result.copyWith(
-          featuredProducts: updatedList, popularProducts: updatedPopularList);
+          featuredProducts: filterListableProducts(updatedList),
+          popularProducts: filterListableProducts(updatedPopularList));
       _featuredPopularProductsAPIResponse = APIResponse.completed(newResult);
       notifyListeners();
     });
@@ -332,10 +405,11 @@ class ProductsProvider extends ChangeNotifier with BaseController {
           favouriteID: favId ?? "",
         );
       }).toList();
+      final filteredList = filterListableProducts(updatedList);
 
-      _cachedProducts[categoryID] = updatedList;
-      _productsCollection = updatedList;
-      _productsListAPIResponse = APIResponse.completed(updatedList);
+      _cachedProducts[categoryID] = filteredList;
+      _productsCollection = filteredList;
+      _productsListAPIResponse = APIResponse.completed(filteredList);
       notifyListeners();
     });
   }
@@ -634,7 +708,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         notifyListeners();
       }, (favouriteList) {
         final list = favouriteList.favouriteList?.productList ?? [];
-        indexStockFrom(list);
+        indexStockFrom(list, overwriteExisting: false);
         final modifiedList = list
             .map(
               (product) => product.copyWith(
@@ -642,9 +716,14 @@ class ProductsProvider extends ChangeNotifier with BaseController {
               ),
             )
             .toList();
+        final overlaidList = modifiedList
+            .map(overlayStockFromSecondarySource)
+            .toList();
+
+        final filteredFavourites = filterListableProducts(overlaidList);
         final modifiedFavouriteList = FavouriteProductRawDataModel(
           favouriteList: FavouriteProductDataModel(
-            productList: modifiedList,
+            productList: filteredFavourites,
           ),
         );
         _favouriteProductResponse =
@@ -677,6 +756,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     _productStockCache.clear();
     // _selectedFoodType = FoodType.nonVeg;
   }
+
   void resetSessionData() {
     List<ProductDataModel> stripFavourites(List<ProductDataModel> products) =>
         products

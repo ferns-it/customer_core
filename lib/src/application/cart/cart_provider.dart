@@ -1,5 +1,6 @@
 import 'package:async/async.dart' show AsyncMemoizer;
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:dartx/dartx.dart';
 import 'dart:developer';
 
@@ -57,12 +58,14 @@ class CartProvider extends ChangeNotifier with BaseController {
   final ICheckoutRepo checkRepo;
   final IOfferRepo offerRepo;
   final IUserSharedPrefsRepo sharedPrefsRepository;
+  final ProductsProvider productsProvider;
 
   CartProvider({
     required this.cartRepo,
     required this.checkRepo,
     required this.offerRepo,
     required this.sharedPrefsRepository,
+    required this.productsProvider,
   });
 
   late TabController _tabController;
@@ -716,12 +719,7 @@ class CartProvider extends ChangeNotifier with BaseController {
         return false;
       }
 
-      final maxQty = product != null &&
-              AppConfig.instance.businessType == BusinessType.fish &&
-              product.stock?.activated == true
-          // Clamp to the REMAINING addable stock (stock minus what's already
-          // in the cart), not the absolute availableStock, otherwise a product
-          // with stock 4 & 2 already in cart would wrongly allow qty up to 4.
+      final maxQty = product != null && product.stock?.activated == true
           ? getRemainingFishStock(product)
           : null;
 
@@ -779,9 +777,7 @@ class CartProvider extends ChangeNotifier with BaseController {
           AlertDialogs.showError(error.message);
           return false;
         }
-        final maxQty = product != null &&
-                AppConfig.instance.businessType == BusinessType.fish &&
-                product.stock?.activated == true
+        final maxQty = product != null && product.stock?.activated == true
             ? getRemainingFishStock(product)
             : null;
         if (maxQty != null && _selectedItemQty > maxQty) {
@@ -846,24 +842,15 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   /// Get the remaining stock for a fish product after subtracting cart quantity
   int getRemainingFishStock(ProductDataModel product) {
-    if (AppConfig.instance.businessType != BusinessType.fish ||
-        product.stock?.activated != true) {
-      return product.stock?.availableStock ?? 0;
+    final stock = product.stock;
+    if (stock?.activated != true) {
+      return stock?.availableStock ?? 0;
     }
     final totalInCart = getTotalCartQtyForProduct(product.pID ?? '');
     final originalStock = product.stock?.availableStock ?? 0;
     final remaining = originalStock - totalInCart;
     return remaining > 0 ? remaining : 0;
   }
-
-  /// Returns true when [error] means the backend rejected the request because
-  /// the product data cached in the app is no longer valid on the website —
-  /// e.g. the stock was consumed on another device, or the dish / variation /
-  /// addon options were changed in the shop admin. The FoodPage backend
-  /// reports those failures as a JSON-parse error ("Invalid JSON format..."),
-  /// which the API layer turns into a [FormatErrorException] (or a message
-  /// containing "invalid json"), so we replace that cryptic text with an
-  /// actionable one instead of showing it to the user verbatim.
   bool _isStaleProductDataError(AppExceptions error) {
     if (error is FormatErrorException) return true;
     final message = error.message.trim().toLowerCase();
@@ -873,10 +860,6 @@ class CartProvider extends ChangeNotifier with BaseController {
         message.contains('syntax and try again');
   }
 
-  /// Builds the friendly message shown instead of the raw backend
-  /// "Invalid JSON format..." error when the cached product data is stale.
-  /// Includes the app's best-known available stock for the dish so the user
-  /// can see how many can actually be added.
   String _staleProductDataErrorMessage(ProductDataModel product) {
     const refreshHint =
         'Stock may have changed on the website — please refresh the menu and try again.';
@@ -884,9 +867,7 @@ class CartProvider extends ChangeNotifier with BaseController {
       return 'This dish is currently unavailable. It may have been removed or '
           'paused on the website. Please refresh the menu and try again.';
     }
-    final isFishStockEnabled =
-        AppConfig.instance.businessType == BusinessType.fish &&
-            product.stock?.activated == true;
+    final isFishStockEnabled = product.stock?.activated == true;
     if (isFishStockEnabled) {
       final remaining = getRemainingFishStock(product);
       if (remaining <= 0) {
@@ -905,8 +886,7 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   Future<bool> incrementCartItemQtyWithStockCheck(int index,
       [ProductDataModel? product]) async {
-    if (AppConfig.instance.businessType == BusinessType.fish &&
-        product?.stock?.activated == true) {
+    if (product?.stock?.activated == true) {
       final remainingStock = getRemainingFishStock(product!);
       return incrementCartItemQty(index, remainingStock: remainingStock);
     }
@@ -1293,8 +1273,9 @@ class CartProvider extends ChangeNotifier with BaseController {
       log(error.toString(), name: "Update Cart Item");
       if (_isStaleProductDataError(error)) {
         listCartItems(requestVersion: activeVersion);
-        AlertDialogs.showError(
-            'Couldn’t update this dish. Stock may have changed. Please refresh and try again.');
+        // The server just told us the stock changed - re-sync it.
+        productsProvider.syncStockAfterCartChange();
+        AlertDialogs.showError('This item is now out of stock.');
       } else {
         AlertDialogs.showError(error.message);
       }

@@ -386,6 +386,7 @@ class StoreDeliverySettingsInfo {
   final String? update_device;
   final String? update_device_id;
   final String? update_details;
+  final String? listUnavailableProducts;
   final List<StoreFixedDeliveryLocationSettings>? FixedDeliveryLocationList;
 
   StoreDeliverySettingsInfo({
@@ -423,6 +424,7 @@ class StoreDeliverySettingsInfo {
     this.update_device,
     this.update_device_id,
     this.update_details,
+    this.listUnavailableProducts,
     this.FixedDeliveryLocationList,
   });
 
@@ -461,6 +463,7 @@ class StoreDeliverySettingsInfo {
     String? update_device,
     String? update_device_id,
     String? update_details,
+    String? listUnavailableProducts,
     List<StoreFixedDeliveryLocationSettings>? FixedDeliveryLocationList,
   }) {
     return StoreDeliverySettingsInfo(
@@ -505,6 +508,8 @@ class StoreDeliverySettingsInfo {
       update_details: update_details ?? this.update_details,
       FixedDeliveryLocationList:
           FixedDeliveryLocationList ?? this.FixedDeliveryLocationList,
+      listUnavailableProducts:
+          listUnavailableProducts ?? this.listUnavailableProducts,
     );
   }
 
@@ -546,6 +551,7 @@ class StoreDeliverySettingsInfo {
       'update_details': update_details,
       'FixedDeliveryLocationList':
           FixedDeliveryLocationList?.map((x) => x.toMap()).toList(),
+      'listUnavailableProducts': listUnavailableProducts,
     };
   }
 
@@ -636,6 +642,9 @@ class StoreDeliverySettingsInfo {
       update_details: map['update_details'] != null
           ? map['update_details'] as String
           : null,
+      listUnavailableProducts: map['listUnavailableProducts'] != null
+          ? map['listUnavailableProducts'] as String
+          : null,
       FixedDeliveryLocationList: map['FixedDeliveryLocationList'] != null
           ? List<StoreFixedDeliveryLocationSettings>.from(
               (map['FixedDeliveryLocationList'] as List<dynamic>)
@@ -656,7 +665,7 @@ class StoreDeliverySettingsInfo {
 
   @override
   String toString() {
-    return 'StoreDeliverySettingsInfo(id: $id, shopId: $shopId, shopPostcode: $shopPostcode, currencyType: $currencyType, takeAway: $takeAway, homeDelivery: $homeDelivery, shopOpen_temp_off: $shopOpen_temp_off, takeAway_temp_off: $takeAway_temp_off, homeDelivery_temp_off: $homeDelivery_temp_off, discountTakeAway: $discountTakeAway, minAmtForTakAwayDiscnt: $minAmtForTakAwayDiscnt, deliveryMinAmount: $deliveryMinAmount, deliveryMinAmountType: $deliveryMinAmountType, discountHomeDelivery: $discountHomeDelivery, minAmtForHomDelvryDiscnt: $minAmtForHomDelvryDiscnt, distanceType: $distanceType, freeDelivery: $freeDelivery, freeDeliveryRadius: $freeDeliveryRadius, freeDeliveryMinOrder: $freeDeliveryMinOrder, deliveryChargeType: $deliveryChargeType, minDeliveryCharge: $minDeliveryCharge, ratePerMile: $ratePerMile, maxDeliveryRadius: $maxDeliveryRadius, preOrder: $preOrder, preOrderBefore: $preOrderBefore, minWaitingTime: $minWaitingTime, onlinePaymentMinAmount: $onlinePaymentMinAmount, dispatchMessage: $dispatchMessage, fixedDeliveryCharge: $fixedDeliveryCharge, updated_at: $updated_at, update_source: $update_source, update_device: $update_device, update_device_id: $update_device_id, update_details: $update_details, FixedDeliveryLocationList: $FixedDeliveryLocationList)';
+    return 'StoreDeliverySettingsInfo(id: $id, shopId: $shopId, shopPostcode: $shopPostcode, currencyType: $currencyType, takeAway: $takeAway, homeDelivery: $homeDelivery, shopOpen_temp_off: $shopOpen_temp_off, takeAway_temp_off: $takeAway_temp_off, homeDelivery_temp_off: $homeDelivery_temp_off, discountTakeAway: $discountTakeAway, minAmtForTakAwayDiscnt: $minAmtForTakAwayDiscnt, deliveryMinAmount: $deliveryMinAmount, deliveryMinAmountType: $deliveryMinAmountType, discountHomeDelivery: $discountHomeDelivery, minAmtForHomDelvryDiscnt: $minAmtForHomDelvryDiscnt, distanceType: $distanceType, freeDelivery: $freeDelivery, freeDeliveryRadius: $freeDeliveryRadius, freeDeliveryMinOrder: $freeDeliveryMinOrder, deliveryChargeType: $deliveryChargeType, minDeliveryCharge: $minDeliveryCharge, ratePerMile: $ratePerMile, maxDeliveryRadius: $maxDeliveryRadius, preOrder: $preOrder, preOrderBefore: $preOrderBefore, minWaitingTime: $minWaitingTime, onlinePaymentMinAmount: $onlinePaymentMinAmount, dispatchMessage: $dispatchMessage, fixedDeliveryCharge: $fixedDeliveryCharge, updated_at: $updated_at, update_source: $update_source, update_device: $update_device, update_device_id: $update_device_id, update_details: $update_details,listUnavailableProducts:$listUnavailableProducts, FixedDeliveryLocationList: $FixedDeliveryLocationList)';
   }
 
   @override
@@ -697,6 +706,7 @@ class StoreDeliverySettingsInfo {
         other.update_device == update_device &&
         other.update_device_id == update_device_id &&
         other.update_details == update_details &&
+        other.listUnavailableProducts == listUnavailableProducts &&
         listEquals(other.FixedDeliveryLocationList, FixedDeliveryLocationList);
   }
 
@@ -736,6 +746,7 @@ class StoreDeliverySettingsInfo {
         update_device.hashCode ^
         update_device_id.hashCode ^
         update_details.hashCode ^
+        listUnavailableProducts.hashCode ^
         FixedDeliveryLocationList.hashCode;
   }
 }

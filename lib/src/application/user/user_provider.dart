@@ -138,8 +138,10 @@ class UserProvider extends ChangeNotifier with BaseController {
 
   void initAllTextEditingController() {
     addressTitleTxtController = TextEditingController();
-    firstNameTxtController = TextEditingController();
-    lastNameTxtController = TextEditingController();
+    firstNameTxtController =
+        TextEditingController(text: userData?.user.userFirstName ?? '');
+    lastNameTxtController =
+        TextEditingController(text: userData?.user.userLastName ?? '');
     line1TxtController = TextEditingController();
     line2TxtController = TextEditingController();
     townTxtController = TextEditingController();

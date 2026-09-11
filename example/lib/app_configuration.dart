@@ -16,7 +16,7 @@ final appConfig = AppConfig(
   fireBaseProjectId: 'customerapp-6d5f7',
   themeMode: AppThemeMode.system,
   isCategoryImageEnabled: true,
-  businessType: BusinessType.fish,
+  // businessType: BusinessType.fish,
   // applicationName: 'Urban Spice',
   // shopName: 'Urban Spice',
   // shopId: '76',

@@ -20,6 +20,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
+import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:customer_core/src/core/utils/ui_utils.dart';
@@ -620,6 +621,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       .getProductQuantity(product.pID);
                                   final cartIndex = cartProvider
                                       .getProductCartIndex(product.pID);
+                                  // Overlay the latest known stock so the
+                                  // stepper caps stay correct even when this
+                                  // list has not been refreshed.
+                                  final freshProduct = productProvider
+                                      .overlayStockFromProductsList(product);
 
                                   return ProductDetailsTile(
                                     product,
@@ -647,7 +653,17 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                         onIncrementQty: () {
                                           cartProvider
                                               .incrementCartItemQtyWithStockCheck(
-                                                  cartIndex, product);
+                                                  cartIndex, freshProduct);
+                                        },
+                                        onIncrementBlocked: () {
+                                          AlertDialogs.showError(
+                                            productQtyUpdated > 0
+                                                ? 'You have added the maximum '
+                                                    'available quantity for '
+                                                    'this item.'
+                                                : 'Sorry, this item is currently '
+                                                    'out of stock.',
+                                          );
                                         }),
                                     useSecondaryWidget: isExist,
                                     onPressed: () {
@@ -695,9 +711,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            AppConfig.instance.businessType == BusinessType.restaurant
-                ? "Our Featured Dishes"
-                : "Today's Catch",
+            "Our Featured Items",
             style: context.customTextTheme.text16W600,
           ),
         ),
@@ -722,10 +736,14 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                           final product = products.elementAt(index);
                           final isExist =
                               cartProvider.isProductExist(product.pID);
-                          // final productQtyUpdated =
-                          //     cartProvider.getProductQuantity(product.pID);
                           final cartIndex =
                               cartProvider.getProductCartIndex(product.pID);
+                          // Overlay the latest known stock so the stepper caps
+                          // stay correct even when this list was not refreshed.
+                          final freshProduct = productProvider
+                              .overlayStockFromProductsList(product);
+                          final productQtyUpdated =
+                              cartProvider.getProductQuantity(product.pID);
 
                           return ProductDetailsTile(
                             product,
@@ -753,7 +771,16 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                 onIncrementQty: () {
                                   cartProvider
                                       .incrementCartItemQtyWithStockCheck(
-                                          cartIndex, product);
+                                          cartIndex, freshProduct);
+                                },
+                                onIncrementBlocked: () {
+                                  AlertDialogs.showError(
+                                    productQtyUpdated > 0
+                                        ? 'You have added the maximum '
+                                            'available quantity for this item.'
+                                        : 'Sorry, this item is currently out '
+                                            'of stock.',
+                                  );
                                 }),
                             useSecondaryWidget: isExist,
                             onPressed: () {
@@ -784,6 +811,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
   Widget buildPopularProducts(BuildContext context) {
     final cartProvider = context.watch<CartProvider>();
     final productListner = context.watch<ProductsProvider>();
+    final productProvider = context.read<ProductsProvider>();
 
     final products = productListner
             .featuredPopularProductsAPIResponse.data?.popularProducts ??
@@ -796,9 +824,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
-            AppConfig.instance.businessType == BusinessType.restaurant
-                ? "Popular Dishes"
-                : "Popular Catches",
+            "Popular Items",
             style: context.customTextTheme.text16W600,
           ),
         ),
@@ -832,6 +858,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                     .getProductQuantity(product.pID);
                                 final cartIndex = cartProvider
                                     .getProductCartIndex(product.pID);
+                                // Overlay the latest known stock so the
+                                // stepper caps stay correct even when this
+                                // list was not refreshed.
+                                final freshProduct = productProvider
+                                    .overlayStockFromProductsList(product);
 
                                 return ProductDetailsTile(
                                   product,
@@ -859,7 +890,17 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       onIncrementQty: () {
                                         cartProvider
                                             .incrementCartItemQtyWithStockCheck(
-                                                cartIndex, product);
+                                                cartIndex, freshProduct);
+                                      },
+                                      onIncrementBlocked: () {
+                                        AlertDialogs.showError(
+                                          productQtyUpdated > 0
+                                              ? 'You have added the maximum '
+                                                  'available quantity for '
+                                                  'this item.'
+                                              : 'Sorry, this item is currently '
+                                                  'out of stock.',
+                                        );
                                       }),
                                   useSecondaryWidget: isExist,
                                   onPressed: () {
@@ -1392,10 +1433,9 @@ class __SearchResultsState extends State<_SearchResults> {
                         cartProvider.getProductQuantity(product.pID);
                     final cartIndex =
                         cartProvider.getProductCartIndex(product.pID);
-
                     final stockAwareProduct = context
                         .read<ProductsProvider>()
-                        .overlayStockFromProductsList(product);
+                        .overlayStockFromSecondarySource(product);
 
                     return ProductDetailsTile(stockAwareProduct,
                         showFavIcon: cartListener.isUserLoggedIn,
@@ -1433,6 +1473,15 @@ class __SearchResultsState extends State<_SearchResults> {
                           },
                           onDecrementQty: () {
                             cartProvider.decrementCartItemQty(cartIndex);
+                          },
+                          onIncrementBlocked: () {
+                            AlertDialogs.showError(
+                              productQtyUpdated > 0
+                                  ? 'You have added the maximum available '
+                                      'quantity for this item.'
+                                  : 'Sorry, this item is currently out of '
+                                      'stock.',
+                            );
                           },
                         ));
                   },

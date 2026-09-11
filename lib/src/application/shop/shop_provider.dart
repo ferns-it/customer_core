@@ -28,6 +28,8 @@ class ShopProvider extends ChangeNotifier with BaseController {
 
   Map<String, String>? get spiceLevelIcons =>
       storeSettings.data?.producctUISettings?.spicelevelIcons;
+  bool get canListUnavailableProducts =>
+      storeSettings.data?.deliveryInfo?.listUnavailableProducts == 'Disabled';
 
   APIResponse<StoreDeliverySlotModel> _deliverySlots = APIResponse.initial();
 
@@ -177,10 +179,10 @@ class ShopProvider extends ChangeNotifier with BaseController {
     // Prefer the store's country code from the settings API, falling back
     // to the app-level configured dial code.
     final settingsCountryCode = _storeSettings.data?.countryCode?.trim();
-    final defaultDialCode = (settingsCountryCode == null ||
-            settingsCountryCode.isEmpty)
-        ? AppConfig.instance.country.dialCode
-        : settingsCountryCode;
+    final defaultDialCode =
+        (settingsCountryCode == null || settingsCountryCode.isEmpty)
+            ? AppConfig.instance.country.dialCode
+            : settingsCountryCode;
 
     // Normalize to digits only so it matches whether the API returns "+91" or "91".
     String normalizeDialCode(String? code) =>

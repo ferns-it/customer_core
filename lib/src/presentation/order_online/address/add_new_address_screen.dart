@@ -1,5 +1,6 @@
 import 'package:auto_route/annotations.dart';
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:customer_core/src/application/user/user_provider.dart';
@@ -96,9 +97,8 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
 
   Widget _buildAddressForm(BuildContext context, UserProvider userProvider,
       UserAddressDataModel? address) {
-    // if (address != null) {
-    //   userProvider.addressTitleTxtController.text = address.addressTitle ?? '';
-    //   userProvider.firstNameTxtController.text = address.firstName ?? '';
+    final shopProvider = context.read<ShopProvider>();
+    final countryCode = shopProvider.storeSettings.data?.countryCode;
     //   userProvider.lastNameTxtController.text = address.lastName ?? '';
     //   userProvider.line1TxtController.text = address.line1 ?? '';
     //   userProvider.line2TxtController.text = address.line2 ?? '';
@@ -170,7 +170,7 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                   controller: userProvider.postCodeTxtController,
                   // validator: (value) =>
                   //     Utils.commonValidator(value, '*required'),
-                  inputFormatters: AppConfig.instance.country == Country.ind
+                  inputFormatters: countryCode == '+91'
                       ? [
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(6),
@@ -178,7 +178,7 @@ class AddNewAddressScreen extends GetProviderView<UserProvider> {
                       : null,
                   validator: (value) => Utils.postcodeValidator(
                     value,
-                    AppConfig.instance.country,
+                    countryCode,
                   ),
                 ),
               ),

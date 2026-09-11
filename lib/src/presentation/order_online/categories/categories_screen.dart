@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
 import 'package:customer_core/src/application/home/home_provider.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
+import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/application/user/user_provider.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
@@ -578,6 +579,9 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                   .getProductQuantity(product.pID);
                               final cartIndex =
                                   cartProvider.getProductCartIndex(product.pID);
+                      
+                              final freshProduct = productListener
+                                  .overlayStockFromProductsList(product);
                               return ProductDetailsTile(
                                 showFavIcon: cartListener.isUserLoggedIn,
                                 product,
@@ -591,7 +595,17 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                     onIncrementQty: () {
                                       cartProvider
                                           .incrementCartItemQtyWithStockCheck(
-                                              cartIndex, product);
+                                              cartIndex, freshProduct);
+                                    },
+                                    onIncrementBlocked: () {
+                                      AlertDialogs.showError(
+                                        productQtyUpdated > 0
+                                            ? 'You have added the maximum '
+                                                'available quantity for '
+                                                'this item.'
+                                            : 'Sorry, this item is currently '
+                                                'out of stock.',
+                                      );
                                     }),
                                 useSecondaryWidget: isExist,
                                 onPressed: () {

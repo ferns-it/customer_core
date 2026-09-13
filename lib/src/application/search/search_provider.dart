@@ -47,7 +47,7 @@ class SearchProvider extends ChangeNotifier with BaseController {
         return error;
       }, (result) async {
         previousSearchKey = searchKey;
-        productsProvider.indexStockFrom(result);
+        productsProvider.indexStockFrom(result, overwriteExisting: false);
         final favouriteList = productsProvider
                 .favouriteProductResponse.data?.favouriteList?.productList ??
             [];
@@ -62,7 +62,8 @@ class SearchProvider extends ChangeNotifier with BaseController {
             favouriteID: favId ?? "",
           );
         }).toList();
-        _searchResponse = updatedSearchList;
+        _searchResponse =
+            productsProvider.filterListableProducts(updatedSearchList);
         notifyListeners();
       });
     } finally {

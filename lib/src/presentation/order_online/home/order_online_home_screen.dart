@@ -292,7 +292,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cartProvider = context.watch<CartProvider>();
     final productProvider = context.read<ProductsProvider>();
-    final productListener = context.read<ProductsProvider>();
+    final productListener = context.watch<ProductsProvider>();
     final cartListener = context.watch<CartProvider>();
     final shopListener = context.watch<ShopProvider>();
 
@@ -531,7 +531,10 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
   Widget buildDealsWidget(ProductsProvider productListener,
       CartProvider cartProvider, ProductsProvider productProvider) {
     // final listOfItems = ['Hot Deals', 'Best Seller', 'Top Rated'];
-    final products = productProvider.productsList;
+    final deals = productListener
+        .filterListableProducts(productListener.productsListRandom)
+        .take(4)
+        .toList();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Column(
@@ -599,20 +602,17 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                   ? const CupertinoActivityIndicator()
                   : Column(
                       children: [
-                        products.isEmpty
+                        deals.isEmpty
                             ? const Center(child: Text("No products found"))
                             : AlignedGridView.count(
                                 physics: const NeverScrollableScrollPhysics(),
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 4.0,
                                 mainAxisSpacing: 8.0,
-                                itemCount: 4,
+                                itemCount: deals.length,
                                 shrinkWrap: true,
                                 itemBuilder: (context, index) {
-                                  final product = productListener
-                                      .productsListRandom
-                                      .getRange(8, 12)
-                                      .elementAt(index);
+                                  final product = deals.elementAt(index);
                                   final isExist = context
                                       .watch<CartProvider>()
                                       .isProductExist(product.pID);
@@ -626,9 +626,16 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                   // list has not been refreshed.
                                   final freshProduct = productProvider
                                       .overlayStockFromProductsList(product);
+                                  final remainingStock = cartProvider
+                                      .getRemainingFishStock(freshProduct);
+                                  final isFishStockEnabled =
+                                      freshProduct.stock?.activated == true;
+                                  final maxQty = isFishStockEnabled
+                                      ? productQtyUpdated + remainingStock
+                                      : null;
 
                                   return ProductDetailsTile(
-                                    product,
+                                    freshProduct,
                                     onPressFavouriteBtn: () async {
                                       if (product.isFavourite) {
                                         await context
@@ -646,6 +653,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                     secondaryWidget: QtyCounterButton2(
                                         qty: productQtyUpdated,
                                         allowDecrementAtMinimum: true,
+                                        maxQty: maxQty,
                                         onDecrementQty: () {
                                           cartProvider
                                               .decrementCartItemQty(cartIndex);
@@ -657,17 +665,12 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                         },
                                         onIncrementBlocked: () {
                                           AlertDialogs.showError(
-                                            productQtyUpdated > 0
-                                                ? 'You have added the maximum '
-                                                    'available quantity for '
-                                                    'this item.'
-                                                : 'Sorry, this item is currently '
-                                                    'out of stock.',
+                                            'Sorry, this item is currently out of stock.',
                                           );
                                         }),
                                     useSecondaryWidget: isExist,
                                     onPressed: () {
-                                      showItemDetailsBottomSheet(product);
+                                      showItemDetailsBottomSheet(freshProduct);
                                     },
                                     onPressAddBtn: () {
                                       if (product.pID == null) return;
@@ -685,7 +688,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       //     cartProvider.resetValues();
                                       //   }
                                       // });
-                                      showAddItemBottomSheet(product);
+                                      showAddItemBottomSheet(freshProduct);
                                     },
                                   );
                                 },
@@ -699,9 +702,10 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
 
   Widget buildFeaturedProducts(ProductsProvider productListener,
       CartProvider cartProvider, ProductsProvider productProvider) {
-    final products = productProvider
+    final rawProducts = productListener
             .featuredPopularProductsAPIResponse.data?.featuredProducts ??
         [];
+    final products = productListener.filterListableProducts(rawProducts);
     final showFavIcon = cartProvider.isUserLoggedIn;
 
     return Column(
@@ -740,13 +744,20 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               cartProvider.getProductCartIndex(product.pID);
                           // Overlay the latest known stock so the stepper caps
                           // stay correct even when this list was not refreshed.
-                          final freshProduct = productProvider
+                          final freshProduct = productListener
                               .overlayStockFromProductsList(product);
                           final productQtyUpdated =
                               cartProvider.getProductQuantity(product.pID);
+                          final remainingStock = cartProvider
+                              .getRemainingFishStock(freshProduct);
+                          final isFishStockEnabled =
+                              freshProduct.stock?.activated == true;
+                          final maxQty = isFishStockEnabled
+                              ? productQtyUpdated + remainingStock
+                              : null;
 
                           return ProductDetailsTile(
-                            product,
+                            freshProduct,
                             showFavIcon: showFavIcon,
                             onPressFavouriteBtn: () async {
                               if (product.isFavourite) {
@@ -765,6 +776,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                 qty: cartProvider
                                     .getProductQuantity(product.pID),
                                 allowDecrementAtMinimum: true,
+                                maxQty: maxQty,
                                 onDecrementQty: () {
                                   cartProvider.decrementCartItemQty(cartIndex);
                                 },
@@ -775,16 +787,12 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                 },
                                 onIncrementBlocked: () {
                                   AlertDialogs.showError(
-                                    productQtyUpdated > 0
-                                        ? 'You have added the maximum '
-                                            'available quantity for this item.'
-                                        : 'Sorry, this item is currently out '
-                                            'of stock.',
+                                    'Sorry, this item is currently out of stock.',
                                   );
                                 }),
                             useSecondaryWidget: isExist,
                             onPressed: () {
-                              showItemDetailsBottomSheet(product);
+                              showItemDetailsBottomSheet(freshProduct);
                             },
                             onPressAddBtn: () {
                               if (product.pID == null) return;
@@ -799,7 +807,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               //     cartProvider.resetValues();
                               //   }
                               // });
-                              showAddItemBottomSheet(product);
+                              showAddItemBottomSheet(freshProduct);
                             },
                           );
                         },
@@ -813,9 +821,10 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     final productListner = context.watch<ProductsProvider>();
     final productProvider = context.read<ProductsProvider>();
 
-    final products = productListner
+    final rawProducts = productListner
             .featuredPopularProductsAPIResponse.data?.popularProducts ??
         [];
+    final products = productListner.filterListableProducts(rawProducts);
     final showFavIcon = cartProvider.isUserLoggedIn;
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -863,9 +872,16 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                 // list was not refreshed.
                                 final freshProduct = productProvider
                                     .overlayStockFromProductsList(product);
+                                final remainingStock = cartProvider
+                                    .getRemainingFishStock(freshProduct);
+                                final isFishStockEnabled =
+                                    freshProduct.stock?.activated == true;
+                                final maxQty = isFishStockEnabled
+                                    ? productQtyUpdated + remainingStock
+                                    : null;
 
                                 return ProductDetailsTile(
-                                  product,
+                                  freshProduct,
                                   showFavIcon: showFavIcon,
                                   onPressFavouriteBtn: () async {
                                     if (product.isFavourite) {
@@ -883,6 +899,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                   secondaryWidget: QtyCounterButton2(
                                       qty: productQtyUpdated,
                                       allowDecrementAtMinimum: true,
+                                      maxQty: maxQty,
                                       onDecrementQty: () {
                                         cartProvider
                                             .decrementCartItemQty(cartIndex);
@@ -894,17 +911,12 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       },
                                       onIncrementBlocked: () {
                                         AlertDialogs.showError(
-                                          productQtyUpdated > 0
-                                              ? 'You have added the maximum '
-                                                  'available quantity for '
-                                                  'this item.'
-                                              : 'Sorry, this item is currently '
-                                                  'out of stock.',
+                                          'Sorry, this item is currently out of stock.',
                                         );
                                       }),
                                   useSecondaryWidget: isExist,
                                   onPressed: () {
-                                    showItemDetailsBottomSheet(product);
+                                    showItemDetailsBottomSheet(freshProduct);
                                   },
                                   onPressAddBtn: () {
                                     if (product.pID == null) return;
@@ -920,7 +932,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                     //     cartProvider.resetValues();
                                     //   }
                                     // });
-                                    showAddItemBottomSheet(product);
+                                    showAddItemBottomSheet(freshProduct);
                                   },
                                 );
                               },
@@ -1408,13 +1420,15 @@ class __SearchResultsState extends State<_SearchResults> {
 
     return Consumer<SearchProvider>(
       builder: (context, value, child) {
+        final productsProvider = context.watch<ProductsProvider>();
+        final searchResults = productsProvider
+            .filterListableProducts(value.searchResponse ?? []);
         if (value.isSearchLoading) {
           return Center(
               child: CircularProgressIndicator(
             color: Theme.of(context).colorScheme.primary,
           ));
-        } else if (value.searchResponse == null ||
-            value.searchResponse?.isEmpty == true) {
+        } else if (searchResults.isEmpty) {
           return const Center(child: Text("No products found"));
         }
         return Padding(
@@ -1423,19 +1437,25 @@ class __SearchResultsState extends State<_SearchResults> {
               crossAxisCount: 2,
               mainAxisSpacing: 0,
               crossAxisSpacing: 0,
-              itemCount: value.searchResponse?.length ?? 0,
+              itemCount: searchResults.length,
               itemBuilder: (context, index) {
-                final product = value.searchResponse?.elementAt(index);
+                final product = searchResults.elementAt(index);
                 return Consumer<CartProvider>(
                   builder: (context, cartProvider, child) {
-                    final isExist = cartProvider.isProductExist(product!.pID);
+                    final isExist = cartProvider.isProductExist(product.pID);
                     final productQtyUpdated =
                         cartProvider.getProductQuantity(product.pID);
                     final cartIndex =
                         cartProvider.getProductCartIndex(product.pID);
-                    final stockAwareProduct = context
-                        .read<ProductsProvider>()
-                        .overlayStockFromSecondarySource(product);
+                    final stockAwareProduct = productsProvider
+                        .overlayStockFromProductsList(product);
+                    final remainingStock = cartProvider
+                        .getRemainingFishStock(stockAwareProduct);
+                    final isFishStockEnabled =
+                        stockAwareProduct.stock?.activated == true;
+                    final maxQty = isFishStockEnabled
+                        ? productQtyUpdated + remainingStock
+                        : null;
 
                     return ProductDetailsTile(stockAwareProduct,
                         showFavIcon: cartListener.isUserLoggedIn,
@@ -1467,6 +1487,7 @@ class __SearchResultsState extends State<_SearchResults> {
                         secondaryWidget: QtyCounterButton2(
                           qty: productQtyUpdated,
                           allowDecrementAtMinimum: true,
+                          maxQty: maxQty,
                           onIncrementQty: () {
                             cartProvider.incrementCartItemQtyWithStockCheck(
                                 cartIndex, stockAwareProduct);
@@ -1476,11 +1497,7 @@ class __SearchResultsState extends State<_SearchResults> {
                           },
                           onIncrementBlocked: () {
                             AlertDialogs.showError(
-                              productQtyUpdated > 0
-                                  ? 'You have added the maximum available '
-                                      'quantity for this item.'
-                                  : 'Sorry, this item is currently out of '
-                                      'stock.',
+                              'Sorry, this item is currently out of stock.',
                             );
                           },
                         ));

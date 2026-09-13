@@ -427,7 +427,7 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                             onIncrementQty: () {
                               shopProvider.clearSelectedDeliverySlot();
                               cartProvider.incrementCartItemQtyWithStockCheck(
-                                  cartIndex, cartProduct);
+                                  index, cartProduct);
                             },
                             onIncrementBlocked: () {
                               AlertDialogs.showError(

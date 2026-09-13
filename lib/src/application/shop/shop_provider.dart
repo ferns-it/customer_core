@@ -25,16 +25,25 @@ class ShopProvider extends ChangeNotifier with BaseController {
   APIResponse<StoreSettingsDataModel> _storeSettings = APIResponse.initial();
 
   APIResponse<StoreSettingsDataModel> get storeSettings => _storeSettings;
+  set storeSettings(APIResponse<StoreSettingsDataModel> value) =>
+      _storeSettings = value;
 
   Map<String, String>? get spiceLevelIcons =>
       storeSettings.data?.producctUISettings?.spicelevelIcons;
-  bool get canListUnavailableProducts =>
-      storeSettings.data?.deliveryInfo?.listUnavailableProducts == 'Disabled';
+
+  /// When "listUnavailableProducts" is "Enabled" in store delivery info,
+  /// out-of-stock / unavailable products should be hidden from listings.
+  bool get shouldHideUnavailableProducts =>
+      storeSettings.data?.deliveryInfo?.listUnavailableProducts
+          ?.trim()
+          .toLowerCase() ==
+      'enabled';
+
+  bool get canListUnavailableProducts => !shouldHideUnavailableProducts;
 
   APIResponse<StoreDeliverySlotModel> _deliverySlots = APIResponse.initial();
 
   APIResponse<StoreDeliverySlotModel> get deliverySlots => _deliverySlots;
-
   DateTime? _selectedDate;
   DateTime? get selectedDate => _selectedDate;
 

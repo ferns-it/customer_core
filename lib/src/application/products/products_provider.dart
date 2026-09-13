@@ -37,9 +37,59 @@ class ProductsProvider extends ChangeNotifier with BaseController {
   Timer? _stockResyncTimer;
   void syncStockAfterCartChange() {
     _stockResyncTimer?.cancel();
-    _stockResyncTimer = Timer(const Duration(milliseconds: 500), () {
-      getFeaturedPopularProducts(silent: true);
-    });
+    getFeaturedPopularProducts(silent: true);
+  }
+
+  /// Immediately marks a product as out of stock and re-filters all product lists.
+  void markProductOutOfStock(String pID) {
+    final currentStock = _productStockCache[pID];
+    _productStockCache[pID] = (currentStock ?? ProductStockDetails()).copyWith(
+      activated: true,
+      availableStock: 0,
+    );
+    _refilterAllProductsAfterStockChange();
+    notifyListeners();
+  }
+
+  void _refilterAllProductsAfterStockChange() {
+    if (!shopProvider.canListUnavailableProducts) {
+      final featuredData = _featuredPopularProductsAPIResponse.data;
+      if (featuredData != null) {
+        _featuredPopularProductsAPIResponse = APIResponse.completed(
+          featuredData.copyWith(
+            featuredProducts:
+                filterListableProducts(featuredData.featuredProducts ?? []),
+            popularProducts:
+                filterListableProducts(featuredData.popularProducts ?? []),
+          ),
+        );
+      }
+
+      final favData = _favouriteProductResponse.data;
+      if (favData?.favouriteList?.productList != null) {
+        _favouriteProductResponse = APIResponse.completed(
+          FavouriteProductRawDataModel(
+            favouriteList: FavouriteProductDataModel(
+              productList:
+                  filterListableProducts(favData!.favouriteList!.productList),
+            ),
+          ),
+        );
+      }
+
+      final productData = _productsListAPIResponse.data;
+      if (productData != null) {
+        _productsListAPIResponse = APIResponse.completed(
+          filterListableProducts(productData),
+        );
+      }
+      productsListRandom = filterListableProducts(productsListRandom);
+
+      for (final entry in _cachedProducts.entries) {
+        _cachedProducts[entry.key] = filterListableProducts(entry.value);
+      }
+      _productsCollection = filterListableProducts(_productsCollection);
+    }
   }
 
   @override
@@ -63,13 +113,26 @@ class ProductsProvider extends ChangeNotifier with BaseController {
   List<ProductDataModel> get productsList =>
       _productsListAPIResponse.data ?? [];
 
+  void refreshListings() {
+    notifyListeners();
+  }
+
   ProductDataModel overlayStockFromProductsList(ProductDataModel product) {
     if (product.pID == null) return product;
     final cachedStock = stockForID(product.pID);
-    if (cachedStock != null) return product.copyWith(stock: cachedStock);
-    final source = productsList.firstOrNullWhere((p) => p.pID == product.pID);
-    if (source == null || source.stock == null) return product;
-    return product.copyWith(stock: source.stock);
+    if (cachedStock != null) {
+      return product.copyWith(stock: cachedStock);
+    }
+    final source = productsList.firstOrNullWhere((p) => p.pID == product.pID) ??
+        _featuredPopularProductsAPIResponse.data?.featuredProducts
+            ?.firstOrNullWhere((p) => p.pID == product.pID) ??
+        _featuredPopularProductsAPIResponse.data?.popularProducts
+            ?.firstOrNullWhere((p) => p.pID == product.pID) ??
+        productsListRandom.firstOrNullWhere((p) => p.pID == product.pID);
+    if (source?.stock != null) {
+      return product.copyWith(stock: source!.stock);
+    }
+    return product;
   }
 
   List<ProductDataModel> _productsCollection = [];
@@ -117,8 +180,6 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       if (stock.availableStock == null) continue;
       if (!overwriteExisting) {
         if (_productStockCache.containsKey(product.pID)) continue;
-        // Secondary sources must never introduce a sold-out state into the
-        // cache; only a positive countable amount is safe to fill with.
         if (stock.availableStock! <= 0) continue;
       }
       _productStockCache[product.pID!] = stock;
@@ -128,22 +189,6 @@ class ProductsProvider extends ChangeNotifier with BaseController {
   /// Latest stock known for a dish, or `null` if it has never been fetched.
   ProductStockDetails? stockForID(String? pID) =>
       pID == null ? null : _productStockCache[pID];
-
-  ProductDataModel overlayStockFromSecondarySource(ProductDataModel product) {
-    if (product.pID == null) return product;
-    final cachedStock = stockForID(product.pID);
-    if (cachedStock != null) return product.copyWith(stock: cachedStock);
-    final stock = product.stock;
-    final isDegenerate = stock?.activated == true &&
-        (stock!.availableStock == null || stock.availableStock! <= 0);
-    if (isDegenerate) {
-      // "No stock information" instead of a false sold-out flag.
-      return product.copyWith(
-        stock: ProductStockDetails(activated: false),
-      );
-    }
-    return product;
-  }
 
   int currentPageForPagination = 1;
   bool hasMoreProducts = true;
@@ -172,6 +217,9 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     bool isRandom = true,
     bool isRefresh = false,
   }) async {
+    if (shopProvider.storeSettings.data == null) {
+      await shopProvider.fetchStoreSettings();
+    }
     try {
       if (isFetchingProductsFromPagination || !hasMoreProducts) return;
       if (isRefresh) {
@@ -305,22 +353,32 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     notifyListeners();
   }
 
+  int Function(ProductDataModel product)? remainingStockResolver;
+
   bool isProductListable(ProductDataModel product) {
     if (product.isAvailable == false) return false;
-    final stock = product.stock;
-    final availableStock = stock?.availableStock;
-    if (stock?.activated == true &&
-        availableStock != null &&
-        availableStock <= 0) {
-      return false;
+    final freshProduct = overlayStockFromProductsList(product);
+    final stock = freshProduct.stock;
+    if (stock?.activated == true) {
+      if (remainingStockResolver != null) {
+        final remaining = remainingStockResolver!(freshProduct);
+        if (remaining <= 0) return false;
+      } else {
+        final availableStock = stock?.availableStock;
+        if (availableStock == null || availableStock <= 0) {
+          return false;
+        }
+      }
     }
     return true;
   }
+
   List<ProductDataModel> filterListableProducts(
       Iterable<ProductDataModel> products) {
     if (shopProvider.canListUnavailableProducts) return products.toList();
     return products.where(isProductListable).toList();
   }
+
   Future<void> getFeaturedPopularProducts({bool silent = false}) async {
     if (shopProvider.storeSettings.data == null) {
       await shopProvider.fetchStoreSettings();
@@ -371,6 +429,9 @@ class ProductsProvider extends ChangeNotifier with BaseController {
   }
 
   Future<void> getAllProducts(String categoryID) async {
+    if (shopProvider.storeSettings.data == null) {
+      await shopProvider.fetchStoreSettings();
+    }
     // if (_cachedProducts.containsKey(categoryID)) {
     //   _productsCollection = _cachedProducts[categoryID]!;
     //   _productsListAPIResponse = APIResponse.completed(_productsCollection);
@@ -448,6 +509,9 @@ class ProductsProvider extends ChangeNotifier with BaseController {
   // }
 
   Future<void> getAllCategories() async {
+    if (shopProvider.storeSettings.data == null) {
+      await shopProvider.fetchStoreSettings();
+    }
     _categoriesListAPIResponse = APIResponse.loading();
 
     notifyListeners();
@@ -672,7 +736,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
         );
         final exists = favList.any(
             (p) => p.pID == newFav.pID || p.favouriteID == newFav.favouriteID);
-        if (!exists) {
+        if (!exists && isProductListable(newFav)) {
           favList.add(newFav);
           _favouriteProductResponse = APIResponse.completed(
             FavouriteProductRawDataModel(
@@ -716,9 +780,8 @@ class ProductsProvider extends ChangeNotifier with BaseController {
               ),
             )
             .toList();
-        final overlaidList = modifiedList
-            .map(overlayStockFromSecondarySource)
-            .toList();
+        final overlaidList =
+            modifiedList.map(overlayStockFromProductsList).toList();
 
         final filteredFavourites = filterListableProducts(overlaidList);
         final modifiedFavouriteList = FavouriteProductRawDataModel(

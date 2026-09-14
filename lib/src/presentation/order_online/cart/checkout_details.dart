@@ -690,7 +690,11 @@ class CheckoutDetailsScreen extends StatelessWidget {
                 verticalSpaceTiny,
                 isTaxApplied == true
                     ? _SummaryRow(
-                        label: "VAT",
+                        // label: "VAT",
+                        label: cartListener.cartDetailsModel?.shopCurrency ==
+                                "INR "
+                            ? "GST"
+                            : "VAT",
                         value: taxAmount ??
                             '${AppConfig.instance.country.symbol}0.00',
                         style: context.customTextTheme.text16W600

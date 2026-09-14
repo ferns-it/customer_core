@@ -22,7 +22,6 @@ class CalculatedDeliveryChargeDetailsModel {
   final String? minimumAmountForDelivery;
   final String? minimumAmountType;
   final String? isTaxApplied;
-
   final DeliveryFeeGeneralData? generalData;
   final DeliveryFeeDeliverySettings? calculatedDeliverySettings;
   final DeliveryFeeAmountInPaisa? amountInPaisa;

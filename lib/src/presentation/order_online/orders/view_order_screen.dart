@@ -447,7 +447,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                   ) ...[
                 verticalSpaceTiny,
                 _SummaryRow(
-                    label: 'VAT ',
+                    label: orderDetails.taxLabel ?? 'VAT',
+                    // label: 'VAT ',
                     value: orderDetails.taxTotalAmount ?? '0.00',
                     style: context.customTextTheme.text16W600.copyWith(
                       color: context.customTextTheme.color,

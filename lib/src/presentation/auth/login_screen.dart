@@ -149,18 +149,30 @@ class _LoginScreenState extends State<LoginScreen> {
           UiConfig.instance.logoWithoutBackground,
           height: 125,
         ),
-        verticalSpaceMedium,
+        SizedBox(
+          height: 80,
+        ),
         ClipRRect(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(32.0),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+              filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
               child: Container(
-                padding: const EdgeInsets.all(15),
+                padding: const EdgeInsets.all(25),
                 decoration: BoxDecoration(
-                  color: AppColors.kBlack.withOpacity(0.4),
+                  color: const Color(0xFF062B45).withOpacity(0.78),
+                  // color: AppColors.kBlack.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(12.0),
                   border: Border.all(
-                      color: AppColors.kWhite.withOpacity(0.2), width: 1.0),
+                    // color: AppColors.kWhite.withOpacity(0.2), width: 1.0
+                    color: Colors.white.withOpacity(0.18),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.25),
+                      blurRadius: 25,
+                      offset: const Offset(0, 12),
+                    ),
+                  ],
                 ),
                 child: Stack(
                   children: [
@@ -254,6 +266,597 @@ class _LoginScreenState extends State<LoginScreen> {
     ));
   }
 
+  // Widget buildContent(
+  //   AuthProvider authProvider,
+  //   BuildContext context,
+  //   AuthProvider authListener,
+  //   HomeProvider homeProvider,
+  //   HomeProvider homeListener,
+  // ) {
+  //   return Center(
+  //     child: SingleChildScrollView(
+  //       physics: const BouncingScrollPhysics(),
+  //       padding: const EdgeInsets.symmetric(vertical: 20),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           // LOGO
+  //           Image.asset(
+  //             UiConfig.instance.logoWithoutBackground,
+  //             height: 125,
+  //             fit: BoxFit.contain,
+  //           ),
+
+  //           const SizedBox(height: 30),
+
+  //           // GLASS LOGIN CARD
+  //           ClipRRect(
+  //             borderRadius: BorderRadius.circular(32),
+  //             child: BackdropFilter(
+  //               filter: ImageFilter.blur(
+  //                 sigmaX: 15,
+  //                 sigmaY: 15,
+  //               ),
+  //               child: Container(
+  //                 width: double.infinity,
+  //                 padding: const EdgeInsets.fromLTRB(
+  //                   44,
+  //                   26,
+  //                   44,
+  //                   36,
+  //                 ),
+  //                 decoration: BoxDecoration(
+  //                   color: const Color(0xFF062B45).withOpacity(0.78),
+  //                   borderRadius: BorderRadius.circular(32),
+  //                   border: Border.all(
+  //                     color: Colors.white.withOpacity(0.18),
+  //                     width: 1.2,
+  //                   ),
+  //                   boxShadow: [
+  //                     BoxShadow(
+  //                       color: Colors.black.withOpacity(0.25),
+  //                       blurRadius: 25,
+  //                       offset: const Offset(0, 12),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 child: Stack(
+  //                   children: [
+  //                     // BACK BUTTON
+  //                     if (widget.showBackButton)
+  //                       Positioned(
+  //                         top: 0,
+  //                         left: 0,
+  //                         child: Container(
+  //                           height: 66,
+  //                           width: 66,
+  //                           decoration: BoxDecoration(
+  //                             shape: BoxShape.circle,
+  //                             color: Colors.white.withOpacity(0.08),
+  //                             border: Border.all(
+  //                               color: Colors.white.withOpacity(0.12),
+  //                             ),
+  //                           ),
+  //                           child: IconButton(
+  //                             onPressed: () {
+  //                               if (authListener.selectedAuthView ==
+  //                                   AuthView.register) {
+  //                                 switch (authListener.currentRegStage) {
+  //                                   case RegStage.contact:
+  //                                     authProvider.onChangeSelectedAuthView(
+  //                                       AuthView.login,
+  //                                     );
+  //                                     authProvider.clearValues();
+  //                                     break;
+
+  //                                   case RegStage.otpCombined:
+  //                                     authProvider.updateCurrentRegStage(
+  //                                       RegStage.contact,
+  //                                     );
+  //                                     break;
+
+  //                                   case RegStage.otpEmail:
+  //                                     authProvider.updateCurrentRegStage(
+  //                                       RegStage.contact,
+  //                                     );
+  //                                     break;
+
+  //                                   case RegStage.otpPhone:
+  //                                     authProvider.updateCurrentRegStage(
+  //                                       RegStage.contact,
+  //                                     );
+  //                                     break;
+
+  //                                   case RegStage.register:
+  //                                     if (authProvider.smsRequired &&
+  //                                         authProvider.emailRequired) {
+  //                                       authProvider.updateCurrentRegStage(
+  //                                         RegStage.otpCombined,
+  //                                       );
+  //                                     } else if (authProvider.emailRequired) {
+  //                                       authProvider.updateCurrentRegStage(
+  //                                         RegStage.otpEmail,
+  //                                       );
+  //                                     } else if (authProvider.smsRequired) {
+  //                                       authProvider.updateCurrentRegStage(
+  //                                         RegStage.otpPhone,
+  //                                       );
+  //                                     } else {
+  //                                       authProvider.updateCurrentRegStage(
+  //                                         RegStage.contact,
+  //                                       );
+  //                                     }
+  //                                     break;
+
+  //                                   case RegStage.success:
+  //                                     break;
+  //                                 }
+  //                               } else if (authListener.selectedAuthView ==
+  //                                   AuthView.forgotPassword) {
+  //                                 authProvider.onChangeSelectedAuthView(
+  //                                   AuthView.login,
+  //                                 );
+  //                                 authProvider.clearValues();
+  //                               } else {
+  //                                 Navigator.pop(context, false);
+  //                               }
+  //                             },
+  //                             icon: const Icon(
+  //                               Icons.arrow_back_ios_new_rounded,
+  //                               color: Colors.white,
+  //                               size: 24,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+
+  //                     Padding(
+  //                       padding: const EdgeInsets.only(top: 38),
+  //                       child: authListener.selectedAuthView ==
+  //                               AuthView.register
+  //                           ? _registerFormParent(
+  //                               authProvider,
+  //                               context,
+  //                               homeProvider,
+  //                               homeListener,
+  //                               authListener,
+  //                             )
+  //                           : authListener.selectedAuthView == AuthView.login
+  //                               ? _loginForm(
+  //                                   authProvider,
+  //                                   context,
+  //                                   authListener,
+  //                                   homeProvider,
+  //                                 )
+  //                               : _forgotWidgetParent(
+  //                                   authProvider,
+  //                                   context,
+  //                                   authListener,
+  //                                 ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // Widget _loginForm(
+  //   AuthProvider authProvider,
+  //   BuildContext context,
+  //   AuthProvider authListener,
+  //   HomeProvider homeProvider,
+  // ) {
+  //   return Form(
+  //     key: authProvider.loginFormKey,
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.stretch,
+  //       children: [
+  //         // SIGN IN
+  //         Center(
+  //           child: Text(
+  //             "SIGN IN",
+  //             style: TextStyle(
+  //               fontSize: 17,
+  //               fontWeight: FontWeight.w600,
+  //               letterSpacing: 0.8,
+  //               color: const Color(0xFF20BCEB),
+  //             ),
+  //           ),
+  //         ),
+
+  //         const SizedBox(height: 28),
+
+  //         // WELCOME BACK
+  //         Center(
+  //           child: Text(
+  //             "Welcome Back",
+  //             textAlign: TextAlign.center,
+  //             style: TextStyle(
+  //               fontSize: 34,
+  //               fontWeight: FontWeight.w700,
+  //               color: Colors.white,
+  //               letterSpacing: -0.5,
+  //             ),
+  //           ),
+  //         ),
+
+  //         const SizedBox(height: 10),
+
+  //         // SUBTITLE
+  //         Center(
+  //           child: Text(
+  //             "Enter your email and password to log in",
+  //             textAlign: TextAlign.center,
+  //             style: TextStyle(
+  //               fontSize: 16,
+  //               fontWeight: FontWeight.w400,
+  //               color: Colors.white.withOpacity(0.62),
+  //             ),
+  //           ),
+  //         ),
+
+  //         const SizedBox(height: 38),
+
+  //         // EMAIL LABEL
+  //         const Text(
+  //           "Email Address",
+  //           style: TextStyle(
+  //             fontSize: 15,
+  //             fontWeight: FontWeight.w500,
+  //             color: Colors.white,
+  //           ),
+  //         ),
+
+  //         const SizedBox(height: 10),
+
+  //         // EMAIL FIELD
+  //         _buildLoginField(
+  //           controller: authProvider.loginUserNameController,
+  //           hintText: "name@example.com",
+  //           icon: FluentIcons.mail_24_regular,
+  //           keyboardType: TextInputType.emailAddress,
+  //           textInputAction: TextInputAction.next,
+  //           validator: FormBuilderValidators.compose([
+  //             FormBuilderValidators.required(),
+  //             FormBuilderValidators.email(),
+  //           ]),
+  //         ),
+
+  //         const SizedBox(height: 28),
+
+  //         // PASSWORD LABEL
+  //         const Text(
+  //           "Password",
+  //           style: TextStyle(
+  //             fontSize: 15,
+  //             fontWeight: FontWeight.w500,
+  //             color: Colors.white,
+  //           ),
+  //         ),
+
+  //         const SizedBox(height: 10),
+
+  //         // PASSWORD FIELD
+  //         _buildLoginField(
+  //           controller: authProvider.loginUserPasswordController,
+  //           hintText: "••••••••",
+  //           icon: FluentIcons.password_24_regular,
+  //           obscureText: authProvider.loginPasswordHide,
+  //           keyboardType: TextInputType.visiblePassword,
+  //           textInputAction: TextInputAction.done,
+  //           suffixIcon: InkWell(
+  //             borderRadius: BorderRadius.circular(30),
+  //             onTap: authProvider.toggleLoginPassword,
+  //             child: Padding(
+  //               padding: const EdgeInsets.all(14),
+  //               child: Icon(
+  //                 authListener.loginPasswordHide
+  //                     ? FluentIcons.eye_off_24_regular
+  //                     : FluentIcons.eye_24_regular,
+  //                 color: Colors.white.withOpacity(0.55),
+  //                 size: 24,
+  //               ),
+  //             ),
+  //           ),
+  //           validator: FormBuilderValidators.compose([
+  //             FormBuilderValidators.required(),
+  //           ]),
+  //         ),
+
+  //         const SizedBox(height: 18),
+
+  //         // FORGOT PASSWORD
+  //         Align(
+  //           alignment: Alignment.centerRight,
+  //           child: InkWell(
+  //             borderRadius: BorderRadius.circular(8),
+  //             onTap: () {
+  //               authProvider.onChangeSelectedAuthView(
+  //                 AuthView.forgotPassword,
+  //               );
+  //             },
+  //             child: const Padding(
+  //               padding: EdgeInsets.symmetric(
+  //                 vertical: 6,
+  //                 horizontal: 2,
+  //               ),
+  //               child: Text(
+  //                 "Forgot Password?",
+  //                 style: TextStyle(
+  //                   fontSize: 16,
+  //                   fontWeight: FontWeight.w600,
+  //                   color: Color(0xFF28B9F0),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+
+  //         const SizedBox(height: 28),
+
+  //         // LOGIN BUTTON
+  //         InkWell(
+  //           borderRadius: BorderRadius.circular(16),
+  //           onTap: authListener.loginLoading
+  //               ? null
+  //               : () async {
+  //                   final validated = authProvider.validateLoginForm();
+
+  //                   if (!validated) return;
+
+  //                   await authProvider.loginUser().then((logged) async {
+  //                     if (logged) {
+  //                       AlertDialogs.showSuccess(
+  //                         "Login successfully!",
+  //                       );
+
+  //                       if (widget.showBackButton) {
+  //                         homeProvider.onChangeCurrentPage(0);
+  //                         Navigator.pop(context, true);
+
+  //                         context.read<UserProvider>().getUserData();
+
+  //                         context.read<CartProvider>().checkUserIsLogged();
+
+  //                         return;
+  //                       }
+
+  //                       DependencyRegistrar.initializeAllProviders(
+  //                         context,
+  //                       );
+
+  //                       await Future.delayed(
+  //                         const Duration(seconds: 1),
+  //                         () {
+  //                           context.router.replaceAll([
+  //                             const OrderOnlineScreenRoute(),
+  //                           ]).then((_) {
+  //                             authProvider.clearValues();
+  //                           });
+  //                         },
+  //                       );
+  //                     }
+  //                   });
+  //                 },
+  //           child: Container(
+  //             height: 64,
+  //             width: double.infinity,
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(16),
+
+  //               // BLUE GRADIENT
+  //               gradient: const LinearGradient(
+  //                 begin: Alignment.centerLeft,
+  //                 end: Alignment.centerRight,
+  //                 colors: [
+  //                   Color(0xFF0796D8),
+  //                   Color(0xFF11C2D5),
+  //                 ],
+  //               ),
+
+  //               boxShadow: [
+  //                 BoxShadow(
+  //                   color: const Color(0xFF0796D8).withOpacity(0.25),
+  //                   blurRadius: 18,
+  //                   offset: const Offset(0, 8),
+  //                 ),
+  //               ],
+  //             ),
+  //             child: Center(
+  //               child: authListener.loginLoading
+  //                   ? showButtonProgress(Colors.white)
+  //                   : Row(
+  //                       mainAxisAlignment: MainAxisAlignment.center,
+  //                       children: const [
+  //                         Text(
+  //                           "Log In",
+  //                           style: TextStyle(
+  //                             fontSize: 18,
+  //                             fontWeight: FontWeight.w600,
+  //                             color: Colors.white,
+  //                           ),
+  //                         ),
+  //                         SizedBox(width: 12),
+  //                         Icon(
+  //                           Icons.arrow_forward_rounded,
+  //                           color: Colors.white,
+  //                           size: 27,
+  //                         ),
+  //                       ],
+  //                     ),
+  //             ),
+  //           ),
+  //         ),
+
+  //         const SizedBox(height: 30),
+
+  //         // OR
+  //         Row(
+  //           children: [
+  //             Expanded(
+  //               child: Container(
+  //                 height: 1,
+  //                 color: Colors.white.withOpacity(0.18),
+  //               ),
+  //             ),
+  //             const Padding(
+  //               padding: EdgeInsets.symmetric(horizontal: 20),
+  //               child: Text(
+  //                 "OR",
+  //                 style: TextStyle(
+  //                   fontSize: 14,
+  //                   fontWeight: FontWeight.w500,
+  //                   color: Colors.white54,
+  //                 ),
+  //               ),
+  //             ),
+  //             Expanded(
+  //               child: Container(
+  //                 height: 1,
+  //                 color: Colors.white.withOpacity(0.18),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+
+  //         const SizedBox(height: 28),
+
+  //         // SIGN UP
+  //         Center(
+  //           child: RichText(
+  //             text: TextSpan(
+  //               children: [
+  //                 const TextSpan(
+  //                   text: "Don't have an account?  ",
+  //                   style: TextStyle(
+  //                     fontSize: 16,
+  //                     color: Colors.white70,
+  //                   ),
+  //                 ),
+  //                 TextSpan(
+  //                   text: "Sign Up",
+  //                   style: const TextStyle(
+  //                     fontSize: 16,
+  //                     fontWeight: FontWeight.w700,
+  //                     color: Color(0xFF20BCEB),
+  //                   ),
+  //                   recognizer: TapGestureRecognizer()
+  //                     ..onTap = () {
+  //                       context.read<ShopProvider>().setDefaultCountry();
+
+  //                       authProvider.onChangeSelectedAuthView(
+  //                         AuthView.register,
+  //                       );
+
+  //                       authProvider.clearValues();
+  //                     },
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  Widget _buildLoginField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    required TextInputType keyboardType,
+    required TextInputAction textInputAction,
+    bool obscureText = false,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      obscureText: obscureText,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 17,
+      ),
+      cursorColor: const Color(0xFF20BCEB),
+      validator: validator,
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color: Colors.white.withOpacity(0.38),
+          fontSize: 17,
+        ),
+        prefixIcon: Padding(
+          padding: const EdgeInsets.only(
+            left: 18,
+            right: 12,
+          ),
+          child: Icon(
+            icon,
+            color: Colors.white.withOpacity(0.75),
+            size: 27,
+          ),
+        ),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 58,
+          minHeight: 58,
+        ),
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.08),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 20,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(
+            color: Colors.white.withOpacity(0.15),
+            width: 1,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(
+            color: Colors.white.withOpacity(0.15),
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(
+            color: Color(0xFF20BCEB),
+            width: 1.5,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(
+            color: Colors.red.withOpacity(0.7),
+            width: 1,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(
+            color: Colors.red,
+            width: 1.5,
+          ),
+        ),
+        errorStyle: const TextStyle(
+          color: Colors.redAccent,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
   Widget _loginForm(
     AuthProvider authProvider,
     BuildContext context,
@@ -265,27 +868,64 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Form(
           key: authProvider.loginFormKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
+            // mainAxisAlignment: MainAxisAlignment.center,
+            // crossAxisAlignment: CrossAxisAlignment.center,
+            // mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               verticalSpaceSmall,
+              // Center(
+              //   child: Text(
+              //     "SIGN IN",
+              //     style: TextStyle(
+              //       fontSize: 15,
+              //       fontWeight: FontWeight.w600,
+              //       letterSpacing: 0.8,
+              //       color: const Color(0xFF20BCEB),
+              //     ),
+              //   ),
+              // ),
+              // verticalSpaceMedium,
               Text(
                 "Welcome Back",
-                style: context.customTextTheme.text24W600
-                    .copyWith(color: AppColors.kWhite),
+                // style: context.customTextTheme.text24W600
+                //     .copyWith(color: AppColors.kWhite),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
+                ),
               ),
-              verticalSpaceSmall,
-              Text(
-                "Enter your email and password to log in",
-                style: context.customTextTheme.text12W400
-                    .copyWith(color: AppColors.kWhite),
+              verticalSpaceTiny,
+              Center(
+                child: Text(
+                  "Enter your email and password to log in",
+                  // style: context.customTextTheme.text12W400
+                  //     .copyWith(color: AppColors.kWhite),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white.withOpacity(0.62),
+                  ),
+                ),
               ),
               verticalSpaceMedium,
+              Text(
+                "Email Address",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w100,
+                  color: Colors.white,
+                ),
+              ),
+              verticalSpaceTiny,
               CustomTextField(
                 textColor: AppColors.kWhite,
                 controller: authProvider.loginUserNameController,
-                hintText: "Email",
+                hintText: "name@gmail.com",
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
                 prefixIcon: const Icon(FluentIcons.mail_24_regular,
@@ -297,10 +937,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 fillColor: Colors.white.withOpacity(0.1),
               ),
               verticalSpaceRegular,
+              const Text(
+                "Password",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+              verticalSpaceTiny,
               CustomTextField(
                 textColor: AppColors.kWhite,
                 controller: authProvider.loginUserPasswordController,
-                hintText: "Password",
+                hintText: "••••••••",
                 keyboardType: TextInputType.visiblePassword,
                 textInputAction: TextInputAction.done,
                 prefixIcon: const Icon(FluentIcons.password_24_regular,
@@ -321,17 +970,42 @@ class _LoginScreenState extends State<LoginScreen> {
                 ]),
                 fillColor: Colors.white.withOpacity(0.1),
               ),
-              verticalSpaceMedium,
-              InkWell(
-                onTap: () {
-                  // context.router.push(const ForgotPasswordScreenRoute());
-                  authProvider
-                      .onChangeSelectedAuthView(AuthView.forgotPassword);
-                },
-                child: Text(
-                  "Forgot Password ?",
-                  style: context.customTextTheme.text14W700
-                      .copyWith(color: AppColors.kWhite),
+              verticalSpaceSmall,
+              // InkWell(
+              //   onTap: () {
+              //     // context.router.push(const ForgotPasswordScreenRoute());
+              //     authProvider
+              //         .onChangeSelectedAuthView(AuthView.forgotPassword);
+              //   },
+              //   child: Text(
+              //     "Forgot Password ?",
+              //     style: context.customTextTheme.text14W700
+              //         .copyWith(color: AppColors.kWhite),
+              //   ),
+              // ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () {
+                    authProvider.onChangeSelectedAuthView(
+                      AuthView.forgotPassword,
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 2,
+                    ),
+                    child: Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF28B9F0),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               verticalSpaceSmall,
@@ -373,15 +1047,41 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
+                      gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color(0xFF0796D8),
+                          Color(0xFF11C2D5),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF0796D8).withOpacity(0.25),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                       color: Theme.of(context).colorScheme.primary),
                   height: 50,
                   width: context.screenWidth,
                   child: Center(
                     child: !authListener.loginLoading
-                        ? Text(
-                            "Log In",
-                            style: context.customTextTheme.text16W400
-                                .copyWith(color: AppColors.kWhite),
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Log In",
+                                style: context.customTextTheme.text16W400
+                                    .copyWith(color: AppColors.kWhite),
+                              ),
+                              horizontalSpaceTiny,
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ],
                           )
                         : showButtonProgress(AppColors.kWhite),
                   ),
@@ -413,25 +1113,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               verticalSpaceMedium,
-              RichText(
-                text: TextSpan(
-                  style: context.customTextTheme.text14W500
-                      .copyWith(color: AppColors.kWhite),
-                  children: [
-                    const TextSpan(text: "Don't have an account?   "),
-                    TextSpan(
-                      text: "Sign Up",
-                      style: context.customTextTheme.text14W700
-                          .copyWith(color: AppColors.kWhite),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          context.read<ShopProvider>().setDefaultCountry();
-                          authProvider
-                              .onChangeSelectedAuthView(AuthView.register);
-                          authProvider.clearValues();
-                        },
-                    ),
-                  ],
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    style: context.customTextTheme.text14W500
+                        .copyWith(color: AppColors.kWhite),
+                    children: [
+                      const TextSpan(text: "Don't have an account?   "),
+                      TextSpan(
+                        text: "Sign Up",
+                        // style: context.customTextTheme.text14W700
+                        //     .copyWith(color: AppColors.kWhite),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF20BCEB),
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            context.read<ShopProvider>().setDefaultCountry();
+                            authProvider
+                                .onChangeSelectedAuthView(AuthView.register);
+                            authProvider.clearValues();
+                          },
+                      ),
+                    ],
+                  ),
                 ),
               )
             ],
@@ -511,20 +1218,43 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               verticalSpaceSmall,
+              // Center(
+              //   child: Text(
+              //     "SIGN UP",
+              //     style: TextStyle(
+              //       fontSize: 15,
+              //       fontWeight: FontWeight.w600,
+              //       letterSpacing: 0.8,
+              //       color: const Color(0xFF20BCEB),
+              //     ),
+              //   ),
+              // ),
+              // verticalSpaceMedium,
               authListener.currentRegStage == RegStage.success
                   ? const SizedBox.shrink()
                   : Text(
                       _getRegisterTitle(authListener),
-                      style: context.customTextTheme.text20W600
-                          .copyWith(color: AppColors.kWhite),
+                      // style: context.customTextTheme.text20W600
+                      //     .copyWith(color: AppColors.kWhite),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
+                      ),
                     ),
               verticalSpaceSmall,
               authListener.currentRegStage == RegStage.success
                   ? const SizedBox.shrink()
                   : Text(
                       _getRegisterSubtitle(authListener),
-                      style: context.customTextTheme.text12W400
-                          .copyWith(color: AppColors.kWhite),
+                      // style: context.customTextTheme.text12W400
+                      //     .copyWith(color: AppColors.kWhite),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white.withOpacity(0.62),
+                      ),
                     ),
               verticalSpaceMedium,
               _buildRegisterContent(authProvider, context, authListener),
@@ -570,8 +1300,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextSpan(
                         text: "Login",
-                        style: context.customTextTheme.text14W700
-                            .copyWith(color: AppColors.kWhite),
+                        // style: context.customTextTheme.text14W700
+                        //     .copyWith(color: AppColors.kWhite),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF20BCEB),
+                        ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             authProvider.initializeRegistrationFlow();
@@ -713,6 +1448,21 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
+            gradient: const LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Color(0xFF0796D8),
+                Color(0xFF11C2D5),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0796D8).withOpacity(0.25),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
             color: Theme.of(context).colorScheme.primary),
         height: 50,
         width: context.screenWidth,
@@ -1039,9 +1789,9 @@ class _LoginScreenState extends State<LoginScreen> {
               activeFillColor: AppColors.kWhite.withOpacity(0.1),
               selectedColor: Theme.of(context).colorScheme.primary,
               selectedFillColor: AppColors.kWhite.withOpacity(0.1),
-              fieldHeight: MediaQuery.of(context).size.width * 0.12,
-              fieldWidth: MediaQuery.of(context).size.width * 0.12,
-              fieldOuterPadding: const EdgeInsets.all(16.0),
+              fieldHeight: MediaQuery.of(context).size.width * 0.11,
+              fieldWidth: MediaQuery.of(context).size.width * 0.11,
+              fieldOuterPadding: const EdgeInsets.all(4.0),
             ),
             controller: authProvider.phoneOtpController,
             showCursor: false,
@@ -2112,6 +2862,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
+                      gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color(0xFF0796D8),
+                          Color(0xFF11C2D5),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF0796D8).withOpacity(0.25),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                       color: Theme.of(context).colorScheme.primary),
                   height: 50,
                   width: context.screenWidth,
@@ -2320,6 +3085,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         verticalSpaceSmall,
         _phoneInputForm(authProvider, context, authListener),
+        verticalSpaceMedium,
         _emailInputForm(authProvider, context, authListener),
       ],
     );
@@ -2333,103 +3099,120 @@ class _LoginScreenState extends State<LoginScreen> {
       key: authProvider.phoneFormKey,
       autovalidateMode: AutovalidateMode.disabled,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: CustomTextField(
-          textColor: AppColors.kWhite,
-          fillColor: Colors.white.withOpacity(0.1),
-          controller: authProvider.registerUserPhoneController,
-          hintText: "Phone Number",
-          keyboardType: TextInputType.phone,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(
-              shopProvider.selectedCountry?.code == "+91" ? 10 : 12,
-            ),
-          ],
-          textInputAction: TextInputAction.done,
-          prefixIcon: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<SmsAvailableCountriesData>(
-                borderRadius: BorderRadius.circular(10),
-                value: shopProvider.selectedCountry,
-                isDense: true,
-                dropdownColor: Colors.white.withOpacity(0.9),
-                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                selectedItemBuilder: (context) {
-                  return shopProvider.smsCountries.map((country) {
-                    return Row(
-                      children: [
-                        Text(
-                          countryCodeToEmoji(country.iso ?? ""),
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          country.code ?? "",
-                          style: const TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList();
-                },
-                items: shopProvider.smsCountries.map((country) {
-                  return DropdownMenuItem(
-                    value: country,
-                    child: Row(
-                      children: [
-                        Text(
-                          countryCodeToEmoji(country.iso ?? ""),
-                          style: const TextStyle(
-                            fontSize: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          country.code ?? "",
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    final oldCountryCode = shopProvider.selectedCountry?.code;
-                    final newCountryCode = value.code;
-
-                    if (oldCountryCode != newCountryCode) {
-                      authProvider.registerUserPhoneController.clear();
-                      authProvider.phoneFormKey.currentState?.reset();
-                    }
-                    shopProvider.updateSelectedCountry(value);
-                  }
-                },
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              "Phone Number",
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w100,
+                color: Colors.white,
               ),
             ),
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return "Phone number is required";
-            }
+            verticalSpaceTiny,
+            CustomTextField(
+              textColor: AppColors.kWhite,
+              fillColor: Colors.white.withOpacity(0.1),
+              controller: authProvider.registerUserPhoneController,
+              hintText: "Phone Number",
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(
+                  shopProvider.selectedCountry?.code == "+91" ? 10 : 12,
+                ),
+              ],
+              textInputAction: TextInputAction.done,
+              prefixIcon: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<SmsAvailableCountriesData>(
+                    borderRadius: BorderRadius.circular(10),
+                    value: shopProvider.selectedCountry,
+                    isDense: true,
+                    dropdownColor: Colors.white.withOpacity(0.9),
+                    icon:
+                        const Icon(Icons.arrow_drop_down, color: Colors.white),
+                    selectedItemBuilder: (context) {
+                      return shopProvider.smsCountries.map((country) {
+                        return Row(
+                          children: [
+                            Text(
+                              countryCodeToEmoji(country.iso ?? ""),
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              country.code ?? "",
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList();
+                    },
+                    items: shopProvider.smsCountries.map((country) {
+                      return DropdownMenuItem(
+                        value: country,
+                        child: Row(
+                          children: [
+                            Text(
+                              countryCodeToEmoji(country.iso ?? ""),
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              country.code ?? "",
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        final oldCountryCode =
+                            shopProvider.selectedCountry?.code;
+                        final newCountryCode = value.code;
 
-            final phone = value.trim();
-            final countryCode = shopProvider.selectedCountry?.code;
+                        if (oldCountryCode != newCountryCode) {
+                          authProvider.registerUserPhoneController.clear();
+                          authProvider.phoneFormKey.currentState?.reset();
+                        }
+                        shopProvider.updateSelectedCountry(value);
+                      }
+                    },
+                  ),
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Phone number is required";
+                }
 
-            if (countryCode == "+91") {
-              if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
-                return "Enter a valid Indian mobile number";
-              }
-            } else if (countryCode == "+44") {
-              if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
-                return "Enter a valid UK mobile number";
-              }
-            }
+                final phone = value.trim();
+                final countryCode = shopProvider.selectedCountry?.code;
 
-            return null;
-          },
+                if (countryCode == "+91") {
+                  if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
+                    return "Enter a valid Indian mobile number";
+                  }
+                } else if (countryCode == "+44") {
+                  if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
+                    return "Enter a valid UK mobile number";
+                  }
+                }
+
+                return null;
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -2441,21 +3224,36 @@ class _LoginScreenState extends State<LoginScreen> {
       key: authProvider.emailFormKey,
       autovalidateMode: AutovalidateMode.disabled,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: CustomTextField(
-          textColor: AppColors.kWhite,
-          fillColor: Colors.white.withOpacity(0.1),
-          enabled: !authListener.contactLoading,
-          controller: authProvider.registerUserEmailController,
-          hintText: "Email Address",
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.done,
-          prefixIcon:
-              const Icon(FluentIcons.mail_24_regular, color: AppColors.kGray3),
-          validator: FormBuilderValidators.compose([
-            FormBuilderValidators.required(),
-            FormBuilderValidators.email(),
-          ]),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              "Email Address",
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w100,
+                color: Colors.white,
+              ),
+            ),
+            verticalSpaceTiny,
+            CustomTextField(
+              textColor: AppColors.kWhite,
+              fillColor: Colors.white.withOpacity(0.1),
+              enabled: !authListener.contactLoading,
+              controller: authProvider.registerUserEmailController,
+              hintText: "name@gmail.com",
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.done,
+              prefixIcon: const Icon(FluentIcons.mail_24_regular,
+                  color: AppColors.kGray3),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(),
+                FormBuilderValidators.email(),
+              ]),
+            ),
+          ],
         ),
       ),
     );

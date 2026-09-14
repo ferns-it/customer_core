@@ -781,9 +781,11 @@ class CartProvider extends ChangeNotifier with BaseController {
         }
         if (product?.pID != null) {
           productsProvider.markProductOutOfStock(product!.pID!);
-        } else {
-          productsProvider.syncStockAfterCartChange();
         }
+        // Re-sync stock from the server right away so a transient failure
+        // cannot leave the product permanently shown as out of stock. The
+        // refreshed data overwrites the optimistic 0 with the real value.
+        productsProvider.syncStockAfterCartChange();
         final maxQty = product != null && product.stock?.activated == true
             ? getRemainingFishStock(product)
             : null;
@@ -863,14 +865,17 @@ class CartProvider extends ChangeNotifier with BaseController {
   bool _isStaleProductDataError(AppExceptions error) {
     if (error is FormatErrorException) return true;
     final message = error.message.trim().toLowerCase();
+    // Only match specific stock-related phrases here. A bare
+    // `contains('stock')` used to flag unrelated failures (and any
+    // FormatException) as "out of stock" and permanently poisoned the stock
+    // cache even when the server still had stock available.
     return message.contains('invalid json') ||
         message.contains('json format') ||
         message.contains('invalid response syntax') ||
         message.contains('syntax and try again') ||
         message.contains('out of stock') ||
         message.contains('not enough stock') ||
-        message.contains('insufficient stock') ||
-        message.contains('stock');
+        message.contains('insufficient stock');
   }
 
   String _staleProductDataErrorMessage(ProductDataModel product) {
@@ -1297,9 +1302,11 @@ class CartProvider extends ChangeNotifier with BaseController {
         listCartItems(requestVersion: activeVersion);
         if (cartItem.pID != null) {
           productsProvider.markProductOutOfStock(cartItem.pID!);
-        } else {
-          productsProvider.syncStockAfterCartChange();
         }
+        // Re-sync stock from the server right away so a transient failure
+        // cannot leave the product permanently shown as out of stock. The
+        // refreshed data overwrites the optimistic 0 with the real value.
+        productsProvider.syncStockAfterCartChange();
         AlertDialogs.showError('This item is now out of stock.');
       } else {
         AlertDialogs.showError(error.message);

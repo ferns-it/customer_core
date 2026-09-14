@@ -462,17 +462,15 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                         qty: cartListener.selectedItemQty,
                         maxQty: isFishStockEnabled ? remainingStock : null,
                         onIncrementQty: () {
-                          cartProvider.incrementQty();
+                          cartProvider.incrementQty(
+                              isFishStockEnabled ? remainingStock : null);
                         },
                         onDecrementQty: () {
                           cartProvider.decrementQty();
                         },
                         onIncrementBlocked: () {
                           AlertDialogs.showError(
-                            isProductOutOfStock
-                                ? 'Sorry, this item is currently out of stock.'
-                                : 'You have added the maximum available '
-                                    'quantity for this item.',
+                            'Sorry, this item is currently out of stock.',
                           );
                         },
                       ),
@@ -709,12 +707,13 @@ class _OrderSectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cartProvider = context.read<CartProvider>();
+    final cartProvider = context.watch<CartProvider>();
+    final productsProvider = context.watch<ProductsProvider>();
+    final freshProduct = productsProvider.overlayStockFromProductsList(product);
     final isFishStockEnabled =
-      
-            product.stock?.activated == true;
+        freshProduct.stock?.activated == true;
     final availableStock =
-        isFishStockEnabled ? cartProvider.getRemainingFishStock(product) : 0;
+        isFishStockEnabled ? cartProvider.getRemainingFishStock(freshProduct) : 0;
     final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
     final isProductUnavailable =
         product.isAvailable == false || isProductOutOfStock;
@@ -1037,14 +1036,15 @@ class AddToCartButton extends GetProviderView<CartProvider> {
     final cartProvider = notifier(context);
     final cartListener = listener(context);
     final authProvider = notifier2<AuthProvider>(context);
+    final productsProvider = context.watch<ProductsProvider>();
+    final freshProduct = productsProvider.overlayStockFromProductsList(product);
 
     final isFishStockEnabled =
-       
-            product.stock?.activated == true;
+        freshProduct.stock?.activated == true;
     final remainingStock =
-        isFishStockEnabled ? cartProvider.getRemainingFishStock(product) : null;
+        isFishStockEnabled ? cartProvider.getRemainingFishStock(freshProduct) : null;
     final isOutOfStock = isFishStockEnabled && (remainingStock ?? 0) <= 0;
-    final isAddDisabled = product.isAvailable == false || isOutOfStock;
+    final isAddDisabled = freshProduct.isAvailable == false || isOutOfStock;
 
     return FilledButton.icon(
       style: FilledButton.styleFrom(

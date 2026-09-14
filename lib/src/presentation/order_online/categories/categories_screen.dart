@@ -135,7 +135,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
     final cartListener = context.watch<CartProvider>();
     final homeProvider = context.read<HomeProvider>();
     final userProvider = context.read<UserProvider>();
-    // final products = productProvider.productsList;
+    final products =
+        productListener.filterListableProducts(productListener.productsList);
     final subCategories = productListener.selectedCategory?.childrens
             ?.where((category) => (category.productsCount?.online ?? 0) > 0)
             .toList() ??
@@ -541,21 +542,20 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                 child: productListener.productsListAPIResponse.status ==
                         APIResponseStatus.loading
                     ? const ShimmerProductDetailsTile()
-                    : productListener.productsList.isEmpty
-                        ? const Text("No Products Found")
+                    : products.isEmpty
+                        ? const Center(child: Text("No Products Found"))
                         : AlignedGridView.count(
                             padding: const EdgeInsets.only(bottom: 200),
                             controller: _scrollController,
                             crossAxisCount: 2,
-                            itemCount: productListener.productsList.length +
+                            itemCount: products.length +
                                 (productListener
                                         .isFetchingProductsFromPagination
                                     ? 1
                                     : 0),
                             cacheExtent: 200,
                             itemBuilder: (context, index) {
-                              if (index >=
-                                  productListener.productsList.length) {
+                              if (index >= products.length) {
                                 return SizedBox(
                                   width: double.infinity,
                                   child: Center(
@@ -569,76 +569,79 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                   ),
                                 );
                               }
-                              final product =
-                                  productListener.productsList.elementAt(index);
+                              final product = products.elementAt(index);
                               final isExist = context
                                   .watch<CartProvider>()
                                   .isProductExist(product.pID);
                               final productQtyUpdated = context
                                   .watch<CartProvider>()
                                   .getProductQuantity(product.pID);
-                              final cartIndex =
-                                  cartProvider.getProductCartIndex(product.pID);
-                      
+
                               final freshProduct = productListener
                                   .overlayStockFromProductsList(product);
+                              final remainingStock =
+                                  cartProvider.getRemainingFishStock(freshProduct);
+                              final isFishStockEnabled =
+                                  freshProduct.stock?.activated == true;
+                              final maxQty = isFishStockEnabled
+                                  ? productQtyUpdated + remainingStock
+                                  : null;
                               return ProductDetailsTile(
                                 showFavIcon: cartListener.isUserLoggedIn,
-                                product,
+                                freshProduct,
                                 secondaryWidget: QtyCounterButton2(
                                     qty: productQtyUpdated,
                                     allowDecrementAtMinimum: true,
+                                    maxQty: maxQty,
                                     onDecrementQty: () {
-                                      cartProvider
-                                          .decrementCartItemQty(cartIndex);
+                                      final idx = cartProvider
+                                          .getProductCartIndex(freshProduct.pID);
+                                      if (idx >= 0) {
+                                        cartProvider.decrementCartItemQty(idx);
+                                      }
                                     },
                                     onIncrementQty: () {
-                                      cartProvider
-                                          .incrementCartItemQtyWithStockCheck(
-                                              cartIndex, freshProduct);
+                                      final idx = cartProvider
+                                          .getProductCartIndex(freshProduct.pID);
+                                      if (idx >= 0) {
+                                        cartProvider
+                                            .incrementCartItemQtyWithStockCheck(
+                                                idx, freshProduct);
+                                      }
                                     },
                                     onIncrementBlocked: () {
                                       AlertDialogs.showError(
-                                        productQtyUpdated > 0
-                                            ? 'You have added the maximum '
-                                                'available quantity for '
-                                                'this item.'
-                                            : 'Sorry, this item is currently '
-                                                'out of stock.',
+                                        'Sorry, this item is currently out of stock.',
                                       );
                                     }),
                                 useSecondaryWidget: isExist,
                                 onPressed: () {
-                                  showItemDetailsBottomSheet(context, product);
+                                  showItemDetailsBottomSheet(context, freshProduct);
                                 },
                                 onPressFavouriteBtn: () async {
-                                  if (product.isFavourite) {
+                                  if (freshProduct.isFavourite) {
                                     await context
                                         .read<ProductsProvider>()
-                                        .removeFavourite(product.favouriteID!,
+                                        .removeFavourite(
+                                            freshProduct.favouriteID!,
                                             context.read<SearchProvider>());
                                   } else {
                                     await context
                                         .read<ProductsProvider>()
-                                        .addFavourite(product.pID!,
+                                        .addFavourite(freshProduct.pID!,
                                             context.read<SearchProvider>());
                                   }
                                 },
                                 onPressAddBtn: () {
-                                  if (product.pID == null) return;
-                                  if (product.variations.isNotEmpty) {
+                                  if (freshProduct.pID == null) return;
+                                  if (freshProduct.variations.isNotEmpty) {
                                     cartProvider.onChangeVariation(
-                                      product.variations.first,
+                                      freshProduct.variations.first,
                                     );
                                   }
                                   cartProvider
-                                      .updateSelectedItemId(product.pID!);
-                                  // cartProvider.addItemToCart().then((added) {
-                                  //   if (added) {
-                                  //     cartProvider.resetValues();
-                                  //   }
-                                  // });
-                                  showAddItemBottomSheet(context, product);
+                                      .updateSelectedItemId(freshProduct.pID!);
+                                  showAddItemBottomSheet(context, freshProduct);
                                 },
                               );
                             },
@@ -792,7 +795,10 @@ class _CategoriesScreenState extends State<CategoriesScreen>
 
               context.read<CartProvider>().updateSelectedItemId(product.pID!);
 
-              showAddItemBottomSheet(context, product);
+              final fresh = context
+                  .read<ProductsProvider>()
+                  .overlayStockFromProductsList(product);
+              showAddItemBottomSheet(context, fresh);
             },
           );
         });

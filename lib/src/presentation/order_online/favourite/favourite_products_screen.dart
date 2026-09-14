@@ -58,7 +58,9 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
             );
           },
           completed: (data) {
-            final products = data.favouriteList?.productList ?? [];
+            final rawProducts = data.favouriteList?.productList ?? [];
+            final products =
+                productProvider.filterListableProducts(rawProducts);
             if (products.isEmpty) {
               return const Center(
                 child: Text("No Favourites"),
@@ -68,12 +70,9 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
               crossAxisCount: 2,
               crossAxisSpacing: 4.0,
               mainAxisSpacing: 8.0,
-              itemCount: productListner.favouriteProductResponse.data
-                  ?.favouriteList?.productList.length,
+              itemCount: products.length,
               itemBuilder: (context, index) {
-                final product = productListner
-                    .favouriteProductResponse.data?.favouriteList?.productList
-                    .elementAt(index);
+                final product = products.elementAt(index);
                 final isExist =
                     context.watch<CartProvider>().isProductExist(product?.pID);
                 final productQtyUpdated = context
@@ -87,6 +86,13 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
 
                 final stockAwareProduct =
                     productProvider.overlayStockFromProductsList(product);
+                final remainingStock =
+                    cartProvider.getRemainingFishStock(stockAwareProduct);
+                final isFishStockEnabled =
+                    stockAwareProduct.stock?.activated == true;
+                final maxQty = isFishStockEnabled
+                    ? productQtyUpdated + remainingStock
+                    : null;
 
                 return ProductDetailsTile(
                   showFavIcon: cartListener.isUserLoggedIn,
@@ -94,6 +100,7 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
                   secondaryWidget: QtyCounterButton2(
                       qty: productQtyUpdated,
                       allowDecrementAtMinimum: true,
+                      maxQty: maxQty,
                       onDecrementQty: () {
                         cartProvider.decrementCartItemQty(cartIndex);
                       },
@@ -103,10 +110,7 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
                       },
                       onIncrementBlocked: () {
                         AlertDialogs.showError(
-                          productQtyUpdated > 0
-                              ? 'You have added the maximum available '
-                                  'quantity for this item.'
-                              : 'Sorry, this item is currently out of stock.',
+                          'Sorry, this item is currently out of stock.',
                         );
                       }),
                   useSecondaryWidget: isExist,

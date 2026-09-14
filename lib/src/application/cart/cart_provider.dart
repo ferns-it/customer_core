@@ -66,7 +66,9 @@ class CartProvider extends ChangeNotifier with BaseController {
     required this.offerRepo,
     required this.sharedPrefsRepository,
     required this.productsProvider,
-  });
+  }) {
+    productsProvider.remainingStockResolver = getRemainingFishStock;
+  }
 
   late TabController _tabController;
 
@@ -656,7 +658,8 @@ class CartProvider extends ChangeNotifier with BaseController {
     notifyListeners();
   }
 
-  void incrementQty() {
+  void incrementQty([int? maxQty]) {
+    if (maxQty != null && _selectedItemQty >= maxQty) return;
     _selectedItemQty = _selectedItemQty + 1;
     notifyListeners();
   }
@@ -772,10 +775,14 @@ class CartProvider extends ChangeNotifier with BaseController {
         notifyListeners();
         return true;
       }, (error) {
-        log(error.toString(), name: "Add Cart Item");
         if (!_isStaleProductDataError(error)) {
           AlertDialogs.showError(error.message);
           return false;
+        }
+        if (product?.pID != null) {
+          productsProvider.markProductOutOfStock(product!.pID!);
+        } else {
+          productsProvider.syncStockAfterCartChange();
         }
         final maxQty = product != null && product.stock?.activated == true
             ? getRemainingFishStock(product)
@@ -842,12 +849,14 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   /// Get the remaining stock for a fish product after subtracting cart quantity
   int getRemainingFishStock(ProductDataModel product) {
-    final stock = product.stock;
+    if (product.pID == null) return 0;
+    final cached = productsProvider.stockForID(product.pID);
+    final stock = cached ?? product.stock;
     if (stock?.activated != true) {
       return stock?.availableStock ?? 0;
     }
-    final totalInCart = getTotalCartQtyForProduct(product.pID ?? '');
-    final originalStock = product.stock?.availableStock ?? 0;
+    final totalInCart = getTotalCartQtyForProduct(product.pID!);
+    final originalStock = stock?.availableStock ?? 0;
     final remaining = originalStock - totalInCart;
     return remaining > 0 ? remaining : 0;
   }
@@ -857,7 +866,11 @@ class CartProvider extends ChangeNotifier with BaseController {
     return message.contains('invalid json') ||
         message.contains('json format') ||
         message.contains('invalid response syntax') ||
-        message.contains('syntax and try again');
+        message.contains('syntax and try again') ||
+        message.contains('out of stock') ||
+        message.contains('not enough stock') ||
+        message.contains('insufficient stock') ||
+        message.contains('stock');
   }
 
   String _staleProductDataErrorMessage(ProductDataModel product) {
@@ -886,8 +899,12 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   Future<bool> incrementCartItemQtyWithStockCheck(int index,
       [ProductDataModel? product]) async {
-    if (product?.stock?.activated == true) {
-      final remainingStock = getRemainingFishStock(product!);
+    if (index < 0 || index >= cartItems.length) return false;
+    final targetProduct = product ??
+        productsProvider.productsList
+            .firstOrNullWhere((p) => p.pID == cartItems[index].pID);
+    if (targetProduct != null && targetProduct.stock?.activated == true) {
+      final remainingStock = getRemainingFishStock(targetProduct);
       return incrementCartItemQty(index, remainingStock: remainingStock);
     }
     return incrementCartItemQty(index);
@@ -920,6 +937,7 @@ class CartProvider extends ChangeNotifier with BaseController {
           _selectedPaymentMethod = PaymentMethod.cash;
         }
         notifyListeners();
+        productsProvider.refreshListings();
       });
     } finally {
       if (activeVersion == _cartRequestVersion) {
@@ -967,6 +985,7 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   Future<bool> incrementCartItemQty(int index, {int? remainingStock}) async {
     if (_cartDetailsModel == null || _cartDeleteLoading == true) return false;
+    if (index < 0 || index >= cartItems.length) return false;
     final locatedCartItem = cartItems.elementAt(index);
     final newQty = (locatedCartItem.quantity ?? 0) + 1;
     final currentItemQty = locatedCartItem.quantity ?? 0;
@@ -1074,11 +1093,13 @@ class CartProvider extends ChangeNotifier with BaseController {
 
     _clearStaleDeliverySelections();
     notifyListeners();
+    productsProvider.refreshListings();
     return true;
   }
 
   Future<bool> decrementCartItemQty(int index) async {
     if (_cartDetailsModel == null || _cartDeleteLoading == true) return false;
+    if (index < 0 || index >= cartItems.length) return false;
     final locatedCartItem = cartItems.elementAt(index);
     final prevQty = locatedCartItem.quantity ?? 0;
     if (prevQty == 1) {
@@ -1185,6 +1206,7 @@ class CartProvider extends ChangeNotifier with BaseController {
 
     _clearStaleDeliverySelections();
     notifyListeners();
+    productsProvider.refreshListings();
     return true;
   }
 
@@ -1273,8 +1295,11 @@ class CartProvider extends ChangeNotifier with BaseController {
       log(error.toString(), name: "Update Cart Item");
       if (_isStaleProductDataError(error)) {
         listCartItems(requestVersion: activeVersion);
-        // The server just told us the stock changed - re-sync it.
-        productsProvider.syncStockAfterCartChange();
+        if (cartItem.pID != null) {
+          productsProvider.markProductOutOfStock(cartItem.pID!);
+        } else {
+          productsProvider.syncStockAfterCartChange();
+        }
         AlertDialogs.showError('This item is now out of stock.');
       } else {
         AlertDialogs.showError(error.message);

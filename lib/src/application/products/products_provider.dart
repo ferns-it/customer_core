@@ -290,8 +290,9 @@ class ProductsProvider extends ChangeNotifier with BaseController {
             favouriteID: favId ?? "",
           );
         }).toList();
-        // Hide unavailable / out-of-stock products when the settings API
-        // configures `listUnavailableProducts` as "Disabled".
+        // Hide unavailable / out-of-stock products unless the settings API
+        // explicitly configures `listUnavailableProducts` as "Enabled"
+        // (see ShopProvider.canListUnavailableProducts).
         _productsListAPIResponse =
             APIResponse.completed(filterListableProducts(updatedList));
 

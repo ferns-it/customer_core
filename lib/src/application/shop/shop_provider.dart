@@ -31,8 +31,9 @@ class ShopProvider extends ChangeNotifier with BaseController {
   Map<String, String>? get spiceLevelIcons =>
       storeSettings.data?.producctUISettings?.spicelevelIcons;
 
-  /// When "listUnavailableProducts" is "Enabled" in store delivery info,
-  /// out-of-stock / unavailable products should be hidden from listings.
+  /// Products that are unavailable / out of stock are hidden from listings
+  /// unless the store delivery info explicitly sets "listUnavailableProducts"
+  /// to "Enabled". A missing or "Disabled" value hides them (the safe default).
   bool get shouldHideUnavailableProducts =>
       storeSettings.data?.deliveryInfo?.listUnavailableProducts
           ?.trim()

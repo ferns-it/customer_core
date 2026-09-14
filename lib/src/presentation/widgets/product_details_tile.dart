@@ -332,9 +332,7 @@ class ProductDetailsTile extends StatelessWidget {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          isProductUnavailable
-                                              ? 'Sold Out'
-                                              : 'Add',
+                                          'Add',
                                           style: context
                                               .customTextTheme.text14W700
                                               .copyWith(
@@ -595,7 +593,7 @@ class ProductDetailsTile extends StatelessWidget {
                             onPressed:
                                 isProductUnavailable ? null : onPressAddBtn,
                             child: Text(
-                              isProductOutOfStock ? 'Sold Out' : 'Add to Cart',
+                              'Add to Cart',
                               style: context.customTextTheme.text14W700
                                   .copyWith(
                                       fontWeight: FontWeight.bold,

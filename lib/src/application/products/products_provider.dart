@@ -356,8 +356,24 @@ class ProductsProvider extends ChangeNotifier with BaseController {
 
   int Function(ProductDataModel product)? remainingStockResolver;
 
+  /// Whether the product cannot be sold online because its stock is either
+  /// not activated or exhausted. Dishes in this state are hidden from every
+  /// customer-facing list, regardless of the store's
+  /// `listUnavailableProducts` setting.
+  bool isProductWithUnavailableStock(ProductDataModel product) {
+    final stock = overlayStockFromProductsList(product).stock;
+    if (stock == null) return false;
+    // Stock tracking disabled -> never listed to customers.
+    if (stock.activated == false) return true;
+    // Out of stock: a known zero/negative remaining amount.
+    if (stock.availableStock != null && stock.availableStock! <= 0) return true;
+    return false;
+  }
+
   bool isProductListable(ProductDataModel product) {
     if (product.isAvailable == false) return false;
+    if (isProductWithUnavailableStock(product)) return false;
+
     final freshProduct = overlayStockFromProductsList(product);
     final stock = freshProduct.stock;
     if (stock?.activated == true) {
@@ -390,7 +406,15 @@ class ProductsProvider extends ChangeNotifier with BaseController {
 
   List<ProductDataModel> filterListableProducts(
       Iterable<ProductDataModel> products) {
-    if (shopProvider.canListUnavailableProducts) return products.toList();
+    // Products that are marked unavailable, have stock tracking disabled, or
+    // are out of stock are always hidden, even when the store setting says
+    // unavailable/out-of-stock products can be listed.
+    if (shopProvider.canListUnavailableProducts) {
+      return products.where((product) {
+        if (product.isAvailable == false) return false;
+        return !isProductWithUnavailableStock(product);
+      }).toList();
+    }
     return products.where(isProductListable).toList();
   }
 

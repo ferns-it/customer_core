@@ -63,16 +63,18 @@ class ProductDetailsTile extends StatelessWidget {
     final spiceLevel = product.spiceLevel;
     final spiceLevelIcon =
         context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
-    final cartProvider = context.watch<CartProvider>();
-    final productsProvider = context.watch<ProductsProvider>();
-    final freshProduct = productsProvider.overlayStockFromProductsList(product);
-    final isFishStockEnabled = freshProduct.stock?.activated == true;
-    final availableStock = isFishStockEnabled
-        ? cartProvider.getRemainingFishStock(freshProduct)
-        : freshProduct.stock?.availableStock ?? 0;
-    final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
-    final isProductUnavailable =
-        product.isAvailable == false || isProductOutOfStock;
+    // final cartProvider = context.watch<CartProvider>();
+    // final productsProvider = context.watch<ProductsProvider>();
+    // final freshProduct = productsProvider.overlayStockFromProductsList(product);
+    // final isFishStockEnabled = freshProduct.stock?.activated == true;
+    // final availableStock = isFishStockEnabled
+    //     ? cartProvider.getRemainingFishStock(freshProduct)
+    // : freshProduct.stock?.availableStock ?? 0;
+    // final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
+
+    final isStockActivated = product.stock?.activated == true;
+    final availableStock = product.stock?.availableStock == 0;
+    final isProductUnavailable = isStockActivated && availableStock;
     return Card(
       color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -234,11 +236,9 @@ class ProductDetailsTile extends StatelessWidget {
                           ),
                       ],
                     ),
-                    if (isFishStockEnabled) ...[
+                    if (isProductUnavailable) ...[
                       verticalSpaceTiny,
-                      isProductOutOfStock
-                          ? StockStatusWidget()
-                          : SizedBox.shrink(),
+                      StockStatusWidget(),
                       verticalSpaceTiny,
                     ],
                     Row(
@@ -332,7 +332,7 @@ class ProductDetailsTile extends StatelessWidget {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          isProductOutOfStock
+                                          isProductUnavailable
                                               ? 'Sold Out'
                                               : 'Add',
                                           style: context

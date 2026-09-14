@@ -41,16 +41,19 @@ class DishDetailBottomSheet extends StatelessWidget {
     final freshProduct = productsProvider.overlayStockFromProductsList(product);
     final baseTextTheme = Theme.of(context).textTheme;
     final allergens = product.selectedAllergensList;
-    final isFishStockEnabled =
-       
-            freshProduct.stock?.activated == true;
-    final remainingStock = isFishStockEnabled
-        ? cartListener.getRemainingFishStock(freshProduct)
-        : 0;
-    final availableStock = isFishStockEnabled
-        ? remainingStock
-        : freshProduct.stock?.availableStock ?? 0;
-    final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
+    // final isFishStockEnabled =
+
+    //         freshProduct.stock?.activated == true;
+    // final remainingStock = isFishStockEnabled
+    //     ? cartListener.getRemainingFishStock(freshProduct)
+    //     : 0;
+    // final availableStock = isFishStockEnabled
+    //     ? remainingStock
+    //     : freshProduct.stock?.availableStock ?? 0;
+    // final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
+    final isStockActivated = product.stock?.activated == true;
+    final availableStock = product.stock?.availableStock == 0;
+    final isProductUnavailable = isStockActivated && availableStock;
 
     return SafeArea(
       bottom: false,
@@ -103,14 +106,12 @@ class DishDetailBottomSheet extends StatelessWidget {
                           child: _DescriptionWidget(product: product),
                         ),
                       ],
-                      if (isFishStockEnabled) ...[
+                      if (isProductUnavailable) ...[
                         verticalSpaceSmall,
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          child: isProductOutOfStock
-                              ? StockStatusWidget()
-                              : SizedBox.shrink(),
-                        ),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 15.0),
+                            child: StockStatusWidget()),
                         verticalSpaceTiny,
                       ],
                       verticalSpaceSmall,
@@ -265,19 +266,21 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
     final allergens = product.selectedAllergensList;
     final cartProvider = context.watch<CartProvider>();
     final productsProvider = context.watch<ProductsProvider>();
-    final activeProduct = productsProvider.overlayStockFromProductsList(product);
-    final isFishStockEnabled =
-       
-            activeProduct.stock?.activated == true;
-    final remainingStock = isFishStockEnabled
-        ? cartListener.getRemainingFishStock(activeProduct)
-        : 0;
-    final availableStock = isFishStockEnabled
-        ? (remainingStock - cartListener.selectedItemQty > 0
-            ? remainingStock - cartListener.selectedItemQty
-            : 0)
-        : activeProduct.stock?.availableStock ?? 0;
-    final isProductOutOfStock = isFishStockEnabled && remainingStock <= 0;
+    final activeProduct =
+        productsProvider.overlayStockFromProductsList(product);
+    // final isFishStockEnabled =
+
+    //         activeProduct.stock?.activated == true;
+    final remainingStock = cartListener.getRemainingFishStock(activeProduct);
+    // final availableStock = isFishStockEnabled
+    //     ? (remainingStock - cartListener.selectedItemQty > 0
+    //         ? remainingStock - cartListener.selectedItemQty
+    //         : 0)
+    //     : activeProduct.stock?.availableStock ?? 0;
+    // final isProductOutOfStock = isFishStockEnabled && remainingStock <= 0;
+    final isStockActivated = product.stock?.activated == true;
+    final availableStock = product.stock?.availableStock == 0;
+    final isProductUnavailable = isStockActivated && availableStock;
     final baseTextTheme = Theme.of(context).textTheme;
     final bottomInset = MediaQuery.of(context).viewPadding.bottom;
 
@@ -447,11 +450,9 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                             ),
                     ],
                   ),
-                  if (isFishStockEnabled) ...[
+                  if (isProductUnavailable) ...[
                     verticalSpaceSmall,
-                    isProductOutOfStock
-                        ? StockStatusWidget()
-                        : SizedBox.shrink(),
+                    StockStatusWidget(),
                     verticalSpaceTiny,
                   ],
                   Row(
@@ -460,10 +461,10 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                       _ProductPriceWidget(product: product),
                       QtyCounterButton2(
                         qty: cartListener.selectedItemQty,
-                        maxQty: isFishStockEnabled ? remainingStock : null,
+                        maxQty: isStockActivated ? remainingStock : null,
                         onIncrementQty: () {
                           cartProvider.incrementQty(
-                              isFishStockEnabled ? remainingStock : null);
+                              isStockActivated ? remainingStock : null);
                         },
                         onDecrementQty: () {
                           cartProvider.decrementQty();
@@ -710,13 +711,17 @@ class _OrderSectionWidget extends StatelessWidget {
     final cartProvider = context.watch<CartProvider>();
     final productsProvider = context.watch<ProductsProvider>();
     final freshProduct = productsProvider.overlayStockFromProductsList(product);
-    final isFishStockEnabled =
-        freshProduct.stock?.activated == true;
-    final availableStock =
-        isFishStockEnabled ? cartProvider.getRemainingFishStock(freshProduct) : 0;
-    final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
-    final isProductUnavailable =
-        product.isAvailable == false || isProductOutOfStock;
+
+    // final isFishStockEnabled = freshProduct.stock?.activated == true;
+    // final availableStock = isFishStockEnabled
+    //     ? cartProvider.getRemainingFishStock(freshProduct)
+    //     : 0;
+    // final isProductOutOfStock = isFishStockEnabled && availableStock <= 0;
+    // final isProductUnavailable =
+    //     product.isAvailable == false || isProductOutOfStock;
+    final isStockActivated = product.stock?.activated == true;
+    final availableStock = product.stock?.availableStock == 0;
+    final isProductUnavailable = isStockActivated && availableStock;
     return Padding(
       padding: const EdgeInsets.all(15.0).copyWith(bottom: 40),
       child: Row(
@@ -743,7 +748,7 @@ class _OrderSectionWidget extends StatelessWidget {
                 child: Text(
                   product.isAvailable == false
                       ? 'Not Available'
-                      : isProductOutOfStock
+                      : isProductUnavailable
                           ? 'Out of Stock'
                           : 'Order Now',
                   style: context.customTextTheme.text14W600
@@ -1039,12 +1044,16 @@ class AddToCartButton extends GetProviderView<CartProvider> {
     final productsProvider = context.watch<ProductsProvider>();
     final freshProduct = productsProvider.overlayStockFromProductsList(product);
 
-    final isFishStockEnabled =
-        freshProduct.stock?.activated == true;
-    final remainingStock =
-        isFishStockEnabled ? cartProvider.getRemainingFishStock(freshProduct) : null;
-    final isOutOfStock = isFishStockEnabled && (remainingStock ?? 0) <= 0;
-    final isAddDisabled = freshProduct.isAvailable == false || isOutOfStock;
+    final isFishStockEnabled = freshProduct.stock?.activated == true;
+    // final remainingStock = isFishStockEnabled
+    //     ? cartProvider.getRemainingFishStock(freshProduct)
+    //     : null;
+    // final isOutOfStock = isFishStockEnabled && (remainingStock ?? 0) <= 0;
+    // final isAddDisabled = freshProduct.isAvailable == false || isOutOfStock;
+
+    final isStockActivated = product.stock?.activated == true;
+    final availableStock = product.stock?.availableStock == 0;
+    final isProductUnavailable = isStockActivated && availableStock;
 
     return FilledButton.icon(
       style: FilledButton.styleFrom(
@@ -1053,7 +1062,7 @@ class AddToCartButton extends GetProviderView<CartProvider> {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      onPressed: isAddDisabled
+      onPressed: isProductUnavailable
           ? null
           : () async {
               final isLogged = await authProvider.checkUserIsLogged();
@@ -1090,7 +1099,7 @@ class AddToCartButton extends GetProviderView<CartProvider> {
           ? Text(
               product.isAvailable == false
                   ? 'Not Available'
-                  : isOutOfStock
+                  : isProductUnavailable
                       ? 'Out of Stock'
                       : 'Add To Cart',
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),

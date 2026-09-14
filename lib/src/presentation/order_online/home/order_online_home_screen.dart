@@ -532,7 +532,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
       CartProvider cartProvider, ProductsProvider productProvider) {
     // final listOfItems = ['Hot Deals', 'Best Seller', 'Top Rated'];
     final deals = productListener
-        .filterListableProducts(productListener.productsListRandom)
+        .filterListableProducts(    productListener.productsListRandom)
         .take(4)
         .toList();
     return Padding(

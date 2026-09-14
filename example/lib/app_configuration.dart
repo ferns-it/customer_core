@@ -35,7 +35,7 @@ final uiConfig = UiConfig(
   logo: 'assets/images/urban spice logo.png',
   // bgImage: 'assets/images/urban spicebg.png',
   // logoWithoutBackground: 'assets/images/urban spice logo.png',
-  bgImage: 'assets/images/coast_bg.jpeg',
+  bgImage: 'assets/images/coastline_bg2.png',
   logoWithoutBackground: 'assets/images/coastline._logo.png',
   bannerImages: [
     "assets/images/banner1.png",

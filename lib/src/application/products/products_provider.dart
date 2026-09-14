@@ -374,6 +374,20 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     return true;
   }
 
+  List<ProductDataModel> filterUnavailableProducts(
+      List<ProductDataModel> products) {
+    final listUnavailable =
+        shopProvider.storeSettings.data?.deliveryInfo?.listUnavailableProducts;
+
+    if (listUnavailable == 'Enabled') {
+      return products;
+    }
+
+    return products.where((product) {
+      return (product.stock?.availableStock ?? 0) > 0;
+    }).toList();
+  }
+
   List<ProductDataModel> filterListableProducts(
       Iterable<ProductDataModel> products) {
     if (shopProvider.canListUnavailableProducts) return products.toList();

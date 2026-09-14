@@ -37,7 +37,7 @@ class ShopProvider extends ChangeNotifier with BaseController {
   bool get shouldHideUnavailableProducts =>
       storeSettings.data?.deliveryInfo?.listUnavailableProducts
           ?.trim()
-          .toLowerCase() ==
+          .toLowerCase() !=
       'enabled';
 
   bool get canListUnavailableProducts => !shouldHideUnavailableProducts;

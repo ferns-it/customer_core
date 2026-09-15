@@ -612,20 +612,14 @@ class _CategoriesScreenState extends State<CategoriesScreen>
 
                               final freshProduct = productListener
                                   .overlayStockFromProductsList(product);
-                              final remainingStock = cartProvider
-                                  .getRemainingFishStock(freshProduct);
-                              final isFishStockEnabled =
-                                  freshProduct.stock?.activated == true;
-                              final maxQty = isFishStockEnabled
-                                  ? productQtyUpdated + remainingStock
-                                  : null;
+                              final availableStock = freshProduct.stock?.availableStock;
                               return ProductDetailsTile(
                                 showFavIcon: cartListener.isUserLoggedIn,
                                 freshProduct,
                                 secondaryWidget: QtyCounterButton2(
                                     qty: productQtyUpdated,
                                     allowDecrementAtMinimum: true,
-                                    maxQty: maxQty,
+                                    availableStock: availableStock,
                                     onDecrementQty: () {
                                       final idx =
                                           cartProvider.getProductCartIndex(

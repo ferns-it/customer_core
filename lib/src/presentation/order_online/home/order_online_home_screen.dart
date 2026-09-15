@@ -626,13 +626,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                   // list has not been refreshed.
                                   final freshProduct = productProvider
                                       .overlayStockFromProductsList(product);
-                                  final remainingStock = cartProvider
-                                      .getRemainingFishStock(freshProduct);
-                                  final isFishStockEnabled =
-                                      freshProduct.stock?.activated == true;
-                                  final maxQty = isFishStockEnabled
-                                      ? productQtyUpdated + remainingStock
-                                      : null;
+                                  final availableStock = freshProduct.stock?.availableStock;
 
                                   return ProductDetailsTile(
                                     freshProduct,
@@ -653,7 +647,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                     secondaryWidget: QtyCounterButton2(
                                         qty: productQtyUpdated,
                                         allowDecrementAtMinimum: true,
-                                        maxQty: maxQty,
+                                        availableStock: availableStock,
                                         onDecrementQty: () {
                                           cartProvider
                                               .decrementCartItemQty(cartIndex);
@@ -748,13 +742,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               .overlayStockFromProductsList(product);
                           final productQtyUpdated =
                               cartProvider.getProductQuantity(product.pID);
-                          final remainingStock = cartProvider
-                              .getRemainingFishStock(freshProduct);
-                          final isFishStockEnabled =
-                              freshProduct.stock?.activated == true;
-                          final maxQty = isFishStockEnabled
-                              ? productQtyUpdated + remainingStock
-                              : null;
+                          final availableStock = freshProduct.stock?.availableStock;
 
                           return ProductDetailsTile(
                             freshProduct,
@@ -773,10 +761,9 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               }
                             },
                             secondaryWidget: QtyCounterButton2(
-                                qty: cartProvider
-                                    .getProductQuantity(product.pID),
+                                qty: productQtyUpdated,
                                 allowDecrementAtMinimum: true,
-                                maxQty: maxQty,
+                                availableStock: availableStock,
                                 onDecrementQty: () {
                                   cartProvider.decrementCartItemQty(cartIndex);
                                 },
@@ -872,13 +859,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                 // list was not refreshed.
                                 final freshProduct = productProvider
                                     .overlayStockFromProductsList(product);
-                                final remainingStock = cartProvider
-                                    .getRemainingFishStock(freshProduct);
-                                final isFishStockEnabled =
-                                    freshProduct.stock?.activated == true;
-                                final maxQty = isFishStockEnabled
-                                    ? productQtyUpdated + remainingStock
-                                    : null;
+                                final availableStock = freshProduct.stock?.availableStock;
 
                                 return ProductDetailsTile(
                                   freshProduct,
@@ -899,7 +880,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                   secondaryWidget: QtyCounterButton2(
                                       qty: productQtyUpdated,
                                       allowDecrementAtMinimum: true,
-                                      maxQty: maxQty,
+                                      availableStock: availableStock,
                                       onDecrementQty: () {
                                         cartProvider
                                             .decrementCartItemQty(cartIndex);
@@ -1449,13 +1430,7 @@ class __SearchResultsState extends State<_SearchResults> {
                         cartProvider.getProductCartIndex(product.pID);
                     final stockAwareProduct = productsProvider
                         .overlayStockFromProductsList(product);
-                    final remainingStock = cartProvider
-                        .getRemainingFishStock(stockAwareProduct);
-                    final isFishStockEnabled =
-                        stockAwareProduct.stock?.activated == true;
-                    final maxQty = isFishStockEnabled
-                        ? productQtyUpdated + remainingStock
-                        : null;
+                    final availableStock = stockAwareProduct.stock?.availableStock;
 
                     return ProductDetailsTile(stockAwareProduct,
                         showFavIcon: cartListener.isUserLoggedIn,
@@ -1487,7 +1462,7 @@ class __SearchResultsState extends State<_SearchResults> {
                         secondaryWidget: QtyCounterButton2(
                           qty: productQtyUpdated,
                           allowDecrementAtMinimum: true,
-                          maxQty: maxQty,
+                          availableStock: availableStock,
                           onIncrementQty: () {
                             cartProvider.incrementCartItemQtyWithStockCheck(
                                 cartIndex, stockAwareProduct);

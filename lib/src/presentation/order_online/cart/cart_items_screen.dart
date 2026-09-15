@@ -67,7 +67,7 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                 final cartProductMatch = productProvider.productsList
                     .firstOrNullWhere((p) => p.pID == product.pID);
                 // Overlay the freshest stock known app-wide so the qty
-                // counter's maxQty reflects stock refreshed on any screen
+                // counter's availableStock reflects stock refreshed on any screen
                 // (home, search, favourites), not the stale snapshot this
                 // list was built with.
                 final cartProduct = cartProductMatch == null
@@ -410,19 +410,12 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                             // removed/cleared from the cart (decrementCartItemQty
                             // deletes the item when quantity is 1).
                             allowDecrementAtMinimum: true,
-                            // Once the server rejects an increment with a
-                            // stock/stale-data error, keep + disabled for
-                            // this session instead of letting the user keep
-                            // tapping and watching the quantity bounce back.
-                            disableIncrement:
-                                cartProvider.isCartIncrementBlockedForStockOut(
-                                    product.pID),
-                            maxQty: 
-                                    cartProduct?.stock?.activated == true
-                                ? (product.quantity ?? 0) +
-                                    cartProvider
-                                        .getRemainingFishStock(cartProduct!)
-                                : null,
+                            // Disabled only when the raw available stock
+                            // (ProductStockDetails.availableStock) is 0 or
+                            // less, regardless of the 'activated' flag or
+                            // quantities already in the cart.
+                            availableStock:
+                                cartProduct?.stock?.availableStock,
                             onDecrementQty: () {
                               // The delivery address/discount invalidation is
                               // handled centrally by CartProvider.

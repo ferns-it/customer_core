@@ -86,13 +86,7 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
 
                 final stockAwareProduct =
                     productProvider.overlayStockFromProductsList(product);
-                final remainingStock =
-                    cartProvider.getRemainingFishStock(stockAwareProduct);
-                final isFishStockEnabled =
-                    stockAwareProduct.stock?.activated == true;
-                final maxQty = isFishStockEnabled
-                    ? productQtyUpdated + remainingStock
-                    : null;
+                final availableStock = stockAwareProduct.stock?.availableStock;
 
                 return ProductDetailsTile(
                   showFavIcon: cartListener.isUserLoggedIn,
@@ -100,7 +94,7 @@ class FavouriteProductsScreen extends GetProviderView<ProductsProvider> {
                   secondaryWidget: QtyCounterButton2(
                       qty: productQtyUpdated,
                       allowDecrementAtMinimum: true,
-                      maxQty: maxQty,
+                      availableStock: availableStock,
                       onDecrementQty: () {
                         cartProvider.decrementCartItemQty(cartIndex);
                       },

@@ -271,7 +271,6 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
     // final isFishStockEnabled =
 
     //         activeProduct.stock?.activated == true;
-    final remainingStock = cartListener.getRemainingFishStock(activeProduct);
     // final availableStock = isFishStockEnabled
     //     ? (remainingStock - cartListener.selectedItemQty > 0
     //         ? remainingStock - cartListener.selectedItemQty
@@ -461,10 +460,10 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                       _ProductPriceWidget(product: product),
                       QtyCounterButton2(
                         qty: cartListener.selectedItemQty,
-                        maxQty: isStockActivated ? remainingStock : null,
+                        availableStock: product.stock?.availableStock,
                         onIncrementQty: () {
-                          cartProvider.incrementQty(
-                              isStockActivated ? remainingStock : null);
+                          cartProvider
+                              .incrementQty(product.stock?.availableStock);
                         },
                         onDecrementQty: () {
                           cartProvider.decrementQty();

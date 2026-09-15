@@ -58,6 +58,29 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     notifyListeners();
   }
 
+  /// Optimistically frees [freedQty] units of stock for [pID] in the stock
+  /// cache without waiting for a server re-sync.
+  ///
+  /// Called right after the server confirms a cart quantity decrease: the
+  /// freed units are added to the cached [ProductStockDetails.availableStock]
+  /// so the increment button re-enables on the next frame instead of staying
+  /// disabled for the few seconds the (slower, authoritative) stock re-sync
+  /// takes to return the real value. The re-sync then overwrites this
+  /// optimistic value with the server's authoritative stock.
+  ///
+  /// Only an existing cache entry is bumped - if none exists, the re-sync
+  /// will populate it, so there is nothing to free optimistically.
+  void freeStockForProduct(String pID, {int freedQty = 1}) {
+    if (freedQty <= 0) return;
+    final currentStock = _productStockCache[pID];
+    if (currentStock == null) return;
+    _productStockCache[pID] = currentStock.copyWith(
+      availableStock: (currentStock.availableStock ?? 0) + freedQty,
+    );
+    _refilterAllProductsAfterStockChange();
+    notifyListeners();
+  }
+
   void _refilterAllProductsAfterStockChange() {
     if (!shopProvider.canListUnavailableProducts) {
       final featuredData = _featuredPopularProductsAPIResponse.data;

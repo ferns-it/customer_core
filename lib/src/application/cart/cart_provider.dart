@@ -811,17 +811,12 @@ class CartProvider extends ChangeNotifier with BaseController {
         return false;
       }
 
-      final maxQty = product != null && product.stock?.activated == true
-          ? getRemainingFishStock(product)
-          : null;
-
-      if (maxQty != null && maxQty <= 0) {
+      // Stock is gated purely on the raw availableStock from
+      // ProductStockDetails - not the 'activated' flag and not quantities
+      // already in the cart. The server remains the final authority.
+      final availableStock = product?.stock?.availableStock;
+      if (availableStock != null && availableStock <= 0) {
         return false;
-      }
-
-      if (maxQty != null && _selectedItemQty > maxQty) {
-        _selectedItemQty = maxQty;
-        notifyListeners();
       }
 
       _addItemLoading = true;
@@ -1012,9 +1007,18 @@ class CartProvider extends ChangeNotifier with BaseController {
     final targetProduct = product ??
         productsProvider.productsList
             .firstOrNullWhere((p) => p.pID == cartItems[index].pID);
-    if (targetProduct != null && targetProduct.stock?.activated == true) {
-      final remainingStock = getRemainingFishStock(targetProduct);
-      return incrementCartItemQty(index, remainingStock: remainingStock);
+    // Stock is gated purely on the raw availableStock from
+    // ProductStockDetails - not the 'activated' flag and not quantities
+    // already in the cart. The server remains the final authority on stock.
+    if (targetProduct != null) {
+      final cached = targetProduct.pID == null
+          ? null
+          : productsProvider.stockForID(targetProduct.pID!);
+      final availableStock = (cached ?? targetProduct.stock)?.availableStock;
+      if (availableStock != null && availableStock <= 0) {
+        AlertDialogs.showError('Sorry, this item is currently out of stock.');
+        return false;
+      }
     }
     return incrementCartItemQty(index);
   }
@@ -1405,11 +1409,17 @@ class CartProvider extends ChangeNotifier with BaseController {
       // re-applies the block straight away.
       if (newQty < (cartItem.quantity ?? 0)) {
         _clearStockOutBlock(cartItem.pID);
-        // The quantity drop just freed stock on the server, so the cached
-        // stock (which the stock-out error optimistically pinned to 0) must
-        // be refreshed too - otherwise getRemainingFishStock keeps reporting
-        // 0 and incrementCartItemQtyWithStockCheck keeps refusing to
-        // increase even though the block itself was lifted.
+        // The quantity drop just freed stock on the server. Free the same
+        // amount in the stock cache immediately (optimistically) so the
+        // increment button re-enables on the next frame - otherwise it stays
+        // disabled for the few seconds the async re-sync below takes, because
+        // the stock-out error had optimistically pinned the cached stock to 0.
+        productsProvider.freeStockForProduct(
+          cartItem.pID!,
+          freedQty: (cartItem.quantity ?? 0) - newQty,
+        );
+        // The authoritative stock re-sync still runs (fire-and-forget) and
+        // overwrites the optimistic value with the server's real stock.
         _syncStockAndReconcileBlocks();
       }
       listCartItems(requestVersion: activeVersion);
@@ -1430,11 +1440,13 @@ class CartProvider extends ChangeNotifier with BaseController {
           _syncStockAndReconcileBlocks();
           AlertDialogs.showError('This item is now out of stock.');
         } else {
-          // A stale-data/parse failure is not a real stock shortage: never
-          // zero the stock cache or disable the increment button for it,
-          // otherwise + is disabled while the item is actually available.
+          // The server reports stock rejections as a generic invalid-JSON
+          // response, so show the out-of-stock message instead of surfacing
+          // the raw parse error. Never zero the stock cache or disable the
+          // increment button for it though - the raw availableStock from
+          // ProductStockDetails stays the source of truth for the UI.
           _syncStockAndReconcileBlocks();
-          AlertDialogs.showError(error.message);
+          AlertDialogs.showError('Sorry, this item is currently out of stock.');
         }
       } else {
         AlertDialogs.showError(error.message);

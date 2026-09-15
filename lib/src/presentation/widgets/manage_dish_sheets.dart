@@ -462,8 +462,18 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                         qty: cartListener.selectedItemQty,
                         availableStock: product.stock?.availableStock,
                         onIncrementQty: () {
-                          cartProvider
-                              .incrementQty(product.stock?.availableStock);
+                          final availableStock = product.stock?.availableStock;
+                          // When the selected qty has already reached the
+                          // available stock, block the increment and show the
+                          // same alert used for the out-of-stock case.
+                          if (availableStock != null &&
+                              cartListener.selectedItemQty >= availableStock) {
+                            AlertDialogs.showError(
+                              'Sorry, this item is currently out of stock.',
+                            );
+                            return;
+                          }
+                          cartProvider.incrementQty(availableStock);
                         },
                         onDecrementQty: () {
                           cartProvider.decrementQty();

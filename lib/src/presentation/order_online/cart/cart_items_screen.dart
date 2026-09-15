@@ -410,6 +410,13 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                             // removed/cleared from the cart (decrementCartItemQty
                             // deletes the item when quantity is 1).
                             allowDecrementAtMinimum: true,
+                            // Once the server rejects an increment with a
+                            // stock/stale-data error, keep + disabled for
+                            // this session instead of letting the user keep
+                            // tapping and watching the quantity bounce back.
+                            disableIncrement:
+                                cartProvider.isCartIncrementBlockedForStockOut(
+                                    product.pID),
                             maxQty: 
                                     cartProduct?.stock?.activated == true
                                 ? (product.quantity ?? 0) +

@@ -116,7 +116,9 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                         Theme.of(context).brightness == Brightness.dark
                             ? Colors.grey
                             : Theme.of(context).colorScheme.primary,
-                    activeColor: Theme.of(context).colorScheme.primary,
+                    activeIconColor:
+                        Theme.of(context).colorScheme.primaryIconColor,
+                    activeColor: Theme.of(context).colorScheme.primaryIconColor ?? Theme.of(context).colorScheme.primary,
                     inactiveColor: Colors.grey,
                     onTap: () => provider.onChangeCurrentPage(0),
                   ),
@@ -124,11 +126,13 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                     selected: currentPage == 1,
                     icon: Assets.lib.assets.lottie.categoryIconLottieGrey,
                     label: "Categories",
+                    activeIconColor:
+                        Theme.of(context).colorScheme.primaryIconColor,
+                    activeColor: Theme.of(context).colorScheme.primaryIconColor ?? Theme.of(context).colorScheme.primary,
                     activeTextColor:
                         Theme.of(context).brightness == Brightness.dark
                             ? Colors.grey
                             : Theme.of(context).colorScheme.primary,
-                    activeColor: Theme.of(context).colorScheme.primary,
                     inactiveColor: Colors.grey,
                     onTap: () async {
                       provider.onChangeCurrentPage(1);
@@ -160,11 +164,13 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                     selected: currentPage == 2,
                     icon: Assets.lib.assets.lottie.historyIconLottieGrey,
                     label: "Orders",
+                    activeIconColor:
+                        Theme.of(context).colorScheme.primaryIconColor,
+                    activeColor: Theme.of(context).colorScheme.primaryIconColor ?? Theme.of(context).colorScheme.primary,
                     activeTextColor:
                         Theme.of(context).brightness == Brightness.dark
                             ? Colors.grey
                             : Theme.of(context).colorScheme.primary,
-                    activeColor: Theme.of(context).colorScheme.primary,
                     inactiveColor: Colors.grey,
                     onTap: () => provider.onChangeCurrentPage(2),
                   ),
@@ -172,11 +178,13 @@ class _OrderOnlineScreenState extends State<OrderOnlineScreen> {
                     selected: currentPage == 3,
                     icon: Assets.lib.assets.lottie.profileIconLottieGrey,
                     label: "Profile",
+                    activeIconColor:
+                        Theme.of(context).colorScheme.primaryIconColor,
+                    activeColor: Theme.of(context).colorScheme.primaryIconColor ?? Theme.of(context).colorScheme.primary,
                     activeTextColor:
                         Theme.of(context).brightness == Brightness.dark
                             ? Colors.grey
                             : Theme.of(context).colorScheme.primary,
-                    activeColor: Theme.of(context).colorScheme.primary,
                     inactiveColor: Colors.grey,
                     onTap: () => provider.onChangeCurrentPage(3),
                   ),

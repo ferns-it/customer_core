@@ -35,9 +35,16 @@ class ProductsProvider extends ChangeNotifier with BaseController {
   Random random = Random();
 
   Timer? _stockResyncTimer;
-  void syncStockAfterCartChange() {
+
+  /// Re-fetches the product stock data from the server, cancelling any
+  /// pending scheduled resync first.
+  ///
+  /// Fire-and-forget callers can ignore the returned future; callers that
+  /// need the refreshed values (e.g. to reconcile stock-out blocks against
+  /// the fresh server data) can await it.
+  Future<void> syncStockAfterCartChange() {
     _stockResyncTimer?.cancel();
-    getFeaturedPopularProducts(silent: true);
+    return getFeaturedPopularProducts(silent: true);
   }
 
   /// Immediately marks a product as out of stock and re-filters all product lists.
@@ -435,11 +442,17 @@ class ProductsProvider extends ChangeNotifier with BaseController {
       );
       notifyListeners();
     }, (result) async {
-      await getFavouriteProductList();
+      // Index the stock synchronously BEFORE any await inside this callback.
+      // `fold` does not await async callbacks, so `getFeaturedPopularProducts`
+      // completes as soon as this callback suspends - callers that reconcile
+      // against the fresh stock (e.g. CartProvider._syncStockAndReconcileBlocks
+      // after a stock-out error) must be able to rely on the cache already
+      // being updated when the returned future resolves.
       final list = result.featuredProducts ?? [];
       final popularList = result.popularProducts ?? [];
       indexStockFrom(list);
       indexStockFrom(popularList);
+      await getFavouriteProductList();
       final favouriteList =
           favouriteProductResponse.data?.favouriteList?.productList ?? [];
       final favIdMap = {

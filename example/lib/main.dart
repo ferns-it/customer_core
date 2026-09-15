@@ -22,12 +22,14 @@ void main() async {
           primary: Color.fromARGB(255, 4, 51, 122),
           onSurface: Colors.white,
           disabledColor: Colors.grey,
-          secondary: Color.fromARGB(255, 4, 51, 122)),
+          secondary: Color.fromARGB(255, 4, 51, 122),
+          primaryIconColor: Color.fromARGB(255, 4, 51, 122)),
       darkThemeOverride: const CustomerDarkThemeOverride(
           primary: Color.fromARGB(255, 4, 51, 122),
           onSurface: Colors.white,
           disabledColor: Colors.grey,
-          secondary: Colors.white),
+          secondary: Colors.white,
+          primaryIconColor: Color(0xFF28B9F0)),
     ),
   );
 }

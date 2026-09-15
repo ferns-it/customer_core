@@ -370,6 +370,95 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   int _nextCartRequestVersion() => ++_cartRequestVersion;
 
+  /// Product IDs whose quantity increase the server rejected with a
+  /// stock/stale-data error during this session. Once a stock-out error
+  /// occurs for a cart item, its increment button is kept disabled so the
+  /// user cannot keep tapping + and watch the server reduce the quantity
+  /// back down on every attempt.
+  final List<String> _stockOutBlockedProductIDs = [];
+
+  /// Whether the cart increment button for [pID] must be forced disabled
+  /// because the server rejected a quantity increase with a stock error.
+  /// This is intentionally independent of the client-side stock cache
+  /// (which `syncStockAfterCartChange` overwrites with the server value),
+  /// so the button stays disabled even after a stock re-sync completes -
+  /// unless the refreshed server data actually shows stock for the product
+  /// (see [_syncStockAndReconcileBlocks]), in which case the block was
+  /// wrong and is lifted automatically.
+  ///
+  /// The block is lifted again as soon as the user reduces the quantity (the
+  /// server then confirms stock was freed), removes the item, or when a
+  /// stock re-sync contradicts the block.
+  bool isCartIncrementBlockedForStockOut(String? pID) =>
+      pID != null && _stockOutBlockedProductIDs.contains(pID);
+
+  void _rememberStockOutBlock(String? pID) {
+    if (pID == null ||
+        pID.isEmpty ||
+        _stockOutBlockedProductIDs.contains(pID)) {
+      return;
+    }
+    _stockOutBlockedProductIDs.add(pID);
+    notifyListeners();
+  }
+
+  /// Lifts the stock-out block for [pID] so the increment button becomes
+  /// usable again.
+  ///
+  /// Called once the server confirms that the user reduced the quantity, which
+  /// frees stock again. If the server still cannot fulfil an increase, the next
+  /// rejected increment re-applies the block immediately.
+  void _clearStockOutBlock(String? pID) {
+    if (pID == null) return;
+    if (_stockOutBlockedProductIDs.remove(pID)) {
+      notifyListeners();
+    }
+  }
+
+  /// Forget stock-out blocks for products that are no longer in the cart
+  /// (e.g. the item was removed or cleared), so a fresh add from the menu
+  /// can use the normal flow again.
+  void _pruneStockOutBlocks(CartDetailsModel refreshedCart) {
+    if (_stockOutBlockedProductIDs.isEmpty) return;
+    final activeProductIDs = refreshedCart.cartItems
+        .map((item) => item.pID)
+        .where((pID) => pID != null)
+        .toList();
+    final stale = _stockOutBlockedProductIDs
+        .where((pID) => !activeProductIDs.contains(pID))
+        .toList();
+    if (stale.isEmpty) return;
+    for (final pID in stale) {
+      _stockOutBlockedProductIDs.remove(pID);
+    }
+    notifyListeners();
+  }
+
+  /// Re-syncs the product stock cache from the server and then lifts any
+  /// stock-out blocks that the fresh data contradicts.
+  ///
+  /// A stock-out block is only trustworthy while the server really has no
+  /// stock for the product. When the refreshed data shows the product is
+  /// available again (the original rejection was stale data or transient),
+  /// the block must be lifted - otherwise the increment button would stay
+  /// disabled incorrectly even though the item can actually be increased.
+  Future<void> _syncStockAndReconcileBlocks() async {
+    await productsProvider.syncStockAfterCartChange();
+    if (_stockOutBlockedProductIDs.isEmpty) return;
+    final healed = _stockOutBlockedProductIDs.where((pID) {
+      final stock = productsProvider.stockForID(pID);
+      // No cached entry at all: nothing contradicts the block, keep it.
+      if (stock == null) return false;
+      // Product is not stock-tracked, or the server reports stock again.
+      return stock.activated != true || (stock.availableStock ?? 0) > 0;
+    }).toList();
+    if (healed.isEmpty) return;
+    for (final pID in healed) {
+      _stockOutBlockedProductIDs.remove(pID);
+    }
+    notifyListeners();
+  }
+
   int _selectedCartTabbarIndex = 0;
   int get selectedCartTabbarIndex => _selectedCartTabbarIndex;
 
@@ -779,13 +868,18 @@ class CartProvider extends ChangeNotifier with BaseController {
           AlertDialogs.showError(error.message);
           return false;
         }
-        if (product?.pID != null) {
+        // Only a genuine stock shortage may zero the stock cache and set
+        // the increment block. A stale-data/parse failure must not disable
+        // the increment button - the item may well still be in stock.
+        if (_isStockShortageError(error) && product?.pID != null) {
           productsProvider.markProductOutOfStock(product!.pID!);
+          _rememberStockOutBlock(product.pID);
         }
         // Re-sync stock from the server right away so a transient failure
         // cannot leave the product permanently shown as out of stock. The
-        // refreshed data overwrites the optimistic 0 with the real value.
-        productsProvider.syncStockAfterCartChange();
+        // refreshed data overwrites the optimistic 0 with the real value
+        // and lifts any block the fresh data contradicts.
+        _syncStockAndReconcileBlocks();
         final maxQty = product != null && product.stock?.activated == true
             ? getRemainingFishStock(product)
             : null;
@@ -862,6 +956,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final remaining = originalStock - totalInCart;
     return remaining > 0 ? remaining : 0;
   }
+
   bool _isStaleProductDataError(AppExceptions error) {
     if (error is FormatErrorException) return true;
     final message = error.message.trim().toLowerCase();
@@ -869,11 +964,20 @@ class CartProvider extends ChangeNotifier with BaseController {
     // `contains('stock')` used to flag unrelated failures (and any
     // FormatException) as "out of stock" and permanently poisoned the stock
     // cache even when the server still had stock available.
-    return message.contains('invalid json') ||
+    return _isStockShortageError(error) ||
+        message.contains('invalid json') ||
         message.contains('json format') ||
         message.contains('invalid response syntax') ||
-        message.contains('syntax and try again') ||
-        message.contains('out of stock') ||
+        message.contains('syntax and try again');
+  }
+
+  /// Only the explicit stock-shortage phrases. A stale-data/parse failure is
+  /// *not* a stock shortage: zeroing the stock cache and setting the
+  /// increment block for those errors would disable the increment button
+  /// incorrectly when the server still has stock.
+  bool _isStockShortageError(AppExceptions error) {
+    final message = error.message.trim().toLowerCase();
+    return message.contains('out of stock') ||
         message.contains('not enough stock') ||
         message.contains('insufficient stock');
   }
@@ -941,6 +1045,7 @@ class CartProvider extends ChangeNotifier with BaseController {
         if (isIndianUser && _selectedPaymentMethod == PaymentMethod.card) {
           _selectedPaymentMethod = PaymentMethod.cash;
         }
+        _pruneStockOutBlocks(result);
         notifyListeners();
         productsProvider.refreshListings();
       });
@@ -1294,20 +1399,43 @@ class CartProvider extends ChangeNotifier with BaseController {
         isGuest: !isLogged, guestID: _guestID, userID: userData?.user.userID);
     response.fold(() {
       if (activeVersion != _cartRequestVersion) return;
+      // A confirmed quantity drop frees stock, so the user must be able to
+      // increase again: lift any stock-out block for this product. If the
+      // server still cannot fulfil an increase, the error branch below
+      // re-applies the block straight away.
+      if (newQty < (cartItem.quantity ?? 0)) {
+        _clearStockOutBlock(cartItem.pID);
+        // The quantity drop just freed stock on the server, so the cached
+        // stock (which the stock-out error optimistically pinned to 0) must
+        // be refreshed too - otherwise getRemainingFishStock keeps reporting
+        // 0 and incrementCartItemQtyWithStockCheck keeps refusing to
+        // increase even though the block itself was lifted.
+        _syncStockAndReconcileBlocks();
+      }
       listCartItems(requestVersion: activeVersion);
     }, (error) {
       if (activeVersion != _cartRequestVersion) return;
       log(error.toString(), name: "Update Cart Item");
       if (_isStaleProductDataError(error)) {
         listCartItems(requestVersion: activeVersion);
-        if (cartItem.pID != null) {
-          productsProvider.markProductOutOfStock(cartItem.pID!);
+        if (_isStockShortageError(error)) {
+          if (cartItem.pID != null) {
+            productsProvider.markProductOutOfStock(cartItem.pID!);
+            _rememberStockOutBlock(cartItem.pID);
+          }
+          // Re-sync stock from the server right away so a transient failure
+          // cannot leave the product permanently shown as out of stock. The
+          // refreshed data overwrites the optimistic 0 with the real value
+          // and lifts the block if the server actually has stock.
+          _syncStockAndReconcileBlocks();
+          AlertDialogs.showError('This item is now out of stock.');
+        } else {
+          // A stale-data/parse failure is not a real stock shortage: never
+          // zero the stock cache or disable the increment button for it,
+          // otherwise + is disabled while the item is actually available.
+          _syncStockAndReconcileBlocks();
+          AlertDialogs.showError(error.message);
         }
-        // Re-sync stock from the server right away so a transient failure
-        // cannot leave the product permanently shown as out of stock. The
-        // refreshed data overwrites the optimistic 0 with the real value.
-        productsProvider.syncStockAfterCartChange();
-        AlertDialogs.showError('This item is now out of stock.');
       } else {
         AlertDialogs.showError(error.message);
       }

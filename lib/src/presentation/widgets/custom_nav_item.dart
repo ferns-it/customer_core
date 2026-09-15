@@ -10,9 +10,10 @@ class CustomNavItem extends StatelessWidget {
   final LottieGenImage icon;
   final String label;
   final VoidCallback onTap;
-  final Color activeColor;
+  final Color? activeColor;
   final Color inactiveColor;
   final Color? activeTextColor;
+  final Color? activeIconColor;
   final Color? inactiveTextColor;
 
   const CustomNavItem({
@@ -24,6 +25,7 @@ class CustomNavItem extends StatelessWidget {
     required this.inactiveColor,
     this.activeTextColor,
     this.inactiveTextColor,
+    this.activeIconColor,
     required this.icon,
   });
 
@@ -57,7 +59,8 @@ class CustomNavItem extends StatelessWidget {
             AnimatedLottieIcon(
               selected: selected,
               asset: icon,
-              
+              activeColor: activeIconColor ?? activeColor ?? Colors.grey,
+              inactiveColor: inactiveColor,
             ),
             const SizedBox(height: 4),
 
@@ -80,11 +83,15 @@ class AnimatedLottieIcon extends StatefulWidget {
   final bool selected;
   final LottieGenImage asset;
   final double size;
+  final Color activeColor;
+  final Color inactiveColor;
 
   const AnimatedLottieIcon({
     Key? key,
     required this.selected,
     required this.asset,
+    required this.activeColor,
+    required this.inactiveColor,
     this.size = 28,
   }) : super(key: key);
 
@@ -113,18 +120,21 @@ class _AnimatedLottieIconState extends State<AnimatedLottieIcon>
 
   @override
   Widget build(BuildContext context) {
-     return widget.asset.lottie(
+    final iconColor =
+        widget.selected ? widget.activeColor : widget.inactiveColor;
+
+    return widget.asset.lottie(
       controller: _controller,
       height: widget.size,
       delegates: LottieDelegates(
         values: [
           ValueDelegate.color(
             const ['**'],
-            value: widget.selected ?  Theme.of(context).colorScheme.primary: Colors.grey,
+            value: iconColor,
           ),
           ValueDelegate.strokeColor(
             const ['**'],
-            value: widget.selected ?  Theme.of(context).colorScheme.primary : Colors.grey,
+            value: iconColor,
           ),
         ],
       ),

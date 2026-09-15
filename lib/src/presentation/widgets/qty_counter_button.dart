@@ -152,6 +152,7 @@ class QtyCounterButton2 extends StatelessWidget {
     this.gap,
     this.maxQty,
     this.allowDecrementAtMinimum = false,
+    this.disableIncrement = false,
     this.onIncrementBlocked,
   });
 
@@ -163,18 +164,25 @@ class QtyCounterButton2 extends StatelessWidget {
   final int? maxQty;
   final bool allowDecrementAtMinimum;
 
+  /// Forces the increment button into the disabled state regardless of
+  /// [maxQty] (e.g. after the server rejected an increment with a
+  /// stock/stale-data error). Taps still invoke [onIncrementBlocked] when
+  /// provided. Defaults to false.
+  final bool disableIncrement;
+
   /// Called when the increment button is tapped while it is disabled
-  /// ([qty] has reached [maxQty]). The button keeps its disabled look but
-  /// stays tappable so callers can explain why the quantity cannot be
-  /// increased (e.g. an "out of stock" alert). When null, the button is
-  /// fully inert as before.
+  /// ([disableIncrement] is true or [qty] has reached [maxQty]). The button
+  /// keeps its disabled look but stays tappable so callers can explain why
+  /// the quantity cannot be increased (e.g. an "out of stock" alert). When
+  /// null, the button is fully inert as before.
   final VoidCallback? onIncrementBlocked;
 
   void _updateQty({required bool isIncrement}) {
     HapticFeedback.lightImpact();
 
     final isDecrementDisabled = allowDecrementAtMinimum ? qty <= 0 : qty <= 1;
-    final isIncrementDisabled = maxQty != null && qty >= maxQty!;
+    final isIncrementDisabled =
+        disableIncrement || (maxQty != null && qty >= maxQty!);
 
     if (isIncrement && !isIncrementDisabled) {
       onIncrementQty?.call();
@@ -184,6 +192,7 @@ class QtyCounterButton2 extends StatelessWidget {
   }
 
   void incrementQty() {
+    if (disableIncrement) return;
     if (maxQty != null && qty >= maxQty!) return;
     _updateQty(isIncrement: true);
   }
@@ -195,7 +204,8 @@ class QtyCounterButton2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDecrementDisabled = allowDecrementAtMinimum ? qty <= 0 : qty <= 1;
-    final isIncrementDisabled = maxQty != null && qty >= maxQty!;
+    final isIncrementDisabled =
+        disableIncrement || (maxQty != null && qty >= maxQty!);
 
     return FittedBox(
       fit: BoxFit.scaleDown,

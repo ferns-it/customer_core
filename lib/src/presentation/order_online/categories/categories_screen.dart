@@ -48,6 +48,15 @@ class _CategoriesScreenState extends State<CategoriesScreen>
     _subCategoryScrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
+    // A TabBar throws "No TabController for TabBar" when it is built without a
+    // controller, so one is created eagerly here. Categories are usually still
+    // loading at this point, so start from whatever is already cached and let
+    // the post-frame callback below re-sync its length once they arrive.
+    _categoryTabController = TabController(
+      length: context.read<ProductsProvider>().categories.length,
+      vsync: this,
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final productProvider = context.read<ProductsProvider>();
 
@@ -69,6 +78,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
 
     if (_categoryTabController != null &&
         index != null &&
+        index >= 0 &&
         index < _categoryTabController!.length &&
         _categoryTabController!.index != index) {
       _categoryTabController!.animateTo(index);
@@ -76,15 +86,38 @@ class _CategoriesScreenState extends State<CategoriesScreen>
   }
 
   void _initTabController(ProductsProvider productProvider) {
-    _categoryTabController?.dispose();
+    final length = productProvider.categories.length;
+    final controller = _categoryTabController;
 
-    _categoryTabController = TabController(
-      length: productProvider.categories.length,
-      vsync: this,
-    );
+    // Keep the controller's length in sync with the categories. [TabController]
+    // cannot change its length, so a new one is created when it grew or shrank
+    // (categories can also end up empty, which is why it is clamped to 0).
+    if (controller == null || controller.length != length) {
+      final previousIndex = controller?.index ?? 0;
+      final next = TabController(
+        length: length,
+        initialIndex: length == 0
+            ? 0
+            : (previousIndex < length ? previousIndex : length - 1),
+        vsync: this,
+      );
+      controller?.dispose();
 
-    _categoryTabController
-        ?.animateTo(productProvider.selectedCategoryIndex ?? 0);
+      if (mounted) {
+        setState(() => _categoryTabController = next);
+      } else {
+        next.dispose();
+      }
+    }
+
+    final active = _categoryTabController;
+    final index = productProvider.selectedCategoryIndex;
+    if (active != null &&
+        index != null &&
+        index >= 0 &&
+        index < active.length) {
+      active.animateTo(index);
+    }
   }
 
   void _onScroll() {
@@ -579,8 +612,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
 
                               final freshProduct = productListener
                                   .overlayStockFromProductsList(product);
-                              final remainingStock =
-                                  cartProvider.getRemainingFishStock(freshProduct);
+                              final remainingStock = cartProvider
+                                  .getRemainingFishStock(freshProduct);
                               final isFishStockEnabled =
                                   freshProduct.stock?.activated == true;
                               final maxQty = isFishStockEnabled
@@ -594,15 +627,17 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                     allowDecrementAtMinimum: true,
                                     maxQty: maxQty,
                                     onDecrementQty: () {
-                                      final idx = cartProvider
-                                          .getProductCartIndex(freshProduct.pID);
+                                      final idx =
+                                          cartProvider.getProductCartIndex(
+                                              freshProduct.pID);
                                       if (idx >= 0) {
                                         cartProvider.decrementCartItemQty(idx);
                                       }
                                     },
                                     onIncrementQty: () {
-                                      final idx = cartProvider
-                                          .getProductCartIndex(freshProduct.pID);
+                                      final idx =
+                                          cartProvider.getProductCartIndex(
+                                              freshProduct.pID);
                                       if (idx >= 0) {
                                         cartProvider
                                             .incrementCartItemQtyWithStockCheck(
@@ -616,7 +651,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                     }),
                                 useSecondaryWidget: isExist,
                                 onPressed: () {
-                                  showItemDetailsBottomSheet(context, freshProduct);
+                                  showItemDetailsBottomSheet(
+                                      context, freshProduct);
                                 },
                                 onPressFavouriteBtn: () async {
                                   if (freshProduct.isFavourite) {

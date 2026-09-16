@@ -92,316 +92,312 @@ class CheckoutDetailsScreen extends StatelessWidget {
                           maxChildSize: 0.9,
                           minChildSize: 0.5,
                           builder: (context, scrollController) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? AppColors.kCardBackground2
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              child: Column(
-                                children: [
-                                  verticalSpaceRegular,
-                                  Container(
-                                    height: 4,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade400,
-                                      borderRadius: BorderRadius.circular(10),
+                            return SafeArea(
+                              top: false,
+                              bottom: true,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? AppColors.kCardBackground2
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                child: Column(
+                                  children: [
+                                    verticalSpaceRegular,
+                                    Container(
+                                      height: 4,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade400,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                  ),
-                                  verticalSpaceRegular,
-                                  Expanded(
-                                    child: ListView.separated(
-                                      controller: scrollController,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      itemCount: cartListener.cartItems.length,
-                                      itemBuilder: (context, index) {
-                                        final product = cartListener.cartItems
-                                            .elementAt(index);
-                                        return Row(
-                                          children: [
-                                            AppConfig.instance
-                                                    .isCategoryImageEnabled
-                                                ? product.productPhoto != null
-                                                    ? ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        child: CachedNetworkImage(
-                                                            height: 60,
-                                                            width: 60,
-                                                            fit: BoxFit.cover,
-                                                            imageUrl: product
-                                                                .productPhoto!),
-                                                      )
-                                                    : const SizedBox.shrink()
-                                                : SizedBox.shrink(),
-                                            product.productPhoto != null
-                                                ? horizontalSpaceSmall
-                                                : const SizedBox.shrink(),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    product.variation != null
-                                                        ? SizedBox(
-                                                            width: context
-                                                                    .screenWidth *
-                                                                0.5,
-                                                            child: Tooltip(
-                                                              message:
-                                                                  "${product.productName ?? 'N/A'} (${product.variation ?? 'N/A'})",
-                                                              triggerMode:
-                                                                  TooltipTriggerMode
-                                                                      .tap,
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
+                                    verticalSpaceRegular,
+                                    Expanded(
+                                      child: ListView.separated(
+                                        controller: scrollController,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        itemCount:
+                                            cartListener.cartItems.length,
+                                        itemBuilder: (context, index) {
+                                          final product = cartListener.cartItems
+                                              .elementAt(index);
+                                          return Row(
+                                            children: [
+                                              AppConfig.instance
+                                                      .isCategoryImageEnabled
+                                                  ? product.productPhoto != null
+                                                      ? ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          child: CachedNetworkImage(
+                                                              height: 60,
+                                                              width: 60,
+                                                              fit: BoxFit.cover,
+                                                              imageUrl: product
+                                                                  .productPhoto!),
+                                                        )
+                                                      : const SizedBox.shrink()
+                                                  : SizedBox.shrink(),
+                                              product.productPhoto != null
+                                                  ? horizontalSpaceSmall
+                                                  : const SizedBox.shrink(),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      product.variation != null
+                                                          ? SizedBox(
+                                                              width: context
+                                                                      .screenWidth *
+                                                                  0.5,
+                                                              child: Tooltip(
+                                                                message:
                                                                     "${product.productName ?? 'N/A'} (${product.variation ?? 'N/A'})",
-                                                                    maxLines: 2,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                    style: context
-                                                                        .customTextTheme
-                                                                        .text16W700
-                                                                        .copyWith(
-                                                                            fontSize:
-                                                                                14,
-                                                                            color:
-                                                                                context.customTextTheme.color),
-                                                                  ),
-                                                                  product.amountDetails
-                                                                              ?.isOfferApplied ==
-                                                                          true
-                                                                      ? Row(
-                                                                          children: [
-                                                                              Text(
-                                                                                product.amountDetails?.itemDetails?.display?.totalAmount ?? product.amountDetails?.display?.totalAmountWithAddon ?? 'N/A',
-                                                                                style: context.customTextTheme.text14W600.copyWith(color: context.customTextTheme.color),
-                                                                              ),
-                                                                              const SizedBox(width: 4),
-                                                                              Text(
-                                                                                product.amountDetails?.itemDetails?.display?.totalAmountNormal ?? 'N/A',
-                                                                                style: context.customTextTheme.text14W600.copyWith(decoration: TextDecoration.lineThrough, decorationColor: Colors.grey, color: Colors.grey),
-                                                                              ),
-                                                                            ])
-                                                                      : Text(
-                                                                          product.product_total_price ??
-                                                                              'N/A',
-                                                                          style: context
-                                                                              .customTextTheme
-                                                                              .text14W600
-                                                                              .copyWith(color: context.customTextTheme.color),
-                                                                        ),
-                                                                ],
-                                                              ),
-                                                            ))
-                                                        : SizedBox(
-                                                            width: context
-                                                                    .screenWidth *
-                                                                0.5,
-                                                            child: Tooltip(
-                                                              message: product
-                                                                          .variation !=
-                                                                      null
-                                                                  ? "${product.productName ?? 'N/A'} (${product.variation ?? 'N/A'})"
-                                                                  : product
-                                                                          .productName ??
-                                                                      'N/A',
-                                                              triggerMode:
-                                                                  TooltipTriggerMode
-                                                                      .tap,
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    product.productName
-                                                                            ?.capitalize() ??
+                                                                triggerMode:
+                                                                    TooltipTriggerMode
+                                                                        .tap,
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Text(
+                                                                      "${product.productName ?? 'N/A'} (${product.variation ?? 'N/A'})",
+                                                                      maxLines:
+                                                                          2,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      style: context
+                                                                          .customTextTheme
+                                                                          .text16W700
+                                                                          .copyWith(
+                                                                              fontSize: 14,
+                                                                              color: context.customTextTheme.color),
+                                                                    ),
+                                                                    product.amountDetails?.isOfferApplied ==
+                                                                            true
+                                                                        ? Row(
+                                                                            children: [
+                                                                                Text(
+                                                                                  product.amountDetails?.itemDetails?.display?.totalAmount ?? product.amountDetails?.display?.totalAmountWithAddon ?? 'N/A',
+                                                                                  style: context.customTextTheme.text14W600.copyWith(color: context.customTextTheme.color),
+                                                                                ),
+                                                                                const SizedBox(width: 4),
+                                                                                Text(
+                                                                                  product.amountDetails?.itemDetails?.display?.totalAmountNormal ?? 'N/A',
+                                                                                  style: context.customTextTheme.text14W600.copyWith(decoration: TextDecoration.lineThrough, decorationColor: Colors.grey, color: Colors.grey),
+                                                                                ),
+                                                                              ])
+                                                                        : Text(
+                                                                            product.product_total_price ??
+                                                                                'N/A',
+                                                                            style:
+                                                                                context.customTextTheme.text14W600.copyWith(color: context.customTextTheme.color),
+                                                                          ),
+                                                                  ],
+                                                                ),
+                                                              ))
+                                                          : SizedBox(
+                                                              width: context
+                                                                      .screenWidth *
+                                                                  0.5,
+                                                              child: Tooltip(
+                                                                message: product
+                                                                            .variation !=
+                                                                        null
+                                                                    ? "${product.productName ?? 'N/A'} (${product.variation ?? 'N/A'})"
+                                                                    : product
+                                                                            .productName ??
                                                                         'N/A',
-                                                                    style: context
-                                                                        .customTextTheme
-                                                                        .text16W700
-                                                                        .copyWith(
-                                                                            fontSize:
-                                                                                14,
-                                                                            color:
-                                                                                context.customTextTheme.color),
-                                                                  ),
-                                                                  product.amountDetails
-                                                                              ?.isOfferApplied ==
-                                                                          true
-                                                                      ? Row(
-                                                                          children: [
-                                                                              Text(
-                                                                                product.amountDetails?.itemDetails?.display?.totalAmount ?? product.amountDetails?.display?.totalAmountWithAddon ?? 'N/A',
-                                                                                style: context.customTextTheme.text14W600.copyWith(color: context.customTextTheme.color),
-                                                                              ),
-                                                                              const SizedBox(width: 4),
-                                                                              Text(
-                                                                                product.amountDetails?.itemDetails?.display?.totalAmountNormal ?? 'N/A',
-                                                                                style: context.customTextTheme.text14W600.copyWith(decoration: TextDecoration.lineThrough, decorationColor: Colors.grey, color: Colors.grey),
-                                                                              ),
-                                                                            ])
-                                                                      : Text(
-                                                                          product.product_total_price ??
-                                                                              'N/A',
-                                                                          style: context
-                                                                              .customTextTheme
-                                                                              .text14W600
-                                                                              .copyWith(color: context.customTextTheme.color),
-                                                                        ),
-                                                                ],
+                                                                triggerMode:
+                                                                    TooltipTriggerMode
+                                                                        .tap,
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Text(
+                                                                      product.productName
+                                                                              ?.capitalize() ??
+                                                                          'N/A',
+                                                                      style: context
+                                                                          .customTextTheme
+                                                                          .text16W700
+                                                                          .copyWith(
+                                                                              fontSize: 14,
+                                                                              color: context.customTextTheme.color),
+                                                                    ),
+                                                                    product.amountDetails?.isOfferApplied ==
+                                                                            true
+                                                                        ? Row(
+                                                                            children: [
+                                                                                Text(
+                                                                                  product.amountDetails?.itemDetails?.display?.totalAmount ?? product.amountDetails?.display?.totalAmountWithAddon ?? 'N/A',
+                                                                                  style: context.customTextTheme.text14W600.copyWith(color: context.customTextTheme.color),
+                                                                                ),
+                                                                                const SizedBox(width: 4),
+                                                                                Text(
+                                                                                  product.amountDetails?.itemDetails?.display?.totalAmountNormal ?? 'N/A',
+                                                                                  style: context.customTextTheme.text14W600.copyWith(decoration: TextDecoration.lineThrough, decorationColor: Colors.grey, color: Colors.grey),
+                                                                                ),
+                                                                              ])
+                                                                        : Text(
+                                                                            product.product_total_price ??
+                                                                                'N/A',
+                                                                            style:
+                                                                                context.customTextTheme.text14W600.copyWith(color: context.customTextTheme.color),
+                                                                          ),
+                                                                  ],
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                    // const Spacer(),
-                                                  ],
-                                                ),
-                                                product.master_addon_apllied
-                                                            .isNotEmpty ==
-                                                        true
-                                                    ? Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: product
-                                                            .master_addon_apllied
-                                                            .map(
-                                                              (addon) => Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  // RichText(
-                                                                  //   text: TextSpan(
-                                                                  //     text: '|  ',
-                                                                  //     style: const TextStyle(color: Colors.grey),
-                                                                  //     children: [
-                                                                  //       TextSpan(text: addon.title, style: const TextStyle(color: Colors.black)),
-                                                                  //     ],
-                                                                  //   ),
-                                                                  // ),
-                                                                  Column(
+                                                      // const Spacer(),
+                                                    ],
+                                                  ),
+                                                  product.master_addon_apllied
+                                                              .isNotEmpty ==
+                                                          true
+                                                      ? Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: product
+                                                              .master_addon_apllied
+                                                              .map(
+                                                                (addon) =>
+                                                                    Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    // RichText(
+                                                                    //   text: TextSpan(
+                                                                    //     text: '|  ',
+                                                                    //     style: const TextStyle(color: Colors.grey),
+                                                                    //     children: [
+                                                                    //       TextSpan(text: addon.title, style: const TextStyle(color: Colors.black)),
+                                                                    //     ],
+                                                                    //   ),
+                                                                    // ),
+                                                                    Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment
+                                                                                .start,
+                                                                        children: addon
+                                                                            .choosedOption
+                                                                            .map((option) =>
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.only(left: 0.0),
+                                                                                  child: Row(
+                                                                                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                    children: [
+                                                                                      Text(
+                                                                                        "+ ${option.text}",
+                                                                                        style: TextStyle(color: isDark ? Colors.white : null),
+                                                                                      ),
+                                                                                      // const Spacer(),
+                                                                                      horizontalSpaceSmall,
+                                                                                      Text(
+                                                                                        option.price ?? 'N/A',
+                                                                                        style: TextStyle(color: isDark ? Colors.white : null),
+                                                                                      ),
+                                                                                      // horizontalSpaceTiny,
+                                                                                      // const Icon(
+                                                                                      //   Icons.delete_outline,
+                                                                                      //   color: Colors.transparent,
+                                                                                      // )
+                                                                                    ],
+                                                                                  ),
+                                                                                ))
+                                                                            .toList())
+                                                                  ],
+                                                                ),
+                                                              )
+                                                              .toList(),
+                                                        )
+                                                      : const SizedBox.shrink(),
+                                                  product.addon_apllied
+                                                              .isNotEmpty ==
+                                                          true
+                                                      ? Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children:
+                                                              product
+                                                                  .addon_apllied
+                                                                  .map(
+                                                                    (addon) =>
+                                                                        Column(
                                                                       crossAxisAlignment:
                                                                           CrossAxisAlignment
                                                                               .start,
-                                                                      children: addon
-                                                                          .choosedOption
-                                                                          .map((option) =>
-                                                                              Padding(
-                                                                                padding: const EdgeInsets.only(left: 0.0),
-                                                                                child: Row(
-                                                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                  children: [
-                                                                                    Text(
-                                                                                      "+ ${option.text}",
-                                                                                      style: TextStyle(color: isDark ? Colors.white : null),
-                                                                                    ),
-                                                                                    // const Spacer(),
-                                                                                    horizontalSpaceSmall,
-                                                                                    Text(
-                                                                                      option.price ?? 'N/A',
-                                                                                      style: TextStyle(color: isDark ? Colors.white : null),
-                                                                                    ),
-                                                                                    // horizontalSpaceTiny,
-                                                                                    // const Icon(
-                                                                                    //   Icons.delete_outline,
-                                                                                    //   color: Colors.transparent,
-                                                                                    // )
-                                                                                  ],
-                                                                                ),
-                                                                              ))
-                                                                          .toList())
-                                                                ],
-                                                              ),
-                                                            )
-                                                            .toList(),
-                                                      )
-                                                    : const SizedBox.shrink(),
-                                                product.addon_apllied
-                                                            .isNotEmpty ==
-                                                        true
-                                                    ? Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children:
-                                                            product
-                                                                .addon_apllied
-                                                                .map(
-                                                                  (addon) =>
-                                                                      Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      // RichText(
-                                                                      //   text: TextSpan(
-                                                                      //     text: '|  ',
-                                                                      //     style: const TextStyle(color: Colors.grey),
-                                                                      //     children: [
-                                                                      //       TextSpan(text: addon.title, style: const TextStyle(color: Colors.black)),
-                                                                      //     ],
-                                                                      //   ),
-                                                                      // ),
-                                                                      Column(
-                                                                          crossAxisAlignment: CrossAxisAlignment
-                                                                              .start,
-                                                                          children: addon
-                                                                              .choosedOption
-                                                                              .map((option) => Padding(
-                                                                                    padding: const EdgeInsets.only(left: 0.0),
-                                                                                    child: Row(
-                                                                                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                      children: [
-                                                                                        Text(
-                                                                                          "+ ${option.text}",
-                                                                                          style: TextStyle(color: isDark ? Colors.white : null),
-                                                                                        ),
-                                                                                        // const Spacer(),
-                                                                                        horizontalSpaceSmall,
-                                                                                        Text(
-                                                                                          option.price ?? 'N/A',
-                                                                                          style: TextStyle(color: isDark ? Colors.white : null),
-                                                                                        ),
-                                                                                        // horizontalSpaceTiny,
-                                                                                        // const Icon(
-                                                                                        //   Icons.delete_outline,
-                                                                                        //   color: Colors.transparent,
-                                                                                        // )
-                                                                                      ],
-                                                                                    ),
-                                                                                  ))
-                                                                              .toList())
-                                                                    ],
-                                                                  ),
-                                                                )
-                                                                .toList(),
-                                                      )
-                                                    : const SizedBox.shrink(),
-                                              ],
-                                            ),
-                                            const Spacer(),
-                                            horizontalSpaceRegular
-                                          ],
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) {
-                                        return verticalSpaceSmall;
-                                      },
+                                                                      children: [
+                                                                        // RichText(
+                                                                        //   text: TextSpan(
+                                                                        //     text: '|  ',
+                                                                        //     style: const TextStyle(color: Colors.grey),
+                                                                        //     children: [
+                                                                        //       TextSpan(text: addon.title, style: const TextStyle(color: Colors.black)),
+                                                                        //     ],
+                                                                        //   ),
+                                                                        // ),
+                                                                        Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: addon.choosedOption
+                                                                                .map((option) => Padding(
+                                                                                      padding: const EdgeInsets.only(left: 0.0),
+                                                                                      child: Row(
+                                                                                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                        children: [
+                                                                                          Text(
+                                                                                            "+ ${option.text}",
+                                                                                            style: TextStyle(color: isDark ? Colors.white : null),
+                                                                                          ),
+                                                                                          // const Spacer(),
+                                                                                          horizontalSpaceSmall,
+                                                                                          Text(
+                                                                                            option.price ?? 'N/A',
+                                                                                            style: TextStyle(color: isDark ? Colors.white : null),
+                                                                                          ),
+                                                                                          // horizontalSpaceTiny,
+                                                                                          // const Icon(
+                                                                                          //   Icons.delete_outline,
+                                                                                          //   color: Colors.transparent,
+                                                                                          // )
+                                                                                        ],
+                                                                                      ),
+                                                                                    ))
+                                                                                .toList())
+                                                                      ],
+                                                                    ),
+                                                                  )
+                                                                  .toList(),
+                                                        )
+                                                      : const SizedBox.shrink(),
+                                                ],
+                                              ),
+                                              const Spacer(),
+                                              horizontalSpaceRegular
+                                            ],
+                                          );
+                                        },
+                                        separatorBuilder: (context, index) {
+                                          return verticalSpaceSmall;
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             );
                           });

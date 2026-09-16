@@ -553,7 +553,6 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     final products =
         productListener.filterListableProducts(productListener.productsList);
 
-    // If there are no category products, don't show anything.
     if (products.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -561,20 +560,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Optional heading
-        // Padding(
-        //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        //   child: Text(
-        //     productListener.selectedCategory?.name ?? 'Products',
-        //     style: const TextStyle(
-        //       fontSize: 20,
-        //       fontWeight: FontWeight.bold,
-        //     ),
-        //   ),
-        // ),
-
         verticalSpaceSmall,
-
         AlignedGridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -591,7 +577,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
             final productQtyUpdated =
                 cartProvider.getProductQuantity(product.pID);
 
-            // Get latest stock information.
+            // Always get the latest stock information.
             final freshProduct =
                 productListener.overlayStockFromProductsList(product);
 
@@ -599,7 +585,9 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
 
             return ProductDetailsTile(
               freshProduct,
+
               showFavIcon: cartListener.isUserLoggedIn,
+
               secondaryWidget: QtyCounterButton2(
                 qty: productQtyUpdated,
                 allowDecrementAtMinimum: true,
@@ -629,10 +617,18 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                   );
                 },
               ),
+
               useSecondaryWidget: isExist,
+
+              // Product details
               onPressed: () {
-                showItemDetailsBottomSheet(freshProduct);
+                showItemDetailsBottomSheet(
+                  context,
+                  freshProduct,
+                );
               },
+
+              // Favourite
               onPressFavouriteBtn: () async {
                 if (freshProduct.isFavourite) {
                   await context.read<ProductsProvider>().removeFavourite(
@@ -646,6 +642,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                       );
                 }
               },
+
+              // Add product
               onPressAddBtn: () {
                 if (freshProduct.pID == null) return;
 
@@ -659,7 +657,10 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                   freshProduct.pID!,
                 );
 
-                showItemDetailsBottomSheet(freshProduct);
+                showAddItemBottomSheet(
+                  context,
+                  freshProduct,
+                );
               },
             );
           },
@@ -852,7 +853,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                         }),
                                     useSecondaryWidget: isExist,
                                     onPressed: () {
-                                      showItemDetailsBottomSheet(freshProduct);
+                                      showItemDetailsBottomSheet(
+                                          context, freshProduct);
                                     },
                                     onPressAddBtn: () {
                                       if (product.pID == null) return;
@@ -870,7 +872,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       //     cartProvider.resetValues();
                                       //   }
                                       // });
-                                      showAddItemBottomSheet(freshProduct);
+                                      showAddItemBottomSheet(
+                                          context, freshProduct);
                                     },
                                   );
                                 },
@@ -968,7 +971,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                 }),
                             useSecondaryWidget: isExist,
                             onPressed: () {
-                              showItemDetailsBottomSheet(freshProduct);
+                              showItemDetailsBottomSheet(context, freshProduct);
                             },
                             onPressAddBtn: () {
                               if (product.pID == null) return;
@@ -983,7 +986,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               //     cartProvider.resetValues();
                               //   }
                               // });
-                              showAddItemBottomSheet(freshProduct);
+                              showAddItemBottomSheet(context, freshProduct);
                             },
                           );
                         },
@@ -1087,7 +1090,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                       }),
                                   useSecondaryWidget: isExist,
                                   onPressed: () {
-                                    showItemDetailsBottomSheet(freshProduct);
+                                    showItemDetailsBottomSheet(
+                                        context, freshProduct);
                                   },
                                   onPressAddBtn: () {
                                     if (product.pID == null) return;
@@ -1103,7 +1107,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                     //     cartProvider.resetValues();
                                     //   }
                                     // });
-                                    showAddItemBottomSheet(freshProduct);
+                                    showAddItemBottomSheet(
+                                        context, freshProduct);
                                   },
                                 );
                               },
@@ -1347,7 +1352,10 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     );
   }
 
-  void showItemDetailsBottomSheet(ProductDataModel product) {
+  void showItemDetailsBottomSheet(
+    BuildContext context,
+    ProductDataModel product,
+  ) {
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -1372,13 +1380,16 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
               context.read<CartProvider>().clearSelectedAddressSecondary();
               context.read<CartProvider>().updateSelectedItemId(product.pID!);
 
-              showAddItemBottomSheet(product);
+              showAddItemBottomSheet(context, product);
             },
           );
         });
   }
 
-  void showAddItemBottomSheet(ProductDataModel product) {
+  void showAddItemBottomSheet(
+    BuildContext context,
+    ProductDataModel product,
+  ) {
     final sheetFuture = showModalBottomSheet(
         context: context,
         isScrollControlled: true,

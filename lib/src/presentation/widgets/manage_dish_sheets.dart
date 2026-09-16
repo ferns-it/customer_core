@@ -56,7 +56,8 @@ class DishDetailBottomSheet extends StatelessWidget {
     final isProductUnavailable = isStockActivated && availableStock;
 
     return SafeArea(
-      bottom: false,
+      top: false,
+      bottom: true,
       maintainBottomViewPadding: false,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -310,220 +311,233 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
     final selectedVariationAllergens =
         getSelectedVariationAllergens(cartListener);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        const RoundedCloseIcon(),
-        verticalSpaceRegular,
-        Theme(
-          data: Theme.of(context).copyWith(
-            textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
-              displayColor: AppColors.kBlack2,
-              bodyColor: AppColors.kBlack2,
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const RoundedCloseIcon(),
+          verticalSpaceRegular,
+          Theme(
+            data: Theme.of(context).copyWith(
+              textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+                displayColor: AppColors.kBlack2,
+                bodyColor: AppColors.kBlack2,
+              ),
             ),
-          ),
-          child: ListTileTheme(
-            contentPadding: EdgeInsets.zero,
-            child: Container(
-              padding: const EdgeInsetsDirectional.symmetric(
-                vertical: 10,
-                horizontal: 15,
-              ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+            child: ListTileTheme(
+              contentPadding: EdgeInsets.zero,
+              child: Container(
+                padding: const EdgeInsetsDirectional.symmetric(
+                  vertical: 10,
+                  horizontal: 15,
                 ),
-              ),
-              constraints: BoxConstraints(
-                maxHeight: context.screenHeight * 0.8,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  verticalSpaceTiny,
-                  Row(
-                    children: [
-                      AppConfig.instance.isCategoryImageEnabled
-                          ? Expanded(
-                              child: _ProductImageWidget(product: product))
-                          : SizedBox.shrink(),
-                      AppConfig.instance.isCategoryImageEnabled
-                          ? horizontalSpaceSmall
-                          : SizedBox.shrink(),
-                      AppConfig.instance.isCategoryImageEnabled
-                          ? Expanded(
-                              flex: 3,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  _ProductNameWidget(product: product),
-                                  if (selectedVariationAllergens.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Wrap(
-                                        spacing: 4,
-                                        runSpacing: 4,
-                                        children: selectedVariationAllergens
-                                            .map(
-                                              (e) => Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Theme.of(context)
-                                                              .brightness ==
-                                                          Brightness.dark
-                                                      ? Colors.grey.shade800
-                                                      : AppColors.kGray3
-                                                          .withOpacity(0.3),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Text(
-                                                  e,
-                                                  style: TextStyle(
-                                                    fontSize: 8,
-                                                    color: context
-                                                        .customTextTheme.color,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                      ),
-                                    ),
-                                  // _RatingAndTimeWidget(product: product),
-                                ],
-                              ),
-                            )
-                          : Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _ProductNameWidget(product: product),
-                                  if (selectedVariationAllergens.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Wrap(
-                                        spacing: 4,
-                                        runSpacing: 4,
-                                        children: selectedVariationAllergens
-                                            .map(
-                                              (e) => Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Theme.of(context)
-                                                              .brightness ==
-                                                          Brightness.dark
-                                                      ? Colors.grey.shade800
-                                                      : AppColors.kGray3
-                                                          .withOpacity(0.3),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Text(
-                                                  e,
-                                                  style: TextStyle(
-                                                    fontSize: 8,
-                                                    color: context
-                                                        .customTextTheme.color,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                      ),
-                                    ),
-                                  verticalSpaceSmall,
-                                ],
-                              ),
-                            ),
-                    ],
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
-                  if (isProductUnavailable) ...[
-                    verticalSpaceSmall,
-                    StockStatusWidget(),
+                ),
+                constraints: BoxConstraints(
+                  maxHeight: context.screenHeight * 0.8,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     verticalSpaceTiny,
-                  ],
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _ProductPriceWidget(product: product),
-                      QtyCounterButton2(
-                        qty: cartListener.selectedItemQty,
-                        availableStock: product.stock?.availableStock,
-                        onIncrementQty: () {
-                          final availableStock = product.stock?.availableStock;
-                          // When the selected qty has already reached the
-                          // available stock, block the increment and show the
-                          // same alert used for the out-of-stock case.
-                          if (availableStock != null &&
-                              cartListener.selectedItemQty >= availableStock) {
+                    Row(
+                      children: [
+                        AppConfig.instance.isCategoryImageEnabled
+                            ? Expanded(
+                                child: _ProductImageWidget(product: product))
+                            : SizedBox.shrink(),
+                        AppConfig.instance.isCategoryImageEnabled
+                            ? horizontalSpaceSmall
+                            : SizedBox.shrink(),
+                        AppConfig.instance.isCategoryImageEnabled
+                            ? Expanded(
+                                flex: 3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    _ProductNameWidget(product: product),
+                                    if (selectedVariationAllergens.isNotEmpty)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Wrap(
+                                          spacing: 4,
+                                          runSpacing: 4,
+                                          children: selectedVariationAllergens
+                                              .map(
+                                                (e) => Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 4,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context)
+                                                                .brightness ==
+                                                            Brightness.dark
+                                                        ? Colors.grey.shade800
+                                                        : AppColors.kGray3
+                                                            .withOpacity(0.3),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: Text(
+                                                    e,
+                                                    style: TextStyle(
+                                                      fontSize: 8,
+                                                      color: context
+                                                          .customTextTheme
+                                                          .color,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                        ),
+                                      ),
+                                    // _RatingAndTimeWidget(product: product),
+                                  ],
+                                ),
+                              )
+                            : Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _ProductNameWidget(product: product),
+                                    if (selectedVariationAllergens.isNotEmpty)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Wrap(
+                                          spacing: 4,
+                                          runSpacing: 4,
+                                          children: selectedVariationAllergens
+                                              .map(
+                                                (e) => Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 4,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context)
+                                                                .brightness ==
+                                                            Brightness.dark
+                                                        ? Colors.grey.shade800
+                                                        : AppColors.kGray3
+                                                            .withOpacity(0.3),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: Text(
+                                                    e,
+                                                    style: TextStyle(
+                                                      fontSize: 8,
+                                                      color: context
+                                                          .customTextTheme
+                                                          .color,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                        ),
+                                      ),
+                                    verticalSpaceSmall,
+                                  ],
+                                ),
+                              ),
+                      ],
+                    ),
+                    if (isProductUnavailable) ...[
+                      verticalSpaceSmall,
+                      StockStatusWidget(),
+                      verticalSpaceTiny,
+                    ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _ProductPriceWidget(product: product),
+                        QtyCounterButton2(
+                          qty: cartListener.selectedItemQty,
+                          availableStock: product.stock?.availableStock,
+                          onIncrementQty: () {
+                            final availableStock =
+                                product.stock?.availableStock;
+                            // When the selected qty has already reached the
+                            // available stock, block the increment and show the
+                            // same alert used for the out-of-stock case.
+                            if (availableStock != null &&
+                                cartListener.selectedItemQty >=
+                                    availableStock) {
+                              AlertDialogs.showError(
+                                'Sorry, this item is currently out of stock.',
+                              );
+                              return;
+                            }
+                            cartProvider.incrementQty(availableStock);
+                          },
+                          onDecrementQty: () {
+                            cartProvider.decrementQty();
+                          },
+                          onIncrementBlocked: () {
                             AlertDialogs.showError(
                               'Sorry, this item is currently out of stock.',
                             );
-                            return;
-                          }
-                          cartProvider.incrementQty(availableStock);
-                        },
-                        onDecrementQty: () {
-                          cartProvider.decrementQty();
-                        },
-                        onIncrementBlocked: () {
-                          AlertDialogs.showError(
-                            'Sorry, this item is currently out of stock.',
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  product.description != null && product.description!.isNotEmpty
-                      ? verticalSpaceSmall
-                      : const SizedBox.shrink(),
-                  _DescriptionWidget(product: product),
-                  verticalSpaceSmall,
-                  Flexible(
-                    flex: 2,
-                    child: ListView(
-                      controller: _scrollController,
-                      shrinkWrap: true,
-                      children: [
-                        _IngredientsWidget(product: product),
-                        verticalSpaceSmall,
-                        _FoodVariationSection(product, key: _variationKey),
-                        verticalSpaceRegular,
-                        _FoodAddonsSection(
-                          product,
-                          addonKeys: _masterAddonKeys,
+                          },
                         ),
                       ],
                     ),
-                  ),
-                  verticalSpaceSmall,
-                  Center(
-                    child: AddToCartButton(
-                      activeProduct,
-                      onValidationFailed: () =>
-                          _scrollToFirstInvalidSection(cartListener),
+                    product.description != null &&
+                            product.description!.isNotEmpty
+                        ? verticalSpaceSmall
+                        : const SizedBox.shrink(),
+                    _DescriptionWidget(product: product),
+                    verticalSpaceSmall,
+                    Flexible(
+                      flex: 2,
+                      child: ListView(
+                        controller: _scrollController,
+                        shrinkWrap: true,
+                        children: [
+                          _IngredientsWidget(product: product),
+                          verticalSpaceSmall,
+                          _FoodVariationSection(product, key: _variationKey),
+                          verticalSpaceRegular,
+                          _FoodAddonsSection(
+                            product,
+                            addonKeys: _masterAddonKeys,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  verticalSpaceTiny,
-                  SizedBox(height: bottomInset > 0 ? bottomInset : 0)
-                ],
+                    verticalSpaceSmall,
+                    Center(
+                      child: AddToCartButton(
+                        activeProduct,
+                        onValidationFailed: () =>
+                            _scrollToFirstInvalidSection(cartListener),
+                      ),
+                    ),
+                    verticalSpaceTiny,
+                    SizedBox(height: bottomInset > 0 ? bottomInset : 0)
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

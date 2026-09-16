@@ -302,6 +302,15 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     final isShopClosed =
         cartListener.cartDetailsModel?.paymentOptions?.shopStatus == 'closed';
 
+    final featuredProducts = productListener
+        .featuredPopularProductsAPIResponse.data?.featuredProducts;
+
+    final popularProducts = productListener
+        .featuredPopularProductsAPIResponse.data?.popularProducts;
+
+    final hasFeaturedProducts = featuredProducts?.isNotEmpty ?? false;
+    final hasPopularProducts = popularProducts?.isNotEmpty ?? false;
+
     return SingleChildScrollView(
       controller: _scrollController,
       child: Column(
@@ -338,35 +347,68 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
           if (productListener.featuredPopularProductsAPIResponse.status ==
               APIResponseStatus.loading) ...[
             const ShimmerProductDetailsTile(count: 4),
-          ] else if (productListener.featuredPopularProductsAPIResponse.data
-                  ?.featuredProducts?.isNotEmpty ==
-              true) ...[
-            verticalSpaceSmall,
-
-            buildFeaturedProducts(
-              productListener,
-              cartProvider,
-              productProvider,
-            ),
-            // else ...[
-            //   verticalSpaceSmall,
-            //   buildFeaturedProducts(
-            //       productListener, cartProvider, productProvider),
-            verticalSpaceMedium,
-            if (productListener.featuredPopularProductsAPIResponse.data
-                    ?.popularProducts?.isNotEmpty ==
-                true)
-              buildPopularProducts(context),
           ] else ...[
-            verticalSpaceSmall,
+            // Featured
+            if (hasFeaturedProducts) ...[
+              verticalSpaceSmall,
+              buildFeaturedProducts(
+                productListener,
+                cartProvider,
+                productProvider,
+              ),
+              verticalSpaceMedium,
+            ],
 
-            // Show category products when there are no available featured products
-            buildCategoryProducts(
-              productListener,
-              cartProvider,
-              productProvider,
-            ),
+            // Popular
+            if (hasPopularProducts) ...[
+              buildPopularProducts(context),
+              verticalSpaceMedium,
+            ],
+
+            // Categories ONLY when both are empty
+            if (!hasFeaturedProducts && !hasPopularProducts) ...[
+              verticalSpaceSmall,
+              buildCategoryProducts(
+                productListener,
+                cartProvider,
+                productProvider,
+              ),
+            ],
           ],
+          // if (productListener.featuredPopularProductsAPIResponse.status ==
+          //     APIResponseStatus.loading) ...[
+          //   const ShimmerProductDetailsTile(count: 4),
+          // ]
+
+          // else if (productListener.featuredPopularProductsAPIResponse.data
+          //         ?.featuredProducts?.isNotEmpty ==
+          //     true) ...[
+          //   verticalSpaceSmall,
+
+          //   buildFeaturedProducts(
+          //     productListener,
+          //     cartProvider,
+          //     productProvider,
+          //   ),
+          //   // else ...[
+          //   //   verticalSpaceSmall,
+          //   //   buildFeaturedProducts(
+          //   //       productListener, cartProvider, productProvider),
+          //   verticalSpaceMedium,
+          //   if (productListener.featuredPopularProductsAPIResponse.data
+          //           ?.popularProducts?.isNotEmpty ==
+          //       true)
+          //     buildPopularProducts(context),
+          // ] else ...[
+          //   verticalSpaceSmall,
+
+          //   // Show category products when there are no available featured products
+          //   buildCategoryProducts(
+          //     productListener,
+          //     cartProvider,
+          //     productProvider,
+          //   ),
+          // ],
           Visibility(
             visible: !productProvider.isFetchingProductsFromPagination,
             child: TextButton.icon(

@@ -1149,432 +1149,443 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
 
         return Theme(
           data: quickSandTextTheme(context),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const RoundedCloseIcon(),
-              verticalSpaceRegular,
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                height: context.screenHeight * 0.8,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+          child: SafeArea(
+            top: false,
+            bottom: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const RoundedCloseIcon(),
+                verticalSpaceRegular,
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  height: context.screenHeight * 0.8,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
                   ),
-                ),
-                child: userListener.isUserAddressListLoading
-                    ? const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      )
-                    : Column(
-                        children: [
-                          verticalSpaceSmall,
-                          const BottomSheetDragHandler(),
+                  child: userListener.isUserAddressListLoading
+                      ? const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        )
+                      : Column(
+                          children: [
+                            verticalSpaceSmall,
+                            const BottomSheetDragHandler(),
 
-                          verticalSpaceRegular,
-                          // Search TextField
-                          TextFormField(
-                            style:
-                                TextStyle(color: context.customTextTheme.color),
-                            controller: userListener.searchAddressTxtController,
-                            onChanged: (value) =>
-                                userListener.searchAddressByPostCode(value),
-                            decoration: InputDecoration(
-                              prefixIcon: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12.0),
-                                child: Assets.lib.assets.icons.searchNormal.svg(
-                                  height: 14,
-                                  width: 14,
-                                  color: Theme.of(context).iconTheme.color,
-                                  fit: BoxFit.contain,
+                            verticalSpaceRegular,
+                            // Search TextField
+                            TextFormField(
+                              style: TextStyle(
+                                  color: context.customTextTheme.color),
+                              controller:
+                                  userListener.searchAddressTxtController,
+                              onChanged: (value) =>
+                                  userListener.searchAddressByPostCode(value),
+                              decoration: InputDecoration(
+                                prefixIcon: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 12.0),
+                                  child:
+                                      Assets.lib.assets.icons.searchNormal.svg(
+                                    height: 14,
+                                    width: 14,
+                                    color: Theme.of(context).iconTheme.color,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
-                              ),
-                              isDense: true,
-                              fillColor: Theme.of(context).cardColor,
-                              filled: true,
-                              hintText: 'Look for a Postcode...',
-                              hintStyle:
-                                  context.customTextTheme.text16W500.copyWith(
-                                color: AppColors.kGray3,
-                              ),
-                              border: const OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(14.0),
+                                isDense: true,
+                                fillColor: Theme.of(context).cardColor,
+                                filled: true,
+                                hintText: 'Look for a Postcode...',
+                                hintStyle:
+                                    context.customTextTheme.text16W500.copyWith(
+                                  color: AppColors.kGray3,
                                 ),
-                              ),
-                              enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
+                                border: const OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(14.0),
+                                  ),
+                                ),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
                               ),
                             ),
-                          ),
-                          verticalSpaceMedium,
-                          // Display Address List
-                          Expanded(
-                            child: addressList.isNotEmpty
-                                ? ListView.separated(
-                                    padding: EdgeInsets.zero,
-                                    itemCount: addressList.length,
-                                    itemBuilder: (context, index) {
-                                      final address = addressList[index];
+                            verticalSpaceMedium,
+                            // Display Address List
+                            Expanded(
+                              child: addressList.isNotEmpty
+                                  ? ListView.separated(
+                                      padding: EdgeInsets.zero,
+                                      itemCount: addressList.length,
+                                      itemBuilder: (context, index) {
+                                        final address = addressList[index];
 
-                                      return Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 0.0),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          // boxShadow: const <BoxShadow>[
-                                          //   BoxShadow(
-                                          //     color:
-                                          //         Color.fromRGBO(0, 0, 0, 0.1),
-                                          //     spreadRadius: 0,
-                                          //     blurRadius: 8,
-                                          //     offset: Offset(0, 3),
-                                          //   ),
-                                          // ],
-                                        ),
-                                        child: Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: ListTileTheme(
-                                                enableFeedback: true,
-                                                tileColor: themeListener
-                                                        .isDarkMode
-                                                    ? AppColors.kCardBackground2
-                                                    : null,
-                                                horizontalTitleGap: 8.0,
-                                                child: RadioListTile(
-                                                  activeColor: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
-                                                  value: address,
-                                                  groupValue: cartListener
-                                                      .selectedAddress,
-                                                  onChanged:
-                                                      (UserAddressDataModel?
-                                                          newAddress) {
-                                                    if (newAddress == null) {
-                                                      return;
-                                                    }
-                                                    context
-                                                        .read<CartProvider>()
-                                                        .onChangeAddress(
-                                                            newAddress);
-                                                    context
-                                                        .read<CartProvider>()
-                                                        .selectedAddressSecondaryFunc(
-                                                            newAddress);
-                                                  },
-                                                  title: Text(
-                                                    address.userFullname,
-                                                    style: context
-                                                        .customTextTheme
-                                                        .text18W600
-                                                        .copyWith(
-                                                            color: context
-                                                                .customTextTheme
-                                                                .color),
-                                                  ),
-                                                  subtitle: Text(
-                                                    Utils.removeExtraSpaces(
-                                                        address.userFulladdress
-                                                            .capitalize()),
-                                                    style: context
-                                                        .customTextTheme
-                                                        .text16W400
-                                                        .copyWith(
-                                                            color: context
-                                                                .customTextTheme
-                                                                .color),
+                                        return Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 0.0),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            // boxShadow: const <BoxShadow>[
+                                            //   BoxShadow(
+                                            //     color:
+                                            //         Color.fromRGBO(0, 0, 0, 0.1),
+                                            //     spreadRadius: 0,
+                                            //     blurRadius: 8,
+                                            //     offset: Offset(0, 3),
+                                            //   ),
+                                            // ],
+                                          ),
+                                          child: Row(
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: ListTileTheme(
+                                                  enableFeedback: true,
+                                                  tileColor:
+                                                      themeListener.isDarkMode
+                                                          ? AppColors
+                                                              .kCardBackground2
+                                                          : null,
+                                                  horizontalTitleGap: 8.0,
+                                                  child: RadioListTile(
+                                                    activeColor:
+                                                        Theme.of(context)
+                                                            .colorScheme
+                                                            .primary,
+                                                    value: address,
+                                                    groupValue: cartListener
+                                                        .selectedAddress,
+                                                    onChanged:
+                                                        (UserAddressDataModel?
+                                                            newAddress) {
+                                                      if (newAddress == null) {
+                                                        return;
+                                                      }
+                                                      context
+                                                          .read<CartProvider>()
+                                                          .onChangeAddress(
+                                                              newAddress);
+                                                      context
+                                                          .read<CartProvider>()
+                                                          .selectedAddressSecondaryFunc(
+                                                              newAddress);
+                                                    },
+                                                    title: Text(
+                                                      address.userFullname,
+                                                      style: context
+                                                          .customTextTheme
+                                                          .text18W600
+                                                          .copyWith(
+                                                              color: context
+                                                                  .customTextTheme
+                                                                  .color),
+                                                    ),
+                                                    subtitle: Text(
+                                                      Utils.removeExtraSpaces(
+                                                          address
+                                                              .userFulladdress
+                                                              .capitalize()),
+                                                      style: context
+                                                          .customTextTheme
+                                                          .text16W400
+                                                          .copyWith(
+                                                              color: context
+                                                                  .customTextTheme
+                                                                  .color),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                context
-                                                    .read<UserProvider>()
-                                                    .initAllTextEditingController();
-                                                context
-                                                    .read<UserProvider>()
-                                                    .loadDataForAddressUpdate(
-                                                        address);
+                                              IconButton(
+                                                onPressed: () {
+                                                  context
+                                                      .read<UserProvider>()
+                                                      .initAllTextEditingController();
+                                                  context
+                                                      .read<UserProvider>()
+                                                      .loadDataForAddressUpdate(
+                                                          address);
 
-                                                context.router.push(
-                                                  AddNewAddressScreenRoute(
-                                                    address: address,
-                                                  ),
-                                                );
-                                              },
-                                              icon: Assets
-                                                  .lib.assets.icons.editIcon
-                                                  .svg(
-                                                      color: Theme.of(context)
-                                                                  .brightness ==
-                                                              Brightness.dark
-                                                          ? Colors.white
-                                                          : Colors.black),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                showDialog(
-                                                  context: context,
-                                                  barrierDismissible:
-                                                      false, // Prevents dismissing while loading
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return Consumer<
-                                                        UserProvider>(
-                                                      builder: (context,
-                                                          userListener, child) {
-                                                        bool isLoading =
-                                                            userListener
-                                                                .isDeletingUserAddress;
+                                                  context.router.push(
+                                                    AddNewAddressScreenRoute(
+                                                      address: address,
+                                                    ),
+                                                  );
+                                                },
+                                                icon: Assets
+                                                    .lib.assets.icons.editIcon
+                                                    .svg(
+                                                        color: Theme.of(context)
+                                                                    .brightness ==
+                                                                Brightness.dark
+                                                            ? Colors.white
+                                                            : Colors.black),
+                                              ),
+                                              IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    barrierDismissible:
+                                                        false, // Prevents dismissing while loading
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return Consumer<
+                                                          UserProvider>(
+                                                        builder: (context,
+                                                            userListener,
+                                                            child) {
+                                                          bool isLoading =
+                                                              userListener
+                                                                  .isDeletingUserAddress;
 
-                                                        return Stack(
-                                                          children: [
-                                                            AlertDialog(
-                                                              title: isLoading
-                                                                  ? null
-                                                                  : Center(
-                                                                      child:
-                                                                          Text(
-                                                                        'Address',
-                                                                        style: context
-                                                                            .customTextTheme
-                                                                            .text18W600
-                                                                            .copyWith(
-                                                                          color: context
-                                                                              .customTextTheme
-                                                                              .color,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                              content: userListener
-                                                                      .isDeletingUserAddress
-                                                                  ? null
-                                                                  : Text(
-                                                                      'Are you sure you want to delete this address?',
-                                                                      style: context
-                                                                          .customTextTheme
-                                                                          .text16W400
-                                                                          .copyWith(
-                                                                        color: context
-                                                                            .customTextTheme
-                                                                            .color,
-                                                                      ),
-                                                                    ),
-                                                              actions: isLoading
-                                                                  ? null
-                                                                  : <Widget>[
-                                                                      Center(
+                                                          return Stack(
+                                                            children: [
+                                                              AlertDialog(
+                                                                title: isLoading
+                                                                    ? null
+                                                                    : Center(
                                                                         child:
-                                                                            Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            OutlinedButton(
-                                                                              onPressed: isLoading
-                                                                                  ? null
-                                                                                  : () {
-                                                                                      Navigator.of(context).pop();
-                                                                                    },
-                                                                              style: OutlinedButton.styleFrom(
-                                                                                side: BorderSide(
-                                                                                  color: Theme.of(context).colorScheme.primary,
-                                                                                ),
-                                                                              ),
-                                                                              child: Text(
-                                                                                'Cancel',
-                                                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(width: 10),
-                                                                            ElevatedButton(
-                                                                              style: ButtonStyle(
-                                                                                backgroundColor: WidgetStatePropertyAll(
-                                                                                  Theme.of(context).colorScheme.primary,
-                                                                                ),
-                                                                                foregroundColor: WidgetStatePropertyAll(
-                                                                                  Theme.of(context).colorScheme.onSurface,
-                                                                                ),
-                                                                              ),
-                                                                              onPressed: isLoading
-                                                                                  ? null
-                                                                                  : () async {
-                                                                                      final currentContext = context; // Store context
-
-                                                                                      final isDeleted = await userListener.deleteUserAddress(address.uaID.toString());
-
-                                                                                      if (currentContext.mounted) {
-                                                                                        if (isDeleted) {
-                                                                                          if (cartListener.selectedAddress?.uaID == address.uaID) {
-                                                                                            currentContext.read<CartProvider>().clearSelectedAddress();
-                                                                                          } else {
-                                                                                            currentContext.read<CartProvider>().clearSelectedAddressSecondary();
-                                                                                          }
-                                                                                        }
-
-                                                                                        Navigator.of(currentContext).pop();
-
-                                                                                        currentContext.read<UserProvider>().getAddressList();
-                                                                                      }
-                                                                                    },
-                                                                              child: const Text(
-                                                                                'Delete',
-                                                                              ),
-                                                                            ),
-                                                                          ],
+                                                                            Text(
+                                                                          'Address',
+                                                                          style: context
+                                                                              .customTextTheme
+                                                                              .text18W600
+                                                                              .copyWith(
+                                                                            color:
+                                                                                context.customTextTheme.color,
+                                                                          ),
                                                                         ),
                                                                       ),
-                                                                    ],
-                                                            ),
-                                                            if (isLoading)
-                                                              Container(
-                                                                color: Colors
-                                                                    .black
-                                                                    .withOpacity(
-                                                                        0.2),
-                                                                child:
-                                                                    const Center(
+                                                                content:
+                                                                    userListener
+                                                                            .isDeletingUserAddress
+                                                                        ? null
+                                                                        : Text(
+                                                                            'Are you sure you want to delete this address?',
+                                                                            style:
+                                                                                context.customTextTheme.text16W400.copyWith(
+                                                                              color: context.customTextTheme.color,
+                                                                            ),
+                                                                          ),
+                                                                actions: isLoading
+                                                                    ? null
+                                                                    : <Widget>[
+                                                                        Center(
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              OutlinedButton(
+                                                                                onPressed: isLoading
+                                                                                    ? null
+                                                                                    : () {
+                                                                                        Navigator.of(context).pop();
+                                                                                      },
+                                                                                style: OutlinedButton.styleFrom(
+                                                                                  side: BorderSide(
+                                                                                    color: Theme.of(context).colorScheme.primary,
+                                                                                  ),
+                                                                                ),
+                                                                                child: Text(
+                                                                                  'Cancel',
+                                                                                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(width: 10),
+                                                                              ElevatedButton(
+                                                                                style: ButtonStyle(
+                                                                                  backgroundColor: WidgetStatePropertyAll(
+                                                                                    Theme.of(context).colorScheme.primary,
+                                                                                  ),
+                                                                                  foregroundColor: WidgetStatePropertyAll(
+                                                                                    Theme.of(context).colorScheme.onSurface,
+                                                                                  ),
+                                                                                ),
+                                                                                onPressed: isLoading
+                                                                                    ? null
+                                                                                    : () async {
+                                                                                        final currentContext = context; // Store context
+
+                                                                                        final isDeleted = await userListener.deleteUserAddress(address.uaID.toString());
+
+                                                                                        if (currentContext.mounted) {
+                                                                                          if (isDeleted) {
+                                                                                            if (cartListener.selectedAddress?.uaID == address.uaID) {
+                                                                                              currentContext.read<CartProvider>().clearSelectedAddress();
+                                                                                            } else {
+                                                                                              currentContext.read<CartProvider>().clearSelectedAddressSecondary();
+                                                                                            }
+                                                                                          }
+
+                                                                                          Navigator.of(currentContext).pop();
+
+                                                                                          currentContext.read<UserProvider>().getAddressList();
+                                                                                        }
+                                                                                      },
+                                                                                child: const Text(
+                                                                                  'Delete',
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                              ),
+                                                              if (isLoading)
+                                                                Container(
+                                                                  color: Colors
+                                                                      .black
+                                                                      .withOpacity(
+                                                                          0.2),
                                                                   child:
-                                                                      CircularProgressIndicator(
-                                                                    color: AppColors
-                                                                        .kBlack,
+                                                                      const Center(
+                                                                    child:
+                                                                        CircularProgressIndicator(
+                                                                      color: AppColors
+                                                                          .kBlack,
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                              icon: Icon(
-                                                Icons.remove_circle_outline,
-                                                color: Theme.of(context)
-                                                            .brightness ==
-                                                        Brightness.dark
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                              ),
-                                            )
-                                          ],
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                icon: Icon(
+                                                  Icons.remove_circle_outline,
+                                                  color: Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.dark
+                                                      ? Colors.white
+                                                      : Colors.black,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder:
+                                          (BuildContext context, int index) {
+                                        return verticalSpaceRegular;
+                                      },
+                                    )
+                                  : Center(
+                                      child: Text(
+                                        userListener.searchAddressTxtController
+                                                .text.isEmpty
+                                            ? 'No address found'
+                                            : 'The address is not found',
+                                        style: context
+                                            .customTextTheme.text14W400
+                                            .copyWith(
+                                          color: context.customTextTheme.color,
                                         ),
-                                      );
-                                    },
-                                    separatorBuilder:
-                                        (BuildContext context, int index) {
-                                      return verticalSpaceRegular;
-                                    },
-                                  )
-                                : Center(
-                                    child: Text(
-                                      userListener.searchAddressTxtController
-                                              .text.isEmpty
-                                          ? 'No address found'
-                                          : 'The address is not found',
-                                      style: context.customTextTheme.text14W400
-                                          .copyWith(
-                                        color: context.customTextTheme.color,
                                       ),
                                     ),
-                                  ),
-                          ),
+                            ),
 
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: FilledButton(
-                                onPressed: () {
-                                  context
-                                      .read<UserProvider>()
-                                      .initAllTextEditingController();
-                                  context.router.push(
-                                      AddNewAddressScreenRoute(address: null));
-                                },
-                                style: FilledButton.styleFrom(
-                                  // minimumSize: const Size.fromHeight(48),
-                                  backgroundColor: Colors.transparent,
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: FilledButton(
+                                  onPressed: () {
+                                    context
+                                        .read<UserProvider>()
+                                        .initAllTextEditingController();
+                                    context.router.push(
+                                        AddNewAddressScreenRoute(
+                                            address: null));
+                                  },
+                                  style: FilledButton.styleFrom(
+                                    // minimumSize: const Size.fromHeight(48),
+                                    backgroundColor: Colors.transparent,
 
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      side: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary)),
-                                ),
-                                child: Text(
-                                  '+ Add Address',
-                                  style: context.customTextTheme.text14W600
-                                      .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary),
-                                ),
-                              )),
-                              horizontalSpaceSmall,
-                              Visibility(
-                                visible:
-                                    userListener.userAddressList.isNotEmpty,
-                                child: Expanded(
-                                  child: FilledButton(
-                                    style: ButtonStyle(
-                                        backgroundColor: WidgetStatePropertyAll(
-                                            Theme.of(context)
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                        side: BorderSide(
+                                            color: Theme.of(context)
                                                 .colorScheme
                                                 .primary)),
-                                    onPressed: cartListener
-                                            .deliveryOrTakeAwayChargeCalculating
-                                        ? null
-                                        : () async {
-                                            context
-                                                .read<CartProvider>()
-                                                .validateAddress()
-                                                .then((validated) {
-                                              if (validated) {
-                                                // ignore: use_build_context_synchronously
-                                                Navigator.pop(context);
-                                              }
-                                            });
-                                          },
-                                    child: cartListener
-                                            .deliveryOrTakeAwayChargeCalculating
-                                        ? showButtonProgress(AppColors.kWhite)
-                                        : Text('Apply',
-                                            style: context
-                                                .customTextTheme.text14W600
-                                                .copyWith(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurface)),
+                                  ),
+                                  child: Text(
+                                    '+ Add Address',
+                                    style: context.customTextTheme.text14W600
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary),
+                                  ),
+                                )),
+                                horizontalSpaceSmall,
+                                Visibility(
+                                  visible:
+                                      userListener.userAddressList.isNotEmpty,
+                                  child: Expanded(
+                                    child: FilledButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              WidgetStatePropertyAll(
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .primary)),
+                                      onPressed: cartListener
+                                              .deliveryOrTakeAwayChargeCalculating
+                                          ? null
+                                          : () async {
+                                              context
+                                                  .read<CartProvider>()
+                                                  .validateAddress()
+                                                  .then((validated) {
+                                                if (validated) {
+                                                  // ignore: use_build_context_synchronously
+                                                  Navigator.pop(context);
+                                                }
+                                              });
+                                            },
+                                      child: cartListener
+                                              .deliveryOrTakeAwayChargeCalculating
+                                          ? showButtonProgress(AppColors.kWhite)
+                                          : Text('Apply',
+                                              style: context
+                                                  .customTextTheme.text14W600
+                                                  .copyWith(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface)),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          verticalSpaceSmall,
-                          SizedBox(height: bottomInsets > 0 ? bottomInsets : 0)
-                        ],
-                      ),
-              ),
-            ],
+                              ],
+                            ),
+                            verticalSpaceSmall,
+                            SizedBox(
+                                height: bottomInsets > 0 ? bottomInsets : 0)
+                          ],
+                        ),
+                ),
+              ],
+            ),
           ),
         );
       },

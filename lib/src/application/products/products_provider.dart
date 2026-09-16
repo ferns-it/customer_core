@@ -36,6 +36,7 @@ class ProductsProvider extends ChangeNotifier with BaseController {
 
   Timer? _stockResyncTimer;
 
+
   /// Re-fetches the product stock data from the server, cancelling any
   /// pending scheduled resync first.
   ///

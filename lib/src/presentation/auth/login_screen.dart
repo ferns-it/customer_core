@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:customer_core/customer_core.dart';
@@ -48,6 +49,23 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // Responsive breakpoints so the screen adapts to phones, tablets and
+  // desktop/web layouts.
+  static const double _tabletBreakpoint = 600;
+  static const double _desktopBreakpoint = 1024;
+
+  /// Maximum width of the glass auth card on tablet / desktop layouts.
+  /// On phones (below [_tabletBreakpoint]) the card stretches edge-to-edge.
+  static const double _cardMaxWidth = 520.0;
+
+  /// Keeps the OTP boxes usable on every screen size: scales with the screen
+  /// width on phones but is clamped on tablets/desktop where the card has a
+  /// fixed max width.
+  double _otpFieldExtent(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    return math.min(math.max(width * 0.11, 38.0), 52.0);
+  }
+
   final StreamController<int> _streamController =
       StreamController<int>.broadcast();
   Timer? _timer;
@@ -118,6 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
@@ -142,128 +161,183 @@ class _LoginScreenState extends State<LoginScreen> {
       AuthProvider authListener,
       HomeProvider homeProvider,
       HomeProvider homeListener) {
-    return Center(
-        child: ListView(
-      children: [
-        Image.asset(
-          UiConfig.instance.logoWithoutBackground,
-          height: 125,
-        ),
-        SizedBox(
-          height: 80,
-        ),
-        ClipRRect(
-            borderRadius: BorderRadius.circular(32.0),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-              child: Container(
-                padding: const EdgeInsets.all(25),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF062B45).withOpacity(0.78),
-                  // color: AppColors.kBlack.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(
-                    // color: AppColors.kWhite.withOpacity(0.2), width: 1.0
-                    color: Colors.white.withOpacity(0.18),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double layoutHeight = math.max(
+          constraints.maxHeight - MediaQuery.viewPaddingOf(context).bottom,
+          0.0,
+        );
+        final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+        final bool isTablet = constraints.maxWidth >= _tabletBreakpoint;
+        final bool isDesktop = constraints.maxWidth >= _desktopBreakpoint;
+        final double cardWidth = math.min(constraints.maxWidth, _cardMaxWidth);
+        final double logoHeight = math.min(
+          math.max(layoutHeight * 0.12, 48.0),
+          isDesktop ? 150.0 : 130.0,
+        );
+        final double headerGap = math.min(
+          math.max(layoutHeight * 0.04, 8.0),
+          60.0,
+        );
+        final double contentTopGap = math.min(
+          math.max(layoutHeight * 0.04, 16.0),
+          48.0,
+        );
+        return SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: keyboardInset),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: layoutHeight),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: logoHeight,
+                  child: Image.asset(
+                    UiConfig.instance.logoWithoutBackground,
+                    fit: BoxFit.contain,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
-                      blurRadius: 25,
-                      offset: const Offset(0, 12),
-                    ),
-                  ],
                 ),
-                child: Stack(
-                  children: [
-                    authListener.selectedAuthView == AuthView.register
-                        ? _registerFormParent(authProvider, context,
-                            homeProvider, homeListener, authListener)
-                        : authListener.selectedAuthView == AuthView.login
-                            ? _loginForm(authProvider, context, authListener,
-                                homeProvider)
-                            : _forgotWidgetParent(
-                                authProvider, context, authListener),
-                    // Back button - visible when showBackButton is true
-                    if (widget.showBackButton)
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        child: IconButton(
-                          onPressed: () {
-                            if (authListener.selectedAuthView ==
-                                AuthView.register) {
-                              switch (authListener.currentRegStage) {
-                                case RegStage.contact:
-                                  // First registration page -> go back to login
-                                  authProvider.onChangeSelectedAuthView(
-                                    AuthView.login,
-                                  );
-                                  authProvider.clearValues();
-                                  break;
-                                case RegStage.otpCombined:
-                                  authProvider
-                                      .updateCurrentRegStage(RegStage.contact);
-                                case RegStage.otpEmail:
-                                  // Email OTP -> go back to contact/email page
-                                  authProvider.updateCurrentRegStage(
-                                    RegStage.contact,
-                                  );
-                                  break;
+                SizedBox(height: headerGap),
+                SizedBox(
+                    width: cardWidth,
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(32.0),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isDesktop ? 40 : (isTablet ? 32 : 25),
+                              vertical: isDesktop ? 32 : 25,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF062B45).withOpacity(0.78),
+                              // color: AppColors.kBlack.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(12.0),
+                              border: Border.all(
+                                // color: AppColors.kWhite.withOpacity(0.2), width: 1.0
+                                color: Colors.white.withOpacity(0.18),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.25),
+                                  blurRadius: 25,
+                                  offset: const Offset(0, 12),
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              children: [
+                                authListener.selectedAuthView ==
+                                        AuthView.register
+                                    ? _registerFormParent(
+                                        authProvider,
+                                        context,
+                                        homeProvider,
+                                        homeListener,
+                                        authListener)
+                                    : authListener.selectedAuthView ==
+                                            AuthView.login
+                                        ? _loginForm(authProvider, context,
+                                            authListener, homeProvider)
+                                        : _forgotWidgetParent(authProvider,
+                                            context, authListener),
+                                // Back button - visible when showBackButton is true
+                                if (widget.showBackButton)
+                                  Positioned(
+                                    top: 0,
+                                    left: 0,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        if (authListener.selectedAuthView ==
+                                            AuthView.register) {
+                                          switch (
+                                              authListener.currentRegStage) {
+                                            case RegStage.contact:
+                                              // First registration page -> go back to login
+                                              authProvider
+                                                  .onChangeSelectedAuthView(
+                                                AuthView.login,
+                                              );
+                                              authProvider.clearValues();
+                                              break;
+                                            case RegStage.otpCombined:
+                                              authProvider
+                                                  .updateCurrentRegStage(
+                                                      RegStage.contact);
+                                            case RegStage.otpEmail:
+                                              // Email OTP -> go back to contact/email page
+                                              authProvider
+                                                  .updateCurrentRegStage(
+                                                RegStage.contact,
+                                              );
+                                              break;
 
-                                case RegStage.otpPhone:
-                                  // Phone OTP -> go back to email OTP
-                                  authProvider.updateCurrentRegStage(
-                                    RegStage.contact,
-                                  );
-                                  break;
-                                case RegStage.register:
-                                  // Details page -> go back based on verification flow
-                                  if (authProvider.smsRequired &&
-                                      authProvider.emailRequired) {
-                                    authProvider.updateCurrentRegStage(
-                                      RegStage.otpCombined,
-                                    );
-                                  } else if (authProvider.emailRequired) {
-                                    authProvider.updateCurrentRegStage(
-                                      RegStage.otpEmail,
-                                    );
-                                  } else if (authProvider.smsRequired) {
-                                    authProvider.updateCurrentRegStage(
-                                      RegStage.otpPhone,
-                                    );
-                                  } else {
-                                    authProvider.updateCurrentRegStage(
-                                      RegStage.contact,
-                                    );
-                                  }
-                                  break;
+                                            case RegStage.otpPhone:
+                                              // Phone OTP -> go back to email OTP
+                                              authProvider
+                                                  .updateCurrentRegStage(
+                                                RegStage.contact,
+                                              );
+                                              break;
+                                            case RegStage.register:
+                                              // Details page -> go back based on verification flow
+                                              if (authProvider.smsRequired &&
+                                                  authProvider.emailRequired) {
+                                                authProvider
+                                                    .updateCurrentRegStage(
+                                                  RegStage.otpCombined,
+                                                );
+                                              } else if (authProvider
+                                                  .emailRequired) {
+                                                authProvider
+                                                    .updateCurrentRegStage(
+                                                  RegStage.otpEmail,
+                                                );
+                                              } else if (authProvider
+                                                  .smsRequired) {
+                                                authProvider
+                                                    .updateCurrentRegStage(
+                                                  RegStage.otpPhone,
+                                                );
+                                              } else {
+                                                authProvider
+                                                    .updateCurrentRegStage(
+                                                  RegStage.contact,
+                                                );
+                                              }
+                                              break;
 
-                                case RegStage.success:
-                                  break;
-                              }
-                            } else if (authListener.selectedAuthView ==
-                                AuthView.forgotPassword) {
-                              authProvider.onChangeSelectedAuthView(
-                                AuthView.login,
-                              );
-                              authProvider.clearValues();
-                            } else {
-                              Navigator.pop(context, false);
-                            }
-                          },
-                          icon: const Icon(
-                            Icons.arrow_back_ios,
-                            color: AppColors.kGray3,
+                                            case RegStage.success:
+                                              break;
+                                          }
+                                        } else if (authListener
+                                                .selectedAuthView ==
+                                            AuthView.forgotPassword) {
+                                          authProvider.onChangeSelectedAuthView(
+                                            AuthView.login,
+                                          );
+                                          authProvider.clearValues();
+                                        } else {
+                                          Navigator.pop(context, false);
+                                        }
+                                      },
+                                      icon: const Icon(
+                                        Icons.arrow_back_ios,
+                                        color: AppColors.kGray3,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            )),
-      ],
-    ));
+                        ))),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   // Widget buildContent(
@@ -863,287 +937,279 @@ class _LoginScreenState extends State<LoginScreen> {
     AuthProvider authListener,
     HomeProvider homeProvider,
   ) {
-    return SingleChildScrollView(
-      child: SizedBox(
-        child: Form(
-          key: authProvider.loginFormKey,
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            // crossAxisAlignment: CrossAxisAlignment.center,
-            // mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              verticalSpaceSmall,
-              // Center(
-              //   child: Text(
-              //     "SIGN IN",
-              //     style: TextStyle(
-              //       fontSize: 15,
-              //       fontWeight: FontWeight.w600,
-              //       letterSpacing: 0.8,
-              //       color: const Color(0xFF20BCEB),
-              //     ),
-              //   ),
-              // ),
-              // verticalSpaceMedium,
-              Text(
-                "Welcome Back",
-                // style: context.customTextTheme.text24W600
-                //     .copyWith(color: AppColors.kWhite),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                  letterSpacing: -0.5,
-                ),
+    return Form(
+      key: authProvider.loginFormKey,
+      child: Column(
+        // mainAxisAlignment: MainAxisAlignment.center,
+        // crossAxisAlignment: CrossAxisAlignment.center,
+        // mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          verticalSpaceSmall,
+          // Center(
+          //   child: Text(
+          //     "SIGN IN",
+          //     style: TextStyle(
+          //       fontSize: 15,
+          //       fontWeight: FontWeight.w600,
+          //       letterSpacing: 0.8,
+          //       color: const Color(0xFF20BCEB),
+          //     ),
+          //   ),
+          // ),
+          // verticalSpaceMedium,
+          Text(
+            "Welcome Back",
+            // style: context.customTextTheme.text24W600
+            //     .copyWith(color: AppColors.kWhite),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              letterSpacing: -0.5,
+            ),
+          ),
+          verticalSpaceTiny,
+          Center(
+            child: Text(
+              "Enter your email and password to log in",
+              // style: context.customTextTheme.text12W400
+              //     .copyWith(color: AppColors.kWhite),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: Colors.white.withOpacity(0.62),
               ),
-              verticalSpaceTiny,
-              Center(
+            ),
+          ),
+          verticalSpaceMedium,
+          Text(
+            "Email Address",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w100,
+              color: Colors.white,
+            ),
+          ),
+          verticalSpaceTiny,
+          CustomTextField(
+            textColor: AppColors.kWhite,
+            controller: authProvider.loginUserNameController,
+            hintText: "name@gmail.com",
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            prefixIcon: const Icon(FluentIcons.mail_24_regular,
+                color: AppColors.kGray3),
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(),
+              FormBuilderValidators.email(),
+            ]),
+            fillColor: Colors.white.withOpacity(0.1),
+          ),
+          verticalSpaceRegular,
+          const Text(
+            "Password",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
+          ),
+          verticalSpaceTiny,
+          CustomTextField(
+            textColor: AppColors.kWhite,
+            controller: authProvider.loginUserPasswordController,
+            hintText: "••••••••",
+            keyboardType: TextInputType.visiblePassword,
+            textInputAction: TextInputAction.done,
+            prefixIcon: const Icon(FluentIcons.password_24_regular,
+                color: AppColors.kGray3),
+            obscureText: authProvider.loginPasswordHide,
+            suffixIcon: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: authProvider.toggleLoginPassword,
+                child: Icon(
+                  authListener.loginPasswordHide
+                      ? FluentIcons.eye_off_24_regular
+                      : FluentIcons.eye_24_regular,
+                  color: AppColors.kGray3,
+                )),
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(),
+              // FormBuilderValidators.password(),
+            ]),
+            fillColor: Colors.white.withOpacity(0.1),
+          ),
+          verticalSpaceSmall,
+          // InkWell(
+          //   onTap: () {
+          //     // context.router.push(const ForgotPasswordScreenRoute());
+          //     authProvider
+          //         .onChangeSelectedAuthView(AuthView.forgotPassword);
+          //   },
+          //   child: Text(
+          //     "Forgot Password ?",
+          //     style: context.customTextTheme.text14W700
+          //         .copyWith(color: AppColors.kWhite),
+          //   ),
+          // ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                authProvider.onChangeSelectedAuthView(
+                  AuthView.forgotPassword,
+                );
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: 6,
+                  horizontal: 2,
+                ),
                 child: Text(
-                  "Enter your email and password to log in",
-                  // style: context.customTextTheme.text12W400
-                  //     .copyWith(color: AppColors.kWhite),
-                  textAlign: TextAlign.center,
+                  "Forgot Password?",
                   style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white.withOpacity(0.62),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF28B9F0),
                   ),
                 ),
               ),
-              verticalSpaceMedium,
-              Text(
-                "Email Address",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w100,
-                  color: Colors.white,
-                ),
-              ),
-              verticalSpaceTiny,
-              CustomTextField(
-                textColor: AppColors.kWhite,
-                controller: authProvider.loginUserNameController,
-                hintText: "name@gmail.com",
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                prefixIcon: const Icon(FluentIcons.mail_24_regular,
-                    color: AppColors.kGray3),
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(),
-                  FormBuilderValidators.email(),
-                ]),
-                fillColor: Colors.white.withOpacity(0.1),
-              ),
-              verticalSpaceRegular,
-              const Text(
-                "Password",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-              verticalSpaceTiny,
-              CustomTextField(
-                textColor: AppColors.kWhite,
-                controller: authProvider.loginUserPasswordController,
-                hintText: "••••••••",
-                keyboardType: TextInputType.visiblePassword,
-                textInputAction: TextInputAction.done,
-                prefixIcon: const Icon(FluentIcons.password_24_regular,
-                    color: AppColors.kGray3),
-                obscureText: authProvider.loginPasswordHide,
-                suffixIcon: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: authProvider.toggleLoginPassword,
-                    child: Icon(
-                      authListener.loginPasswordHide
-                          ? FluentIcons.eye_off_24_regular
-                          : FluentIcons.eye_24_regular,
-                      color: AppColors.kGray3,
-                    )),
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(),
-                  // FormBuilderValidators.password(),
-                ]),
-                fillColor: Colors.white.withOpacity(0.1),
-              ),
-              verticalSpaceSmall,
-              // InkWell(
-              //   onTap: () {
-              //     // context.router.push(const ForgotPasswordScreenRoute());
-              //     authProvider
-              //         .onChangeSelectedAuthView(AuthView.forgotPassword);
-              //   },
-              //   child: Text(
-              //     "Forgot Password ?",
-              //     style: context.customTextTheme.text14W700
-              //         .copyWith(color: AppColors.kWhite),
-              //   ),
-              // ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () {
-                    authProvider.onChangeSelectedAuthView(
-                      AuthView.forgotPassword,
-                    );
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 6,
-                      horizontal: 2,
-                    ),
-                    child: Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF28B9F0),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              verticalSpaceSmall,
-              InkWell(
-                onTap: authListener.loginLoading
-                    ? null
-                    : () async {
-                        final validated = authProvider.validateLoginForm();
-                        if (validated) {
-                          await authProvider.loginUser().then((logged) async {
-                            if (logged) {
-                              AlertDialogs.showSuccess("Login successfully!");
-                              if (widget.showBackButton) {
-                                homeProvider.onChangeCurrentPage(0);
-                                Navigator.pop(context, true);
-                                context.read<UserProvider>().getUserData();
-                                context
-                                    .read<CartProvider>()
-                                    .checkUserIsLogged();
+            ),
+          ),
+          verticalSpaceSmall,
+          InkWell(
+            onTap: authListener.loginLoading
+                ? null
+                : () async {
+                    final validated = authProvider.validateLoginForm();
+                    if (validated) {
+                      await authProvider.loginUser().then((logged) async {
+                        if (logged) {
+                          AlertDialogs.showSuccess("Login successfully!");
+                          if (widget.showBackButton) {
+                            homeProvider.onChangeCurrentPage(0);
+                            Navigator.pop(context, true);
+                            context.read<UserProvider>().getUserData();
+                            context.read<CartProvider>().checkUserIsLogged();
 
-                                return;
-                              }
+                            return;
+                          }
 
-                              DependencyRegistrar.initializeAllProviders(
-                                  context);
-                              await Future.delayed(const Duration(seconds: 1),
-                                  () {
-                                context.router.replaceAll([
-                                  const OrderOnlineScreenRoute(),
-                                ]).then((_) {
-                                  authProvider.clearValues();
-                                  // productProvider.getAllCategories();
-                                });
-                              });
-                            }
+                          DependencyRegistrar.initializeAllProviders(context);
+                          await Future.delayed(const Duration(seconds: 1), () {
+                            context.router.replaceAll([
+                              const OrderOnlineScreenRoute(),
+                            ]).then((_) {
+                              authProvider.clearValues();
+                              // productProvider.getAllCategories();
+                            });
                           });
                         }
-                      },
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      gradient: const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [
-                          Color(0xFF0796D8),
-                          Color(0xFF11C2D5),
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF0796D8).withOpacity(0.25),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                      color: Theme.of(context).colorScheme.primary),
-                  height: 50,
-                  width: context.screenWidth,
-                  child: Center(
-                    child: !authListener.loginLoading
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Log In",
-                                style: context.customTextTheme.text16W400
-                                    .copyWith(color: AppColors.kWhite),
-                              ),
-                              horizontalSpaceTiny,
-                              Icon(
-                                Icons.arrow_forward_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ],
-                          )
-                        : showButtonProgress(AppColors.kWhite),
-                  ),
-                ),
-              ),
-              verticalSpaceLarge,
-              Visibility(
-                visible: authListener.isRegisterMode == false,
-                child: Row(
-                  children: [
-                    const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
-                    horizontalSpaceMedium,
-                    Text(
-                      'OR',
-                      style: context.customTextTheme.text12W600
-                          .copyWith(color: AppColors.kGray),
-                    ),
-                    horizontalSpaceMedium,
-                    const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
-                  ],
-                ),
-              ),
-              verticalSpaceMedium,
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                    style: context.customTextTheme.text14W500
-                        .copyWith(color: AppColors.kWhite),
-                    children: [
-                      const TextSpan(text: "Don't have an account?   "),
-                      TextSpan(
-                        text: "Sign Up",
-                        // style: context.customTextTheme.text14W700
-                        //     .copyWith(color: AppColors.kWhite),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF20BCEB),
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            context.read<ShopProvider>().setDefaultCountry();
-                            authProvider
-                                .onChangeSelectedAuthView(AuthView.register);
-                            authProvider.clearValues();
-                          },
-                      ),
+                      });
+                    }
+                  },
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  gradient: const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xFF0796D8),
+                      Color(0xFF11C2D5),
                     ],
                   ),
-                ),
-              )
-            ],
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF0796D8).withOpacity(0.25),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                  color: Theme.of(context).colorScheme.primary),
+              height: 50,
+              width: double.infinity,
+              child: Center(
+                child: !authListener.loginLoading
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Log In",
+                            style: context.customTextTheme.text16W400
+                                .copyWith(color: AppColors.kWhite),
+                          ),
+                          horizontalSpaceTiny,
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ],
+                      )
+                    : showButtonProgress(AppColors.kWhite),
+              ),
+            ),
           ),
-        ),
+          verticalSpaceLarge,
+          Visibility(
+            visible: authListener.isRegisterMode == false,
+            child: Row(
+              children: [
+                const Flexible(
+                    child: Divider(
+                  thickness: 2,
+                  color: AppColors.kGray,
+                )),
+                horizontalSpaceMedium,
+                Text(
+                  'OR',
+                  style: context.customTextTheme.text12W600
+                      .copyWith(color: AppColors.kGray),
+                ),
+                horizontalSpaceMedium,
+                const Flexible(
+                    child: Divider(
+                  thickness: 2,
+                  color: AppColors.kGray,
+                )),
+              ],
+            ),
+          ),
+          verticalSpaceMedium,
+          Center(
+            child: RichText(
+              text: TextSpan(
+                style: context.customTextTheme.text14W500
+                    .copyWith(color: AppColors.kWhite),
+                children: [
+                  const TextSpan(text: "Don't have an account?   "),
+                  TextSpan(
+                    text: "Sign Up",
+                    // style: context.customTextTheme.text14W700
+                    //     .copyWith(color: AppColors.kWhite),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF20BCEB),
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        context.read<ShopProvider>().setDefaultCountry();
+                        authProvider
+                            .onChangeSelectedAuthView(AuthView.register);
+                        authProvider.clearValues();
+                      },
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -1154,174 +1220,168 @@ class _LoginScreenState extends State<LoginScreen> {
       HomeProvider homeProvider,
       HomeProvider homeListener,
       AuthProvider authListener) {
-    return SingleChildScrollView(
-      child: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            child: Visibility(
-              visible: authListener.currentRegStage != RegStage.success,
-              child: IconButton(
-                onPressed: () {
-                  print("CURRENT STAGE: ${authListener.currentRegStage}");
-                  if (authListener.currentRegStage == RegStage.contact) {
-                    authListener.onChangeSelectedAuthView(AuthView.login);
-                    authProvider.clearValues(registerControllersOnly: true);
-                  } else if (authListener.currentRegStage ==
-                      RegStage.otpEmail) {
+    return Stack(
+      children: [
+        Positioned(
+          top: 0,
+          left: 0,
+          child: Visibility(
+            visible: authListener.currentRegStage != RegStage.success,
+            child: IconButton(
+              onPressed: () {
+                print("CURRENT STAGE: ${authListener.currentRegStage}");
+                if (authListener.currentRegStage == RegStage.contact) {
+                  authListener.onChangeSelectedAuthView(AuthView.login);
+                  authProvider.clearValues(registerControllersOnly: true);
+                } else if (authListener.currentRegStage == RegStage.otpEmail) {
+                  authProvider.updateCurrentRegStage(
+                    RegStage.contact,
+                  );
+                } else if (authListener.currentRegStage == RegStage.otpPhone) {
+                  if (authProvider.emailRequired) {
+                    authProvider.updateCurrentRegStage(
+                      RegStage.otpEmail,
+                    );
+                  } else {
                     authProvider.updateCurrentRegStage(
                       RegStage.contact,
                     );
-                  } else if (authListener.currentRegStage ==
-                      RegStage.otpPhone) {
-                    if (authProvider.emailRequired) {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.otpEmail,
-                      );
-                    } else {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.contact,
-                      );
-                    }
-                  } else if (authListener.currentRegStage ==
-                      RegStage.register) {
-                    if (authProvider.smsRequired &&
-                        authProvider.emailRequired) {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.otpCombined,
-                      );
-                    } else if (authProvider.emailRequired) {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.otpEmail,
-                      );
-                    } else if (authProvider.smsRequired) {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.otpPhone,
-                      );
-                    } else {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.contact,
-                      );
-                    }
                   }
-                },
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: AppColors.kGray3,
-                ),
+                } else if (authListener.currentRegStage == RegStage.register) {
+                  if (authProvider.smsRequired && authProvider.emailRequired) {
+                    authProvider.updateCurrentRegStage(
+                      RegStage.otpCombined,
+                    );
+                  } else if (authProvider.emailRequired) {
+                    authProvider.updateCurrentRegStage(
+                      RegStage.otpEmail,
+                    );
+                  } else if (authProvider.smsRequired) {
+                    authProvider.updateCurrentRegStage(
+                      RegStage.otpPhone,
+                    );
+                  } else {
+                    authProvider.updateCurrentRegStage(
+                      RegStage.contact,
+                    );
+                  }
+                }
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: AppColors.kGray3,
               ),
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              verticalSpaceSmall,
-              // Center(
-              //   child: Text(
-              //     "SIGN UP",
-              //     style: TextStyle(
-              //       fontSize: 15,
-              //       fontWeight: FontWeight.w600,
-              //       letterSpacing: 0.8,
-              //       color: const Color(0xFF20BCEB),
-              //     ),
-              //   ),
-              // ),
-              // verticalSpaceMedium,
-              authListener.currentRegStage == RegStage.success
-                  ? const SizedBox.shrink()
-                  : Text(
-                      _getRegisterTitle(authListener),
-                      // style: context.customTextTheme.text20W600
-                      //     .copyWith(color: AppColors.kWhite),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            verticalSpaceSmall,
+            // Center(
+            //   child: Text(
+            //     "SIGN UP",
+            //     style: TextStyle(
+            //       fontSize: 15,
+            //       fontWeight: FontWeight.w600,
+            //       letterSpacing: 0.8,
+            //       color: const Color(0xFF20BCEB),
+            //     ),
+            //   ),
+            // ),
+            // verticalSpaceMedium,
+            authListener.currentRegStage == RegStage.success
+                ? const SizedBox.shrink()
+                : Text(
+                    _getRegisterTitle(authListener),
+                    // style: context.customTextTheme.text20W600
+                    //     .copyWith(color: AppColors.kWhite),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
                     ),
-              verticalSpaceSmall,
-              authListener.currentRegStage == RegStage.success
-                  ? const SizedBox.shrink()
-                  : Text(
-                      _getRegisterSubtitle(authListener),
-                      // style: context.customTextTheme.text12W400
-                      //     .copyWith(color: AppColors.kWhite),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white.withOpacity(0.62),
-                      ),
+                  ),
+            verticalSpaceSmall,
+            authListener.currentRegStage == RegStage.success
+                ? const SizedBox.shrink()
+                : Text(
+                    _getRegisterSubtitle(authListener),
+                    textAlign: TextAlign.center,
+                    // style: context.customTextTheme.text12W400
+                    //     .copyWith(color: AppColors.kWhite),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white.withOpacity(0.62),
                     ),
-              verticalSpaceMedium,
-              _buildRegisterContent(authProvider, context, authListener),
-              verticalSpaceRegular,
-              _buildRegisterActionButton(
-                  authProvider, context, authListener, homeProvider),
-              verticalSpaceLarge,
-              Visibility(
-                visible: authListener.currentRegStage == RegStage.contact,
-                child: Row(
+                  ),
+            verticalSpaceSmall,
+            _buildRegisterContent(authProvider, context, authListener),
+            verticalSpaceRegular,
+            _buildRegisterActionButton(
+                authProvider, context, authListener, homeProvider),
+            verticalSpaceLarge,
+            Visibility(
+              visible: authListener.currentRegStage == RegStage.contact,
+              child: Row(
+                children: [
+                  const Flexible(
+                      child: Divider(
+                    thickness: 2,
+                    color: AppColors.kGray,
+                  )),
+                  horizontalSpaceMedium,
+                  Text(
+                    'OR',
+                    style: context.customTextTheme.text12W600
+                        .copyWith(color: AppColors.kGray),
+                  ),
+                  horizontalSpaceMedium,
+                  const Flexible(
+                      child: Divider(
+                    thickness: 2,
+                    color: AppColors.kGray,
+                  )),
+                ],
+              ),
+            ),
+            verticalSpaceMedium,
+            Visibility(
+              visible: authListener.currentRegStage == RegStage.contact,
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
                   children: [
-                    const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
-                    horizontalSpaceMedium,
-                    Text(
-                      'OR',
-                      style: context.customTextTheme.text12W600
-                          .copyWith(color: AppColors.kGray),
+                    TextSpan(
+                      text: "Already have an account?  ",
+                      style: context.customTextTheme.text14W500
+                          .copyWith(color: AppColors.kWhite),
                     ),
-                    horizontalSpaceMedium,
-                    const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
+                    TextSpan(
+                      text: "Login",
+                      // style: context.customTextTheme.text14W700
+                      //     .copyWith(color: AppColors.kWhite),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF20BCEB),
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          authProvider.initializeRegistrationFlow();
+                          authProvider.onChangeSelectedAuthView(AuthView.login);
+                        },
+                    ),
                   ],
                 ),
               ),
-              verticalSpaceMedium,
-              Visibility(
-                visible: authListener.currentRegStage == RegStage.contact,
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "Already have an account?  ",
-                        style: context.customTextTheme.text14W500
-                            .copyWith(color: AppColors.kWhite),
-                      ),
-                      TextSpan(
-                        text: "Login",
-                        // style: context.customTextTheme.text14W700
-                        //     .copyWith(color: AppColors.kWhite),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF20BCEB),
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            authProvider.initializeRegistrationFlow();
-                            authProvider
-                                .onChangeSelectedAuthView(AuthView.login);
-                          },
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-        ],
-      ),
+            )
+          ],
+        ),
+      ],
     );
   }
 
@@ -1465,7 +1525,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
             color: Theme.of(context).colorScheme.primary),
         height: 50,
-        width: context.screenWidth,
+        width: double.infinity,
         child: Center(
             child: !authListener.registrationButtonLoading
                 ? Text(
@@ -2006,8 +2066,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   activeFillColor: AppColors.kWhite.withOpacity(0.1),
                   selectedColor: Theme.of(context).colorScheme.primary,
                   selectedFillColor: AppColors.kWhite.withOpacity(0.1),
-                  fieldHeight: MediaQuery.of(context).size.width * 0.11,
-                  fieldWidth: MediaQuery.of(context).size.width * 0.11,
+                  fieldHeight: _otpFieldExtent(context),
+                  fieldWidth: _otpFieldExtent(context),
                   fieldOuterPadding: const EdgeInsets.all(4.0),
                 ),
                 controller: authProvider.emailOtpController,
@@ -2424,8 +2484,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           bothEnabled && !authProvider.emailOtpVerified
                               ? AppColors.kGray.withOpacity(0.3)
                               : AppColors.kWhite.withOpacity(0.1),
-                      fieldHeight: MediaQuery.of(context).size.width * 0.11,
-                      fieldWidth: MediaQuery.of(context).size.width * 0.11,
+                      fieldHeight: _otpFieldExtent(context),
+                      fieldWidth: _otpFieldExtent(context),
                       fieldOuterPadding: const EdgeInsets.all(4.0),
                     ),
                     controller: authProvider.phoneOtpController,
@@ -2745,166 +2805,163 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // _forgotWidget(authProvider, context, authListener),
     ];
-    return SingleChildScrollView(
-      child: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            child: Visibility(
-              visible: authListener.currentForgotForm != 2,
-              child: IconButton(
-                onPressed: () {
-                  if (widget.isFromProfile) {
-                    Navigator.pop(context);
-                  }
-                  if (authListener.currentForgotForm == 0) {
-                    authProvider.onChangeSelectedAuthView(AuthView.login);
-                  }
+    return Stack(
+      children: [
+        Positioned(
+          top: 0,
+          left: 0,
+          child: Visibility(
+            visible: authListener.currentForgotForm != 2,
+            child: IconButton(
+              onPressed: () {
+                if (widget.isFromProfile) {
+                  Navigator.pop(context);
+                }
+                if (authListener.currentForgotForm == 0) {
+                  authProvider.onChangeSelectedAuthView(AuthView.login);
+                }
 
-                  if (authListener.currentForgotForm == 1) {
-                    authProvider
-                        .onChangeSelectedAuthView(AuthView.forgotPassword);
-                    authProvider.updateCurrentForgotForm(
-                        (authListener.currentForgotForm - 1) % widgets.length);
-                  }
-                },
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: AppColors.kGray3,
-                ),
+                if (authListener.currentForgotForm == 1) {
+                  authProvider
+                      .onChangeSelectedAuthView(AuthView.forgotPassword);
+                  authProvider.updateCurrentForgotForm(
+                      (authListener.currentForgotForm - 1) % widgets.length);
+                }
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: AppColors.kGray3,
               ),
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // SizedBox(
-              //     height: 200,
-              //     child: Image(image: AssetImage(Assets.images.loginImage.path))),
-              verticalSpaceSmall,
+        ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // SizedBox(
+            //     height: 200,
+            //     child: Image(image: AssetImage(Assets.images.loginImage.path))),
+            verticalSpaceSmall,
 
-              authListener.currentForgotForm == 0
-                  ? Text('Reset Password',
-                      textAlign: TextAlign.center,
-                      style: context.customTextTheme.text18W600
-                          .copyWith(color: AppColors.kWhite))
-                  : const SizedBox.shrink(),
-              verticalSpaceSmall,
-              authListener.currentForgotForm == 0
-                  ? Text(
-                      textAlign: TextAlign.center,
-                      'Enter Your Email Address To Reset Your Password',
-                      style: context.customTextTheme.text12W400
-                          .copyWith(color: AppColors.kWhite),
-                    )
-                  : authListener.currentForgotForm == 1
-                      ? Text(
-                          textAlign: TextAlign.center,
-                          'Enter OTP To Reset Your Password',
-                          style: context.customTextTheme.text14W400
-                              .copyWith(color: AppColors.kWhite),
-                        )
-                      : const SizedBox.shrink(),
-              verticalSpaceRegular,
-              AnimatedCrossFade(
-                firstChild: widgets[authListener.currentForgotForm],
-                secondChild: widgets[
-                    (authListener.currentForgotForm + 1) % widgets.length],
-                duration: const Duration(seconds: 1),
-                firstCurve: Curves.ease,
-                secondCurve: Curves.ease,
-                reverseDuration: const Duration(seconds: 1),
-                sizeCurve: Curves.ease,
-                crossFadeState: CrossFadeState.showFirst,
-              ),
+            authListener.currentForgotForm == 0
+                ? Text('Reset Password',
+                    textAlign: TextAlign.center,
+                    style: context.customTextTheme.text18W600
+                        .copyWith(color: AppColors.kWhite))
+                : const SizedBox.shrink(),
+            verticalSpaceSmall,
+            authListener.currentForgotForm == 0
+                ? Text(
+                    textAlign: TextAlign.center,
+                    'Enter Your Email Address To Reset Your Password',
+                    style: context.customTextTheme.text12W400
+                        .copyWith(color: AppColors.kWhite),
+                  )
+                : authListener.currentForgotForm == 1
+                    ? Text(
+                        textAlign: TextAlign.center,
+                        'Enter OTP To Reset Your Password',
+                        style: context.customTextTheme.text14W400
+                            .copyWith(color: AppColors.kWhite),
+                      )
+                    : const SizedBox.shrink(),
+            verticalSpaceRegular,
+            AnimatedCrossFade(
+              firstChild: widgets[authListener.currentForgotForm],
+              secondChild: widgets[
+                  (authListener.currentForgotForm + 1) % widgets.length],
+              duration: const Duration(seconds: 1),
+              firstCurve: Curves.ease,
+              secondCurve: Curves.ease,
+              reverseDuration: const Duration(seconds: 1),
+              sizeCurve: Curves.ease,
+              crossFadeState: CrossFadeState.showFirst,
+            ),
 
-              verticalSpaceSmall,
+            verticalSpaceSmall,
 
-              InkWell(
-                onTap: authListener.resetLoading
-                    ? null
-                    : () async {
-                        if (authListener.currentForgotForm == 0) {
-                          final isValidated =
-                              await authProvider.resetPassword();
-                          if (isValidated) {
-                            authProvider.resetFormKey.currentState?.save();
-                            AlertDialogs.showSuccess('Otp Sent Successfully!');
-                            startTimer();
-                            authProvider.updateCurrentForgotForm(1);
-                          } else {
-                            log('INVALIDATED', name: 'isValidated');
-                          }
-                        } else if (authListener.currentForgotForm == 1) {
-                          final isValidated =
-                              await authProvider.validateResetPasswordOTP();
-                          if (isValidated) {
-                            AlertDialogs.showSuccess(
-                                "Password Changed successfully!");
-                            authProvider.updateCurrentForgotForm(2);
-                            return;
-                          } else {
-                            log('INVALIDATED', name: 'isValidated');
-                          }
-                        } else if (authListener.currentForgotForm == 2) {
-                          if (widget.isFromProfile) {
-                            context.router.back();
-                          } else {
-                            setState(() {
-                              widget.isFromProfile = false;
-                            });
-                          }
-                          authProvider.onChangeSelectedAuthView(AuthView.login);
-                          authProvider.updateCurrentForgotForm(0);
+            InkWell(
+              onTap: authListener.resetLoading
+                  ? null
+                  : () async {
+                      if (authListener.currentForgotForm == 0) {
+                        final isValidated = await authProvider.resetPassword();
+                        if (isValidated) {
+                          authProvider.resetFormKey.currentState?.save();
+                          AlertDialogs.showSuccess('Otp Sent Successfully!');
+                          startTimer();
+                          authProvider.updateCurrentForgotForm(1);
+                        } else {
+                          log('INVALIDATED', name: 'isValidated');
                         }
-                      },
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      gradient: const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [
-                          Color(0xFF0796D8),
-                          Color(0xFF11C2D5),
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF0796D8).withOpacity(0.25),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
-                        ),
+                      } else if (authListener.currentForgotForm == 1) {
+                        final isValidated =
+                            await authProvider.validateResetPasswordOTP();
+                        if (isValidated) {
+                          AlertDialogs.showSuccess(
+                              "Password Changed successfully!");
+                          authProvider.updateCurrentForgotForm(2);
+                          return;
+                        } else {
+                          log('INVALIDATED', name: 'isValidated');
+                        }
+                      } else if (authListener.currentForgotForm == 2) {
+                        if (widget.isFromProfile) {
+                          context.router.back();
+                        } else {
+                          setState(() {
+                            widget.isFromProfile = false;
+                          });
+                        }
+                        authProvider.onChangeSelectedAuthView(AuthView.login);
+                        authProvider.updateCurrentForgotForm(0);
+                      }
+                    },
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xFF0796D8),
+                        Color(0xFF11C2D5),
                       ],
-                      color: Theme.of(context).colorScheme.primary),
-                  height: 50,
-                  width: context.screenWidth,
-                  child: Center(
-                      child: authListener.resetLoading
-                          ? const SizedBox(
-                              height: 25,
-                              width: 25,
-                              child: CircularProgressIndicator.adaptive(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    AppColors.kWhite),
-                              ))
-                          : Text(
-                              authListener.currentForgotForm == 0
-                                  ? 'Request OTP'
-                                  : authListener.currentForgotForm == 1
-                                      ? 'Submit'
-                                      : 'Done',
-                              style: context.customTextTheme.text16W400
-                                  .copyWith(color: AppColors.kWhite),
-                            )),
-                ),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0796D8).withOpacity(0.25),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                    color: Theme.of(context).colorScheme.primary),
+                height: 50,
+                width: double.infinity,
+                child: Center(
+                    child: authListener.resetLoading
+                        ? const SizedBox(
+                            height: 25,
+                            width: 25,
+                            child: CircularProgressIndicator.adaptive(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.kWhite),
+                            ))
+                        : Text(
+                            authListener.currentForgotForm == 0
+                                ? 'Request OTP'
+                                : authListener.currentForgotForm == 1
+                                    ? 'Submit'
+                                    : 'Done',
+                            style: context.customTextTheme.text16W400
+                                .copyWith(color: AppColors.kWhite),
+                          )),
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

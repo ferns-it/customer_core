@@ -338,15 +338,34 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
           if (productListener.featuredPopularProductsAPIResponse.status ==
               APIResponseStatus.loading) ...[
             const ShimmerProductDetailsTile(count: 4),
-          ] else ...[
+          ] else if (productListener.featuredPopularProductsAPIResponse.data
+                  ?.featuredProducts?.isNotEmpty ==
+              true) ...[
             verticalSpaceSmall,
+
             buildFeaturedProducts(
-                productListener, cartProvider, productProvider),
+              productListener,
+              cartProvider,
+              productProvider,
+            ),
+            // else ...[
+            //   verticalSpaceSmall,
+            //   buildFeaturedProducts(
+            //       productListener, cartProvider, productProvider),
             verticalSpaceMedium,
             if (productListener.featuredPopularProductsAPIResponse.data
                     ?.popularProducts?.isNotEmpty ==
                 true)
               buildPopularProducts(context),
+          ] else ...[
+            verticalSpaceSmall,
+
+            // Show category products when there are no available featured products
+            buildCategoryProducts(
+              productListener,
+              cartProvider,
+              productProvider,
+            ),
           ],
           Visibility(
             visible: !productProvider.isFetchingProductsFromPagination,
@@ -481,6 +500,132 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
   //     }).toList(),
   //   );
   // }
+
+  Widget buildCategoryProducts(
+    ProductsProvider productListener,
+    CartProvider cartProvider,
+    ProductsProvider productProvider,
+  ) {
+    final cartListener = context.watch<CartProvider>();
+
+    final products =
+        productListener.filterListableProducts(productListener.productsList);
+
+    // If there are no category products, don't show anything.
+    if (products.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Optional heading
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        //   child: Text(
+        //     productListener.selectedCategory?.name ?? 'Products',
+        //     style: const TextStyle(
+        //       fontSize: 20,
+        //       fontWeight: FontWeight.bold,
+        //     ),
+        //   ),
+        // ),
+
+        verticalSpaceSmall,
+
+        AlignedGridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            final product = products[index];
+
+            final isExist = cartProvider.isProductExist(product.pID);
+
+            final productQtyUpdated =
+                cartProvider.getProductQuantity(product.pID);
+
+            // Get latest stock information.
+            final freshProduct =
+                productListener.overlayStockFromProductsList(product);
+
+            final availableStock = freshProduct.stock?.availableStock;
+
+            return ProductDetailsTile(
+              freshProduct,
+              showFavIcon: cartListener.isUserLoggedIn,
+              secondaryWidget: QtyCounterButton2(
+                qty: productQtyUpdated,
+                allowDecrementAtMinimum: true,
+                availableStock: availableStock,
+                onDecrementQty: () {
+                  final idx =
+                      cartProvider.getProductCartIndex(freshProduct.pID);
+
+                  if (idx >= 0) {
+                    cartProvider.decrementCartItemQty(idx);
+                  }
+                },
+                onIncrementQty: () {
+                  final idx =
+                      cartProvider.getProductCartIndex(freshProduct.pID);
+
+                  if (idx >= 0) {
+                    cartProvider.incrementCartItemQtyWithStockCheck(
+                      idx,
+                      freshProduct,
+                    );
+                  }
+                },
+                onIncrementBlocked: () {
+                  AlertDialogs.showError(
+                    'Sorry, this item is currently out of stock.',
+                  );
+                },
+              ),
+              useSecondaryWidget: isExist,
+              onPressed: () {
+                showItemDetailsBottomSheet(freshProduct);
+              },
+              onPressFavouriteBtn: () async {
+                if (freshProduct.isFavourite) {
+                  await context.read<ProductsProvider>().removeFavourite(
+                        freshProduct.favouriteID!,
+                        context.read<SearchProvider>(),
+                      );
+                } else {
+                  await context.read<ProductsProvider>().addFavourite(
+                        freshProduct.pID!,
+                        context.read<SearchProvider>(),
+                      );
+                }
+              },
+              onPressAddBtn: () {
+                if (freshProduct.pID == null) return;
+
+                if (freshProduct.variations.isNotEmpty) {
+                  cartProvider.onChangeVariation(
+                    freshProduct.variations.first,
+                  );
+                }
+
+                cartProvider.updateSelectedItemId(
+                  freshProduct.pID!,
+                );
+
+                showItemDetailsBottomSheet(freshProduct);
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   Widget buildImageForBanners() {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -532,7 +677,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
       CartProvider cartProvider, ProductsProvider productProvider) {
     // final listOfItems = ['Hot Deals', 'Best Seller', 'Top Rated'];
     final deals = productListener
-        .filterListableProducts(    productListener.productsListRandom)
+        .filterListableProducts(productListener.productsListRandom)
         .take(4)
         .toList();
     return Padding(
@@ -626,7 +771,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                   // list has not been refreshed.
                                   final freshProduct = productProvider
                                       .overlayStockFromProductsList(product);
-                                  final availableStock = freshProduct.stock?.availableStock;
+                                  final availableStock =
+                                      freshProduct.stock?.availableStock;
 
                                   return ProductDetailsTile(
                                     freshProduct,
@@ -742,7 +888,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                               .overlayStockFromProductsList(product);
                           final productQtyUpdated =
                               cartProvider.getProductQuantity(product.pID);
-                          final availableStock = freshProduct.stock?.availableStock;
+                          final availableStock =
+                              freshProduct.stock?.availableStock;
 
                           return ProductDetailsTile(
                             freshProduct,
@@ -859,7 +1006,8 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                                 // list was not refreshed.
                                 final freshProduct = productProvider
                                     .overlayStockFromProductsList(product);
-                                final availableStock = freshProduct.stock?.availableStock;
+                                final availableStock =
+                                    freshProduct.stock?.availableStock;
 
                                 return ProductDetailsTile(
                                   freshProduct,
@@ -1402,8 +1550,8 @@ class __SearchResultsState extends State<_SearchResults> {
     return Consumer<SearchProvider>(
       builder: (context, value, child) {
         final productsProvider = context.watch<ProductsProvider>();
-        final searchResults = productsProvider
-            .filterListableProducts(value.searchResponse ?? []);
+        final searchResults =
+            productsProvider.filterListableProducts(value.searchResponse ?? []);
         if (value.isSearchLoading) {
           return Center(
               child: CircularProgressIndicator(
@@ -1428,9 +1576,10 @@ class __SearchResultsState extends State<_SearchResults> {
                         cartProvider.getProductQuantity(product.pID);
                     final cartIndex =
                         cartProvider.getProductCartIndex(product.pID);
-                    final stockAwareProduct = productsProvider
-                        .overlayStockFromProductsList(product);
-                    final availableStock = stockAwareProduct.stock?.availableStock;
+                    final stockAwareProduct =
+                        productsProvider.overlayStockFromProductsList(product);
+                    final availableStock =
+                        stockAwareProduct.stock?.availableStock;
 
                     return ProductDetailsTile(stockAwareProduct,
                         showFavIcon: cartListener.isUserLoggedIn,

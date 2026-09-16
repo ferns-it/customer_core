@@ -408,6 +408,10 @@ class ProductDataModel {
     }
     return null;
   }
+
+  bool get isOutOfStock {
+    return stock?.activated == true && (stock?.availableStock ?? 0) <= 0;
+  }
 }
 
 class ProductStockDetails {

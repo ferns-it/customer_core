@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:dartx/dartx.dart';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -43,59 +44,86 @@ class DishDetailBottomSheet extends StatelessWidget {
         children: <Widget>[
           const RoundedCloseIcon(),
           verticalSpaceRegular,
-          Theme(
-            data: Theme.of(context).copyWith(
-              textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
-                displayColor: AppColors.kBlack2,
-                bodyColor: AppColors.kBlack2,
-              ),
-            ),
-            child: Container(
-              padding: const EdgeInsetsDirectional.symmetric(
-                  // vertical: 10,
-                  // horizontal: 15,
+          Flexible(
+            child: SingleChildScrollView(
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  textTheme:
+                      GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+                    displayColor: AppColors.kBlack2,
+                    bodyColor: AppColors.kBlack2,
                   ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
                 ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // verticalSpaceTiny,
-                  AppConfig.instance.isCategoryImageEnabled == true
-                      ? _ProductImageWidget(product: product)
-                      : SizedBox.shrink(),
-                  verticalSpaceRegular,
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: _ProductNameWidget(product: product),
+                child: Container(
+                  padding: const EdgeInsetsDirectional.symmetric(
+                      // vertical: 10,
+                      // horizontal: 15,
+                      ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
                   ),
-                  // _RatingAndTimeWidget(product: product),
-                  product.description != null && product.description!.isNotEmpty
-                      ? verticalSpaceSmall
-                      : const SizedBox.shrink(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: _DescriptionWidget(product: product),
-                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // verticalSpaceTiny,
+                      AppConfig.instance.isCategoryImageEnabled == true
+                          ? _ProductImageWidget(product: product)
+                          : SizedBox.shrink(),
+                      verticalSpaceRegular,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: _ProductNameWidget(product: product),
+                      ),
+                      // _RatingAndTimeWidget(product: product),
+                      product.description != null &&
+                              product.description!.isNotEmpty
+                          ? verticalSpaceSmall
+                          : const SizedBox.shrink(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: _DescriptionWidget(product: product),
+                      ),
 
-                  product.description != null && product.description!.isNotEmpty
-                      ? verticalSpaceRegular
-                      : const SizedBox.shrink(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Wrap(
-                      spacing: 2,
-                      runSpacing: 4,
-                      children: [
-                        ...allergens.take(4).map(
-                              (e) => Container(
+                      product.description != null &&
+                              product.description!.isNotEmpty
+                          ? verticalSpaceRegular
+                          : const SizedBox.shrink(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Wrap(
+                          spacing: 2,
+                          runSpacing: 4,
+                          children: [
+                            ...allergens.take(4).map(
+                                  (e) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.grey.shade800
+                                          : AppColors.kGray3.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      e,
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        color: context.customTextTheme.color,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            if (allergens.length > 4)
+                              Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 4,
@@ -108,43 +136,29 @@ class DishDetailBottomSheet extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  e,
+                                  '+${allergens.length - 4}',
                                   style: TextStyle(
                                     fontSize: 8,
                                     color: context.customTextTheme.color,
                                   ),
                                 ),
                               ),
-                            ),
-                        if (allergens.length > 4)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.grey.shade800
-                                  : AppColors.kGray3.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '+${allergens.length - 4}',
-                              style: TextStyle(
-                                fontSize: 8,
-                                color: context.customTextTheme.color,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                          ],
+                        ),
+                      ),
+                      verticalSpaceRegular,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: _IngredientsWidget(product: product),
+                      ),
+
+                      _OrderSectionWidget(
+                        product: product,
+                        onRequestOrderDish: onRequestOrderDish,
+                      ),
+                    ],
                   ),
-                  _OrderSectionWidget(
-                    product: product,
-                    onRequestOrderDish: onRequestOrderDish,
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -154,14 +168,88 @@ class DishDetailBottomSheet extends StatelessWidget {
   }
 }
 
-class AddDishBottomSheet extends GetProviderView<CartProvider> {
+class AddDishBottomSheet extends StatefulWidget {
   final ProductDataModel product;
 
   const AddDishBottomSheet({super.key, required this.product});
 
   @override
+  State<AddDishBottomSheet> createState() => _AddDishBottomSheetState();
+}
+
+class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
+  final ScrollController _scrollController = ScrollController();
+  final _variationKey = GlobalKey();
+  late final List<GlobalKey> _masterAddonKeys;
+
+  ProductDataModel get product => widget.product;
+
+  @override
+  void initState() {
+    super.initState();
+    _masterAddonKeys =
+        List.generate(product.masterAddons.length, (_) => GlobalKey());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Returns the [GlobalKey] of the first required section that is not
+  /// satisfied, or `null` when every required section is satisfied.
+  GlobalKey? _firstInvalidSectionKey(CartProvider cart) {
+    // Variation section is required whenever the product offers multiple
+    // variations and none has been selected yet.
+    if (product.hasMultipleVariation && cart.selectedItemVariation == null) {
+      return _variationKey;
+    }
+
+    for (var i = 0; i < product.masterAddons.length; i++) {
+      final modifier = product.masterAddons[i];
+      final minimumRequired = int.tryParse(modifier.minimumRequired ?? '') ?? 0;
+      final maximumRequired = int.tryParse(modifier.maximumRequired ?? '') ?? 0;
+
+      // No min/max constraint means this section is not required.
+      if (minimumRequired == 0 && maximumRequired == 0) continue;
+
+      final selectedModifier = cart.selectedMasterAddons.firstOrNullWhere(
+        (e) => e.id == modifier.id,
+      );
+      final selectedCount = selectedModifier?.options.length ?? 0;
+
+      if (selectedCount < minimumRequired) return _masterAddonKeys[i];
+      if (maximumRequired != 0 && selectedCount > maximumRequired) {
+        return _masterAddonKeys[i];
+      }
+    }
+
+    return null;
+  }
+
+  /// Scrolls the sheet to the first invalid required section.
+  /// Returns `true` when such a section exists (and add-to-cart should be
+  /// blocked), `false` when everything required is satisfied.
+  bool _scrollToFirstInvalidSection(CartProvider cart) {
+    final key = _firstInvalidSectionKey(cart);
+    if (key == null) return false;
+
+    final sectionContext = key.currentContext;
+    if (sectionContext == null) return false;
+
+    Scrollable.ensureVisible(
+      sectionContext,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOutCubic,
+      alignment: 0.1,
+    );
+    return true;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final cartListener = listener(context);
+    final cartListener = context.watch<CartProvider>();
     final allergens = product.selectedAllergensList;
 
     final baseTextTheme = Theme.of(context).textTheme;
@@ -352,16 +440,28 @@ class AddDishBottomSheet extends GetProviderView<CartProvider> {
                   Flexible(
                     flex: 2,
                     child: ListView(
+                      controller: _scrollController,
                       shrinkWrap: true,
                       children: [
-                        _FoodVariationSection(product),
+                        _IngredientsWidget(product: product),
+                        verticalSpaceSmall,
+                        _FoodVariationSection(product, key: _variationKey),
                         verticalSpaceRegular,
-                        _FoodAddonsSection(product),
+                        _FoodAddonsSection(
+                          product,
+                          addonKeys: _masterAddonKeys,
+                        ),
                       ],
                     ),
                   ),
                   verticalSpaceSmall,
-                  Center(child: AddToCartButton(product)),
+                  Center(
+                    child: AddToCartButton(
+                      product,
+                      onValidationFailed: () =>
+                          _scrollToFirstInvalidSection(cartListener),
+                    ),
+                  ),
                   verticalSpaceTiny,
                   SizedBox(height: bottomInset > 0 ? bottomInset : 0)
                 ],
@@ -420,11 +520,78 @@ class _ProductNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      (product.name ?? "").capitalize(),
-      style: context.customTextTheme.text20W600.copyWith(
-        color: context.customTextTheme.color,
-      ),
+    final spiceLevel = product.spiceLevel;
+    final spiceLevelIcon =
+        context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Text(
+            (product.name ?? "").capitalize(),
+            style: context.customTextTheme.text20W600.copyWith(
+              color: context.customTextTheme.color,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        horizontalSpaceSmall,
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (spiceLevel != null &&
+                Utils.isSpiceLevelApplicable(spiceLevel)) ...[
+              Container(
+                decoration: BoxDecoration(
+                    boxShadow: [
+                      // BoxShadow(
+                      //     color: Colors.black.withOpacity(0.12), blurRadius: 6)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.10),
+                        blurRadius: 4,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                    color: Utils.spiceLevelColor(context, spiceLevel)
+                        .withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.all(4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (spiceLevelIcon != null && spiceLevelIcon.isNotEmpty)
+                      Text(
+                        ['Medium', 'Hot', 'Extra Hot'].contains(spiceLevel)
+                            ? '🌶️'
+                            : spiceLevelIcon,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.red,
+                        ),
+                      ),
+                    // Text(
+                    //   spiceLevelIcon,
+                    //   style: TextStyle(fontSize: 12, color: Colors.red),
+                    // ),
+                    horizontalSpaceTiny,
+                    Text(
+                      spiceLevel,
+                      style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color:
+                              Utils.spiceLevelTextColor(context, spiceLevel)),
+                    ),
+                  ],
+                ),
+              ),
+            ]
+          ],
+        ),
+      ],
     );
   }
 }
@@ -497,6 +664,38 @@ class _DescriptionWidget extends StatelessWidget {
             ),
           )
         : const SizedBox.shrink();
+  }
+}
+
+class _IngredientsWidget extends StatelessWidget {
+  final ProductDataModel product;
+
+  const _IngredientsWidget({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    return product.ingredients != null && product.ingredients!.isNotEmpty
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 0.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ingredients',
+                    style: context.customTextTheme.text16W600,
+                  ),
+                  verticalSpaceSmall,
+                  Text(
+                    Utils.removeHtmlTags(product.ingredients ?? 'N/A'),
+                    style: const TextStyle(fontSize: 13, height: 1.4),
+                  )
+                ],
+              ),
+            ),
+          )
+        : SizedBox.shrink();
   }
 }
 
@@ -593,7 +792,7 @@ class _ProductPriceWidget extends StatelessWidget {
 
 // ADD DISH WIDGETS
 class _FoodVariationSection extends GetProviderView<CartProvider> {
-  const _FoodVariationSection(this.item);
+  const _FoodVariationSection(this.item, {super.key});
 
   final ProductDataModel item;
 
@@ -640,14 +839,12 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
           return RadioListTile(
             value: cartListener.selectedItemVariation == variation,
             groupValue: true,
-
             title: Text(
               (variation.name ?? "").capitalize(),
               style: context.customTextTheme.text14W600.copyWith(
                 color: context.customTextTheme.color,
               ),
             ),
-
             subtitle: variation.offerPriceEnabled == 'Yes' &&
                     variation.offerPriceDetails?.currentOfferPrice != null
                 ? RichText(
@@ -675,25 +872,12 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
                       color: context.customTextTheme.color,
                     ),
                   ),
-            // subtitle: Text(
-            //   (variation.offerPriceEnabled == 'Yes'
-            //               ? variation.offerPriceDetails?.currentOfferPrice
-            //                   ?.offerPriceFormatted
-            //               : variation.name ?? "")
-            //           ?.capitalize() ??
-            //       '',
-            //   style: context.customTextTheme.text14W500.copyWith(
-            //     color:
-            //         themeListener.isDarkMode ? Colors.white : AppColors.kBlack,
-            //   ),
-            // ),
             fillColor: WidgetStateProperty.resolveWith<Color>((states) {
               if (states.contains(WidgetState.selected)) {
                 return Theme.of(context).colorScheme.primary; // selected color
               }
               return Colors.grey; // 👈 unselected color
             }),
-
             controlAffinity: ListTileControlAffinity.trailing,
             onChanged: (_) => cartProvider.onChangeVariation(variation),
             visualDensity: VisualDensity.compact,
@@ -705,9 +889,10 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
 }
 
 class _FoodAddonsSection extends GetProviderView<CartProvider> {
-  const _FoodAddonsSection(this.item);
+  const _FoodAddonsSection(this.item, {super.key, this.addonKeys});
 
   final ProductDataModel item;
+  final List<Key?>? addonKeys;
 
   @override
   Widget build(BuildContext context) {
@@ -718,8 +903,9 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
     return Column(
       children: [
         Column(
-          children: item.masterAddons.map((modifier) {
+          children: item.masterAddons.mapIndexed((index, modifier) {
             return Column(
+              key: addonKeys?[index],
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -833,9 +1019,14 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
 }
 
 class AddToCartButton extends GetProviderView<CartProvider> {
-  const AddToCartButton(this.product, {super.key});
+  const AddToCartButton(this.product, {super.key, this.onValidationFailed});
 
   final ProductDataModel product;
+
+  /// Called when a required section is not satisfied. It should scroll the
+  /// sheet to the first invalid required section. Returns `true` when such a
+  /// section exists (so add-to-cart is blocked), `false` otherwise.
+  final bool Function()? onValidationFailed;
 
   @override
   Widget build(BuildContext context) {
@@ -863,7 +1054,8 @@ class AddToCartButton extends GetProviderView<CartProvider> {
               }
               final validationResult =
                   cartProvider.validateRequiredModifiers(product);
-              if (validationResult) {
+              final hasInvalidSection = onValidationFailed?.call() ?? false;
+              if (validationResult && !hasInvalidSection) {
                 cartProvider.addItemToCart(isGuest: !isLogged).then((added) {
                   if (added) {
                     cartProvider.clearSelectedAddressSecondary();

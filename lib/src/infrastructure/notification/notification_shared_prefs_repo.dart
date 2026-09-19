@@ -1,9 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:customer_core/src/core/constants/app_identifiers.dart';
 import 'package:customer_core/src/domain/notification/models/notification_model.dart';
 
 class NotificationSharedPrefs {
-  static  String kUserPrefsKey =
+  static String kUserPrefsKey =
       "${AppIdentifiers.kBuildIdentifier}/notification";
 
   static Future<bool> clearNotification() async {
@@ -34,8 +35,8 @@ class NotificationSharedPrefs {
       // load existing notifications
       final List<String> storedList = prefs.getStringList(kUserPrefsKey) ?? [];
 
-      // add new notification JSON
-      storedList.add(notification.toJson());
+      // add new notification at the front so the latest shows first
+      storedList.insert(0, notification.toJson());
 
       // save back to prefs
       await prefs.setStringList(kUserPrefsKey, storedList);

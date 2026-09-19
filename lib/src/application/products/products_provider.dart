@@ -648,4 +648,45 @@ class ProductsProvider extends ChangeNotifier with BaseController {
     _productsCollection.clear();
     // _selectedFoodType = FoodType.nonVeg;
   }
+
+  /// Removes the previously logged-in user's favourite marks from all in-memory
+  /// product lists so they don't leak into the next user/session (e.g. after a
+  /// logout followed by another login).
+  void resetSessionData() {
+    List<ProductDataModel> stripFavourites(List<ProductDataModel> products) =>
+        products
+            .map((p) =>
+                (p.isFavourite || (p.favouriteID?.isNotEmpty ?? false))
+                    ? p.copyWith(isFavourite: false, favouriteID: '')
+                    : p)
+            .toList();
+
+    _favouriteProductResponse = APIResponse.initial();
+
+    final featured = _featuredPopularProductsAPIResponse.data;
+    if (featured != null) {
+      _featuredPopularProductsAPIResponse = APIResponse.completed(
+        featured.copyWith(
+          featuredProducts: stripFavourites(featured.featuredProducts ?? []),
+          popularProducts: stripFavourites(featured.popularProducts ?? []),
+        ),
+      );
+    }
+
+    final productData = _productsListAPIResponse.data;
+    if (productData != null) {
+      _productsListAPIResponse = APIResponse.completed(
+        stripFavourites(productData),
+      );
+    }
+
+    _productsCollection = stripFavourites(_productsCollection);
+    productsListRandom = stripFavourites(productsListRandom);
+
+    for (final entry in _cachedProducts.entries) {
+      _cachedProducts[entry.key] = stripFavourites(entry.value);
+    }
+
+    notifyListeners();
+  }
 }

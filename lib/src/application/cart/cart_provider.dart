@@ -278,13 +278,18 @@ class CartProvider extends ChangeNotifier with BaseController {
               : double.parse(
                   _validatedCouponDetails!.coupenData!.coupenAmount!);
 
-  bool get isStripeEnabled => selectedOrderType == OrderType.delivery
-      ? deliveryDetails?.cartData?.paymentOptions?.isStripeEnabled ??
-          cartDetailsModel?.paymentOptions?.isStripeEnabled ??
-          false
-      : takeAwayDetails?.cartData?.paymentOptions?.isStripeEnabled ??
-          cartDetailsModel?.paymentOptions?.isStripeEnabled ??
-          false;
+  bool get isIndianUser => _userData?.user.isIndianUser ?? false;
+
+  bool get isStripeEnabled {
+    if (isIndianUser) return false;
+    return selectedOrderType == OrderType.delivery
+        ? deliveryDetails?.cartData?.paymentOptions?.isStripeEnabled ??
+            cartDetailsModel?.paymentOptions?.isStripeEnabled ??
+            false
+        : takeAwayDetails?.cartData?.paymentOptions?.isStripeEnabled ??
+            cartDetailsModel?.paymentOptions?.isStripeEnabled ??
+            false;
+  }
 
   bool get isCODEnabled => selectedOrderType == OrderType.delivery
       ? deliveryDetails?.cartData?.paymentOptions?.isCODEnabled ??
@@ -363,6 +368,9 @@ class CartProvider extends ChangeNotifier with BaseController {
 
   bool _isUserLoggedIn = false;
   bool get isUserLoggedIn => _isUserLoggedIn;
+
+  UserLoginResponse? _userData;
+  UserLoginResponse? get userData => _userData;
 
   String get _activeCurrencySymbol =>
       (_cartDetailsModel?.shopCurrencyIcon?.trim().isNotEmpty ?? false)
@@ -472,13 +480,29 @@ class CartProvider extends ChangeNotifier with BaseController {
   }
 
   Future<bool> checkUserIsLogged() async {
-    _isUserLoggedIn = await sharedPrefsRepository.getUserData() != null;
+    _userData = await sharedPrefsRepository.getUserData();
+    _isUserLoggedIn = _userData != null;
     notifyListeners();
     return _isUserLoggedIn;
   }
 
-  Future<UserLoginResponse?> getUserData() async =>
-      await sharedPrefsRepository.getUserData();
+  Future<UserLoginResponse?> getUserData() async {
+    _userData = await sharedPrefsRepository.getUserData();
+    notifyListeners();
+    return _userData;
+  }
+
+  /// Clears all in-memory cart/session state (items, totals, login flag,
+  /// guest id) so a previously logged-in user's cart/favourites never leak
+  /// into the next user session. Use on logout.
+  void resetSessionData() {
+    _isUserLoggedIn = false;
+    _userData = null;
+    _cartDetailsModel = null;
+    _guestID = null;
+    _validatedCouponDetails = null;
+    resetValues();
+  }
 
   Future<void> listAllOffers() async {
     try {
@@ -727,8 +751,6 @@ class CartProvider extends ChangeNotifier with BaseController {
       notifyListeners();
       final userData = await sharedPrefsRepository.getUserData();
       final userID = userData?.user.userID;
-      await clearCart();
-
       final response =
           await cartRepo.transferCart(guestID: guestID, userID: userID);
       return response.fold(
@@ -736,7 +758,9 @@ class CartProvider extends ChangeNotifier with BaseController {
           AlertDialogs.showError(exception.message);
           return false;
         },
-        (result) {
+        (result) async {
+      
+          await listCartItems();
           return true;
         },
       );
@@ -771,6 +795,9 @@ class CartProvider extends ChangeNotifier with BaseController {
         log(exception.toString());
       }, (result) {
         _cartDetailsModel = result;
+        if (isIndianUser && _selectedPaymentMethod == PaymentMethod.card) {
+          _selectedPaymentMethod = PaymentMethod.cash;
+        }
         notifyListeners();
       });
     } finally {
@@ -817,13 +844,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final locatedCartItem = cartItems.elementAt(index);
     final newQty = (locatedCartItem.quantity ?? 0) + 1;
 
-    // _debounceTimer?.cancel();
-    // _debounceTimer = Timer(
-    //   const Duration(seconds: 2),
-    //   () => _updateQty(locatedCartItem, newQty),
-    // );
-
-    _updateQty(locatedCartItem, newQty); // Call _updateQty directly
+    _updateQty(locatedCartItem, newQty);
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
@@ -834,9 +855,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedAddons = appliedAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice = option.priceSingle;
-
         final price = _parseCurrencyToDouble(rawPrice);
-
         final updatedPrice = price * newQty;
 
         return option.copyWith(
@@ -850,9 +869,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedMasterAddons = appliedMasterAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice = option.priceSingle;
-
         final price = _parseCurrencyToDouble(rawPrice);
-
         final updatedPrice = price * newQty;
 
         return option.copyWith(
@@ -863,41 +880,39 @@ class CartProvider extends ChangeNotifier with BaseController {
       return e.copyWith(choosedOption: updatedOptions);
     }).toList();
 
-    newCartItems[index] = item.copyWith(
-      master_addon_apllied: updatedAppliedMasterAddons,
-      addon_apllied: updatedAppliedAddons,
-    );
+    // Use getModifiersTotal which now uses priceSingle (unit prices) with safe fold()
+    final itemModifiersTotal = item.getModifiersTotal;
+    final itemModifiersTotalInPaisa =
+        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final itemProductPrice = _parseCurrencyToDouble(item.product_price);
     final itemProductPriceInPaisa =
         itemProductPrice * AppConfig.instance.country.currencyDivisor;
-    final itemModifiersTotal = item.getModifiersTotal * newQty;
-    final itemModifiersTotalInPaisa =
-        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final totalItemPrice = newQty * itemProductPriceInPaisa;
+    final totalPriceWithModifiers =
+        totalItemPrice + (newQty * itemModifiersTotalInPaisa);
     final productTotalPriceFormatted =
-        (totalItemPrice) / AppConfig.instance.country.currencyDivisor;
+        totalItemPrice / AppConfig.instance.country.currencyDivisor;
     final updatedAmountDetails = _scaleAmountDetailsForQty(
       amountDetails: item.amountDetails,
       previousQty: prevQty,
       newQty: newQty,
     );
 
+    // Keep the locally computed (gross) total here; the authoritative,
+    // offer-aware amounts come from the server via the _updateQty refresh.
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
       quantity: newQty,
       master_addon_apllied: updatedAppliedMasterAddons,
       addon_apllied: updatedAppliedAddons,
-      total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
+      total: totalPriceWithModifiers.toInt(),
       amountDetails: updatedAmountDetails,
       product_total_price: _formatDynamicCurrency(productTotalPriceFormatted),
     );
 
     final totalAmountInPaisa = newCartItems.fold<int>(
       0,
-      (sum, item) {
-        log(sum.toString(), name: "totalAmountInPaisaSum");
-        return sum + (item.total ?? 0);
-      },
+      (sum, item) => sum + (item.total ?? 0),
     );
     final totalDiscountInPaisa = newCartItems.fold<int>(
       0,
@@ -938,13 +953,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     }
     final newQty = prevQty - 1;
 
-    // _debounceTimer?.cancel();
-    // _debounceTimer = Timer(
-    //   const Duration(seconds: 2),
-    //   () => _updateQty(locatedCartItem, newQty),
-    // );
-
-    _updateQty(locatedCartItem, newQty); // Call _updateQty directly
+    _updateQty(locatedCartItem, newQty);
 
     final newCartItems = List<CartItemDataModel>.from(cartItems);
     final item = newCartItems[index];
@@ -955,9 +964,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedAddons = appliedAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice = option.priceSingle;
-
         final price = _parseCurrencyToDouble(rawPrice);
-
         final updatedPrice = price * newQty;
 
         return option.copyWith(
@@ -971,9 +978,7 @@ class CartProvider extends ChangeNotifier with BaseController {
     final updatedAppliedMasterAddons = appliedMasterAddons.map((e) {
       final updatedOptions = e.choosedOption.map((option) {
         final rawPrice = option.priceSingle;
-
         final price = _parseCurrencyToDouble(rawPrice);
-
         final updatedPrice = price * newQty;
 
         return option.copyWith(
@@ -984,30 +989,32 @@ class CartProvider extends ChangeNotifier with BaseController {
       return e.copyWith(choosedOption: updatedOptions);
     }).toList();
 
-    newCartItems[index] = item.copyWith(
-        master_addon_apllied: updatedAppliedMasterAddons,
-        addon_apllied: updatedAppliedAddons);
+    // Use getModifiersTotal which now uses priceSingle (unit prices) with safe fold()
+    final itemModifiersTotal = item.getModifiersTotal;
+    final itemModifiersTotalInPaisa =
+        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final itemProductPrice = _parseCurrencyToDouble(item.product_price);
     final itemProductPriceInPaisa =
         itemProductPrice * AppConfig.instance.country.currencyDivisor;
-    final itemModifiersTotal = item.getModifiersTotal * newQty;
-    final itemModifiersTotalInPaisa =
-        itemModifiersTotal * AppConfig.instance.country.currencyDivisor;
     final totalItemPrice = newQty * itemProductPriceInPaisa;
+    final totalPriceWithModifiers =
+        totalItemPrice + (newQty * itemModifiersTotalInPaisa);
     final productTotalPriceFormatted =
-        (totalItemPrice) / AppConfig.instance.country.currencyDivisor;
+        totalItemPrice / AppConfig.instance.country.currencyDivisor;
     final updatedAmountDetails = _scaleAmountDetailsForQty(
       amountDetails: item.amountDetails,
       previousQty: prevQty1,
       newQty: newQty,
     );
 
+    // Keep the locally computed (gross) total here; the authoritative,
+    // offer-aware amounts come from the server via the _updateQty refresh.
     newCartItems[index] = item.copyWith(
       cartID: locatedCartItem.cartID,
       quantity: newQty,
       master_addon_apllied: updatedAppliedMasterAddons,
       addon_apllied: updatedAppliedAddons,
-      total: (totalItemPrice + itemModifiersTotalInPaisa).toInt(),
+      total: totalPriceWithModifiers.toInt(),
       amountDetails: updatedAmountDetails,
       product_total_price: _formatDynamicCurrency(productTotalPriceFormatted),
     );
@@ -1041,9 +1048,6 @@ class CartProvider extends ChangeNotifier with BaseController {
             totalDiscountInPaisa / AppConfig.instance.country.currencyDivisor),
       ),
     );
-    //new cart value => totalAmountInPaisa /  AppConfig.instance.country.currencyDivisor
-
-    //validatedCouponDetails => minSpend
 
     _selectedAddress = null;
     _deliveryDetails = null;
@@ -1128,7 +1132,10 @@ class CartProvider extends ChangeNotifier with BaseController {
     final response = await cartRepo.updateCartItem(cartItem.cartID!, payload,
         isGuest: !isLogged, guestID: _guestID, userID: userData?.user.userID);
     response.fold(() {
-      // listCartItems();
+      // Refresh the cart with server-authoritative amounts after a quantity
+      // change so the displayed totals update immediately & correctly
+      // (offers/addons/rounding are computed on the server).
+      listCartItems();
     }, (error) {
       AlertDialogs.showError(error.message);
     });
@@ -1143,14 +1150,22 @@ class CartProvider extends ChangeNotifier with BaseController {
       calculateDeliveryCharge();
       return;
     } else {
-      calculateTakeAwayCharge(
-        pickupTime: _selectedPickUpTime ??
-            DateTime.now().add(const Duration(minutes: 15)),
-      );
+      if (_selectedPickUpTime != null) {
+        calculateTakeAwayCharge();
+      }
+      // calculateTakeAwayCharge(
+      //   pickupTime: _selectedPickUpTime ??
+      //       DateTime.now().add(const Duration(minutes: 15)),
+      // );
     }
   }
 
   void onChangePaymentMethod(PaymentMethod method) {
+    if (method == PaymentMethod.card && isIndianUser) {
+      AlertDialogs.showInfo(
+          "Card payment is not available for Indian registered users");
+      return;
+    }
     _selectedPaymentMethod = method;
     notifyListeners();
   }
@@ -1188,6 +1203,12 @@ class CartProvider extends ChangeNotifier with BaseController {
   }
 
   bool validateInputData() {
+    if (selectedPaymentMethod == PaymentMethod.card && isIndianUser) {
+      AlertDialogs.showInfo(
+          "Card payment is not available for Indian registered users");
+      return false;
+    }
+
     if (selectedAddress == null) {
       AlertDialogs.showInfo("Please pick an address");
       return false;

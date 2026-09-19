@@ -1,15 +1,20 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
+import 'package:customer_core/src/core/utils/country_flag.dart';
+import 'package:customer_core/src/domain/store/models/store_settings_data_model.dart';
 import 'package:dartx/dartx.dart';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import 'package:customer_core/src/application/auth/auth_provider.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
+import 'package:customer_core/src/application/otp/otp_provider.dart';
 import 'package:customer_core/src/application/payment/payment_provider.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/application/user/user_provider.dart';
@@ -18,12 +23,17 @@ import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/core/utils/date_utils.dart';
 import 'package:customer_core/src/core/utils/ui_utils.dart';
+import 'package:customer_core/src/domain/otp/otp_purpose.dart';
+import 'package:customer_core/src/domain/user/models/user.dart';
+import 'package:customer_core/src/domain/user/models/user_login_response.dart';
 import 'package:customer_core/src/presentation/auth/login_screen.dart';
 import 'package:customer_core/src/presentation/widgets/bottom_sheet_drag_handler.dart';
 import 'package:customer_core/src/presentation/widgets/custom_close_icon.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../../application/order/order_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/country_flag.dart';
 import '../../../core/utils/utils.dart';
 
 import '../../widgets/button_progress.dart';
@@ -299,33 +309,6 @@ class _CartScreenState extends State<CartScreen>
     );
   }
 
-  Widget _buildShopClosed() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 0),
-      decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(15.0),
-          border: Border.all(color: Colors.red.shade700)
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: Colors.black.withOpacity(0.3), // Shadow color
-          //     blurRadius: 4, // Softness of the shadow
-          //     spreadRadius: 0.3, // How much the shadow extends
-          //     offset: const Offset(0, 2), // Position of the shadow (x, y)
-          //   ),
-          // ],
-          ),
-      height: 60,
-      width: context.screenWidth * 0.9,
-      child: Center(
-        child: Text(
-          "Sorry, We're closed now",
-          style: TextStyle(color: Colors.red.shade700),
-        ),
-      ),
-    );
-  }
-
   Widget _buildFloatingActionButton(BuildContext context) {
     final cartListener = context.watch<CartProvider>();
     final cartProvider = context.read<CartProvider>();
@@ -334,206 +317,400 @@ class _CartScreenState extends State<CartScreen>
     final paymentListener = context.watch<PaymentProvider>();
     final orderProvider = context.read<OrderProvider>();
     final userListener = context.watch<UserProvider>();
+    final userProvider = context.read<UserProvider>();
+    final authProvider = context.read<AuthProvider>();
+    final storeSettings = shopListener.storeSettings.data;
+    final smsRequired = storeSettings?.smsVerification == "Enabled";
+
+    final isTakeAwayTempEnabled =
+        storeSettings?.deliveryInfo?.takeAway_temp_off != null &&
+            storeSettings?.deliveryInfo?.takeAway_temp_off == 'No';
+    final isHomeDeliveryTempEnabled =
+        storeSettings?.deliveryInfo?.homeDelivery_temp_off != null &&
+            storeSettings?.deliveryInfo?.homeDelivery_temp_off == 'No';
+    final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
+        storeSettings?.deliveryInfo?.homeDelivery != null &&
+        storeSettings?.deliveryInfo?.homeDelivery == '1';
+    final isTakeAwayEnabled = isTakeAwayTempEnabled &&
+        storeSettings?.deliveryInfo?.takeAway != null &&
+        storeSettings?.deliveryInfo?.takeAway == '1';
+    final isShopTempClosed =
+        storeSettings?.deliveryInfo?.shopOpen_temp_off == 'Yes';
+    final isShopClosed =
+        cartListener.cartDetailsModel?.paymentOptions?.shopStatus == 'closed';
+    final isShopClosedInactive =
+        (isShopClosed && !cartListener.isCartEmpty) || isShopTempClosed;
 
     return Visibility(
       visible: !cartListener.isCartEmpty &&
           !(cartListener.cartTransferring ||
               cartListener.deliveryOrTakeAwayChargeCalculating ||
               userListener.isUserAddressListLoading),
-      child: cartListener.cartDetailsModel?.paymentOptions?.shopStatus ==
-                  'closed' &&
-              !cartListener.isCartEmpty
-          ? _buildShopClosed()
-          : Visibility(
-              visible: MediaQuery.of(context).viewInsets.bottom == 0,
-              child: Container(
-                  margin: const EdgeInsets.only(bottom: 0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.kCardBackground2
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(15.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3), // Shadow color
-                        blurRadius: 4, // Softness of the shadow
-                        spreadRadius: 0.3, // How much the shadow extends
-                        offset:
-                            const Offset(0, 2), // Position of the shadow (x, y)
-                      ),
-                    ],
-                  ),
-                  height: 60,
-                  width: context.screenWidth * 0.9,
-                  child: cartListener.tabController.index == 0
-                      ? Row(
-                          children: [
-                            Expanded(
-                                child: _buildTotalAmountWidget(
-                                    "${cartListener.cartDetailsModel?.cartTotal?.cartTotalPriceDisplay}")),
-                            Expanded(
-                              child: InkWell(
-                                onTap: () async {
-                                  final isLogged =
-                                      await cartProvider.checkUserIsLogged();
-                                  if (!isLogged) {
-                                    // context.router.push(LoginScreenRoute());
-                                    final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => LoginScreen(
-                                            showBackButton: true,
-                                          ),
-                                        ));
-                                    if (result == true) {
-                                      await cartProvider.transferCart();
-                                      await context
-                                          .read<UserProvider>()
-                                          .getAddressList()
-                                          .then(
-                                        (_) {
-                                          final addressList =
-                                              Provider.of<UserProvider>(context,
-                                                      listen: false)
-                                                  .userAddressList;
-                                          if (addressList.isNotEmpty) {
-                                            final address = addressList.first;
+      child: Visibility(
+        visible: MediaQuery.of(context).viewInsets.bottom == 0,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.kCardBackground2
+                : Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3), // Shadow color
+                blurRadius: 4, // Softness of the shadow
+                spreadRadius: 0.3, // How much the shadow extends
+                offset: const Offset(0, 2), // Position of the shadow (x, y)
+              ),
+            ],
+          ),
+          height: 60,
+          width: context.screenWidth * 0.9,
+          child: cartListener.tabController.index == 0
+              ? Row(
+                  children: [
+                    Expanded(
+                        child: _buildTotalAmountWidget(
+                            "${cartListener.cartDetailsModel?.cartTotal?.cartTotalPriceDisplay}")),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          if (isShopClosedInactive) {
+                            AlertDialogs.showError(
+                                "Shop is temporarily closed. Please try again later.",
+                                context: context);
+                            return;
+                          }
+                          final isLogged =
+                              await cartProvider.checkUserIsLogged();
+                          if (!isLogged) {
+                            // context.router.push(LoginScreenRoute());
+                            final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      LoginScreen(showBackButton: true),
+                                ));
+                            if (result == true) {
+                              await cartProvider.transferCart();
+                              await context
+                                  .read<UserProvider>()
+                                  .getAddressList()
+                                  .then(
+                                (_) {
+                                  final addressList = Provider.of<UserProvider>(
+                                          context,
+                                          listen: false)
+                                      .userAddressList;
+                                  if (addressList.isNotEmpty) {
+                                    final address = addressList.first;
 
-                                            cartProvider
-                                                .onChangeAddress(address);
-                                            cartProvider.onChangeOrderType(
-                                                OrderType.delivery);
+                                    cartProvider.onChangeAddress(address);
+                                    cartProvider
+                                        .onChangeOrderType(OrderType.delivery);
 
-                                            // cartProvider
-                                            //     .calculateDeliveryCharge();
-                                            cartProvider.jumpToPage(1);
-                                            return;
-                                          }
-                                        },
-                                      ).catchError((e) {
-                                        setState(() {});
-                                      });
-                                    }
+                                    // cartProvider
+                                    //     .calculateDeliveryCharge();
+                                    cartProvider.jumpToPage(1);
                                     return;
                                   }
-                                  cartProvider.jumpToPage(1);
-                                  shopListener.clearSelectedDeliverySlot();
-                                  await context
-                                      .read<UserProvider>()
-                                      .getAddressList()
-                                      .then(
-                                    (_) {
-                                      final addressList =
-                                          Provider.of<UserProvider>(context,
-                                                  listen: false)
-                                              .userAddressList;
-                                      if (addressList.isNotEmpty) {
-                                        final address = addressList.firstWhere(
-                                          (element) => element.dDefault == '1',
-                                          orElse: () => addressList.first,
-                                        );
+                                },
+                              ).catchError((e) {
+                                setState(() {});
+                              });
+                            }
+                            return;
+                          }
+                          cartProvider.jumpToPage(1);
+                          shopListener.clearSelectedDeliverySlot();
+                          await context
+                              .read<UserProvider>()
+                              .getAddressList()
+                              .then(
+                            (_) {
+                              final addressList = Provider.of<UserProvider>(
+                                      context,
+                                      listen: false)
+                                  .userAddressList;
+                              if (addressList.isNotEmpty) {
+                                final address = addressList.firstWhere(
+                                  (element) => element.dDefault == '1',
+                                  orElse: () => addressList.first,
+                                );
 
-                                        cartProvider.onChangeAddress(address);
-                                        cartProvider.onChangeOrderType(
-                                            OrderType.delivery);
-                                        cartProvider.jumpToPage(1);
+                                cartProvider.onChangeAddress(address);
+                                if (!isHomeDeliveryEnabled &&
+                                    isTakeAwayEnabled) {
+                                  cartProvider
+                                      .onChangeOrderType(OrderType.takeaway);
+                                } else {
+                                  cartProvider
+                                      .onChangeOrderType(OrderType.delivery);
+                                }
+                                cartProvider.jumpToPage(1);
+                                return;
+                              }
+                            },
+                          ).catchError((e) {
+                            setState(() {});
+                          });
+                        },
+                        child: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(10.0)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  FluentIcons.cart_24_filled,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                                horizontalSpaceSmall,
+                                Text("Checkout",
+                                    style: context.customTextTheme.text14W700
+                                        .copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface)),
+                              ],
+                            )),
+                      ),
+                    ),
+                    horizontalSpaceSmall,
+                  ],
+                )
+              : cartListener.tabController.index == 1
+                  ? Row(
+                      children: [
+                        Expanded(
+                            child: _buildTotalAmountWidget(
+                                "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
+                        Expanded(
+                          child: InkWell(
+                            onTap: cartProvider.createOrderPending
+                                ? null
+                                : () async {
+                                    // Validate address / delivery charges first
+                                    if (cartListener.selectedOrderType ==
+                                        OrderType.delivery) {
+                                      final validated =
+                                          await cartProvider.validateAddress();
+                                      if (!validated) return;
+                                    } else {
+                                      if (cartListener.selectedPickUpTime ==
+                                          null) {
+                                        AlertDialogs.showError(
+                                            "Please select pickup time",
+                                            context: context);
                                         return;
                                       }
-                                    },
-                                  ).catchError((e) {
-                                    setState(() {});
-                                  });
-                                },
-                                child: Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          FluentIcons.cart_24_filled,
+                                      // ensure takeaway calculations present
+                                      final ok =
+                                          cartProvider.validateInputData();
+                                      if (!ok) return;
+                                    }
+
+                                    if (cartListener.selectedPaymentMethod ==
+                                            PaymentMethod.card &&
+                                        cartListener.totalAmount <
+                                            shopListener
+                                                .onlinePaymentMinAmount) {
+                                      AlertDialogs.showError(
+                                          "Minimum amount for the card payment is ￡${shopListener.onlinePaymentMinAmount}, Please choose another payment option",
+                                          context: context);
+                                      return;
+                                    }
+
+                                    // Skip mobile verification for card payments
+                                    if (cartListener.selectedPaymentMethod !=
+                                        PaymentMethod.card) {
+                                      final user = userProvider.userData?.user;
+
+                                      // SMS verification disabled but no phone number
+                                      if (!smsRequired &&
+                                          (user?.userMobile == '0' ||
+                                              user!.userMobile!
+                                                  .trim()
+                                                  .isEmpty)) {
+                                        final phoneAdded =
+                                            await mobileNumberDialog(context);
+
+                                        if (!phoneAdded) return;
+
+                                        cartProvider.jumpToPage(2);
+                                        return;
+                                      }
+
+                                      // SMS verification enabled
+                                      if (smsRequired &&
+                                          user?.isMobileVerified != "Yes") {
+                                        final verified =
+                                            await mobileVerificationDialog(
+                                                context);
+
+                                        if (!verified) return;
+
+                                        cartProvider.jumpToPage(2);
+                                        return;
+                                      }
+                                    }
+
+                                    cartProvider.jumpToPage(2);
+                                  },
+                            child: Container(
+                                height: 40,
+                                decoration: BoxDecoration(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      FluentIcons.check_24_regular,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                    horizontalSpaceSmall,
+                                    Text("Confirm",
+                                        style: context
+                                            .customTextTheme.text14W700
+                                            .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface)),
+                                  ],
+                                )),
+                          ),
+                        ),
+                        horizontalSpaceSmall,
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                            child: _buildTotalAmountWidget(
+                                "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
+                        Expanded(
+                          child: InkWell(
+                            onTap: cartListener.createOrderPending
+                                ? null
+                                : () async {
+                                    // Validate address / delivery charges before payment
+                                    if (cartProvider.selectedOrderType ==
+                                        OrderType.delivery) {
+                                      final validated =
+                                          await cartProvider.validateAddress();
+                                      if (!validated) return;
+                                    } else {
+                                      final ok =
+                                          cartProvider.validateInputData();
+                                      if (!ok) return;
+                                    }
+
+                                    if (cartProvider.selectedPaymentMethod ==
+                                        PaymentMethod.card) {
+                                      paymentProvider.createPaymentIntent(
+                                          deliveryType:
+                                              cartProvider.selectedOrderType ==
+                                                      OrderType.delivery
+                                                  ? "door_delivery"
+                                                  : "store_pickup",
+                                          postCode:
+                                              cartProvider.selectedOrderType ==
+                                                      OrderType.delivery
+                                                  ? cartProvider.selectedAddress
+                                                          ?.postcode ??
+                                                      ""
+                                                  : "",
+                                          pickupTime: cartProvider
+                                                      .selectedOrderType ==
+                                                  OrderType.takeaway
+                                              ? cartProvider.selectedPickUpTime
+                                                      ?.toIso8601String() ??
+                                                  ''
+                                              : '',
+                                          cartProvider.calculatedDiscount,
+                                          cartProvider.calculatedDeliveryFee,
+                                          onPaymentSuccess: (transactionId) {
+                                        cartProvider
+                                            .createOrder(
+                                                tID: transactionId,
+                                                deliveryDate: shopListener
+                                                    .formattedSelectedDate,
+                                                deliverySlot:
+                                                    "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}")
+                                            .then((created) {
+                                          if (created) {
+                                            Future.delayed(
+                                                const Duration(seconds: 2), () {
+                                              cartProvider.resetValues();
+
+                                              context.replaceRoute(
+                                                  const SuccessScreenRoute());
+                                            });
+                                          }
+                                        });
+                                      });
+                                      return;
+                                    }
+
+                                    cartProvider
+                                        .createOrder(
+                                            deliveryDate: shopListener
+                                                .formattedSelectedDateForPayload,
+                                            deliverySlot:
+                                                "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}")
+                                        .then((created) {
+                                      if (created) {
+                                        context.replaceRoute(
+                                            const SuccessScreenRoute());
+
+                                        cartProvider.resetValues();
+                                        // orderProvider.fetchAllOrders();
+                                        cartProvider
+                                            .clearSelectedAddressSecondary();
+                                        cartProvider.clearSelectedAddress();
+                                      }
+                                    });
+                                    await orderProvider.fetchAllOrders();
+                                  },
+                            child: Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              child: cartListener.createOrderPending
+                                  ? Center(
+                                      child: SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
                                           color: Theme.of(context)
                                               .colorScheme
                                               .onSurface,
                                         ),
-                                        horizontalSpaceSmall,
-                                        Text("Checkout",
-                                            style: context
-                                                .customTextTheme.text14W700
-                                                .copyWith(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurface)),
-                                      ],
-                                    )),
-                              ),
-                            ),
-                            horizontalSpaceSmall,
-                          ],
-                        )
-                      : cartListener.tabController.index == 1
-                          ? Row(
-                              children: [
-                                Expanded(
-                                    child: _buildTotalAmountWidget(
-                                        "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: cartProvider.createOrderPending
-                                        ? null
-                                        : () async {
-                                            // Validate address / delivery charges first
-                                            if (cartListener
-                                                    .selectedOrderType ==
-                                                OrderType.delivery) {
-                                              final validated =
-                                                  await cartProvider
-                                                      .validateAddress();
-                                              if (!validated) return;
-                                            } else {
-                                              if (cartListener
-                                                      .selectedPickUpTime ==
-                                                  null) {
-                                                AlertDialogs.showError(
-                                                    "Please select pickup time",
-                                                    context: context);
-                                                return;
-                                              }
-                                              // ensure takeaway calculations present
-                                              final ok = cartProvider
-                                                  .validateInputData();
-                                              if (!ok) return;
-                                            }
-
-                                            if (cartListener
-                                                        .selectedPaymentMethod ==
-                                                    PaymentMethod.card &&
-                                                cartListener.totalAmount <
-                                                    shopListener
-                                                        .onlinePaymentMinAmount) {
-                                              AlertDialogs.showError(
-                                                  "Minimum amount for the card payment is ￡${shopListener.onlinePaymentMinAmount}, Please choose another payment option",
-                                                  context: context);
-                                              return;
-                                            }
-
-                                            cartProvider.jumpToPage(2);
-                                          },
-                                    child: Container(
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                            borderRadius:
-                                                BorderRadius.circular(10.0)),
-                                        child: Row(
+                                      ),
+                                    )
+                                  : paymentListener.creatingPaymentIntent
+                                      ? Center(
+                                          child: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
+                                          ),
+                                        )
+                                      : Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
@@ -544,7 +721,7 @@ class _CartScreenState extends State<CartScreen>
                                                   .onSurface,
                                             ),
                                             horizontalSpaceSmall,
-                                            Text("Confirm",
+                                            Text("Pay",
                                                 style: context
                                                     .customTextTheme.text14W700
                                                     .copyWith(
@@ -552,179 +729,15 @@ class _CartScreenState extends State<CartScreen>
                                                             .colorScheme
                                                             .onSurface)),
                                           ],
-                                        )),
-                                  ),
-                                ),
-                                horizontalSpaceSmall,
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Expanded(
-                                    child: _buildTotalAmountWidget(
-                                        "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}")),
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: cartListener.createOrderPending
-                                        ? null
-                                        : () async {
-                                            // Validate address / delivery charges before payment
-                                            if (cartProvider
-                                                    .selectedOrderType ==
-                                                OrderType.delivery) {
-                                              final validated =
-                                                  await cartProvider
-                                                      .validateAddress();
-                                              if (!validated) return;
-                                            } else {
-                                              final ok = cartProvider
-                                                  .validateInputData();
-                                              if (!ok) return;
-                                            }
-
-                                            if (cartProvider
-                                                    .selectedPaymentMethod ==
-                                                PaymentMethod.card) {
-                                              paymentProvider.createPaymentIntent(
-                                                  deliveryType:
-                                                      cartProvider.selectedOrderType ==
-                                                              OrderType.delivery
-                                                          ? "door_delivery"
-                                                          : "store_pickup",
-                                                  postCode: cartProvider
-                                                              .selectedOrderType ==
-                                                          OrderType.delivery
-                                                      ? cartProvider
-                                                              .selectedAddress
-                                                              ?.postcode ??
-                                                          ""
-                                                      : "",
-                                                  pickupTime: cartProvider
-                                                              .selectedOrderType ==
-                                                          OrderType.takeaway
-                                                      ? cartProvider
-                                                              .selectedPickUpTime
-                                                              ?.toIso8601String() ??
-                                                          ''
-                                                      : '',
-                                                  cartProvider
-                                                      .calculatedDiscount,
-                                                  cartProvider.calculatedDeliveryFee,
-                                                  onPaymentSuccess:
-                                                      (transactionId) {
-                                                cartProvider
-                                                    .createOrder(
-                                                        tID: transactionId,
-                                                        deliveryDate: shopListener
-                                                            .formattedSelectedDate,
-                                                        deliverySlot:
-                                                            "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}")
-                                                    .then((created) {
-                                                  if (created) {
-                                                    Future.delayed(
-                                                        const Duration(
-                                                            seconds: 2), () {
-                                                      cartProvider
-                                                          .resetValues();
-
-                                                      context.replaceRoute(
-                                                          const SuccessScreenRoute());
-                                                    });
-                                                  }
-                                                });
-                                              });
-                                              return;
-                                            }
-
-                                            cartProvider
-                                                .createOrder(
-                                                    deliveryDate: shopListener
-                                                        .formattedSelectedDateForPayload,
-                                                    deliverySlot:
-                                                        "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}")
-                                                .then((created) {
-                                              if (created) {
-                                                context.replaceRoute(
-                                                    const SuccessScreenRoute());
-
-                                                cartProvider.resetValues();
-                                                // orderProvider.fetchAllOrders();
-                                                cartProvider
-                                                    .clearSelectedAddressSecondary();
-                                                cartProvider
-                                                    .clearSelectedAddress();
-                                              }
-                                            });
-                                            await orderProvider
-                                                .fetchAllOrders();
-                                          },
-                                    child: Container(
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0)),
-                                      child: cartListener.createOrderPending
-                                          ? Center(
-                                              child: SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                                ),
-                                              ),
-                                            )
-                                          : paymentListener
-                                                  .creatingPaymentIntent
-                                              ? Center(
-                                                  child: SizedBox(
-                                                    height: 20,
-                                                    width: 20,
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface,
-                                                    ),
-                                                  ),
-                                                )
-                                              : Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                      FluentIcons
-                                                          .check_24_regular,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface,
-                                                    ),
-                                                    horizontalSpaceSmall,
-                                                    Text("Pay",
-                                                        style: context
-                                                            .customTextTheme
-                                                            .text14W700
-                                                            .copyWith(
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .colorScheme
-                                                                    .onSurface)),
-                                                  ],
-                                                ),
-                                    ),
-                                  ),
-                                ),
-                                horizontalSpaceSmall,
-                              ],
-                            )),
-            ),
+                                        ),
+                            ),
+                          ),
+                        ),
+                        horizontalSpaceSmall,
+                      ],
+                    ),
+        ),
+      ),
     );
   }
 
@@ -945,7 +958,20 @@ class _CartScreenState extends State<CartScreen>
         builder: (context) {
           final userListener = context.watch<UserProvider>();
           final cartListener = context.watch<CartProvider>();
+          final storeSettings = context.read<ShopProvider>().storeSettings.data;
 
+          final isTakeAwayTempEnabled =
+              storeSettings?.deliveryInfo?.takeAway_temp_off != null &&
+                  storeSettings?.deliveryInfo?.takeAway_temp_off == 'No';
+          final isHomeDeliveryTempEnabled =
+              storeSettings?.deliveryInfo?.homeDelivery_temp_off != null &&
+                  storeSettings?.deliveryInfo?.homeDelivery_temp_off == 'No';
+          final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
+              storeSettings?.deliveryInfo?.homeDelivery != null &&
+              storeSettings?.deliveryInfo?.homeDelivery == '1';
+          final isTakeAwayEnabled = isTakeAwayTempEnabled &&
+              storeSettings?.deliveryInfo?.takeAway != null &&
+              storeSettings?.deliveryInfo?.takeAway == '1';
           return Theme(
             data: quickSandTextTheme(context),
             child: Column(
@@ -1059,6 +1085,18 @@ class _CartScreenState extends State<CartScreen>
                                               context
                                                   .read<CartProvider>()
                                                   .onChangeAddress(address);
+                                              if (!isHomeDeliveryEnabled &&
+                                                  isTakeAwayEnabled) {
+                                                context
+                                                    .read<CartProvider>()
+                                                    .onChangeOrderType(
+                                                        OrderType.takeaway);
+                                              } else {
+                                                context
+                                                    .read<CartProvider>()
+                                                    .onChangeOrderType(
+                                                        OrderType.delivery);
+                                              }
                                             },
                                             // title: Text(
                                             //   address.addressTitle ?? "",
@@ -1471,6 +1509,767 @@ class _CartScreenState extends State<CartScreen>
         ),
       );
     });
+  }
+
+  /// Shows a mobile verification dialog
+  Future<bool> mobileVerificationDialog(BuildContext context) async {
+    final otpProvider = context.read<OtpProvider>();
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return const _MobileVerificationDialogContent();
+      },
+    );
+
+    // Clean up OTP resources regardless of how dialog was dismissed
+    otpProvider.stopTimer();
+    otpProvider.clear();
+    return result ?? false;
+  }
+}
+
+Future<bool> mobileNumberDialog(BuildContext context) async {
+  final authProvider = context.read<AuthProvider>();
+  final userProvider = context.read<UserProvider>();
+  final formKey = GlobalKey<FormState>();
+  bool isLoading = false;
+  final shopProvider = context.read<ShopProvider>();
+  String countryCode =
+      shopProvider.selectedCountry?.code ?? AppConfig.instance.country.dialCode;
+  authProvider.registerUserPhoneController.clear();
+
+  return await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          return StatefulBuilder(
+            builder: (context, setDialogState) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                title: Column(
+                  children: [
+                    verticalSpaceSmall,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.phone_android_rounded,
+                            color: Theme.of(context).colorScheme.primary),
+                        horizontalSpaceSmall,
+                        Text(
+                          "Add Mobile Number",
+                          style: context.customTextTheme.text18W600,
+                        ),
+                      ],
+                    ),
+                    verticalSpaceSmall,
+                    Text(
+                      "A mobile number is required to place your order.",
+                      style: context.customTextTheme.text14W500.copyWith(
+                          // color: AppColors.kGray3,
+                          ),
+                    ),
+                  ],
+                ),
+                content: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     border: Border.all(color: AppColors.kGray3),
+                      //     borderRadius: BorderRadius.circular(10),
+                      //   ),
+                      //   child: Row(
+                      //     children: [
+                      // Container(
+                      //   padding:
+                      //       const EdgeInsets.symmetric(horizontal: 12),
+                      //   decoration: BoxDecoration(
+                      //     border: Border(
+                      //       right: BorderSide(color: AppColors.kGray3),
+                      //     ),
+                      //   ),
+                      //   child: DropdownButtonHideUnderline(
+                      //     child: DropdownButton<String>(
+                      //       value: shopProvider.selectedCountry?.code ??
+                      //           AppConfig.instance.country.dialCode,
+                      //       isDense: true,
+                      //       icon: const Icon(Icons.arrow_drop_down),
+                      //       style: context.customTextTheme.text14W500,
+                      //       items:
+                      //           shopProvider.smsCountries.map((country) {
+                      //         return DropdownMenuItem(
+                      //           value: country.code,
+                      //           child: Row(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Text(
+                      //                 countryCodeToEmoji(
+                      //                     country.iso ?? ""),
+                      //                 style:
+                      //                     const TextStyle(fontSize: 16),
+                      //               ),
+                      //               const SizedBox(width: 6),
+                      //               Text(
+                      //                 country.code ?? "",
+                      //                 style:
+                      //                     const TextStyle(fontSize: 14),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       }).toList(),
+                      //       onChanged: (value) {
+                      //         if (value != null) {
+                      //           final country = shopProvider.smsCountries
+                      //               .firstWhere((c) => c.code == value);
+                      //           shopProvider
+                      //               .updateSelectedCountry(country);
+                      //         }
+                      //       },
+                      //     ),
+                      //   ),
+                      // ),
+                      // Expanded(
+                      //   child: TextFormField(
+                      //     controller:
+                      //         authProvider.registerUserPhoneController,
+                      //     keyboardType: TextInputType.phone,
+                      //     decoration: InputDecoration(
+                      //       labelText: 'Mobile Number',
+                      //       hintText: 'Enter mobile number',
+                      //       hintStyle:
+                      //           const TextStyle(color: AppColors.kGray),
+                      //       prefixIcon: const Icon(Icons.phone_outlined),
+                      //       border: OutlineInputBorder(
+                      //           borderRadius: BorderRadius.circular(10),
+                      //           borderSide: BorderSide.none),
+                      //       enabledBorder: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(10),
+                      //         // borderSide:
+                      //         //     BorderSide(color: Colors.grey.shade300),
+                      //       ),
+                      //       focusedBorder: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(10),
+                      //         // borderSide: const BorderSide(
+                      //         //   color: Colors.grey,
+                      //         // ),
+                      //       ),
+                      //       contentPadding: const EdgeInsets.symmetric(
+                      //         horizontal: 16,
+                      //         vertical: 16,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      TextFormField(
+                        controller: authProvider.registerUserPhoneController,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.done,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(11),
+                        ],
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: InputDecoration(
+                          // hintStyle: TextStyle(color: Colors.grey),
+                          labelStyle: const TextStyle(color: Colors.grey),
+                          labelText: 'Mobile Number',
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderSide: BorderSide(color: AppColors.kGray3),
+                          ),
+                          enabledBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderSide: BorderSide(color: AppColors.kGray3),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 1.5,
+                            ),
+                          ),
+                          errorBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderSide:
+                                BorderSide(color: AppColors.kRed, width: 1.2),
+                          ),
+                          focusedErrorBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderSide:
+                                BorderSide(color: AppColors.kRed, width: 1.5),
+                          ),
+                          prefix: DropdownButtonHideUnderline(
+                            child: DropdownButton<SmsAvailableCountriesData>(
+                              value: shopProvider.selectedCountry,
+                              isDense: true,
+                              dropdownColor: Colors.white,
+                              icon: const Icon(Icons.arrow_drop_down),
+                              underline: const SizedBox.shrink(),
+                              selectedItemBuilder: (context) {
+                                return shopProvider.smsCountries.map((country) {
+                                  return Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        countryCodeToEmoji(country.iso ?? ""),
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        country.code ?? "",
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  );
+                                }).toList();
+                              },
+                              items: shopProvider.smsCountries.map((country) {
+                                return DropdownMenuItem(
+                                  value: country,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        countryCodeToEmoji(country.iso ?? ""),
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        country.code ?? "",
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  shopProvider.updateSelectedCountry(value);
+                                  setDialogState(() {
+                                    countryCode = value.code ??
+                                        AppConfig.instance.country.dialCode;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          final phone = value?.trim() ?? '';
+                          if (phone.isEmpty) {
+                            return "Please enter your mobile number";
+                          }
+                          if (countryCode == "+91") {
+                            if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
+                              return "Enter a valid Indian mobile number";
+                            }
+                          } else if (countryCode == "+44") {
+                            if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
+                              return "Enter a valid UK mobile number";
+                            }
+                          }
+                          return '';
+                        },
+                      ),
+                      //   ],
+                      // ),
+                      // ),
+                      // verticalSpaceSmall,
+                      // Text(
+                      //   "Example: 7700000000",
+                      //   style: context.customTextTheme.text12W500
+                      //       .copyWith(color: AppColors.kGray3),
+                      //   textAlign: TextAlign.start,
+                      // ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: isLoading
+                        ? null
+                        : () => Navigator.pop(dialogContext, false),
+                    child: Text(
+                      "Cancel",
+                      style: context.customTextTheme.text14W600,
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                    ),
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            if (!formKey.currentState!.validate()) {
+                              return;
+                            }
+                            setDialogState(() => isLoading = true);
+
+                            final success =
+                                await userProvider.updateBasicProfile(
+                              firstName:
+                                  userProvider.userData?.user.userFirstName ??
+                                      "",
+                              lastName:
+                                  userProvider.userData?.user.userLastName ??
+                                      "",
+                              mobile: authProvider
+                                  .registerUserPhoneController.text
+                                  .trim(),
+                            );
+
+                            if (success && context.mounted) {
+                              // Update local user data with the new mobile number
+                              if (userProvider.userData != null) {
+                                final phone = authProvider
+                                    .registerUserPhoneController.text
+                                    .trim();
+                                final countryCode =
+                                    userProvider.userData!.user.countryCode ??
+                                        AppConfig.instance.country.dialCode;
+                                final updatedUserData =
+                                    userProvider.userData!.copyWith(
+                                  user: userProvider.userData!.user.copyWith(
+                                    userMobile: "$countryCode$phone",
+                                    userMobileActual: phone,
+                                  ),
+                                );
+                                await userProvider.sharedPrefsRepository
+                                    .saveUserData(updatedUserData);
+                                await userProvider.getUserData();
+                              }
+                              Navigator.pop(context, true);
+                            }
+                          },
+                    // child: isLoading
+                    //     ? const SizedBox(
+                    //         height: 16,
+                    //         width: 16,
+                    //         child: CircularProgressIndicator(
+                    //           strokeWidth: 2,
+                    //           color: AppColors.kWhite,
+                    //         ),
+                    //       )
+                    // :
+                    child: Text(
+                      "Save",
+                      style: context.customTextTheme.text14W600
+                          .copyWith(color: AppColors.kWhite),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ) ??
+      false;
+}
+
+/// Internal widget for the mobile verification dialog content.
+/// Handles phone number input and OTP verification steps.
+class _MobileVerificationDialogContent extends StatefulWidget {
+  const _MobileVerificationDialogContent();
+
+  @override
+  State<_MobileVerificationDialogContent> createState() =>
+      _MobileVerificationDialogContentState();
+}
+
+class _MobileVerificationDialogContentState
+    extends State<_MobileVerificationDialogContent> {
+  final phoneController = TextEditingController();
+  final otpController = TextEditingController();
+  final _otpFormKey = GlobalKey<FormState>();
+  bool otpSent = false;
+  String countryCode = '';
+
+  @override
+  void initState() {
+    super.initState();
+    final userProvider = context.read<UserProvider>();
+    final shopProvider = context.read<ShopProvider>();
+
+    final user = userProvider.userData?.user;
+    phoneController.text = user?.userMobileActual ?? user?.userMobile ?? '';
+
+    // Use the country code from the login response if available, or infer from user profile / selected country
+    final rawCountryCode = user?.countryCode?.trim() ?? '';
+    final formattedCode = user?.formattedCountryCode.trim() ?? '';
+    final mobile = (user?.userMobileActual?.trim().isNotEmpty == true
+            ? user!.userMobileActual!
+            : user?.userMobile?.trim() ?? '')
+        .trim();
+
+    SmsAvailableCountriesData? matchingCountry;
+
+    // 1. Try matching using countryCode or formattedCountryCode
+    final targetCode =
+        rawCountryCode.isNotEmpty ? rawCountryCode : formattedCode;
+    if (targetCode.isNotEmpty) {
+      final cleanTarget = targetCode.replaceAll('+', '').toLowerCase();
+      matchingCountry = shopProvider.smsCountries
+          .cast<SmsAvailableCountriesData?>()
+          .firstWhere(
+        (c) {
+          if (c == null) return false;
+          final cCode = (c.code ?? '').replaceAll('+', '').toLowerCase().trim();
+          final cIso = (c.iso ?? '').toLowerCase().trim();
+          return cCode == cleanTarget || cIso == cleanTarget;
+        },
+        orElse: () => null,
+      );
+    }
+
+    // 2. If no match yet, try matching against mobile number prefix
+    if (matchingCountry == null && mobile.isNotEmpty) {
+      final cleanMobile = mobile.replaceAll('+', '').trim();
+      matchingCountry = shopProvider.smsCountries
+          .cast<SmsAvailableCountriesData?>()
+          .firstWhere(
+        (c) {
+          if (c == null) return false;
+          final cCode = (c.code ?? '').replaceAll('+', '').toLowerCase().trim();
+          return cCode.isNotEmpty && cleanMobile.startsWith(cCode);
+        },
+        orElse: () => null,
+      );
+    }
+
+    if (matchingCountry != null) {
+      shopProvider.updateSelectedCountry(matchingCountry);
+      countryCode = matchingCountry.code ?? AppConfig.instance.country.dialCode;
+    } else {
+      countryCode = shopProvider.selectedCountry?.code ??
+          AppConfig.instance.country.dialCode;
+    }
+  }
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    otpController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final otpProvider = context.read<OtpProvider>();
+    final userProvider = context.read<UserProvider>();
+    final otpListener = context.watch<OtpProvider>();
+    final authProvider = context.read<AuthProvider>();
+    final shopProvider = context.watch<ShopProvider>();
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      title: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              verticalSpaceSmall,
+              Icon(Icons.phone_android_rounded,
+                  color: Theme.of(context).colorScheme.primary),
+              horizontalSpaceSmall,
+              Text(
+                "Mobile Verification",
+                style: context.customTextTheme.text18W600,
+              ),
+            ],
+          ),
+          if (!otpSent) ...[
+            verticalSpaceTiny,
+            Text(
+              "Enter your mobile number to verify",
+              textAlign: TextAlign.center,
+              style: context.customTextTheme.text14W500,
+            ),
+          ],
+        ],
+      ),
+      content: Form(
+        key: _otpFormKey,
+        child: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!otpSent)
+                  TextFormField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(11),
+                    ],
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: InputDecoration(
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      labelText: 'Mobile Number',
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderSide: BorderSide(color: AppColors.kGray3),
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderSide: BorderSide(color: AppColors.kGray3),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 1.5,
+                        ),
+                      ),
+                      errorBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            BorderSide(color: AppColors.kRed, width: 1.2),
+                      ),
+                      focusedErrorBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderSide:
+                            BorderSide(color: AppColors.kRed, width: 1.5),
+                      ),
+                      prefix: DropdownButtonHideUnderline(
+                        child: DropdownButton<SmsAvailableCountriesData>(
+                          value: shopProvider.selectedCountry,
+                          isDense: true,
+                          dropdownColor: Colors.white,
+                          icon: const Icon(Icons.arrow_drop_down),
+                          underline: const SizedBox.shrink(),
+                          selectedItemBuilder: (context) {
+                            return shopProvider.smsCountries.map((country) {
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    countryCodeToEmoji(country.iso ?? ""),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    country.code ?? "",
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              );
+                            }).toList();
+                          },
+                          items: shopProvider.smsCountries.map((country) {
+                            return DropdownMenuItem(
+                              value: country,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    countryCodeToEmoji(country.iso ?? ""),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    country.code ?? "",
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              shopProvider.updateSelectedCountry(value);
+                              setState(() {
+                                countryCode = value.code ??
+                                    AppConfig.instance.country.dialCode;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      final phone = value?.trim() ?? '';
+                      if (phone.isEmpty) {
+                        return "Please enter your mobile number";
+                      }
+                      if (countryCode == "+91") {
+                        if (!RegExp(r'^[6-9]\d{9}$').hasMatch(phone)) {
+                          return "Enter a valid Indian mobile number";
+                        }
+                      } else if (countryCode == "+44") {
+                        if (!RegExp(r'^\d{10,11}$').hasMatch(phone)) {
+                          return "Enter a valid UK mobile number";
+                        }
+                      }
+                      return '';
+                    },
+                  )
+                else ...[
+                  Text(
+                    "Enter the OTP sent to $countryCode ${phoneController.text}",
+                    textAlign: TextAlign.center,
+                    style: context.customTextTheme.text14W500,
+                  ),
+                  verticalSpaceRegular,
+                  PinCodeTextField(
+                    length: 6,
+                    obscureText: false,
+                    animationType: AnimationType.scale,
+                    textStyle: TextStyle(color: AppColors.kBlack2),
+                    pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.box,
+                      borderRadius: BorderRadius.circular(10.0),
+                      activeColor: AppColors.kBlack2,
+                      inactiveColor: AppColors.kBlack2,
+                      inactiveFillColor: AppColors.kOffWhite3,
+                      activeFillColor: AppColors.kOffWhite3,
+                      selectedColor: AppColors.kBlack2,
+                      selectedFillColor: AppColors.kOffWhite3,
+                      fieldHeight: MediaQuery.of(context).size.height / 20,
+                      fieldWidth: MediaQuery.of(context).size.width / 11,
+                      fieldOuterPadding:
+                          const EdgeInsets.symmetric(horizontal: 2),
+                    ),
+                    controller: otpController,
+                    showCursor: false,
+                    animationDuration: const Duration(milliseconds: 300),
+                    enableActiveFill: true,
+                    keyboardType: TextInputType.phone,
+                    onCompleted: (v) {},
+                    onChanged: (value) {},
+                    appContext: context,
+                    autoDisposeControllers: false,
+                  ),
+                  if (otpListener.canResend)
+                    TextButton(
+                      onPressed: otpListener.loading
+                          ? null
+                          : () async {
+                              await otpProvider.sendPhoneOtp(
+                                phone: phoneController.text.trim(),
+                                countryCode: countryCode,
+                                purpose: OtpPurpose.phoneVerification,
+                              );
+                            },
+                      child: const Text("Resend OTP"),
+                    )
+                  else
+                    Text(
+                      "Resend OTP in ${otpListener.seconds} seconds",
+                      style: context.customTextTheme.text12W500
+                          .copyWith(color: AppColors.kGray3),
+                    ),
+                ],
+                verticalSpaceSmall,
+                if (otpListener.loading)
+                  const Center(child: CircularProgressIndicator()),
+              ],
+            )),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+          child: Text(
+            "Cancel",
+            style: context.customTextTheme.text14W600,
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          onPressed: otpListener.loading
+              ? null
+              : () async {
+                  if (!otpSent) {
+                    // Step 1: Send OTP
+                    // if (!_otpFormKey.currentState!.validate()) {
+                    //   return;
+                    // }
+                    final rawPhone = phoneController.text.trim();
+                    final fullPhone = "$countryCode$rawPhone";
+                    final sent = await otpProvider.sendPhoneOtp(
+                      phone: rawPhone,
+                      countryCode: countryCode,
+                      purpose: OtpPurpose.phoneVerification,
+                    );
+                    if (sent && mounted) {
+                      setState(() => otpSent = true);
+                    }
+                  } else {
+                    // Step 2: Verify OTP
+                    final otp = otpController.text.trim();
+                    if (otp.isEmpty) {
+                      AlertDialogs.showError("Please enter the OTP",
+                          context: context);
+                      return;
+                    }
+                    final rawPhone = phoneController.text.trim();
+                    final fullPhone = "$countryCode$rawPhone";
+                    final isValid = await otpProvider.verifyPhoneOtp(
+                        phone: rawPhone,
+                        countryCode: countryCode,
+                        purpose: OtpPurpose.phoneVerification,
+                        otp: otp,
+                        userID: userProvider.userData?.user.userID ?? '',
+                        userType: 'Registered');
+                    if (isValid) {
+                      if (userProvider.userData != null) {
+                        final phone = phoneController.text.trim();
+                        final formattedCountryCode = countryCode.startsWith('+')
+                            ? countryCode
+                            : '+$countryCode';
+                        final updatedUserData = userProvider.userData!.copyWith(
+                          user: userProvider.userData!.user.copyWith(
+                            isMobileVerified: "Yes",
+                            countryCode: formattedCountryCode,
+                            userMobileActual: phone,
+                            userMobile: "$formattedCountryCode$phone",
+                          ),
+                        );
+                        await userProvider.sharedPrefsRepository
+                            .saveUserData(updatedUserData);
+                        await userProvider.getUserData();
+                      }
+                      if (context.mounted) {
+                        Navigator.of(context).pop(true);
+                      }
+                    }
+                  }
+                },
+          child: Text(
+            otpSent ? "Verify" : "Send OTP",
+            style: context.customTextTheme.text14W600
+                .copyWith(color: AppColors.kWhite),
+          ),
+        ),
+      ],
+    );
   }
 }
 

@@ -239,6 +239,19 @@ class CalculateTakeAwayDetails {
   }
 
   bool get isTaxAppliedBool => isTaxApplied == 'Yes';
+  bool get hasTax {
+  final tax = taxTotalAmount;
+
+  if (tax == null || tax.trim().isEmpty) {
+    return false;
+  }
+
+  final amount = double.tryParse(
+    tax.replaceAll(RegExp(r'[^0-9.]'), ''),
+  );
+
+  return amount != null && amount > 0;
+}
 }
 
 class GeneralData {

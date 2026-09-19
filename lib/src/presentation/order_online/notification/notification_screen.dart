@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:customer_core/src/application/notification/notification_provider.dart';
 import 'package:customer_core/src/application/theme/theme_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
@@ -17,22 +18,25 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  List<NotificationModel> notifications = [];
+@override
+void initState() {
+  super.initState();
 
-  @override
-  void initState() {
-    super.initState();
-    NotificationSharedPrefs.getNotification().then((value) {
-      setState(() {
-        notifications = value;
-      });
-    });
-  }
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    context.read<NotificationProvider>().loadNotifications();
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
     final themeListener = context.watch<ThemeProvider>();
+     final notificationProvider =
+      context.watch<NotificationProvider>();
+
+  final notifications = notificationProvider.notifications;
     return Scaffold(
+      backgroundColor: Theme.of(context).cardColor,
       appBar: AppBar(
         leadingWidth: 70,
         title: Text(
@@ -40,6 +44,22 @@ class _NotificationScreenState extends State<NotificationScreen> {
           style: context.customTextTheme.text20W600,
         ),
         centerTitle: true,
+        actions: [
+          notifications.isEmpty
+              ? SizedBox.shrink()
+              : TextButton(
+                  onPressed: () {
+                     context.read<NotificationProvider>().clearNotifications();
+                  },
+                  child: Text(
+                    'Clear All',
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                )
+        ],
       ),
       body: notifications.isEmpty
           ? const Center(child: Text("No notifications found"))
@@ -71,38 +91,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       : Colors.grey),
                             )
                           : const SizedBox.shrink(),
+                      Divider(
+                        color: Colors.grey.shade300,
+                      )
                     ],
                   ),
                 );
               },
-            ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: notifications.isEmpty
-          ? null
-          : FloatingActionButton.extended(
-              //
-              elevation: 6,
-              extendedPadding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              onPressed: () {
-                NotificationSharedPrefs.clearNotification();
-                setState(() {
-                  notifications = [];
-                });
-              },
-              backgroundColor: Colors.red.shade100,
-              icon: Icon(FluentIcons.delete_20_regular,
-                  color: Colors.red.shade700),
-              label: Text(
-                'Clear All',
-                style: TextStyle(
-                  color: Colors.red.shade700,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ),
     );
   }

@@ -36,8 +36,10 @@ class Endpoints {
   static const String kActiveOrders = 'shop/user/activeorders/';
   static const String kVerifyAlreadyRegistered =
       'shop/user/verifyalreadyregistered';
+  static const String kLinkPartialUser = 'shop/user/linkpartialuser';
   static const String kUserConsent = 'shop/user/getconsents/';
   static const String kSaveUserConsent = 'shop/user/saveconsent';
+  static const String kUpdateBasicProfile = 'shop/user/updatebasicprofile';
 
   // Cart Endpoints
   static const String kListCartItems = 'shop/user/carts';
@@ -145,4 +147,11 @@ class Endpoints {
 
   //search
   static const String kSearch = 'shop/seller/search';
+
+  //OTP services
+
+  static const String kSendPhoneOTP = 'shop/otpservices/sendotptophone';
+  static const String kVerifyPhoneOTP = 'shop/otpservices/verifyotptophone';
+  static const String kSendEmailOTP = 'shop/otpservices/sendotptoemail';
+  static const String kVerifyEmailOTP = 'shop/otpservices/verifyotptoemail';
 }

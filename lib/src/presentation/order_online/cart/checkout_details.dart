@@ -46,14 +46,23 @@ class CheckoutDetailsScreen extends StatelessWidget {
         cartListener.deliveryDetails?.amountFormatted?.deliveryDiscount;
     final takeawayDiscount =
         cartListener.takeAwayDetails?.amountFormatted?.takeAwayDiscount;
+    final taxDetails = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.taxDetails
+        : cartListener.takeAwayDetails?.taxDetails;
+    final hasTaxAmount = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.hasTax
+        : cartListener.takeAwayDetails?.hasTax;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15.0),
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.only(bottom: context.screenHeight * 0.1),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).padding.bottom + 120,
+            ),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               verticalSpaceRegular,
@@ -543,7 +552,8 @@ class CheckoutDetailsScreen extends StatelessWidget {
                       userListener.userData?.user.userMobile?.isEmpty == true
                   ? const SizedBox.shrink()
                   : Text(
-                      userListener.userData?.user.userMobile ?? "",
+                      '${userListener.userData?.user.formattedCountryCode} ${userListener.userData?.user.userMobileActual}' ??
+                          "",
                       style: GoogleFonts.quicksand(
                         textStyle: context.customTextTheme.text16W500.copyWith(
                           color: isDark ? Colors.white : null,
@@ -675,7 +685,8 @@ class CheckoutDetailsScreen extends StatelessWidget {
                           ),
                         )
                       : SizedBox.shrink()),
-              if (isTaxApplied == true || taxAmount != null) ...[
+              if (isTaxApplied == true &&
+                  (taxDetails?.isNotEmpty ?? false)) ...[
                 verticalSpaceTiny,
                 isTaxApplied == true
                     ? _SummaryRow(
@@ -684,8 +695,9 @@ class CheckoutDetailsScreen extends StatelessWidget {
                             '${AppConfig.instance.country.symbol}0.00',
                         style: context.customTextTheme.text16W600
                             .copyWith(color: context.customTextTheme.color),
-                        infoWidget: taxAmount !=
-                                '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                        infoWidget: hasTaxAmount == true
+                            // taxAmount !=
+                            //         '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
                             ? Tooltip(
                                 decoration: BoxDecoration(
                                   color: context.customTextTheme.color,

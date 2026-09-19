@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:customer_core/gen/assets.gen.dart';
+import 'package:customer_core/src/application/order/order_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/auth/auth_provider.dart';
 import 'package:customer_core/src/core/routes/routes.gr.dart';
@@ -138,6 +139,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             "Registered Successfully!",
                           );
                           authProvider.clearValues();
+                          context.read<OrderProvider>().clearData();
                           DependencyRegistrar.initializeAllProviders(context);
                           Future.delayed(const Duration(seconds: 1), () {
                             context.router.replaceAll([

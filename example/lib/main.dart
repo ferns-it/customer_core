@@ -23,25 +23,29 @@ void main() async {
           onSurface: Colors.white,
           disabledColor: Colors.grey,
           secondary: Colors.red.shade800,
-          primaryIconColor: Colors.red.shade800),
+          primaryIconColor: Colors.red.shade800,
+          loginCardBgColor: Colors.black),
       darkThemeOverride: CustomerDarkThemeOverride(
           primary: Colors.red.shade800,
           onSurface: Colors.white,
           disabledColor: Colors.grey,
           secondary: Colors.white,
-          primaryIconColor: Colors.red.shade500),
-      // lightThemeOverride: const CustomerLightThemeOverride(
-      //     primary: Color.fromARGB(255, 4, 51, 122),
-      //     onSurface: Colors.white,
-      //     disabledColor: Colors.grey,
-      //     secondary: Color.fromARGB(255, 4, 51, 122),
-      //     primaryIconColor: Color.fromARGB(255, 4, 51, 122)),
-      // darkThemeOverride: const CustomerDarkThemeOverride(
-      //     primary: Color.fromARGB(255, 4, 51, 122),
-      //     onSurface: Colors.white,
-      //     disabledColor: Colors.grey,
-      //     secondary: Colors.white,
-      //     primaryIconColor: Color(0xFF28B9F0)),
+          primaryIconColor: Colors.red.shade500,
+          loginCardBgColor: Colors.black),
+      //   lightThemeOverride: const CustomerLightThemeOverride(
+      //       primary: Color.fromARGB(255, 4, 51, 122),
+      //       onSurface: Colors.white,
+      //       disabledColor: Colors.grey,
+      //       secondary: Color.fromARGB(255, 4, 51, 122),
+      //       primaryIconColor: Color.fromARGB(255, 4, 51, 122),
+      //       loginCardBgColor: const Color(0xFF062B45)),
+      //   darkThemeOverride: const CustomerDarkThemeOverride(
+      //       primary: Color.fromARGB(255, 4, 51, 122),
+      //       onSurface: Colors.white,
+      //       disabledColor: Colors.grey,
+      //       secondary: Colors.white,
+      //       primaryIconColor: Color(0xFF28B9F0),
+      //       loginCardBgColor: const Color(0xFF062B45)),
     ),
   );
 }

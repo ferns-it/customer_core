@@ -90,6 +90,8 @@ class _CustomerAppState extends State<CustomerApp> {
           secondary: override.secondary ?? baseLight.colorScheme.secondary,
           primaryIconColor: override.primaryIconColor ??
               baseLight.colorScheme.primaryIconColor,
+          loginCardBgColor: override.loginCardBgColor ??
+              baseLight.colorScheme.loginCardBgColor,
         ),
         disabledColor: override.disabledColor ?? baseLight.disabledColor,
       );
@@ -105,6 +107,8 @@ class _CustomerAppState extends State<CustomerApp> {
           secondary: override.secondary ?? baseDark.colorScheme.secondary,
           primaryIconColor: override.primaryIconColor ??
               baseDark.colorScheme.primaryIconColor,
+          loginCardBgColor: override.loginCardBgColor ??
+              baseDark.colorScheme.loginCardBgColor,
         ),
         disabledColor: override.disabledColor ?? baseDark.disabledColor,
       );

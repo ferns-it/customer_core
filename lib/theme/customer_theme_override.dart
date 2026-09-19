@@ -6,6 +6,7 @@ class CustomerDarkThemeOverride {
   final Color? disabledColor;
   final Color? secondary;
   final Color? primaryIconColor;
+  final Color? loginCardBgColor;
 
   const CustomerDarkThemeOverride({
     this.primary,
@@ -13,6 +14,7 @@ class CustomerDarkThemeOverride {
     this.disabledColor,
     this.secondary,
     this.primaryIconColor,
+    this.loginCardBgColor,
   });
 }
 
@@ -22,11 +24,13 @@ class CustomerLightThemeOverride {
   final Color? disabledColor;
   final Color? secondary;
   final Color? primaryIconColor;
+  final Color? loginCardBgColor;
 
   const CustomerLightThemeOverride(
       {this.primary,
       this.onSurface,
       this.disabledColor,
       this.secondary,
-      this.primaryIconColor});
+      this.primaryIconColor,
+      this.loginCardBgColor});
 }

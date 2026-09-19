@@ -211,7 +211,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               vertical: isDesktop ? 32 : 25,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF062B45).withOpacity(0.78),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .loginCardBgColor
+                                  ?.withOpacity(0.78),
                               // color: AppColors.kBlack.withOpacity(0.4),
                               borderRadius: BorderRadius.circular(12.0),
                               border: Border.all(
@@ -858,7 +861,7 @@ class _LoginScreenState extends State<LoginScreen> {
         color: Colors.white,
         fontSize: 17,
       ),
-      cursorColor: const Color(0xFF20BCEB),
+      cursorColor: Theme.of(context).colorScheme.primaryIconColor,
       validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
@@ -904,8 +907,9 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(
-            color: Color(0xFF20BCEB),
+          borderSide: BorderSide(
+            color:
+                Theme.of(context).colorScheme.primaryIconColor ?? Colors.grey,
             width: 1.5,
           ),
         ),
@@ -1064,7 +1068,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   AuthView.forgotPassword,
                 );
               },
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.symmetric(
                   vertical: 6,
                   horizontal: 2,
@@ -1074,7 +1078,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF28B9F0),
+                    color: Theme.of(context).colorScheme.primaryIconColor,
                   ),
                 ),
               ),
@@ -1115,17 +1119,26 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Container(
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  gradient: const LinearGradient(
+                  gradient: LinearGradient(
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      Color(0xFF0796D8),
-                      Color(0xFF11C2D5),
+                      Theme.of(context).colorScheme.primaryIconColor ??
+                          Theme.of(context).colorScheme.primary,
+                      Theme.of(context)
+                              .colorScheme
+                              .primaryIconColor
+                              ?.withOpacity(0.5) ??
+                          Theme.of(context).colorScheme.primary,
                     ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF0796D8).withOpacity(0.25),
+                      color: Theme.of(context)
+                              .colorScheme
+                              .primaryIconColor
+                              ?.withOpacity(0.25) ??
+                          Theme.of(context).colorScheme.primary,
                       blurRadius: 18,
                       offset: const Offset(0, 8),
                     ),
@@ -1192,10 +1205,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     text: "Sign Up",
                     // style: context.customTextTheme.text14W700
                     //     .copyWith(color: AppColors.kWhite),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF20BCEB),
+                      color: Theme.of(context).colorScheme.primaryIconColor,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
@@ -1364,10 +1377,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       text: "Login",
                       // style: context.customTextTheme.text14W700
                       //     .copyWith(color: AppColors.kWhite),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF20BCEB),
+                        color: Theme.of(context).colorScheme.primaryIconColor,
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
@@ -1508,17 +1521,26 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               colors: [
-                Color(0xFF0796D8),
-                Color(0xFF11C2D5),
+                Theme.of(context).colorScheme.primaryIconColor ??
+                    Theme.of(context).colorScheme.primary,
+                Theme.of(context)
+                        .colorScheme
+                        .primaryIconColor
+                        ?.withOpacity(0.5) ??
+                    Theme.of(context).colorScheme.primary,
               ],
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF0796D8).withOpacity(0.25),
+                color: Theme.of(context)
+                        .colorScheme
+                        .primaryIconColor
+                        ?.withOpacity(0.25) ??
+                    Theme.of(context).colorScheme.primary,
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -2920,17 +2942,26 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                       colors: [
-                        Color(0xFF0796D8),
-                        Color(0xFF11C2D5),
+                        Theme.of(context).colorScheme.primaryIconColor ??
+                            Theme.of(context).colorScheme.primary,
+                        Theme.of(context)
+                                .colorScheme
+                                .primaryIconColor
+                                ?.withOpacity(0.5) ??
+                            Theme.of(context).colorScheme.primary,
                       ],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF0796D8).withOpacity(0.25),
+                        color: Theme.of(context)
+                                .colorScheme
+                                .primaryIconColor
+                                ?.withOpacity(0.25) ??
+                            Theme.of(context).colorScheme.primary,
                         blurRadius: 18,
                         offset: const Offset(0, 8),
                       ),

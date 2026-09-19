@@ -18,18 +18,30 @@ void main() async {
       appConfig: appConfig,
       uiConfig: uiConfig,
       keyConfig: keyConfig,
-      lightThemeOverride: const CustomerLightThemeOverride(
-          primary: Color.fromARGB(255, 4, 51, 122),
+      lightThemeOverride: CustomerLightThemeOverride(
+          primary: Colors.red.shade800,
           onSurface: Colors.white,
           disabledColor: Colors.grey,
-          secondary: Color.fromARGB(255, 4, 51, 122),
-          primaryIconColor: Color.fromARGB(255, 4, 51, 122)),
-      darkThemeOverride: const CustomerDarkThemeOverride(
-          primary: Color.fromARGB(255, 4, 51, 122),
+          secondary: Colors.red.shade800,
+          primaryIconColor: Colors.red.shade800),
+      darkThemeOverride: CustomerDarkThemeOverride(
+          primary: Colors.red.shade800,
           onSurface: Colors.white,
           disabledColor: Colors.grey,
           secondary: Colors.white,
-          primaryIconColor: Color(0xFF28B9F0)),
+          primaryIconColor: Colors.red.shade500),
+      // lightThemeOverride: const CustomerLightThemeOverride(
+      //     primary: Color.fromARGB(255, 4, 51, 122),
+      //     onSurface: Colors.white,
+      //     disabledColor: Colors.grey,
+      //     secondary: Color.fromARGB(255, 4, 51, 122),
+      //     primaryIconColor: Color.fromARGB(255, 4, 51, 122)),
+      // darkThemeOverride: const CustomerDarkThemeOverride(
+      //     primary: Color.fromARGB(255, 4, 51, 122),
+      //     onSurface: Colors.white,
+      //     disabledColor: Colors.grey,
+      //     secondary: Colors.white,
+      //     primaryIconColor: Color(0xFF28B9F0)),
     ),
   );
 }

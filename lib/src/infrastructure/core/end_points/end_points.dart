@@ -3,7 +3,7 @@ import 'package:customer_core/src/core/config/app_env.dart';
 class Endpoints {
   static const String _kDemoBaseUrl = 'https://demo.foodpage.co.uk/v2/';
   static const String _kDevBaseUrl = 'https://development.foodpage.co.uk/v2/';
-  static const String _kBaseUrl = 'https://foodpage.co.uk/v2/';
+  static const String _kBaseUrl = 'https://order.foodpage.co.uk/v2/';
   static const String kTableReservationBaseUrl =
       'https://dev.ferns-it.in/view-reservation';
 

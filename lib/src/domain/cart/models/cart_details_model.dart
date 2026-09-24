@@ -311,20 +311,26 @@ class CartItemDataModel {
       CartItemDataModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   double get getModifiersTotal {
+    double _sumAddonPrices(List<ChoosedModifierOption> options) {
+      double total = 0.0;
+      for (final option in options) {
+        final raw = (option.priceSingle ?? "0.00")
+            .replaceAll(RegExp(r'[^0-9.]'), '');
+        total += double.tryParse(raw) ?? 0.0;
+      }
+      return total;
+    }
+
     final total = addon_apllied.isNotEmpty
-        ? addon_apllied
-            .expand((e) => e.choosedOption.map((e) => double.parse(
-                (e.priceSingle ?? "0.00")
-                    .replaceAll(AppConfig.instance.country.symbol, ""))))
-            .reduce((a, b) => a + b)
+        ? addon_apllied.fold<double>(0.0, (sum, e) {
+            return sum + _sumAddonPrices(e.choosedOption);
+          })
         : 0.0;
 
     final totalMasterAddons = master_addon_apllied.isNotEmpty
-        ? master_addon_apllied
-            .expand((e) => e.choosedOption.map((e) => double.parse(
-                (e.priceSingle ?? "0.00")
-                    .replaceAll(AppConfig.instance.country.symbol, ""))))
-            .reduce((a, b) => a + b)
+        ? master_addon_apllied.fold<double>(0.0, (sum, e) {
+            return sum + _sumAddonPrices(e.choosedOption);
+          })
         : 0.0;
 
     return total + totalMasterAddons;

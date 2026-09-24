@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/domain/user/models/basic_profile_data_model.dart';
 import 'package:customer_core/src/domain/user/models/user_consent_list_data_model.dart';
 import 'package:customer_core/src/domain/user/models/user_register_response.dart';
 import 'package:dio/dio.dart';
@@ -149,7 +150,7 @@ class UserRepo implements IUserRepo {
     try {
       final response = await APIManager.post(
         api: Endpoints.kUserRegistration,
-        dataKeyChecking: true,
+        dataKeyChecking: false,
         data: payload.toJson(),
       );
       if (response == null) return Left(InternalServerErrorException());
@@ -211,6 +212,25 @@ class UserRepo implements IUserRepo {
     }
   }
 
+  Future<Either<AppExceptions, String>> updateBasicProfile(
+      {required BasicProfileDataModel data,}) async {
+    try {
+      final response = await APIManager.put(
+        api: Endpoints.kUpdateBasicProfile,
+        needAuthentication: true,
+        data: data.toJson(),
+      );
+      if (response == null) return Left(InternalServerErrorException());
+      final decodedData = jsonDecode(response);
+      return Right(decodedData["message"]);
+    } on DioException catch (e) {
+      return Left(e.error is AppExceptions
+          ? e.error as AppExceptions
+          : InternalServerErrorException());
+    } catch (_) {
+      return Left(InternalServerErrorException());
+    }
+  }
   @override
   Future<Either<AppExceptions, String>> updateAddress(
       {required AddNewUserAddressRequestModel data,
@@ -306,18 +326,65 @@ class UserRepo implements IUserRepo {
       };
 
       final response = await APIManager.post(
-          api: Endpoints.kVerifyAlreadyRegistered, data: data);
+        api: Endpoints.kVerifyAlreadyRegistered,
+        data: data,
+        dataKeyChecking: false,
+      );
+      print("API RESPONSE = $response");
+
       if (response == null) {
         return left(InternalServerErrorException());
       }
       Map<String, dynamic> decoded = jsonDecode(response);
       return right(decoded);
     } on DioException catch (e) {
+      print("STATUS : ${e.response?.statusCode}");
+      print("DATA   : ${e.response?.data}");
+      print("ERROR  : ${e.message}");
+      print("TYPE   : ${e.type}");
+      if (e.response?.statusCode == 409) {
+        return right(
+          jsonDecode(e.response!.data as String) as Map<String, dynamic>,
+        );
+      }
       return left(e.error is AppExceptions
           ? e.error as AppExceptions
           : InternalServerErrorException());
     } catch (_) {
       return left(InternalServerErrorException());
+    }
+  }
+
+  @override
+  Future<Either<AppExceptions, bool>> linkPartialUser({
+    required String userEmail,
+    required String userMobile,
+    required String shopID,
+  }) async {
+    try {
+      final data = {
+        "shopID": shopID,
+        "userEmail": userEmail,
+        "userMobile": userMobile,
+        "FPsecretkey": KeyConfig.instance.fpSecretKey,
+      };
+
+      final response = await APIManager.post(
+        api: Endpoints.kLinkPartialUser,
+        data: data,
+        dataKeyChecking: false,
+      );
+
+      if (response == null) {
+        return Left(InternalServerErrorException());
+      }
+      return const Right(true);
+    } on DioException catch (e) {
+      return Left(e.error is AppExceptions
+          ? e.error as AppExceptions
+          : InternalServerErrorException());
+    } catch (_) {
+      return Left(InternalServerErrorException());
     }
   }
 

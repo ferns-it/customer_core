@@ -64,52 +64,55 @@ class _QtyCounterButtonState extends State<QtyCounterButton> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 2),
+      constraints: const BoxConstraints(minWidth: 100),
       decoration: BoxDecoration(
         color: AppColors.kBlack3,
         borderRadius: BorderRadius.circular(10),
       ),
-      width: 100,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          InkWell(
-            onTap: decrementQty,
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: AppColors.kOffWhite2,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.remove,
-                color: AppColors.kBlack3,
-              ),
-            ),
-          ),
-          Text(
-            "${widget.qty}",
-            style: context.customTextTheme.text14W700.copyWith(
-              color: Colors.white,
-            ),
-          ),
-          InkWell(
-            onTap: incrementQty,
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: AppColors.kOffWhite2,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.add,
-                color: AppColors.kBlack3,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              onTap: decrementQty,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: AppColors.kOffWhite2,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.remove,
+                  color: AppColors.kBlack3,
+                ),
               ),
             ),
-          ),
-        ],
+            Text(
+              "${widget.qty}",
+              style: context.customTextTheme.text14W700.copyWith(
+                color: Colors.white,
+              ),
+            ),
+            InkWell(
+              onTap: incrementQty,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: AppColors.kOffWhite2,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.add,
+                  color: AppColors.kBlack3,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -168,55 +171,54 @@ class _QtyCounterButton2State extends State<QtyCounterButton2> {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minWidth: 90, maxWidth: 100),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          InkWell(
-            onTap: () async {
-              decrementQty();
-            },
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                  color: AppColors.kWhite,
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 90),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              onTap: decrementQty,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                    color: AppColors.kWhite,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(
+                      color: AppColors.kGray.withOpacity(0.15),
+                    )),
+                child: Icon(
+                  Icons.remove_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+            Text(
+              "${widget.qty}",
+              style: context.customTextTheme.text14W700.copyWith(
+                color: context.customTextTheme.color,
+              ),
+            ),
+            InkWell(
+              onTap: incrementQty,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(
-                    color: AppColors.kGray.withOpacity(0.15),
-                  )),
-              child: Icon(
-                Icons.remove_rounded,
-                color: Theme.of(context).colorScheme.primary,
+                ),
+                child: Icon(
+                  Icons.add_rounded,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ),
-          ),
-          Text(
-            "${widget.qty}",
-            style: context.customTextTheme.text14W700.copyWith(
-              color: context.customTextTheme.color,
-            ),
-          ),
-          InkWell(
-            onTap: () async {
-              incrementQty();
-            },
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Icon(
-                Icons.add_rounded,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }

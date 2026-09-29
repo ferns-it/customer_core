@@ -1,8 +1,5 @@
-import 'dart:io';
-
+import 'package:customer_core/src/domain/user/models/basic_profile_data_model.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
 import 'package:customer_core/src/core/constants/app_identifiers.dart';
 import 'package:customer_core/src/core/utils/alert_dialogs.dart';
@@ -51,6 +48,9 @@ class UserProvider extends ChangeNotifier with BaseController {
   bool _isAddingOrUpdatingUserAddress = false;
 
   bool get isAddingOrUpdatingUserAddress => _isAddingOrUpdatingUserAddress;
+  bool _isUpdateBasicProfile = false;
+
+  bool get isUpdateBasicProfile => _isUpdateBasicProfile;
 
   bool _isUserAddressListLoading = false;
 
@@ -109,15 +109,12 @@ class UserProvider extends ChangeNotifier with BaseController {
   late TextEditingController landMarkTxtController;
   late TextEditingController searchAddressTxtController;
 
-  static const _channel = MethodChannel('app_version_channel');
-
   bool get isUserExist => _userData != null;
 
   @override
   Future<void> init() {
     getUserData();
     getAddressList();
-    checkNewAppUpdates();
     return super.init();
   }
 
@@ -283,6 +280,40 @@ class UserProvider extends ChangeNotifier with BaseController {
     }
   }
 
+  Future<bool> updateBasicProfile({
+    required String firstName,
+    required String lastName,
+    required String mobile,
+  }) async {
+    try {
+      _isUpdateBasicProfile = true;
+      notifyListeners();
+
+      final data = BasicProfileDataModel(
+        userFirstName: firstName,
+        userLastName: lastName,
+        userMobile: mobile,
+      );
+
+      final Either<AppExceptions, String> response =
+          await userRepo.updateBasicProfile(data: data);
+      print("updateprofileResponse: $response");
+      return response.fold(
+        (error) {
+          AlertDialogs.showError(error.message);
+          return false;
+        },
+        (message) {
+          AlertDialogs.showSuccess(message);
+          return true;
+        },
+      );
+    } finally {
+      _isUpdateBasicProfile = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> setDefaultUserAddress(String addressID) async {
     try {
       _isAddingOrUpdatingUserAddress = true;
@@ -418,39 +449,6 @@ class UserProvider extends ChangeNotifier with BaseController {
     } finally {
       _isUserConsentLoading = false;
       notifyListeners();
-    }
-  }
-
-  Future<void> prepareFakeManager() async {
-    await _channel.invokeMethod("prepareFakeManager");
-  }
-
-  Future<void> triggerFakeUpdateAvailable() async {
-    await _channel.invokeMethod('triggerFakeUpdateAvailable');
-  }
-
-  Future<void> completeFakeUpdate() async {
-    await _channel.invokeMethod('completeFakeUpdate');
-  }
-
-  Future<void> startImmediateUpdate() async {
-    await _channel.invokeMethod('startImmediateUpdate');
-  }
-
-  Future<void> setFakeMode(bool enable) async {
-    await _channel.invokeMethod("setFakeMode", {"enable": enable});
-  }
-
-  Future<bool> checkUpdate() async {
-    return await _channel.invokeMethod("checkUpdate");
-  }
-
-  Future<void> checkNewAppUpdates() async {
-    if (kDebugMode || Platform.isIOS) return;
-
-    final isUpdateAvailable = await checkUpdate();
-    if (isUpdateAvailable) {
-      await startImmediateUpdate();
     }
   }
 

@@ -1,4 +1,5 @@
-
+import 'package:customer_core/customer_core.dart';
+import 'package:customer_core/src/core/constants/enums.dart';
 import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/domain/store/models/store_delivery_slot_model.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,9 @@ class ShopProvider extends ChangeNotifier with BaseController {
 
   APIResponse<StoreSettingsDataModel> get storeSettings => _storeSettings;
 
+  Map<String, String>? get spiceLevelIcons =>
+      storeSettings.data?.producctUISettings?.spicelevelIcons;
+
   APIResponse<StoreDeliverySlotModel> _deliverySlots = APIResponse.initial();
 
   APIResponse<StoreDeliverySlotModel> get deliverySlots => _deliverySlots;
@@ -46,6 +50,10 @@ class ShopProvider extends ChangeNotifier with BaseController {
 
   bool isLoading = false;
   String? errorMessage;
+
+  List<SmsAvailableCountriesData> smsCountries = [];
+
+  SmsAvailableCountriesData? selectedCountry;
 
   List<StoreDeliverySlotDataModelResponse>? get slotForSelectedDate {
     final slots = _deliverySlots.data?.deliverySlots;
@@ -80,6 +88,34 @@ class ShopProvider extends ChangeNotifier with BaseController {
     final formattedAmt = double.tryParse(amtString ?? '0') ?? 0.00;
 
     return formattedAmt;
+  }
+
+  VerificationType get verificationType {
+    final settings = storeSettings.data;
+    if (settings == null) return VerificationType.email;
+
+    final sms = settings.smsVerification?.toLowerCase() == 'enabled';
+    final email = settings.emailVerification?.toLowerCase() == 'enabled';
+
+    if (sms && email) return VerificationType.both;
+    if (sms) return VerificationType.sms;
+    return VerificationType.email;
+  }
+
+  String get otpMessage {
+    switch (verificationType) {
+      case VerificationType.sms:
+        return "Enter the OTP sent to your registered mobile number";
+
+      case VerificationType.email:
+        return "Enter the OTP sent to your registered email address";
+
+      case VerificationType.both:
+        return "Enter the OTP sent to your registered mobile number and email address";
+
+      case VerificationType.none:
+        return "Enter the OTP";
+    }
   }
 
   @override
@@ -120,9 +156,50 @@ class ShopProvider extends ChangeNotifier with BaseController {
       },
       (data) {
         _storeSettings = APIResponse.completed(data);
+
+        // Load allowed SMS countries from API
+        smsCountries = data.smsAvailableCountries ?? [];
+
+        // Select the first country by default
+        // if (smsCountries.isNotEmpty) {
+        //   selectedCountry = smsCountries.first;
+        // }
+
+        setDefaultCountry();
         notifyListeners();
       },
     );
+  }
+
+  void setDefaultCountry() {
+    if (smsCountries.isEmpty) return;
+
+    // Prefer the store's country code from the settings API, falling back
+    // to the app-level configured dial code.
+    final settingsCountryCode = _storeSettings.data?.countryCode?.trim();
+    final defaultDialCode = (settingsCountryCode == null ||
+            settingsCountryCode.isEmpty)
+        ? AppConfig.instance.country.dialCode
+        : settingsCountryCode;
+
+    // Normalize to digits only so it matches whether the API returns "+91" or "91".
+    String normalizeDialCode(String? code) =>
+        (code ?? '').replaceAll(RegExp(r'[^0-9]'), '');
+
+    selectedCountry = smsCountries.firstWhere(
+      (country) =>
+          normalizeDialCode(country.code) == normalizeDialCode(defaultDialCode),
+      orElse: () => smsCountries.first,
+    );
+
+    // Defer notifyListeners to avoid calling it during build phase
+    Future.microtask(() => notifyListeners());
+  }
+
+  void updateSelectedCountry(SmsAvailableCountriesData country) {
+    selectedCountry = country;
+    // Defer notifyListeners to avoid calling it during build phase
+    Future.microtask(() => notifyListeners());
   }
 
   Future<void> fetchShopDeliverySlots() async {

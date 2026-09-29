@@ -1,6 +1,8 @@
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/application/theme/theme_provider.dart';
+import 'package:customer_core/src/core/global/global_variable.dart';
 import 'package:customer_core/src/core/theme/app_theme.dart';
+import 'package:customer_core/src/domain/firebase/remote_config_service.dart';
 import 'package:customer_core/src/presentation/widgets/connectivity_wrapper.dart';
 import 'package:customer_core/theme/customer_theme_override.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,7 @@ class _CustomerAppState extends State<CustomerApp> {
   void initState() {
     super.initState();
     appRouter = AppRouter();
+    GlobalVariable.router = appRouter;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!initialized) {
         DependencyRegistrar.initializeAllProviders(context);
@@ -45,6 +48,8 @@ class _CustomerAppState extends State<CustomerApp> {
     });
     // initialize once
     AppConfig.instance = widget.appConfig;
+    // The in-app update check is driven by this Remote Config key.
+    RemoteConfigService().setConfigKey(widget.appConfig.remoteConfigKey);
     UiConfig.instance = widget.uiConfig;
     KeyConfig.instance = widget.keyConfig;
     AppEnvironment.current = widget.appConfig.env;

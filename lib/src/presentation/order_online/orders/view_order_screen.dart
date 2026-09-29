@@ -3,6 +3,7 @@ import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:customer_core/src/application/core/dependency_registrar.dart';
+import 'package:customer_core/src/application/user/user_provider.dart';
 import 'package:customer_core/src/domain/cart/models/cart_details_model.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/order/order_provider.dart';
@@ -110,6 +111,7 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
     // UserLoginResponse customerDetails,
     BuildContext context,
   ) {
+    final userListener = context.watch<UserProvider>();
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -161,7 +163,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
               ),
             ),
             Text(
-              orderDetails.phone ?? "",
+              '${userListener.userData?.user.formattedCountryCode} ${userListener.userData?.user.userMobileActual}' ??
+                  "",
               style: context.customTextTheme.text16W500
                   .copyWith(color: context.customTextTheme.color),
             ),
@@ -438,7 +441,10 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                           ),
                         )
                       : SizedBox.shrink()),
-              if (isTaxApplicable) ...[
+              if (isTaxApplicable
+                  // && orderDetails.taxTotalAmount !=
+                  // '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                  ) ...[
                 verticalSpaceTiny,
                 _SummaryRow(
                     label: 'VAT ',

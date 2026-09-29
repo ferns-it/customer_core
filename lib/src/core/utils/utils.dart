@@ -1,6 +1,7 @@
 import 'dart:math';
+import 'dart:ui';
 
-
+import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
 
 import 'dart:math' as math;
@@ -13,6 +14,129 @@ class Utils {
     final result = parse(data.body?.text).documentElement?.text;
     return result ?? '';
   }
+
+//  static String stripHtml(String html) {
+//       return html
+//           .replaceAll(
+//             RegExp(r'<br\s*/?>', caseSensitive: false),
+//             '\n',
+//           )
+//           .replaceAll(
+//             RegExp(r'</p>', caseSensitive: false),
+//             '\n',
+//           )
+//           .replaceAll(
+//             RegExp(r'<[^>]*>'),
+//             '',
+//           )
+//           .replaceAll('&nbsp;', ' ')
+//           .trim();
+//     }
+  static bool isSpiceLevelApplicable(String? spiceLevel) {
+    if (spiceLevel == null) return false;
+    final normalized = spiceLevel.trim().toLowerCase();
+    if (normalized.isEmpty) return false;
+
+    const notApplicableValues = {
+      'not applicable',
+      'n/a',
+      'na',
+      'none',
+      'nil',
+      '-',
+      '0',
+    };
+
+    return !notApplicableValues.contains(normalized);
+  }
+
+  static Color spiceLevelColor(BuildContext context, String? spiceLevel) {
+    if (spiceLevel == null) return Theme.of(context).cardColor;
+    switch (spiceLevel.trim().toLowerCase()) {
+      case 'not spicy':
+        return const Color(0xFFE8F5E9); // Soft green
+      case 'mild':
+        return const Color(0xFFFFE69C); // Soft yellow
+      case 'medium':
+        return const Color(0xFFFFE8C2); // Soft orange
+      case 'hot':
+        return const Color(0xFFFFD6D6); // Soft red
+      case 'extra hot':
+        return const Color(0xFFFFB8B8); // Stronger red
+      default:
+        return Theme.of(context).cardColor;
+    }
+  }
+
+  static Color spiceLevelTextColor(
+    BuildContext context,
+    String? spiceLevel,
+  ) {
+    switch (spiceLevel?.trim().toLowerCase()) {
+      case 'not spicy':
+        return const Color(0xFF2E7D32); // Dark green
+
+      case 'mild':
+        return const Color(0xFF795500);
+      case 'medium':
+        return const Color(0xFFE65100); // Dark orange
+
+      case 'hot':
+        return const Color(0xFFC62828); // Dark red
+
+      case 'extra hot':
+        return const Color(0xFFB71C1C); // Strong red
+
+      default:
+        return Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
+    }
+  }
+  // static Color spiceLevelTextColor(
+  //   BuildContext context,
+  //   String? spiceLevel,
+  // ) {
+  //   switch (spiceLevel?.trim().toLowerCase()) {
+  //     case 'not spicy':
+  //       return const Color(0xFF1B5E20);
+
+  //     case 'mild':
+  //       return const Color(0xFF795500);
+
+  //     case 'medium':
+  //       return const Color(0xFFB54700);
+
+  //     case 'hot':
+  //       return const Color(0xFFB42318);
+
+  //     case 'extra hot':
+  //       return const Color(0xFF8B0000);
+
+  //     default:
+  //       return Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
+  //   }
+  // }
+
+  // static Color spiceLevelColor(BuildContext context, String? spiceLevel) {
+  //   switch (spiceLevel?.trim().toLowerCase()) {
+  //     case 'not spicy':
+  //       return const Color(0xFFB7E4C7); // Fresh green
+
+  //     case 'mild':
+  //       return const Color(0xFFFFE69C); // Warm yellow
+
+  //     case 'medium':
+  //       return const Color(0xFFFFC878); // Soft orange
+
+  //     case 'hot':
+  //       return const Color(0xFFFFA8A8); // Warm red
+
+  //     case 'extra hot':
+  //       return const Color(0xFFFF7777); // Strong red
+
+  //     default:
+  //       return Theme.of(context).cardColor;
+  //   }
+  // }
 
   static String removeExtraSpaces(String input) {
     return input.replaceAll(RegExp(r'\s+'), ' ').trim();
@@ -48,7 +172,7 @@ class Utils {
     if (value.isEmpty) {
       return "*required";
     }
-    if (value.isNotEmpty ) {
+    if (value.isNotEmpty) {
       return "Invalid Email Id";
     }
     return null;

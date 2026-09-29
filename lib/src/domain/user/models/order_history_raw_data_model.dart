@@ -95,7 +95,6 @@ class OrderDetailsModel {
   final String? shopMobile;
   final String? shopAddress1;
   final String? shopAddress2;
-
   final String? deliveryDiscountLabel;
   final String? isTaxApplicable;
   final String? taxLabel;
@@ -529,6 +528,7 @@ class OrderDetailsModel {
       : '${AppConfig.instance.country.symbol}0.00';
 
   bool get isTaxApplicablebool => isTaxApplicable == 'Yes';
+ 
 
   // String get formattedDiscount {
   //   if (deliveryDiscount != null) {
@@ -584,9 +584,7 @@ class OrderDetailsModel {
   bool get orderRejected {
     if (orderStatus == OrderStatus.rejected) return true;
     return status?.toLowerCase().contains("order rejected") == true;
-    
   }
-  
 }
 
 class OrderHistoryDishesDataModel {

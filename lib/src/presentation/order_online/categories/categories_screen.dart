@@ -1,6 +1,7 @@
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
+import 'package:customer_core/src/presentation/order_online/home/order_online_home_screen.dart';
 import 'package:flutter/rendering.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
 import 'package:customer_core/src/application/home/home_provider.dart';
@@ -129,8 +130,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
   Widget build(BuildContext context) {
     final productListener = context.watch<ProductsProvider>();
     final productProvider = context.read<ProductsProvider>();
-    final cartProvider = context.read<CartProvider>();
-    final cartListener = context.read<CartProvider>();
+    final cartProvider = context.watch<CartProvider>();
+    final cartListener = context.watch<CartProvider>();
     final homeProvider = context.read<HomeProvider>();
     final userProvider = context.read<UserProvider>();
     // final products = productProvider.productsList;
@@ -145,121 +146,249 @@ class _CategoriesScreenState extends State<CategoriesScreen>
           padding: const EdgeInsets.all(0.0),
           child: Column(
             children: [
-              _categoryTabController == null
-                  ? const SizedBox.shrink()
-                  : TabBar(
-                      controller: _categoryTabController,
-                      onTap: (index) async {
-                        final category = productListener.categories[index];
-                        final cID = category.cID;
+              TabBar(
+                controller: _categoryTabController,
+                onTap: (index) async {
+                  final category = productListener.categories[index];
+                  final cID = category.cID;
 
-                        // If same category, still sync controller
-                        if (_categoryTabController!.index != index) {
-                          _categoryTabController!.animateTo(index);
-                        }
+                  if (cID == productListener.selectedCategory?.cID) {
+                    return;
+                  }
 
-                        if (cID == productListener.selectedCategory?.cID)
-                          return;
+                  productProvider.onChangeHasMoreProducts(true);
+                  productProvider.onChangeSelectedCategory(category);
+                  productProvider.onChangeSelectedCategoryIndex(index);
+                  productProvider.onChangeSelectedSubCategory(null);
 
-                        productProvider.onChangeHasMoreProducts(true);
-                        productProvider.onChangeSelectedCategory(category);
-                        productProvider.onChangeSelectedCategoryIndex(index);
+                  homeProvider.showNavBar();
 
-                        productProvider.onChangeSelectedSubCategory(null);
+                  if (cID != null) {
+                    await productProvider.getAllProductsByPagination(
+                      categoryID: cID,
+                      isRandom: false,
+                      isRefresh: true,
+                    );
+                  }
+                },
+                tabAlignment: TabAlignment.start,
+                isScrollable: true,
+                dividerColor: Colors.transparent,
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                indicatorWeight: 3,
+                indicatorSize: TabBarIndicatorSize.label,
+                indicatorPadding: EdgeInsets.all(0.1),
+                labelPadding: const EdgeInsets.only(right: 10),
+                padding: EdgeInsets.zero,
+                tabs: productListener.categories.map((e) {
+                  final measured = textWidth(
+                    e.name ?? '',
+                    const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  );
 
-                        homeProvider.showNavBar();
-
-                        if (cID != null) {
-                          await productProvider.getAllProductsByPagination(
-                            categoryID: cID,
-                            isRandom: false,
-                            isRefresh: true,
-                          );
-                        }
-                      },
-                      tabAlignment: TabAlignment.start,
-                      isScrollable: true,
-                      dividerColor: Colors.transparent,
-                      indicatorColor: Theme.of(context).colorScheme.primary,
-                      tabs: productListener.categories
-                          .mapIndexed((index, e) => AppConfig
-                                      .instance.isCategoryImageEnabled ==
-                                  true
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      height: 50,
-                                      padding: const EdgeInsets.all(2),
-                                      margin: const EdgeInsets.only(bottom: 0),
-                                      // decoration: BoxDecoration(
-                                      // color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                      // border: productListner.selectedCategory == e
-                                      //     ? Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5)
-                                      //     : null,
-                                      // borderRadius: BorderRadius.circular(10)),
-                                      child: e.image != null
-                                          ? Center(
-                                              child: CachedNetworkImage(
-                                              imageUrl: e.image ?? '',
-                                              height: 50,
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Image(
-                                                image: AssetImage(
-                                                    Assets.lib.assets.images
-                                                        .noimage.path,
-                                                    package: 'customer_core'),
-                                                height: 50,
-                                              ),
-                                            ))
-                                          : SizedBox(
-                                              height: 60,
-                                              width: 60,
-                                              child: Center(
-                                                child: Image(
-                                                  image: AssetImage(
-                                                      Assets.lib.assets.images
-                                                          .noimage.path,
-                                                      package: 'customer_core'),
-                                                  height: 50,
-                                                ),
-                                              ),
-                                            ),
+                  return Tab(
+                    child: Container(
+                      height: 40,
+                      width: measured + 24,
+                      margin: const EdgeInsets.only(bottom: 5),
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: AppConfig.instance.isCategoryImageEnabled == true
+                          ? Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: e.image != null
+                                      ? CachedNetworkImage(
+                                          imageUrl: e.image!,
+                                          fit: BoxFit.cover,
+                                          errorWidget: (context, url, error) {
+                                            return Image.asset(
+                                              Assets.lib.assets.images.noimage
+                                                  .path,
+                                              fit: BoxFit.cover,
+                                              package: 'customer_core',
+                                            );
+                                          },
+                                        )
+                                      : Image.asset(
+                                          Assets.lib.assets.images.noimage.path,
+                                          fit: BoxFit.cover,
+                                          package: 'customer_core',
+                                        ),
+                                ),
+                                Positioned.fill(
+                                  child: Container(
+                                    color: Colors.black.withOpacity(0.3),
+                                  ),
+                                ),
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
                                     ),
-                                    Text(
+                                    child: Text(
                                       e.name ?? '',
-                                      maxLines: 1,
+                                      maxLines: 2,
                                       textAlign: TextAlign.center,
                                       overflow: TextOverflow.ellipsis,
-                                      style: context.customTextTheme.text12W500
-                                          .copyWith(
-                                        color: context.customTextTheme.color,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black,
+                                            offset: Offset(0, 1),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    verticalSpaceSmall,
-                                  ],
-                                )
-                              : Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10),
-                                      child: Text(
-                                        e.name ?? '',
-                                        maxLines: 1,
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: context
-                                            .customTextTheme.text14W500
-                                            .copyWith(
-                                          color: context.customTextTheme.color,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ))
-                          .toList()),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Center(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 6),
+                                child: Text(
+                                  e.name ?? '',
+                                  maxLines: 2,
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: context.customTextTheme.color,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              // _categoryTabController == null
+              //     ? const SizedBox.shrink()
+              //     : TabBar(
+              //         controller: _categoryTabController,
+              //         onTap: (index) async {
+              //           final category = productListener.categories[index];
+              //           final cID = category.cID;
+
+              //           // If same category, still sync controller
+              //           if (_categoryTabController!.index != index) {
+              //             _categoryTabController!.animateTo(index);
+              //           }
+
+              //           if (cID == productListener.selectedCategory?.cID)
+              //             return;
+
+              //           productProvider.onChangeHasMoreProducts(true);
+              //           productProvider.onChangeSelectedCategory(category);
+              //           productProvider.onChangeSelectedCategoryIndex(index);
+
+              //           productProvider.onChangeSelectedSubCategory(null);
+
+              //           homeProvider.showNavBar();
+
+              //           if (cID != null) {
+              //             await productProvider.getAllProductsByPagination(
+              //               categoryID: cID,
+              //               isRandom: false,
+              //               isRefresh: true,
+              //             );
+              //           }
+              //         },
+              //         tabAlignment: TabAlignment.start,
+              //         isScrollable: true,
+              //         dividerColor: Colors.transparent,
+              //         indicatorColor: Theme.of(context).colorScheme.primary,
+              //         tabs: productListener.categories
+              //             .mapIndexed((index, e) => AppConfig
+              //                         .instance.isCategoryImageEnabled ==
+              //                     true
+              //                 ? Column(
+              //                     crossAxisAlignment: CrossAxisAlignment.center,
+              //                     children: [
+              //                       Container(
+              //                         height: 50,
+              //                         padding: const EdgeInsets.all(2),
+              //                         margin: const EdgeInsets.only(bottom: 0),
+              //                         // decoration: BoxDecoration(
+              //                         // color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              //                         // border: productListner.selectedCategory == e
+              //                         //     ? Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5)
+              //                         //     : null,
+              //                         // borderRadius: BorderRadius.circular(10)),
+              //                         child: e.image != null
+              //                             ? Center(
+              //                                 child: CachedNetworkImage(
+              //                                 imageUrl: e.image ?? '',
+              //                                 height: 50,
+              //                                 errorWidget:
+              //                                     (context, url, error) =>
+              //                                         Image(
+              //                                   image: AssetImage(
+              //                                       Assets.lib.assets.images
+              //                                           .noimage.path,
+              //                                       package: 'customer_core'),
+              //                                   height: 50,
+              //                                 ),
+              //                               ))
+              //                             : SizedBox(
+              //                                 height: 60,
+              //                                 width: 60,
+              //                                 child: Center(
+              //                                   child: Image(
+              //                                     image: AssetImage(
+              //                                         Assets.lib.assets.images
+              //                                             .noimage.path,
+              //                                         package: 'customer_core'),
+              //                                     height: 50,
+              //                                   ),
+              //                                 ),
+              //                               ),
+              //                       ),
+              //                       Text(
+              //                         e.name ?? '',
+              //                         maxLines: 1,
+              //                         textAlign: TextAlign.center,
+              //                         overflow: TextOverflow.ellipsis,
+              //                         style: context.customTextTheme.text12W500
+              //                             .copyWith(
+              //                           color: context.customTextTheme.color,
+              //                         ),
+              //                       ),
+              //                       verticalSpaceSmall,
+              //                     ],
+              //                   )
+              //                 : Column(
+              //                     children: [
+              //                       Padding(
+              //                         padding: const EdgeInsets.symmetric(
+              //                             vertical: 10),
+              //                         child: Text(
+              //                           e.name ?? '',
+              //                           maxLines: 1,
+              //                           textAlign: TextAlign.center,
+              //                           overflow: TextOverflow.ellipsis,
+              //                           style: context
+              //                               .customTextTheme.text14W500
+              //                               .copyWith(
+              //                             color: context.customTextTheme.color,
+              //                           ),
+              //                         ),
+              //                       ),
+              //                     ],
+              //                   ))
+              //             .toList()),
               verticalSpaceSmall,
               Row(
                 children: [

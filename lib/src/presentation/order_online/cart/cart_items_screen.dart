@@ -134,10 +134,6 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                                 ?.itemDetails
                                                                 ?.display
                                                                 ?.totalAmount ??
-                                                            product
-                                                                .amountDetails
-                                                                ?.display
-                                                                ?.totalAmountWithAddon ??
                                                             'N/A',
                                                         style: context
                                                             .customTextTheme
@@ -215,10 +211,6 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                                                 ?.itemDetails
                                                                 ?.display
                                                                 ?.totalAmount ??
-                                                            product
-                                                                .amountDetails
-                                                                ?.display
-                                                                ?.totalAmountWithAddon ??
                                                             'N/A',
                                                         style: context
                                                             .customTextTheme
@@ -264,7 +256,6 @@ class _CartItemsScreenState extends State<CartItemsScreen> {
                                           ),
                                         ),
                                       ),
-                                // const Spacer(),
                               ],
                             ),
                             product.master_addon_apllied.isNotEmpty == true

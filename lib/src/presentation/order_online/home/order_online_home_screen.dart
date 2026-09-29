@@ -1,10 +1,13 @@
+import 'dart:async';
+
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
+import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/rendering.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
+import 'package:customer_core/src/application/notification/notification_provider.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
-import 'package:customer_core/src/infrastructure/notification/notification_shared_prefs_repo.dart';
 import 'package:customer_core/src/infrastructure/store/recent_search_product_prefs.dart';
 import 'package:customer_core/src/presentation/widgets/animated_search_bar.dart';
 
@@ -40,10 +43,15 @@ class OrderOnlineHomeScreen extends StatefulWidget {
 }
 
 class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
   late ScrollController _scrollController;
-  int notificationCount = 0;
+
+  /// How often the shop/cart status is re-synced from the server while the
+  /// Home tab is visible, so the "shop closed" banner updates without a
+  /// manual pull-to-refresh.
+  static const Duration shopStatusRefreshInterval = Duration(seconds: 60);
+  Timer? _shopStatusTimer;
 
   // final isNewView = true;
   final List<String> imageUrlsForBanner = UiConfig.instance.bannerImages;
@@ -54,6 +62,10 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
 
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
+
+    WidgetsBinding.instance.addObserver(this);
+    context.read<HomeProvider>().currentPage.addListener(_onCurrentPageChanged);
+    _startShopStatusPolling();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final productProvider = context.read<ProductsProvider>();
@@ -66,13 +78,6 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
           _setupTabController(productProvider.categories);
         });
       }
-      NotificationSharedPrefs.getNotification().then(
-        (value) {
-          setState(() {
-            notificationCount = value.length;
-          });
-        },
-      );
     });
   }
 
@@ -88,8 +93,55 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     }
   }
 
+  /// Re-fetches the cart details (which carry `paymentOptions.shopStatus`)
+  /// so `isShopClosed` reflects the latest server state.
+  Future<void> _refreshShopStatus() async {
+    if (!mounted) return;
+    await context.read<CartProvider>().listCartItems();
+  }
+
+  /// Re-fetches the store settings (which carry `deliveryInfo.shopOpen_temp_off`)
+  /// so the temporary close flag also stays up to date.
+  Future<void> _refreshStoreSettings() async {
+    if (!mounted) return;
+    await context.read<ShopProvider>().fetchStoreSettings();
+  }
+
+  void _startShopStatusPolling() {
+    _shopStatusTimer?.cancel();
+    _shopStatusTimer = Timer.periodic(shopStatusRefreshInterval, (_) {
+      // Only poll while the Home tab is active to avoid unnecessary calls.
+      if (context.read<HomeProvider>().currentPage.value == 0) {
+        _refreshShopStatus();
+        _refreshStoreSettings();
+      }
+    });
+  }
+
+  void _onCurrentPageChanged() {
+    // Re-sync status whenever the user comes back to the Home tab.
+    if (context.read<HomeProvider>().currentPage.value == 0) {
+      _refreshShopStatus();
+      _refreshStoreSettings();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshShopStatus();
+      _refreshStoreSettings();
+    }
+  }
+
   @override
   void dispose() {
+    _shopStatusTimer?.cancel();
+    context
+        .read<HomeProvider>()
+        .currentPage
+        .removeListener(_onCurrentPageChanged);
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
@@ -122,10 +174,11 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     final cartProvider = context.watch<CartProvider>();
     final promotionListner = context.watch<PromotionsProvider>();
 
-    // final shopProvider = context.read<ShopProvider>();
-    // final shopListener = context.watch<ShopProvider>();
     final hideThreshold = context.screenHeight * 0.15; // 10%
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final notificationCount =
+        context.watch<NotificationProvider>().notifications.length;
 
     return PopScope(
         onPopInvokedWithResult: (_, __) {
@@ -142,6 +195,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
               Future.wait([
                 productProvider.getFeaturedPopularProducts(),
                 cartProvider.listCartItems(),
+                context.read<ShopProvider>().fetchStoreSettings(),
               ]);
             },
             child: SafeArea(
@@ -238,6 +292,14 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
     final cartProvider = context.watch<CartProvider>();
     final productProvider = context.read<ProductsProvider>();
     final productListener = context.read<ProductsProvider>();
+    final cartListener = context.watch<CartProvider>();
+    final shopListener = context.watch<ShopProvider>();
+
+    final storeSettings = shopListener.storeSettings.data;
+    final isShopTempClosed =
+        storeSettings?.deliveryInfo?.shopOpen_temp_off == 'Yes';
+    final isShopClosed =
+        cartListener.cartDetailsModel?.paymentOptions?.shopStatus == 'closed';
 
     return SingleChildScrollView(
       controller: _scrollController,
@@ -245,19 +307,21 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           Visibility(
-            visible:
-                cartProvider.cartDetailsModel?.paymentOptions?.shopStatus ==
-                        'closed' &&
-                    cartProvider.cartItems.isNotEmpty,
+            visible: (isShopClosed && cartProvider.cartItems.isNotEmpty) ||
+                isShopTempClosed,
             child: MaterialBanner(
-              content: const Row(
+              content: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(FluentIcons.warning_20_regular, color: Colors.white),
                   horizontalSpaceSmall,
                   Text(
-                    "Sorry, We're closed now",
-                  ),
+                    isShopTempClosed
+                        ? "Sorry, We're temporarily closed"
+                        : isShopClosed
+                            ? "Sorry, We're closed now"
+                            : "",
+                  )
                 ],
               ),
               dividerColor: Colors.transparent,
@@ -582,7 +646,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            "Our Featured Products",
+            "Our Featured Dishes",
             style: context.customTextTheme.text16W600,
           ),
         ),
@@ -682,7 +746,7 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
-            "Popular Products",
+            "Popular Dishes",
             style: context.customTextTheme.text16W600,
           ),
         ),
@@ -843,7 +907,6 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
                       ],
                     ),
                     verticalSpaceSmall,
-
                     TabBar(
                       onTap: (index) async {
                         final category =
@@ -1052,7 +1115,6 @@ class _OrderOnlineHomeScreenState extends State<OrderOnlineHomeScreen>
           topRight: Radius.circular(20),
         )),
         builder: (context) {
-          
           return AddDishBottomSheet(
             product: product,
           );

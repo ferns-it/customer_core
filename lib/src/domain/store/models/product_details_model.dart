@@ -359,6 +359,7 @@ class ProductDataModel {
         isOfferPrice.hashCode ^
         offerPriceDetails.hashCode;
   }
+
 // List<String> get allergensList {
 //   return variations
 //       .expand((variation) => variation.allergens ?? [])
@@ -367,16 +368,36 @@ class ProductDataModel {
 //       .toSet()
 //       .toList();
 // }
-List<String> get selectedAllergensList {
-  return variations.expand((variation) {
-    return variation.allergens!.where(
-      (allergen) => variation.selectedallergens!.contains(allergen.id),
-    );
-  }).map((e) => e.name ?? '')
-    .where((e) => e.isNotEmpty)
-    .toSet()
-    .toList();
-}
+  List<String> get selectedAllergensList {
+    return variations
+        .expand((variation) {
+          return variation.allergens!.where(
+            (allergen) => variation.selectedallergens!.contains(allergen.id),
+          );
+        })
+        .map((e) => e.name ?? '')
+        .where((e) => e.isNotEmpty)
+        .toSet()
+        .toList();
+  }
+
+  String? get spiceLevel {
+    for (final variation in variations) {
+      if (variation.spiceLevel != null && variation.spiceLevel!.isNotEmpty) {
+        return variation.spiceLevel;
+      }
+    }
+    return null;
+  }
+
+  String? get ingredients {
+    for (final variation in variations) {
+      if (variation.ingredients != null && variation.ingredients!.isNotEmpty) {
+        return variation.ingredients;
+      }
+    }
+    return null;
+  }
 }
 
 class ProductVariationDataModel {
@@ -388,6 +409,7 @@ class ProductVariationDataModel {
   final String? isUnlimitedStock;
   final String? stock;
   final List<ProductsAllergenDataModel>? allergens;
+  final String? spiceLevel;
   final List<dynamic>? selectedallergens;
   final List<dynamic>? allergensMaster;
   final List<ProductMasterAddonDataModel>? variationmasteraddons;
@@ -403,6 +425,7 @@ class ProductVariationDataModel {
     this.isUnlimitedStock,
     this.stock,
     this.allergens,
+    this.spiceLevel,
     this.selectedallergens,
     this.allergensMaster,
     this.variationmasteraddons,
@@ -419,6 +442,7 @@ class ProductVariationDataModel {
     String? isUnlimitedStock,
     String? stock,
     List<ProductsAllergenDataModel>? allergens,
+    String? spiceLevel,
     List<dynamic>? selectedallergens,
     List<dynamic>? allergensMaster,
     List<ProductMasterAddonDataModel>? variationmasteraddons,
@@ -434,6 +458,7 @@ class ProductVariationDataModel {
       isUnlimitedStock: isUnlimitedStock ?? this.isUnlimitedStock,
       stock: stock ?? this.stock,
       allergens: allergens ?? this.allergens,
+      spiceLevel: spiceLevel ?? this.spiceLevel,
       selectedallergens: selectedallergens ?? this.selectedallergens,
       allergensMaster: allergensMaster ?? this.allergensMaster,
       variationmasteraddons:
@@ -453,6 +478,7 @@ class ProductVariationDataModel {
       'isUnlimitedStock': isUnlimitedStock,
       'stock': stock,
       'allergens': allergens?.map((x) => x.toMap()).toList(),
+      'spiceLevel': spiceLevel,
       'selectedallergens': selectedallergens,
       'allergensMaster': allergensMaster,
       'variationmasteraddons':
@@ -500,6 +526,8 @@ class ProductVariationDataModel {
       //         ),
       //       )
       //     : [],
+      spiceLevel:
+          map['spiceLevel'] != null ? map['spiceLevel'] as String : null,
       selectedallergens: map['selectedallergens'] != null
           ? List<dynamic>.from((map['selectedallergens'] as List<dynamic>))
           : null,
@@ -533,7 +561,7 @@ class ProductVariationDataModel {
 
   @override
   String toString() {
-    return 'ProductVariationDataModel(pvID: $pvID, name: $name, price: $price, displayPrice: $displayPrice, ingredients: $ingredients, isUnlimitedStock: $isUnlimitedStock, stock: $stock, allergens: $allergens, selectedallergens: $selectedallergens, allergensMaster: $allergensMaster, variationmasteraddons: $variationmasteraddons, offerPriceEnabled: $offerPriceEnabled, offerPriceDetails: $offerPriceDetails)';
+    return 'ProductVariationDataModel(pvID: $pvID, name: $name, price: $price, displayPrice: $displayPrice, ingredients: $ingredients, isUnlimitedStock: $isUnlimitedStock, stock: $stock, allergens: $allergens,spiceLevel:$spiceLevel, selectedallergens: $selectedallergens, allergensMaster: $allergensMaster, variationmasteraddons: $variationmasteraddons, offerPriceEnabled: $offerPriceEnabled, offerPriceDetails: $offerPriceDetails)';
   }
 
   @override
@@ -548,6 +576,7 @@ class ProductVariationDataModel {
         other.isUnlimitedStock == isUnlimitedStock &&
         other.stock == stock &&
         listEquals(other.allergens, allergens) &&
+        other.spiceLevel == spiceLevel &&
         listEquals(other.selectedallergens, selectedallergens) &&
         listEquals(other.allergensMaster, allergensMaster) &&
         listEquals(other.variationmasteraddons, variationmasteraddons) &&
@@ -565,6 +594,7 @@ class ProductVariationDataModel {
         isUnlimitedStock.hashCode ^
         stock.hashCode ^
         allergens.hashCode ^
+        spiceLevel.hashCode ^
         selectedallergens.hashCode ^
         allergensMaster.hashCode ^
         variationmasteraddons.hashCode ^

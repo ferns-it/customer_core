@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
@@ -10,6 +8,8 @@ import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:customer_core/src/domain/store/models/product_details_model.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:customer_core/src/application/shop/shop_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/theme/app_colors.dart';
 
@@ -38,12 +38,8 @@ class ProductDetailsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseTextTheme = Theme.of(context).textTheme;
-
     final isPlaceHolderUrl =
         product.photo?.contains("dish_placeholder.png") ?? false;
-
-    // const defaultTileShade = Color(0xFFedf0ef);
-
     return Theme(
       data: Theme.of(context).copyWith(
         textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
@@ -61,141 +57,364 @@ class ProductDetailsTile extends StatelessWidget {
   }
 
   Widget buildTileView2(BuildContext context, bool isPlaceHolderUrl) {
+    final allergens = product.selectedAllergensList;
+    final spiceLevel = product.spiceLevel;
+    final spiceLevelIcon =
+        context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
     return Card(
-      // color: Colors.black12,
-      shape: RoundedRectangleBorder(
-          // side: BorderSide(
-          //     color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
-          borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Stack(
         children: [
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                isPlaceHolderUrl
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 35.0, bottom: 45.0),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              isPlaceHolderUrl
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 35.0, bottom: 45.0),
+                      child: Center(
                         child:
                             Assets.lib.assets.images.noimage.image(height: 60),
-                      )
-                    : ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
-                          bottomLeft: Radius.circular(8),
-                          bottomRight: Radius.circular(8),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(0.0),
-                          child: CachedNetworkImage(
-                            // height: 130,
-                            imageUrl: product.photo ?? '',
-
-                            errorWidget: (context, url, error) => Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 35.0, bottom: 45.0),
-                              child: Assets.lib.assets.images.noimage.image(),
-                            ),
-                            // fit: BoxFit.cover,
-                          ),
+                      ),
+                    )
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        imageUrl: product.photo ?? '',
+                        errorWidget: (context, url, error) => Padding(
+                          padding:
+                              const EdgeInsets.only(top: 35.0, bottom: 45.0),
+                          child: Center(
+                              child: Assets.lib.assets.images.noimage.image()),
                         ),
                       ),
-                verticalSpaceSmall,
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  child: Text(
-                    product.name ?? '',
-                    style: context.customTextTheme.text14W700.copyWith(
-                      color: context.customTextTheme.color,
                     ),
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                product.isOfferPrice == 'Yes' &&
-                        product.offerPriceDetails?.currentOfferPrice != null
-                    ? RichText(
-                        text: TextSpan(
-                          text:
-                              "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
-                          style: TextStyle(
+              verticalSpaceSmall,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            softWrap: true,
+                            product.name ?? '',
+                            style: context.customTextTheme.text14W700.copyWith(
                               color: context.customTextTheme.color,
-                              fontSize: 15),
-                          children: [
-                            TextSpan(
-                              text: product.price ?? '',
-                              style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.lineThrough),
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (spiceLevel != null &&
+                                Utils.isSpiceLevelApplicable(spiceLevel)) ...[
+                              Container(
+                                decoration: BoxDecoration(
+                                    boxShadow: [
+                                      // BoxShadow(
+                                      //     color: Colors.black.withOpacity(0.12),
+                                      //     blurRadius: 6)
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.10),
+                                        blurRadius: 4,
+                                        spreadRadius: 0,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                    color: Utils.spiceLevelColor(
+                                            context, spiceLevel)
+                                        .withOpacity(0.7),
+                                    borderRadius: BorderRadius.circular(10)),
+                                padding: EdgeInsets.only(
+                                    top: 2, left: 4, right: 4, bottom: 2),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    if (spiceLevelIcon != null &&
+                                        spiceLevelIcon.isNotEmpty)
+                                      // Text(
+                                      //   spiceLevelIcon,
+                                      //   style: TextStyle(
+                                      //       fontSize: 12, color: Colors.red),
+                                      // ),
+                                      Text(
+                                        ['Medium', 'Hot', 'Extra Hot']
+                                                .contains(spiceLevel)
+                                            ? '🌶️'
+                                            : spiceLevelIcon,
+                                        style: TextStyle(
+                                            fontSize: 12, color: Colors.red),
+                                      ),
+                                    horizontalSpaceTiny,
+                                    Text(
+                                      spiceLevel,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Utils.spiceLevelTextColor(
+                                            context, spiceLevel),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ]
                           ],
                         ),
-                      )
-                    : Text(
-                        product.price ?? '',
-                        style: context.customTextTheme.text14W700.copyWith(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                          color: context.customTextTheme.color,
-                        ),
-                      ),
-                useSecondaryWidget
-                    ? SizedBox(
-                        height: 50, child: Center(child: secondaryWidget))
-                    : FilledButton(
-                        style: FilledButton.styleFrom(
-                            disabledBackgroundColor: Colors.transparent,
-                            disabledForegroundColor:
-                                Theme.of(context).disabledColor,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0)),
-                            fixedSize: const Size(double.infinity, 30),
-                            side: BorderSide(
-                                color: product.isAvailable == true
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Colors.grey),
-                            backgroundColor: product.isAvailable == true
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.transparent),
-                        onPressed:
-                            product.isAvailable == true ? onPressAddBtn : null,
-                        child: Text(
-                          'Add to Cart',
-                          style: context.customTextTheme.text14W700.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: product.isAvailable == true
-                                ? Theme.of(context).colorScheme.onSurface
-                                : Theme.of(context).disabledColor,
+                      ],
+                    ),
+                    verticalSpaceSmall,
+                    Wrap(
+                      spacing: 2,
+                      runSpacing: 4,
+                      children: [
+                        ...allergens.take(4).map(
+                              (e) => Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey.shade800
+                                      : Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  e,
+                                  style: TextStyle(
+                                      fontSize: 8,
+                                      color: context.customTextTheme.color,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                        if (allergens.length > 4)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.grey.shade800
+                                  : Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '+${allergens.length - 4}',
+                              style: TextStyle(
+                                fontSize: 8,
+                                color: context.customTextTheme.color,
+                              ),
+                            ),
                           ),
+                      ],
+                    ),
+                    verticalSpaceSmall,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: product.isOfferPrice == 'Yes' &&
+                                  product.offerPriceDetails
+                                          ?.currentOfferPrice !=
+                                      null
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: context.customTextTheme.color,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        product.price ?? '',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 14,
+                                            decoration:
+                                                TextDecoration.lineThrough),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Flexible(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      product.price ?? '',
+                                      maxLines: 1,
+                                      style: context.customTextTheme.text14W700
+                                          .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                        color: context.customTextTheme.color,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                         ),
-                      ),
-                // verticalSpaceSmall,
-              ],
-            ),
+                        horizontalSpaceSmall,
+                        useSecondaryWidget
+                            ? Center(child: secondaryWidget)
+                            : SizedBox(
+                                height: 30,
+                                child: FilledButton(
+                                    style: FilledButton.styleFrom(
+                                        disabledBackgroundColor: Colors
+                                            .transparent,
+                                        disabledForegroundColor:
+                                            Theme.of(context).disabledColor,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0)),
+                                        fixedSize: const Size(80, 30),
+                                        side: BorderSide(
+                                            color: product.isAvailable == true
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                : Colors.grey),
+                                        backgroundColor:
+                                            product.isAvailable == true
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                : Colors.transparent),
+                                    onPressed: product.isAvailable == true
+                                        ? onPressAddBtn
+                                        : null,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Icon(
+                                        //   Icons.add,
+                                        //   size: 16,
+                                        // ),
+                                        // horizontalSpaceTiny,
+                                        Text(
+                                          'Add',
+                                          style: context
+                                              .customTextTheme.text14W700
+                                              .copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: product.isAvailable == true
+                                                ? Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                : Theme.of(context)
+                                                    .disabledColor,
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                              ),
+                      ],
+                    ),
+                    verticalSpaceSmall,
+                  ],
+                ),
+              )
+            ],
           ),
           Visibility(
             visible: showFavIcon,
             child: Positioned(
-              right: 2,
-              top: 2,
-              child: IconButton(
-                onPressed: onPressFavouriteBtn,
-                style: IconButton.styleFrom(
-                    backgroundColor: AppColors.kWhite,
-                    foregroundColor: AppColors.kBlack2),
-                icon: Icon(
-                  product.isFavourite
-                      ? FluentIcons.heart_24_filled
-                      : FluentIcons.heart_24_regular,
-                  color: product.isFavourite ? Colors.red : null,
+              right: 8,
+              top: 8,
+              child: Material(
+                color: Colors.white.withOpacity(0.92),
+                shape: const CircleBorder(),
+                child: InkWell(
+                  onTap: onPressFavouriteBtn,
+                  customBorder: const CircleBorder(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Icon(
+                      product.isFavourite
+                          ? FluentIcons.heart_24_filled
+                          : FluentIcons.heart_24_regular,
+                      size: 18,
+                      color:
+                          product.isFavourite ? Colors.red : AppColors.kBlack2,
+                    ),
+                  ),
                 ),
               ),
             ),
-          )
+          ),
+          // Positioned(
+          //   left: 8,
+          //   top: 120,
+          //   child: Row(
+          //     mainAxisSize: MainAxisSize.min,
+          //     children: [
+          //       if (spiceLevel != null &&
+          //           _isSpiceLevelApplicable(spiceLevel)) ...[
+          //         Container(
+          //           padding:
+          //               const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          //           decoration: BoxDecoration(
+          //             boxShadow: [
+          //               BoxShadow(
+          //                   color: Colors.black.withOpacity(0.12),
+          //                   blurRadius: 10,
+          //                   offset: Offset(0, 3))
+          //             ],
+          //             color: Colors.white,
+          //             borderRadius: BorderRadius.circular(8),
+          //           ),
+          //           child: Row(
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             children: [
+          //               if (spiceLevelIcon != null && spiceLevelIcon.isNotEmpty)
+          //                 Text(
+          //                   spiceLevelIcon,
+          //                   style: TextStyle(fontSize: 12, color: Colors.red),
+          //                 ),
+          //               horizontalSpaceTiny,
+          //               Text(
+          //                 spiceLevel,
+          //                 style: TextStyle(
+          //                   fontWeight: FontWeight.bold,
+          //                   fontSize: 11,
+          //                   color: context.customTextTheme.color,
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //       ]
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );
@@ -203,6 +422,9 @@ class ProductDetailsTile extends StatelessWidget {
 
   Widget buildTileView3(BuildContext context) {
     final allergens = product.selectedAllergensList;
+    final spiceLevel = product.spiceLevel;
+    final spiceLevelIcon =
+        context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
     return Card(
       color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -310,6 +532,29 @@ class ProductDetailsTile extends StatelessWidget {
                         ),
                     ],
                   ),
+                  verticalSpaceSmall,
+                  if (spiceLevel != null &&
+                      Utils.isSpiceLevelApplicable(spiceLevel)) ...[
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (spiceLevelIcon != null && spiceLevelIcon.isNotEmpty)
+                          Text(
+                            spiceLevelIcon,
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        horizontalSpaceTiny,
+                        Text(
+                          spiceLevel,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: context.customTextTheme.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                    verticalSpaceSmall,
+                  ],
                   verticalSpaceSmall,
                   product.isOfferPrice == 'Yes' &&
                           product.offerPriceDetails?.currentOfferPrice != null

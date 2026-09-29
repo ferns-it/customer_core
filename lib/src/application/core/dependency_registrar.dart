@@ -1,6 +1,9 @@
 import 'package:customer_core/src/application/home/home_provider.dart';
+import 'package:customer_core/src/application/notification/notification_provider.dart';
+import 'package:customer_core/src/application/otp/otp_provider.dart';
 import 'package:customer_core/src/application/promotion/promotions_provider.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
+import 'package:customer_core/src/application/settings/app_update_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:customer_core/src/application/auth/auth_provider.dart';
 import 'package:customer_core/src/application/core/time_dropdown_provider.dart';
@@ -30,11 +33,14 @@ class DependencyRegistrar {
     ChangeNotifierProvider(
       create: (context) => TimeDropdownProvider()..generateTimeSlots(),
     ),
-    // ChangeNotifierProvider(create: (context) => getIt<NotificationProvider>()),
+    ChangeNotifierProvider(create: (context) => getIt<NotificationProvider>()),
     ChangeNotifierProvider(create: (context) => getIt<PromotionsProvider>()),
     ChangeNotifierProvider(create: (context) => getIt<HomeProvider>()),
     ChangeNotifierProvider(create: (context) => getIt<SearchProvider>()),
     ChangeNotifierProvider(create: (context) => ThemeProvider()),
+    ChangeNotifierProvider(create: (context) => getIt<OtpProvider>()),
+    ChangeNotifierProvider(create: (context) => AppUpdateProvider()),
+
   ];
 
   static Future<void> initializeAllProviders(BuildContext context) async {
@@ -50,6 +56,7 @@ class DependencyRegistrar {
       context.read<PromotionsProvider>().init();
       context.read<HomeProvider>().init();
       context.read<SearchProvider>().init();
+      context.read<NotificationProvider>().init();
     });
   }
 }

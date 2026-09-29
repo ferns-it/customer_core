@@ -42,10 +42,45 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final cartListener = context.watch<CartProvider>();
     final userListener = context.watch<UserProvider>();
     final userProvider = context.read<UserProvider>();
-    final themeListener = context.watch<ThemeProvider>();
+    final cartProvider = context.read<CartProvider>();
+    final shopListener = context.watch<ShopProvider>();
     const outlinedBorder = OutlineInputBorder(
       borderSide: BorderSide(color: Colors.transparent),
     );
+
+    // Check the temporary flags first, then the normal flags
+    final isTakeAwayTempEnabled =
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway_temp_off !=
+                null &&
+            shopListener.storeSettings.data?.deliveryInfo?.takeAway_temp_off ==
+                'No';
+    final isHomeDeliveryTempEnabled = shopListener
+                .storeSettings.data?.deliveryInfo?.homeDelivery_temp_off !=
+            null &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery_temp_off ==
+            'No';
+
+    final isTakeAwayEnabled = isTakeAwayTempEnabled &&
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway != null &&
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
+    final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery != null &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery == '1';
+
+    if (!isHomeDeliveryEnabled &&
+        isTakeAwayEnabled &&
+        cartListener.selectedOrderType != OrderType.takeaway) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        cartProvider.onChangeOrderType(OrderType.takeaway);
+        cartProvider.clearCalculatedDeliveryDetails();
+      });
+    } else if (isHomeDeliveryEnabled &&
+        !isTakeAwayEnabled &&
+        cartListener.selectedOrderType != OrderType.delivery) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        cartProvider.onChangeOrderType(OrderType.delivery);
+      });
+    }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final taxGroup = cartListener.selectedOrderType == OrderType.delivery
@@ -57,6 +92,13 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final taxAmount = cartListener.selectedOrderType == OrderType.delivery
         ? cartListener.deliveryDetails?.amountFormatted?.taxTotalAmount
         : cartListener.takeAwayDetails?.amountFormatted?.taxTotalAmount;
+    final taxDetails = cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.taxDetails
+        : cartListener.takeAwayDetails?.taxDetails;
+    final hasTaxAmount = 
+    cartListener.selectedOrderType == OrderType.delivery
+        ? cartListener.deliveryDetails?.hasTax
+        : cartListener.takeAwayDetails?.hasTax;
 
     final subTotal =
         cartListener.cartDetailsModel?.cartTotal?.cartTotalPrice_NormalDisplay;
@@ -202,14 +244,13 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                     ),
                                   ),
                                   userListener.userData?.user.userMobile ==
-                                              null ||
+                                              '0' ||
                                           userListener.userData?.user.userMobile
                                                   ?.isEmpty ==
                                               true
                                       ? const SizedBox.shrink()
                                       : Text(
-                                          userListener
-                                                  .userData?.user.userMobile ??
+                                          '${userListener.userData?.user.formattedCountryCode} ${userListener.userData?.user.userMobileActual}' ??
                                               "",
                                           style: GoogleFonts.quicksand(
                                             textStyle: context
@@ -544,8 +585,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                   Theme.of(context).colorScheme.primary,
 
                               onChanged: (_) {
-                                if (!cartListener.isStripeEnabled) {
-                                  AlertDialogs.showInfo(
+                                final isIndianUser =
+                                    userListener.userData?.user.isIndianUser ??
+                                        cartListener.isIndianUser;
+                                if (!cartListener.isStripeEnabled ||
+                                    isIndianUser) {
+                                  AlertDialogs.showError(
                                       'Card payment not available');
                                   return;
                                 }
@@ -669,7 +714,7 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                 ),
                               )
                             : SizedBox.shrink()),
-                    if (isTaxApplied == true || taxAmount != null) ...[
+                    if (isTaxApplied == true) ...[
                       verticalSpaceTiny,
                       isTaxApplied == true
                           ? _SummaryRow(
@@ -679,8 +724,9 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                               style: context.customTextTheme.text16W600
                                   .copyWith(
                                       color: context.customTextTheme.color),
-                              infoWidget: taxAmount !=
-                                      '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                              infoWidget: hasTaxAmount == true
+                                  //  taxAmount !=
+                                  //         '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
                                   ? Tooltip(
                                       decoration: BoxDecoration(
                                         color: context.customTextTheme.color,
@@ -741,14 +787,27 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
     final cartListener = context.watch<CartProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final isHomeDeliveryEnabled =
-        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery != null &&
-            shopListener.storeSettings.data?.deliveryInfo?.homeDelivery == '1';
-    final isTakeAwayEnabled =
-        shopListener.storeSettings.data?.deliveryInfo?.takeAway != null &&
-            shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
+    // Check the temporary flags first, then the normal flags
+    final isTakeAwayTempEnabled =
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway_temp_off !=
+                null &&
+            shopListener.storeSettings.data?.deliveryInfo?.takeAway_temp_off ==
+                'No';
+    final isHomeDeliveryTempEnabled = shopListener
+                .storeSettings.data?.deliveryInfo?.homeDelivery_temp_off !=
+            null &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery_temp_off ==
+            'No';
 
-    if (isTakeAwayEnabled && isHomeDeliveryEnabled) {
+    final isTakeAwayEnabled = isTakeAwayTempEnabled &&
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway != null &&
+        shopListener.storeSettings.data?.deliveryInfo?.takeAway == '1';
+    final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery != null &&
+        shopListener.storeSettings.data?.deliveryInfo?.homeDelivery == '1';
+
+    // If both are enabled, show both options
+    if (isHomeDeliveryEnabled && isTakeAwayEnabled) {
       return ListTileTheme(
         enableFeedback: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -785,12 +844,6 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                   ),
                 ),
                 onTap: () {
-                  final isEnabled = shopListener
-                      .storeSettings.data?.deliveryInfo?.homeDelivery;
-                  if (isEnabled == null || isEnabled == '0') {
-                    AlertDialogs.showInfo("Home delivery not available");
-                    return;
-                  }
                   cartProvider.onChangeOrderType(
                     OrderType.delivery,
                   );
@@ -829,9 +882,13 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                   ),
                 ),
                 onTap: () {
+                  // Check the temporary takeaway flag first, then the normal one
+                  final isTempEnabled = shopListener.storeSettings.data
+                          ?.deliveryInfo?.takeAway_temp_off ==
+                      'No';
                   final isEnabled =
                       shopListener.storeSettings.data?.deliveryInfo?.takeAway;
-                  if (isEnabled == null || isEnabled == '0') {
+                  if (!isTempEnabled || isEnabled == null || isEnabled == '0') {
                     AlertDialogs.showInfo("Takeaway not available");
                     return;
                   }
@@ -844,7 +901,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
           ],
         ),
       );
-    } else if (isTakeAwayEnabled) {
+    } else if (isTakeAwayEnabled && !isHomeDeliveryEnabled) {
+      // Only takeaway is enabled
       return ListTile(
         contentPadding: EdgeInsets.zero,
         minLeadingWidth: 5,
@@ -857,10 +915,12 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         ),
         subtitle: Text(
           'We\'re serving takeaway orders only',
-          style: context.customTextTheme.text14W500,
+          style: context.customTextTheme.text14W500
+              .copyWith(color: context.customTextTheme.color),
         ),
       );
-    } else if (isHomeDeliveryEnabled) {
+    } else if (!isTakeAwayEnabled && isHomeDeliveryEnabled) {
+      // Only home delivery is enabled
       return ListTile(
         contentPadding: EdgeInsets.zero,
         minLeadingWidth: 5,
@@ -873,7 +933,8 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
         ),
         subtitle: Text(
           'We\'re serving home delivery orders only',
-          style: context.customTextTheme.text14W500,
+          style: context.customTextTheme.text14W500
+              .copyWith(color: context.customTextTheme.color),
         ),
       );
     }
@@ -1008,62 +1069,68 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                       minute: cartListener.selectedPickUpTime!.minute)
                   : DateTimeUtils.addMinutesToTime(TimeOfDay.now(), 15),
               builder: (BuildContext context, Widget? child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    dialogBackgroundColor: AppColors.kWhite,
-                    textTheme: poppinsTextTheme(context).textTheme.copyWith(
-                        bodySmall: const TextStyle(color: Colors.white)),
-                    timePickerTheme: TimePickerThemeData(
-                        helpTextStyle:
-                            TextStyle(color: context.customTextTheme.color),
-                        entryModeIconColor:
-                            Theme.of(context).colorScheme.primary,
-                        dialTextColor: WidgetStateColor.resolveWith(
-                          (states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return Theme.of(context).colorScheme.onSurface;
-                            }
-                            return context.customTextTheme.color!;
-                          },
-                        ),
-                        backgroundColor:
-                            Theme.of(context).colorScheme.brightness ==
-                                    Brightness.dark
-                                ? AppColors.kCardBackground2
-                                : AppColors.kOffWhite,
-                        dialBackgroundColor: Theme.of(context).cardColor,
-                        dayPeriodColor: WidgetStateColor.resolveWith(
-                          (states) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    alwaysUse24HourFormat: false,
+                  ),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      dialogBackgroundColor: AppColors.kWhite,
+                      textTheme: poppinsTextTheme(context).textTheme.copyWith(
+                          bodySmall: const TextStyle(color: Colors.white)),
+                      timePickerTheme: TimePickerThemeData(
+                          helpTextStyle:
+                              TextStyle(color: context.customTextTheme.color),
+                          entryModeIconColor:
+                              Theme.of(context).colorScheme.primary,
+                          dialTextColor: WidgetStateColor.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return Theme.of(context).colorScheme.onSurface;
+                              }
+                              return context.customTextTheme.color!;
+                            },
+                          ),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.brightness ==
+                                      Brightness.dark
+                                  ? AppColors.kCardBackground2
+                                  : AppColors.kOffWhite,
+                          dialBackgroundColor: Theme.of(context).cardColor,
+                          dayPeriodColor: WidgetStateColor.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return Theme.of(context).colorScheme.primary;
+                              }
+                              return Theme.of(context).cardColor;
+                            },
+                          ),
+                          hourMinuteColor:
+                              WidgetStateColor.resolveWith((states) {
                             if (states.contains(WidgetState.selected)) {
                               return Theme.of(context).colorScheme.primary;
                             }
                             return Theme.of(context).cardColor;
-                          },
-                        ),
-                        hourMinuteColor: WidgetStateColor.resolveWith((states) {
-                          if (states.contains(WidgetState.selected)) {
-                            return Theme.of(context).colorScheme.primary;
-                          }
-                          return Theme.of(context).cardColor;
-                        }),
-                        hourMinuteTextColor: WidgetStateColor.resolveWith(
-                          (states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return Theme.of(context).colorScheme.surface;
-                            }
-                            return Theme.of(context).colorScheme.primary;
-                          },
-                        ),
-                        dayPeriodTextColor: WidgetStateColor.resolveWith(
-                          (states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return Theme.of(context).colorScheme.surface;
-                            }
-                            return Theme.of(context).colorScheme.secondary;
-                          },
-                        )),
+                          }),
+                          hourMinuteTextColor: WidgetStateColor.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return Theme.of(context).colorScheme.surface;
+                              }
+                              return Theme.of(context).colorScheme.primary;
+                            },
+                          ),
+                          dayPeriodTextColor: WidgetStateColor.resolveWith(
+                            (states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return Theme.of(context).colorScheme.surface;
+                              }
+                              return Theme.of(context).colorScheme.secondary;
+                            },
+                          )),
+                    ),
+                    child: child!,
                   ),
-                  child: child!,
                 );
               },
             );
@@ -1431,12 +1498,17 @@ class _DeliveryDetailsScreenState extends State<DeliveryDetailsScreen> {
                                                                                   : () async {
                                                                                       final currentContext = context; // Store context
 
-                                                                                      await userListener.deleteUserAddress(address.uaID.toString());
-                                                                                      // cartListener.selectedAddressSecondary = null;
-
-                                                                                      cartListener.clearSelectedAddressSecondary();
+                                                                                      final isDeleted = await userListener.deleteUserAddress(address.uaID.toString());
 
                                                                                       if (currentContext.mounted) {
+                                                                                        if (isDeleted) {
+                                                                                          if (cartListener.selectedAddress?.uaID == address.uaID) {
+                                                                                            currentContext.read<CartProvider>().clearSelectedAddress();
+                                                                                          } else {
+                                                                                            currentContext.read<CartProvider>().clearSelectedAddressSecondary();
+                                                                                          }
+                                                                                        }
+
                                                                                         Navigator.of(currentContext).pop();
 
                                                                                         currentContext.read<UserProvider>().getAddressList();

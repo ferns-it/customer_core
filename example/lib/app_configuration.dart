@@ -4,9 +4,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 final appConfig = AppConfig(
   applicationName: 'Le Arabia Customer',
   shopName: 'Le Arabia',
-  shopId: '76',
-  // shopId: '93',
-  country: Country.uk,
+
+  // shopId: '95',
+  shopId: '1',
+  country: Country.ind,
   env: AppEnv.prod,
   shopIdentifier: 'le-arabia',
   // shopIdentifier: 'brew--chew-',
@@ -17,6 +18,8 @@ final appConfig = AppConfig(
   fireBaseProjectId: 'customerapp-6d5f7',
   themeMode: AppThemeMode.system,
   isCategoryImageEnabled: true,
+  remoteConfigKey: 'le_arabia_config',
+  // businessType: BusinessType.fish,
   // applicationName: 'Urban Spice',
   // shopName: 'Urban Spice',
   // shopId: '76',

@@ -1,9 +1,5 @@
-import 'dart:io';
-
 import 'package:customer_core/src/domain/user/models/basic_profile_data_model.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
 import 'package:customer_core/src/core/constants/app_identifiers.dart';
 import 'package:customer_core/src/core/utils/alert_dialogs.dart';
@@ -113,15 +109,12 @@ class UserProvider extends ChangeNotifier with BaseController {
   late TextEditingController landMarkTxtController;
   late TextEditingController searchAddressTxtController;
 
-  static const _channel = MethodChannel('app_version_channel');
-
   bool get isUserExist => _userData != null;
 
   @override
   Future<void> init() {
     getUserData();
     getAddressList();
-    checkNewAppUpdates();
     return super.init();
   }
 
@@ -458,39 +451,6 @@ class UserProvider extends ChangeNotifier with BaseController {
     } finally {
       _isUserConsentLoading = false;
       notifyListeners();
-    }
-  }
-
-  Future<void> prepareFakeManager() async {
-    await _channel.invokeMethod("prepareFakeManager");
-  }
-
-  Future<void> triggerFakeUpdateAvailable() async {
-    await _channel.invokeMethod('triggerFakeUpdateAvailable');
-  }
-
-  Future<void> completeFakeUpdate() async {
-    await _channel.invokeMethod('completeFakeUpdate');
-  }
-
-  Future<void> startImmediateUpdate() async {
-    await _channel.invokeMethod('startImmediateUpdate');
-  }
-
-  Future<void> setFakeMode(bool enable) async {
-    await _channel.invokeMethod("setFakeMode", {"enable": enable});
-  }
-
-  Future<bool> checkUpdate() async {
-    return await _channel.invokeMethod("checkUpdate");
-  }
-
-  Future<void> checkNewAppUpdates() async {
-    if (kDebugMode || Platform.isIOS) return;
-
-    final isUpdateAvailable = await checkUpdate();
-    if (isUpdateAvailable) {
-      await startImmediateUpdate();
     }
   }
 

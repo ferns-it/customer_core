@@ -1,16 +1,18 @@
 import 'dart:developer';
 
+import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/application/connectivity/connectivity_controller.dart';
+import 'package:customer_core/src/domain/firebase/remote_config_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'application/notification/notification_provider.dart';
 import 'domain/dependency_injection/injection_config.dart';
 
 class CustomerInitializer {
-  static Future<void> init(
-      ) async {
+  static Future<void> init() async {
     await ConnectivityController.instance.init();
     // WidgetsFlutterBinding.ensureInitialized();
 
@@ -25,6 +27,28 @@ class CustomerInitializer {
 
     // DI
     configureInjection();
+    // Remote Config must never crash/block startup: the host app assigns
+    // `AppConfig.instance` when `CustomerApp` is built, which can happen
+    // after this call. Guard everything and fall back gracefully.
+    try {
+      final remoteConfigService = RemoteConfigService();
+
+      // `AppConfig.instance` is assigned when `CustomerApp` is built, which can
+      // happen after this call, so fall back to the default key instead of
+      // reading a not yet initialised AppConfig.
+      remoteConfigService.setConfigKey(
+        AppConfig.hasInstance
+            ? AppConfig.instance.remoteConfigKey
+            : RemoteConfigService.defaultConfigKey,
+      );
+
+      await remoteConfigService.refresh().timeout(
+            const Duration(seconds: 15),
+            onTimeout: () => debugPrint('Remote Config warm-up timed out'),
+          );
+    } catch (e) {
+      debugPrint('Remote Config warm-up failed (non-fatal): $e');
+    }
 
     final notificationProvider = getIt<NotificationProvider>();
 

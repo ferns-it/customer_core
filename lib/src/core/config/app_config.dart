@@ -2,7 +2,15 @@ import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/core/config/business_type.dart';
 
 class AppConfig {
-  static late AppConfig instance;
+  static AppConfig? _instance;
+
+  static AppConfig get instance => _instance!;
+
+  static set instance(AppConfig value) => _instance = value;
+
+  /// Whether [instance] was already assigned by the host app.
+  static bool get hasInstance => _instance != null;
+
   final String applicationName;
   final String shopName;
   final String shopId;
@@ -18,6 +26,7 @@ class AppConfig {
   final AppThemeMode themeMode;
   final bool isCategoryImageEnabled;
   final BusinessType businessType;
+  final String remoteConfigKey;
 
   AppConfig({
     required this.applicationName,
@@ -35,5 +44,6 @@ class AppConfig {
     this.isCategoryImageEnabled = true,
     this.businessType = BusinessType.restaurant,
     this.themeMode = AppThemeMode.system,
+    required this.remoteConfigKey,
   });
 }

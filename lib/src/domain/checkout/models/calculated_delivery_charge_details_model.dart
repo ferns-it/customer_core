@@ -310,7 +310,7 @@ class DeliveryFeeGeneralData {
   final String? sourcePostCode;
   final String? destinationPostCode;
   final String? distance;
-  final int? calibratedDistance;
+  final double? calibratedDistance;
   final String? duration;
   final int? cartItemsCount;
   final int? discountPercentage;
@@ -333,7 +333,7 @@ class DeliveryFeeGeneralData {
     String? sourcePostCode,
     String? destinationPostCode,
     String? distance,
-    int? calibratedDistance,
+    double? calibratedDistance,
     String? duration,
     int? cartItemsCount,
     int? discountPercentage,
@@ -376,9 +376,7 @@ class DeliveryFeeGeneralData {
           ? map['destinationPostCode'] as String
           : null,
       distance: map['distance'] != null ? map['distance'] as String : null,
-      calibratedDistance: map['calibratedDistance'] != null
-          ? map['calibratedDistance'] as int
-          : null,
+      calibratedDistance: (map['calibratedDistance'] as num?)?.toDouble(),
       duration: map['duration'] != null ? map['duration'] as String : null,
       cartItemsCount:
           map['cartItemsCount'] != null ? map['cartItemsCount'] as int : null,
@@ -431,7 +429,7 @@ class DeliveryFeeGeneralData {
 class DeliveryFeeDeliverySettings {
   final String? fixedDeliveryCharges;
   final String? freeDelivery;
-  final int? calibratedDistance;
+  final double? calibratedDistance;
   final double? freeDeliveryRadius;
   final double? maxDeliveryRadius;
   final double? ratePerMile;
@@ -454,7 +452,7 @@ class DeliveryFeeDeliverySettings {
   DeliveryFeeDeliverySettings copyWith({
     String? fixedDeliveryCharges,
     String? freeDelivery,
-    int? calibratedDistance,
+    double? calibratedDistance,
     double? freeDeliveryRadius,
     double? maxDeliveryRadius,
     double? ratePerMile,
@@ -497,9 +495,7 @@ class DeliveryFeeDeliverySettings {
           : null,
       freeDelivery:
           map['freeDelivery'] != null ? map['freeDelivery'] as String : null,
-      calibratedDistance: map['calibratedDistance'] != null
-          ? map['calibratedDistance'] as int
-          : null,
+      calibratedDistance: (map['calibratedDistance'] as num?)?.toDouble(),
       // freeDeliveryRadius: map['freeDeliveryRadius'] != null
       //     ? map['freeDeliveryRadius'] as int
       // : null,

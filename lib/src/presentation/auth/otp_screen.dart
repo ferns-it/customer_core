@@ -73,39 +73,41 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                       horizontalSpaceTiny,
                       InkWell(
-                          onTap: () => Navigator.pop(context),
-                          child: const Icon(Icons.edit, size: 16.0))
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(Icons.edit, size: 16.0),
+                      ),
                     ],
                   ),
                 ),
                 verticalSpaceLarge,
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: PinCodeTextField(
+                  child: MaterialPinField(
                     length: 6,
                     obscureText: false,
-                    animationType: AnimationType.scale,
-                    pinTheme: PinTheme(
-                      shape: PinCodeFieldShape.box,
-                      borderRadius: BorderRadius.circular(10.0),
-                      activeColor: AppColors.kBlack2,
-                      inactiveColor: AppColors.kBlack2,
-                      inactiveFillColor: AppColors.kOffWhite3,
-                      activeFillColor: AppColors.kOffWhite3,
-                      selectedColor: AppColors.kBlack2,
-                      selectedFillColor: AppColors.kOffWhite3,
-                      fieldHeight: 52,
-                      fieldWidth: 52,
-                    ),
-                    controller: authProvider.emailOtpController,
-                    showCursor: false,
-                    animationDuration: const Duration(milliseconds: 300),
-                    enableActiveFill: true,
+                    pinController: authProvider.emailOtpController,
                     keyboardType: TextInputType.phone,
                     onCompleted: (v) {},
                     onChanged: (value) {},
-                    appContext: context,
-                    autoDisposeControllers: false,
+                    theme: MaterialPinTheme(
+                      shape: MaterialPinShape.outlined,
+                      cellSize: const Size(52, 52),
+                      borderRadius: BorderRadius.circular(10.0),
+
+                      // Borders: inactive = empty cell, selected = focused, active = filled
+                      borderColor: AppColors.kBlack2,
+                      focusedBorderColor: AppColors.kBlack2,
+                      filledBorderColor: AppColors.kBlack2,
+
+                      // Fills (replaces enableActiveFill: true)
+                      fillColor: AppColors.kOffWhite3,
+                      focusedFillColor: AppColors.kOffWhite3,
+                      filledFillColor: AppColors.kOffWhite3,
+
+                      showCursor: false,
+                      entryAnimation: MaterialPinAnimation.scale,
+                      animationDuration: const Duration(milliseconds: 300),
+                    ),
                   ),
                 ),
                 verticalSpaceMedium,
@@ -117,8 +119,9 @@ class _OtpScreenState extends State<OtpScreen> {
                       children: [
                         Text(
                           "Didn't get OTP? ",
-                          style: context.customTextTheme.text12W500
-                              .copyWith(color: AppColors.kGray3),
+                          style: context.customTextTheme.text12W500.copyWith(
+                            color: AppColors.kGray3,
+                          ),
                         ),
                         Text(
                           "Resend OTP",
@@ -135,41 +138,36 @@ class _OtpScreenState extends State<OtpScreen> {
                     if (validated) {
                       authProvider.registerUser().then((registered) {
                         if (registered) {
-                          AlertDialogs.showSuccess(
-                            "Registered Successfully!",
-                          );
+                          AlertDialogs.showSuccess("Registered Successfully!");
                           authProvider.clearValues();
                           context.read<OrderProvider>().clearData();
                           DependencyRegistrar.initializeAllProviders(context);
                           Future.delayed(const Duration(seconds: 1), () {
-                            context.router.replaceAll([
-                              HomeScreenRoute(),
-                            ]);
+                            context.router.replaceAll([HomeScreenRoute()]);
                           });
                         }
                       });
                     } else {
-                      AlertDialogs.showError(
-                        "Invalid OTP",
-                      );
+                      AlertDialogs.showError("Invalid OTP");
                     }
                   },
                   child: Container(
-                      width: context.screenWidth,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      child: Center(
-                        child: !authListener.registerLoading
-                            ? Text(
-                                "SUBMIT",
-                                style: context.customTextTheme.text16W400
-                                    .copyWith(color: Colors.white),
-                              )
-                            : showButtonProgress(Colors.white),
-                      )),
+                    width: context.screenWidth,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    child: Center(
+                      child: !authListener.registerLoading
+                          ? Text(
+                              "SUBMIT",
+                              style: context.customTextTheme.text16W400
+                                  .copyWith(color: Colors.white),
+                            )
+                          : showButtonProgress(Colors.white),
+                    ),
+                  ),
                 ),
               ],
             ),

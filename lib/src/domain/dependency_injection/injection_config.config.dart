@@ -1,4 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -8,6 +9,7 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+
 import 'package:customer_core/src/application/auth/auth_provider.dart' as _i993;
 import 'package:customer_core/src/application/cart/cart_provider.dart' as _i437;
 import 'package:customer_core/src/application/home/home_provider.dart' as _i514;
@@ -19,7 +21,7 @@ import 'package:customer_core/src/application/otp/otp_provider.dart' as _i615;
 import 'package:customer_core/src/application/payment/payment_provider.dart'
     as _i412;
 import 'package:customer_core/src/application/products/products_provider.dart'
-    as _i805;
+    as _i806;
 import 'package:customer_core/src/application/promotion/promotions_provider.dart'
     as _i184;
 import 'package:customer_core/src/application/search/search_provider.dart'
@@ -64,70 +66,86 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
 extension GetItInjectableX on _i174.GetIt {
-// initializes the registration of main-scope dependencies inside of GetIt
+  // initializes the registration of main-scope dependencies inside of GetIt
   _i174.GetIt init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
   }) {
-    final gh = _i526.GetItHelper(
-      this,
-      environment,
-      environmentFilter,
-    );
+    final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.lazySingleton<_i514.HomeProvider>(() => _i514.HomeProvider());
     gh.lazySingleton<_i86.NotificationProvider>(
-        () => _i86.NotificationProvider());
+      () => _i86.NotificationProvider(),
+    );
     gh.lazySingleton<_i805.ThemeProvider>(() => _i805.ThemeProvider());
     gh.lazySingleton<_i335.IUserSharedPrefsRepo>(
-        () => _i447.UserSharedPrefsRepo());
+      () => _i447.UserSharedPrefsRepo(),
+    );
     gh.lazySingleton<_i71.ISearchRepo>(() => _i662.SearchRepo());
     gh.lazySingleton<_i303.ITableRepo>(() => _i519.TableRepo());
-    gh.lazySingleton<_i581.TableProvider>(() => _i581.TableProvider(
-          tableRepo: gh<_i303.ITableRepo>(),
-          userSharedPrefsRepo: gh<_i335.IUserSharedPrefsRepo>(),
-        ));
     gh.lazySingleton<_i696.ICartRepo>(() => _i640.CartRepo());
+    gh.lazySingleton<_i581.TableProvider>(
+      () => _i581.TableProvider(
+        tableRepo: gh<_i303.ITableRepo>(),
+        userSharedPrefsRepo: gh<_i335.IUserSharedPrefsRepo>(),
+      ),
+    );
     gh.lazySingleton<_i266.IUserRepo>(() => _i854.UserRepo());
     gh.lazySingleton<_i94.IOfferRepo>(() => _i459.OfferRepo());
     gh.lazySingleton<_i706.ICheckoutRepo>(() => _i454.CheckoutRepo());
     gh.lazySingleton<_i654.IOtpRepo>(() => _i782.OtpRepo());
-    gh.lazySingleton<_i592.OrderProvider>(() => _i592.OrderProvider(
-          userRepo: gh<_i266.IUserRepo>(),
-          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
-        ));
-    gh.lazySingleton<_i914.UserProvider>(() => _i914.UserProvider(
-          userRepo: gh<_i266.IUserRepo>(),
-          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
-        ));
     gh.lazySingleton<_i333.IStoreRepo>(() => _i797.StoreRepo());
     gh.lazySingleton<_i304.IPromotionRepo>(() => _i1037.PromotionsRepo());
-    gh.lazySingleton<_i805.ProductsProvider>(() => _i805.ProductsProvider(
-          storeRepo: gh<_i333.IStoreRepo>(),
-          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
-        ));
-    gh.lazySingleton<_i437.CartProvider>(() => _i437.CartProvider(
-          cartRepo: gh<_i696.ICartRepo>(),
-          checkRepo: gh<_i706.ICheckoutRepo>(),
-          offerRepo: gh<_i94.IOfferRepo>(),
-          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
-        ));
+    gh.lazySingleton<_i592.OrderProvider>(
+      () => _i592.OrderProvider(
+        userRepo: gh<_i266.IUserRepo>(),
+        sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
+      ),
+    );
+    gh.lazySingleton<_i914.UserProvider>(
+      () => _i914.UserProvider(
+        userRepo: gh<_i266.IUserRepo>(),
+        sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
+      ),
+    );
     gh.lazySingleton<_i615.OtpProvider>(
-        () => _i615.OtpProvider(otpRepo: gh<_i654.IOtpRepo>()));
+      () => _i615.OtpProvider(otpRepo: gh<_i654.IOtpRepo>()),
+    );
+    gh.lazySingleton<_i993.AuthProvider>(
+      () => _i993.AuthProvider(
+        userRepository: gh<_i266.IUserRepo>(),
+        sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
+        otpProvider: gh<_i615.OtpProvider>(),
+      ),
+    );
+    gh.lazySingleton<_i806.ProductsProvider>(
+      () => _i806.ProductsProvider(
+        storeRepo: gh<_i333.IStoreRepo>(),
+        sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
+      ),
+    );
     gh.lazySingleton<_i412.PaymentProvider>(
-        () => _i412.PaymentProvider(checkoutRepo: gh<_i706.ICheckoutRepo>()));
-    gh.lazySingleton<_i663.ShopProvider>(
-        () => _i663.ShopProvider(gh<_i333.IStoreRepo>()));
+      () => _i412.PaymentProvider(checkoutRepo: gh<_i706.ICheckoutRepo>()),
+    );
+    gh.lazySingleton<_i437.CartProvider>(
+      () => _i437.CartProvider(
+        cartRepo: gh<_i696.ICartRepo>(),
+        checkRepo: gh<_i706.ICheckoutRepo>(),
+        offerRepo: gh<_i94.IOfferRepo>(),
+        sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
+      ),
+    );
     gh.factory<_i184.PromotionsProvider>(
-        () => _i184.PromotionsProvider(gh<_i304.IPromotionRepo>()));
-    gh.lazySingleton<_i553.SearchProvider>(() => _i553.SearchProvider(
-          searchRepo: gh<_i71.ISearchRepo>(),
-          productsProvider: gh<_i805.ProductsProvider>(),
-        ));
-    gh.lazySingleton<_i993.AuthProvider>(() => _i993.AuthProvider(
-          userRepository: gh<_i266.IUserRepo>(),
-          sharedPrefsRepository: gh<_i335.IUserSharedPrefsRepo>(),
-          otpProvider: gh<_i615.OtpProvider>(),
-        ));
+      () => _i184.PromotionsProvider(gh<_i304.IPromotionRepo>()),
+    );
+    gh.lazySingleton<_i663.ShopProvider>(
+      () => _i663.ShopProvider(gh<_i333.IStoreRepo>()),
+    );
+    gh.lazySingleton<_i553.SearchProvider>(
+      () => _i553.SearchProvider(
+        searchRepo: gh<_i71.ISearchRepo>(),
+        productsProvider: gh<_i806.ProductsProvider>(),
+      ),
+    );
     return this;
   }
 }

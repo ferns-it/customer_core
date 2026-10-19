@@ -6,7 +6,7 @@ part 'validated_coupon_details.g.dart';
 part 'validated_coupon_details.freezed.dart';
 
 @freezed
-class ValidatedCouponDetails with _$ValidatedCouponDetails {
+abstract class ValidatedCouponDetails with _$ValidatedCouponDetails {
   const factory ValidatedCouponDetails({
     String? shopID,
     String? coupenCode,
@@ -20,7 +20,7 @@ class ValidatedCouponDetails with _$ValidatedCouponDetails {
 }
 
 @freezed
-class CoupenData with _$CoupenData {
+abstract class CoupenData with _$CoupenData {
   const factory CoupenData({
     String? id,
     String? shopID,

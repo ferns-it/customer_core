@@ -6,9 +6,8 @@ part of 'offer_details_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$OfferDetailsModelImpl _$$OfferDetailsModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$OfferDetailsModelImpl(
+_OfferDetailsModel _$OfferDetailsModelFromJson(Map<String, dynamic> json) =>
+    _OfferDetailsModel(
       id: json['id'] as String?,
       shopID: json['shopID'] as String?,
       coupenCode: json['coupenCode'] as String?,
@@ -21,8 +20,7 @@ _$OfferDetailsModelImpl _$$OfferDetailsModelImplFromJson(
       coupenStatus: json['coupenStatus'] as String?,
     );
 
-Map<String, dynamic> _$$OfferDetailsModelImplToJson(
-        _$OfferDetailsModelImpl instance) =>
+Map<String, dynamic> _$OfferDetailsModelToJson(_OfferDetailsModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'shopID': instance.shopID,

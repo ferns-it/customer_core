@@ -1,3 +1,5 @@
+// dart format width=80
+
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
@@ -5,7 +7,7 @@
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-// ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
+// ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -121,29 +123,29 @@ class $LibAssetsIconsGen {
 
   /// List of all assets
   List<dynamic> get values => [
-        stripeLogoWine,
-        cashOnDelivery,
-        ccStripe,
-        contactless,
-        creditCard,
-        deliveryAddress,
-        dicountCopon,
-        editIcon,
-        emptyCart,
-        fastDelivery,
-        getInTouch,
-        man,
-        money,
-        moneyBlack,
-        nonVeg,
-        notificationIcon1,
-        notificationIcon2,
-        searchNormal,
-        stripe,
-        takeAway,
-        veg,
-        zigzag
-      ];
+    stripeLogoWine,
+    cashOnDelivery,
+    ccStripe,
+    contactless,
+    creditCard,
+    deliveryAddress,
+    dicountCopon,
+    editIcon,
+    emptyCart,
+    fastDelivery,
+    getInTouch,
+    man,
+    money,
+    moneyBlack,
+    nonVeg,
+    notificationIcon1,
+    notificationIcon2,
+    searchNormal,
+    stripe,
+    takeAway,
+    veg,
+    zigzag,
+  ];
 }
 
 class $LibAssetsImagesGen {
@@ -378,66 +380,66 @@ class $LibAssetsImagesGen {
 
   /// List of all assets
   List<dynamic> get values => [
-        a1,
-        group1000003922,
-        pattern,
-        profileCircle,
-        appLogo01,
-        banner1,
-        banner2,
-        banner3,
-        bg01,
-        bg02,
-        bg03,
-        bg04,
-        bg05,
-        calendarClock,
-        discount,
-        foodBackground,
-        foodGifAnimation,
-        freshdenBanner1,
-        freshdenBanner2,
-        freshdenBanner,
-        freshdenLogoV1,
-        freshdenLogoV2,
-        freshdenLogoV4,
-        freshdenLogoV5,
-        freshdenLogoV6,
-        freshdenLogoV7,
-        freshdenLogoV8,
-        freshdenLogoV9,
-        groceryBackground,
-        homeDelivery,
-        loginpage,
-        logout,
-        logoutIcon,
-        noOrder,
-        noOrders,
-        noimage,
-        offers,
-        orderPage,
-        otpVerification,
-        pay,
-        pickup,
-        pizza,
-        profilePhoto,
-        restaurantSeating,
-        shopid,
-        signInImg,
-        sliderOne,
-        sliderTwo,
-        success01,
-        success02,
-        tableHistory,
-        takeAway,
-        urbanSpiceLogo,
-        urbanSpicebg,
-        urbanspiceLogoWithoutBg,
-        user,
-        userlogin,
-        userpassword,
-        welcome
-      ];
+    a1,
+    group1000003922,
+    pattern,
+    profileCircle,
+    appLogo01,
+    banner1,
+    banner2,
+    banner3,
+    bg01,
+    bg02,
+    bg03,
+    bg04,
+    bg05,
+    calendarClock,
+    discount,
+    foodBackground,
+    foodGifAnimation,
+    freshdenBanner1,
+    freshdenBanner2,
+    freshdenBanner,
+    freshdenLogoV1,
+    freshdenLogoV2,
+    freshdenLogoV4,
+    freshdenLogoV5,
+    freshdenLogoV6,
+    freshdenLogoV7,
+    freshdenLogoV8,
+    freshdenLogoV9,
+    groceryBackground,
+    homeDelivery,
+    loginpage,
+    logout,
+    logoutIcon,
+    noOrder,
+    noOrders,
+    noimage,
+    offers,
+    orderPage,
+    otpVerification,
+    pay,
+    pickup,
+    pizza,
+    profilePhoto,
+    restaurantSeating,
+    shopid,
+    signInImg,
+    sliderOne,
+    sliderTwo,
+    success01,
+    success02,
+    tableHistory,
+    takeAway,
+    urbanSpiceLogo,
+    urbanSpicebg,
+    urbanspiceLogoWithoutBg,
+    user,
+    userlogin,
+    userpassword,
+    welcome,
+  ];
 }
 
 class $LibAssetsLottieGen {
@@ -489,23 +491,21 @@ class $LibAssetsLottieGen {
 
   /// List of all assets
   List<LottieGenImage> get values => [
-        categoryIconLottieGrey,
-        categoryIconLottie,
-        historyIconLottieGrey,
-        historyIconLottie,
-        homeIconLottieGrey,
-        homeIconLottie,
-        infiniteLoading,
-        poppersLottie,
-        profileIconLottieGrey,
-        profileIconLottie,
-        successCircleCheck
-      ];
+    categoryIconLottieGrey,
+    categoryIconLottie,
+    historyIconLottieGrey,
+    historyIconLottie,
+    homeIconLottieGrey,
+    homeIconLottie,
+    infiniteLoading,
+    poppersLottie,
+    profileIconLottieGrey,
+    profileIconLottie,
+    successCircleCheck,
+  ];
 }
 
-class Assets {
-  const Assets._();
-
+abstract final class Assets {
   static const String package = 'customer_core';
 
   static const $LibGen lib = $LibGen();
@@ -516,6 +516,7 @@ class AssetGenImage {
     this._assetName, {
     this.size,
     this.flavors = const {},
+    this.animation,
   });
 
   final String _assetName;
@@ -524,6 +525,7 @@ class AssetGenImage {
 
   final Size? size;
   final Set<String> flavors;
+  final AssetGenImageAnimation? animation;
 
   Image image({
     Key? key,
@@ -584,11 +586,7 @@ class AssetGenImage {
     @Deprecated('Do not specify package for a generated library asset')
     String? package = package,
   }) {
-    return AssetImage(
-      _assetName,
-      bundle: bundle,
-      package: package,
-    );
+    return AssetImage(_assetName, bundle: bundle, package: package);
   }
 
   String get path => _assetName;
@@ -596,18 +594,24 @@ class AssetGenImage {
   String get keyName => 'packages/customer_core/$_assetName';
 }
 
-class SvgGenImage {
-  const SvgGenImage(
-    this._assetName, {
-    this.size,
-    this.flavors = const {},
-  }) : _isVecFormat = false;
+class AssetGenImageAnimation {
+  const AssetGenImageAnimation({
+    required this.isAnimation,
+    required this.duration,
+    required this.frames,
+  });
 
-  const SvgGenImage.vec(
-    this._assetName, {
-    this.size,
-    this.flavors = const {},
-  }) : _isVecFormat = true;
+  final bool isAnimation;
+  final Duration duration;
+  final int frames;
+}
+
+class SvgGenImage {
+  const SvgGenImage(this._assetName, {this.size, this.flavors = const {}})
+    : _isVecFormat = false;
+
+  const SvgGenImage.vec(this._assetName, {this.size, this.flavors = const {}})
+    : _isVecFormat = true;
 
   final String _assetName;
   final Size? size;
@@ -631,6 +635,7 @@ class SvgGenImage {
     String? semanticsLabel,
     bool excludeFromSemantics = false,
     _svg.SvgTheme? theme,
+    _svg.ColorMapper? colorMapper,
     ColorFilter? colorFilter,
     Clip clipBehavior = Clip.hardEdge,
     @deprecated Color? color,
@@ -650,6 +655,7 @@ class SvgGenImage {
         assetBundle: bundle,
         packageName: package,
         theme: theme,
+        colorMapper: colorMapper,
       );
     }
     return _svg.SvgPicture(
@@ -664,7 +670,8 @@ class SvgGenImage {
       placeholderBuilder: placeholderBuilder,
       semanticsLabel: semanticsLabel,
       excludeFromSemantics: excludeFromSemantics,
-      colorFilter: colorFilter ??
+      colorFilter:
+          colorFilter ??
           (color == null ? null : ColorFilter.mode(color, colorBlendMode)),
       clipBehavior: clipBehavior,
       cacheColorFilter: cacheColorFilter,
@@ -677,10 +684,7 @@ class SvgGenImage {
 }
 
 class LottieGenImage {
-  const LottieGenImage(
-    this._assetName, {
-    this.flavors = const {},
-  });
+  const LottieGenImage(this._assetName, {this.flavors = const {}});
 
   final String _assetName;
   final Set<String> flavors;
@@ -699,11 +703,8 @@ class LottieGenImage {
     _lottie.LottieImageProviderFactory? imageProviderFactory,
     Key? key,
     AssetBundle? bundle,
-    Widget Function(
-      BuildContext,
-      Widget,
-      _lottie.LottieComposition?,
-    )? frameBuilder,
+    Widget Function(BuildContext, Widget, _lottie.LottieComposition?)?
+    frameBuilder,
     ImageErrorWidgetBuilder? errorBuilder,
     double? width,
     double? height,

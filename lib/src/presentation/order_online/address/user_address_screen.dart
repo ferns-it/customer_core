@@ -22,9 +22,12 @@ class UserAddressScreen extends GetProviderView<UserProvider> {
     final userNotifier = notifier(context);
 
     final cartProvider = context.read<CartProvider>();
+    final baseTextTheme = Theme.of(context).textTheme;
     return Theme(
         data: Theme.of(context).copyWith(
-          textTheme: GoogleFonts.quicksandTextTheme(),
+          textTheme: baseTextTheme.apply(
+  fontFamily: GoogleFonts.quicksand().fontFamily,
+),
         ),
         child: Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,

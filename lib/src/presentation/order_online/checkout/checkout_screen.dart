@@ -34,11 +34,15 @@ class CheckoutScreen extends GetProviderView<CartProvider> {
     final shopListner = listener2<ShopProvider>(context);
 
     final baseTextTheme = Theme.of(context).textTheme;
-    final textTheme = GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+    // final textTheme = GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+    //   displayColor: AppColors.kBlack2,
+    //   bodyColor: AppColors.kBlack2,
+    // );
+   final textTheme= baseTextTheme.apply(
+      fontFamily: GoogleFonts.quicksand().fontFamily,
       displayColor: AppColors.kBlack2,
       bodyColor: AppColors.kBlack2,
     );
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(

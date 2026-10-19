@@ -13,7 +13,7 @@ import 'package:customer_core/src/domain/store/models/store_settings_data_model.
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:customer_core/src/application/auth/auth_provider.dart';
@@ -114,7 +114,9 @@ class _LoginScreenState extends State<LoginScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         image: DecorationImage(
-            image: AssetImage(UiConfig.instance.bgImage), fit: BoxFit.cover),
+          image: AssetImage(UiConfig.instance.bgImage),
+          fit: BoxFit.cover,
+        ),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -128,8 +130,13 @@ class _LoginScreenState extends State<LoginScreen> {
             onPopInvokedWithResult: (_, __) {
               authProvider.clearValues(registerControllersOnly: true);
             },
-            child: buildContent(authProvider, context, authListener,
-                homeProvider, homeListener),
+            child: buildContent(
+              authProvider,
+              context,
+              authListener,
+              homeProvider,
+              homeListener,
+            ),
           ),
         ),
       ),
@@ -137,17 +144,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget buildContent(
-      AuthProvider authProvider,
-      BuildContext context,
-      AuthProvider authListener,
-      HomeProvider homeProvider,
-      HomeProvider homeListener) {
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+    HomeProvider homeProvider,
+    HomeProvider homeListener,
+  ) {
     return Center(
-        child: ListView(
-      children: [
-        Image.asset(UiConfig.instance.logoWithoutBackground, height: 125),
-        verticalSpaceMedium,
-        ClipRRect(
+      child: ListView(
+        children: [
+          Image.asset(UiConfig.instance.logoWithoutBackground, height: 125),
+          verticalSpaceMedium,
+          ClipRRect(
             borderRadius: BorderRadius.circular(12.0),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
@@ -157,18 +165,32 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: AppColors.kBlack.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(12.0),
                   border: Border.all(
-                      color: AppColors.kWhite.withOpacity(0.2), width: 1.0),
+                    color: AppColors.kWhite.withOpacity(0.2),
+                    width: 1.0,
+                  ),
                 ),
                 child: Stack(
                   children: [
                     authListener.selectedAuthView == AuthView.register
-                        ? _registerFormParent(authProvider, context,
-                            homeProvider, homeListener, authListener)
+                        ? _registerFormParent(
+                            authProvider,
+                            context,
+                            homeProvider,
+                            homeListener,
+                            authListener,
+                          )
                         : authListener.selectedAuthView == AuthView.login
-                            ? _loginForm(authProvider, context, authListener,
-                                homeProvider)
-                            : _forgotWidgetParent(
-                                authProvider, context, authListener),
+                        ? _loginForm(
+                            authProvider,
+                            context,
+                            authListener,
+                            homeProvider,
+                          )
+                        : _forgotWidgetParent(
+                            authProvider,
+                            context,
+                            authListener,
+                          ),
                     // Back button - visible when showBackButton is true
                     if (widget.showBackButton)
                       Positioned(
@@ -187,8 +209,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   authProvider.clearValues();
                                   break;
                                 case RegStage.otpCombined:
-                                  authProvider
-                                      .updateCurrentRegStage(RegStage.contact);
+                                  authProvider.updateCurrentRegStage(
+                                    RegStage.contact,
+                                  );
                                 case RegStage.otpEmail:
                                   // Email OTP -> go back to contact/email page
                                   authProvider.updateCurrentRegStage(
@@ -246,9 +269,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-            )),
-      ],
-    ));
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _loginForm(
@@ -269,14 +294,16 @@ class _LoginScreenState extends State<LoginScreen> {
               verticalSpaceSmall,
               Text(
                 "Welcome Back",
-                style: context.customTextTheme.text24W600
-                    .copyWith(color: AppColors.kWhite),
+                style: context.customTextTheme.text24W600.copyWith(
+                  color: AppColors.kWhite,
+                ),
               ),
               verticalSpaceSmall,
               Text(
                 "Enter your email and password to log in",
-                style: context.customTextTheme.text12W400
-                    .copyWith(color: AppColors.kWhite),
+                style: context.customTextTheme.text12W400.copyWith(
+                  color: AppColors.kWhite,
+                ),
               ),
               verticalSpaceMedium,
               CustomTextField(
@@ -285,8 +312,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 hintText: "Email",
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
-                prefixIcon: const Icon(FluentIcons.mail_24_regular,
-                    color: AppColors.kGray3),
+                prefixIcon: const Icon(
+                  FluentIcons.mail_24_regular,
+                  color: AppColors.kGray3,
+                ),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                   FormBuilderValidators.email(),
@@ -300,18 +329,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 hintText: "Password",
                 keyboardType: TextInputType.visiblePassword,
                 textInputAction: TextInputAction.done,
-                prefixIcon: const Icon(FluentIcons.password_24_regular,
-                    color: AppColors.kGray3),
+                prefixIcon: const Icon(
+                  FluentIcons.password_24_regular,
+                  color: AppColors.kGray3,
+                ),
                 obscureText: authProvider.loginPasswordHide,
                 suffixIcon: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: authProvider.toggleLoginPassword,
-                    child: Icon(
-                      authListener.loginPasswordHide
-                          ? FluentIcons.eye_off_24_regular
-                          : FluentIcons.eye_24_regular,
-                      color: AppColors.kGray3,
-                    )),
+                  customBorder: const CircleBorder(),
+                  onTap: authProvider.toggleLoginPassword,
+                  child: Icon(
+                    authListener.loginPasswordHide
+                        ? FluentIcons.eye_off_24_regular
+                        : FluentIcons.eye_24_regular,
+                    color: AppColors.kGray3,
+                  ),
+                ),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                   // FormBuilderValidators.password(),
@@ -322,13 +354,15 @@ class _LoginScreenState extends State<LoginScreen> {
               InkWell(
                 onTap: () {
                   // context.router.push(const ForgotPasswordScreenRoute());
-                  authProvider
-                      .onChangeSelectedAuthView(AuthView.forgotPassword);
+                  authProvider.onChangeSelectedAuthView(
+                    AuthView.forgotPassword,
+                  );
                 },
                 child: Text(
                   "Forgot Password ?",
-                  style: context.customTextTheme.text14W700
-                      .copyWith(color: AppColors.kWhite),
+                  style: context.customTextTheme.text14W700.copyWith(
+                    color: AppColors.kWhite,
+                  ),
                 ),
               ),
               verticalSpaceSmall,
@@ -353,32 +387,39 @@ class _LoginScreenState extends State<LoginScreen> {
                               }
 
                               DependencyRegistrar.initializeAllProviders(
-                                  context);
-                              await Future.delayed(const Duration(seconds: 1),
-                                  () {
-                                context.router.replaceAll([
-                                  const OrderOnlineScreenRoute(),
-                                ]).then((_) {
-                                  authProvider.clearValues();
-                                  // productProvider.getAllCategories();
-                                });
-                              });
+                                context,
+                              );
+                              await Future.delayed(
+                                const Duration(seconds: 1),
+                                () {
+                                  context.router
+                                      .replaceAll([
+                                        const OrderOnlineScreenRoute(),
+                                      ])
+                                      .then((_) {
+                                        authProvider.clearValues();
+                                        // productProvider.getAllCategories();
+                                      });
+                                },
+                              );
                             }
                           });
                         }
                       },
                 child: Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Theme.of(context).colorScheme.primary),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   height: 50,
                   width: context.screenWidth,
                   child: Center(
                     child: !authListener.loginLoading
                         ? Text(
                             "Log In",
-                            style: context.customTextTheme.text16W400
-                                .copyWith(color: AppColors.kWhite),
+                            style: context.customTextTheme.text16W400.copyWith(
+                              color: AppColors.kWhite,
+                            ),
                           )
                         : showButtonProgress(AppColors.kWhite),
                   ),
@@ -390,47 +431,47 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Row(
                   children: [
                     const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
+                      child: Divider(thickness: 2, color: AppColors.kGray),
+                    ),
                     horizontalSpaceMedium,
                     Text(
                       'OR',
-                      style: context.customTextTheme.text12W600
-                          .copyWith(color: AppColors.kGray),
+                      style: context.customTextTheme.text12W600.copyWith(
+                        color: AppColors.kGray,
+                      ),
                     ),
                     horizontalSpaceMedium,
                     const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
+                      child: Divider(thickness: 2, color: AppColors.kGray),
+                    ),
                   ],
                 ),
               ),
               verticalSpaceMedium,
               RichText(
                 text: TextSpan(
-                  style: context.customTextTheme.text14W500
-                      .copyWith(color: AppColors.kWhite),
+                  style: context.customTextTheme.text14W500.copyWith(
+                    color: AppColors.kWhite,
+                  ),
                   children: [
                     const TextSpan(text: "Don't have an account?   "),
                     TextSpan(
                       text: "Sign Up",
-                      style: context.customTextTheme.text14W700
-                          .copyWith(color: AppColors.kWhite),
+                      style: context.customTextTheme.text14W700.copyWith(
+                        color: AppColors.kWhite,
+                      ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           context.read<ShopProvider>().setDefaultCountry();
-                          authProvider
-                              .onChangeSelectedAuthView(AuthView.register);
+                          authProvider.onChangeSelectedAuthView(
+                            AuthView.register,
+                          );
                           authProvider.clearValues();
                         },
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -439,11 +480,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _registerFormParent(
-      AuthProvider authProvider,
-      BuildContext context,
-      HomeProvider homeProvider,
-      HomeProvider homeListener,
-      AuthProvider authListener) {
+    AuthProvider authProvider,
+    BuildContext context,
+    HomeProvider homeProvider,
+    HomeProvider homeListener,
+    AuthProvider authListener,
+  ) {
     return SingleChildScrollView(
       child: Stack(
         children: [
@@ -460,46 +502,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     authProvider.clearValues(registerControllersOnly: true);
                   } else if (authListener.currentRegStage ==
                       RegStage.otpEmail) {
-                    authProvider.updateCurrentRegStage(
-                      RegStage.contact,
-                    );
+                    authProvider.updateCurrentRegStage(RegStage.contact);
                   } else if (authListener.currentRegStage ==
                       RegStage.otpPhone) {
                     if (authProvider.emailRequired) {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.otpEmail,
-                      );
+                      authProvider.updateCurrentRegStage(RegStage.otpEmail);
                     } else {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.contact,
-                      );
+                      authProvider.updateCurrentRegStage(RegStage.contact);
                     }
                   } else if (authListener.currentRegStage ==
                       RegStage.register) {
                     if (authProvider.smsRequired &&
                         authProvider.emailRequired) {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.otpCombined,
-                      );
+                      authProvider.updateCurrentRegStage(RegStage.otpCombined);
                     } else if (authProvider.emailRequired) {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.otpEmail,
-                      );
+                      authProvider.updateCurrentRegStage(RegStage.otpEmail);
                     } else if (authProvider.smsRequired) {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.otpPhone,
-                      );
+                      authProvider.updateCurrentRegStage(RegStage.otpPhone);
                     } else {
-                      authProvider.updateCurrentRegStage(
-                        RegStage.contact,
-                      );
+                      authProvider.updateCurrentRegStage(RegStage.contact);
                     }
                   }
                 },
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: AppColors.kGray3,
-                ),
+                icon: const Icon(Icons.arrow_back_ios, color: AppColors.kGray3),
               ),
             ),
           ),
@@ -512,44 +537,47 @@ class _LoginScreenState extends State<LoginScreen> {
                   ? const SizedBox.shrink()
                   : Text(
                       _getRegisterTitle(authListener),
-                      style: context.customTextTheme.text20W600
-                          .copyWith(color: AppColors.kWhite),
+                      style: context.customTextTheme.text20W600.copyWith(
+                        color: AppColors.kWhite,
+                      ),
                     ),
               verticalSpaceSmall,
               authListener.currentRegStage == RegStage.success
                   ? const SizedBox.shrink()
                   : Text(
                       _getRegisterSubtitle(authListener),
-                      style: context.customTextTheme.text12W400
-                          .copyWith(color: AppColors.kWhite),
+                      style: context.customTextTheme.text12W400.copyWith(
+                        color: AppColors.kWhite,
+                      ),
                     ),
               verticalSpaceMedium,
               _buildRegisterContent(authProvider, context, authListener),
               verticalSpaceRegular,
               _buildRegisterActionButton(
-                  authProvider, context, authListener, homeProvider),
+                authProvider,
+                context,
+                authListener,
+                homeProvider,
+              ),
               verticalSpaceLarge,
               Visibility(
                 visible: authListener.currentRegStage == RegStage.contact,
                 child: Row(
                   children: [
                     const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
+                      child: Divider(thickness: 2, color: AppColors.kGray),
+                    ),
                     horizontalSpaceMedium,
                     Text(
                       'OR',
-                      style: context.customTextTheme.text12W600
-                          .copyWith(color: AppColors.kGray),
+                      style: context.customTextTheme.text12W600.copyWith(
+                        color: AppColors.kGray,
+                      ),
                     ),
                     horizontalSpaceMedium,
                     const Flexible(
-                        child: Divider(
-                      thickness: 2,
-                      color: AppColors.kGray,
-                    )),
+                      child: Divider(thickness: 2, color: AppColors.kGray),
+                    ),
                   ],
                 ),
               ),
@@ -562,24 +590,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       TextSpan(
                         text: "Already have an account?  ",
-                        style: context.customTextTheme.text14W500
-                            .copyWith(color: AppColors.kWhite),
+                        style: context.customTextTheme.text14W500.copyWith(
+                          color: AppColors.kWhite,
+                        ),
                       ),
                       TextSpan(
                         text: "Login",
-                        style: context.customTextTheme.text14W700
-                            .copyWith(color: AppColors.kWhite),
+                        style: context.customTextTheme.text14W700.copyWith(
+                          color: AppColors.kWhite,
+                        ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             authProvider.initializeRegistrationFlow();
-                            authProvider
-                                .onChangeSelectedAuthView(AuthView.login);
+                            authProvider.onChangeSelectedAuthView(
+                              AuthView.login,
+                            );
                           },
                       ),
                     ],
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ],
@@ -640,8 +671,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Widget _buildRegisterContent(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _buildRegisterContent(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     switch (authListener.currentRegStage) {
       case RegStage.contact:
         return _registerForm1(authProvider, context, authListener);
@@ -659,10 +693,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildRegisterActionButton(
-      AuthProvider authProvider,
-      BuildContext context,
-      AuthProvider authListener,
-      HomeProvider homeProvider) {
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+    HomeProvider homeProvider,
+  ) {
     if (authListener.currentRegStage == RegStage.otpCombined) {
       return const SizedBox.shrink();
     }
@@ -706,21 +741,28 @@ class _LoginScreenState extends State<LoginScreen> {
       onTap: authListener.registerLoading || authListener.loginLoading
           ? null
           : () => _onRegisterButtonTap(
-              authProvider, context, authListener, homeProvider),
+              authProvider,
+              context,
+              authListener,
+              homeProvider,
+            ),
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Theme.of(context).colorScheme.primary),
+          borderRadius: BorderRadius.circular(10),
+          color: Theme.of(context).colorScheme.primary,
+        ),
         height: 50,
         width: context.screenWidth,
         child: Center(
-            child: !authListener.registrationButtonLoading
-                ? Text(
-                    _getRegisterButtonText(authListener),
-                    style: context.customTextTheme.text16W400
-                        .copyWith(color: AppColors.kWhite),
-                  )
-                : showButtonProgress(Colors.white)),
+          child: !authListener.registrationButtonLoading
+              ? Text(
+                  _getRegisterButtonText(authListener),
+                  style: context.customTextTheme.text16W400.copyWith(
+                    color: AppColors.kWhite,
+                  ),
+                )
+              : showButtonProgress(Colors.white),
+        ),
       ),
     );
   }
@@ -749,10 +791,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _onRegisterButtonTap(
-      AuthProvider authProvider,
-      BuildContext context,
-      AuthProvider authListener,
-      HomeProvider homeProvider) async {
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+    HomeProvider homeProvider,
+  ) async {
     switch (authListener.currentRegStage) {
       case RegStage.contact:
         final phoneValid = authProvider.validatePhoneForm();
@@ -825,10 +868,13 @@ class _LoginScreenState extends State<LoginScreen> {
           AlertDialogs.showError("Please enter the phone OTP");
           return;
         }
-        final phoneCountryCode =
-            context.read<ShopProvider>().selectedCountry?.code;
+        final phoneCountryCode = context
+            .read<ShopProvider>()
+            .selectedCountry
+            ?.code;
         final verified = await authProvider.verifyPhoneOtpForInline(
-            countryCode: phoneCountryCode);
+          countryCode: phoneCountryCode,
+        );
         if (verified) {
           AlertDialogs.showSuccess("Phone verified successfully!");
           authProvider.updateCurrentRegStage(RegStage.register);
@@ -838,10 +884,13 @@ class _LoginScreenState extends State<LoginScreen> {
       case RegStage.register:
         final validated = authProvider.validateRegisterForm2();
         if (validated) {
-          final regCountryCode =
-              context.read<ShopProvider>().selectedCountry?.code;
-          final registered =
-              await authProvider.registerUser(countryCode: regCountryCode);
+          final regCountryCode = context
+              .read<ShopProvider>()
+              .selectedCountry
+              ?.code;
+          final registered = await authProvider.registerUser(
+            countryCode: regCountryCode,
+          );
           if (registered) {
             AlertDialogs.showSuccess('Account Created Successfully');
             authProvider.loginUserNameController.text =
@@ -862,11 +911,11 @@ class _LoginScreenState extends State<LoginScreen> {
               // Full registration flow -> move to the home screen
               DependencyRegistrar.initializeAllProviders(context);
               await Future.delayed(const Duration(seconds: 1), () {
-                context.router.replaceAll([
-                  const OrderOnlineScreenRoute(),
-                ]).then((_) {
-                  authProvider.clearValues();
-                });
+                context.router
+                    .replaceAll([const OrderOnlineScreenRoute()])
+                    .then((_) {
+                      authProvider.clearValues();
+                    });
               });
               authProvider.initializeRegistrationFlow();
               authProvider.onChangeSelectedAuthView(AuthView.login);
@@ -886,17 +935,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _showLinkDialog(
-    BuildContext context,
-    AuthProvider authProvider,
-  ) {
+  void _showLinkDialog(BuildContext context, AuthProvider authProvider) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text("Link Mobile Number"),
-        content: Text(
-          authProvider.verifyResponse?.message ?? "",
-        ),
+        content: Text(authProvider.verifyResponse?.message ?? ""),
         actions: [
           TextButton(
             onPressed: () {
@@ -919,52 +963,38 @@ class _LoginScreenState extends State<LoginScreen> {
 
               if (!authProvider.smsRequired && !authProvider.emailRequired) {
                 // No verification required
-                authProvider.updateCurrentRegStage(
-                  RegStage.register,
-                );
+                authProvider.updateCurrentRegStage(RegStage.register);
               } else if (authProvider.emailRequired &&
                   authProvider.smsRequired) {
                 // Both enabled
-                authProvider.updateCurrentRegStage(
-                  RegStage.otpCombined,
-                );
+                authProvider.updateCurrentRegStage(RegStage.otpCombined);
                 startTimer();
                 await authProvider.sendEmailOtpForInline();
               } else if (authProvider.emailRequired) {
                 // Only email enabled
-                authProvider.updateCurrentRegStage(
-                  RegStage.otpEmail,
-                );
+                authProvider.updateCurrentRegStage(RegStage.otpEmail);
                 startTimer();
                 await authProvider.sendEmailOtpForInline();
               } else if (authProvider.smsRequired) {
                 // Only SMS enabled - Navigate to phone OTP stage; OTP is sent when user clicks "Send OTP"
-                authProvider.updateCurrentRegStage(
-                  RegStage.otpPhone,
-                );
+                authProvider.updateCurrentRegStage(RegStage.otpPhone);
               }
             },
-            child: const Text(
-              "Yes",
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
+            child: const Text("Yes", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
   }
 
-  Widget _inlineCombinedOtpWidget(AuthProvider authProvider,
-      BuildContext context, AuthProvider authListener) {
+  Widget _inlineCombinedOtpWidget(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     return Column(
       children: [
-        _inlineEmailOtpWidget(
-          authProvider,
-          context,
-          authListener,
-        ),
+        _inlineEmailOtpWidget(authProvider, context, authListener),
         // Only show phone verification section after email is verified
         // if (authProvider.emailOtpVerified) ...[
         //   const SizedBox(height: 16),
@@ -977,15 +1007,9 @@ class _LoginScreenState extends State<LoginScreen> {
         //   ),
         // ],
         if (authProvider.emailOtpVerified) ...[
-          Divider(
-            color: Colors.grey,
-          ),
+          Divider(color: Colors.grey),
           verticalSpaceSmall,
-          _inlinePhoneOtpWidget(
-            authProvider,
-            context,
-            authListener,
-          ),
+          _inlinePhoneOtpWidget(authProvider, context, authListener),
         ],
         // if (authProvider.emailOtpVerified && authProvider.phoneOtpVerified)
         //   Padding(
@@ -1012,110 +1036,130 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _otpWidget(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _otpWidget(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     return Column(
       children: [
         PopScope(
           canPop: true,
           onPopInvokedWithResult: (_, __) =>
               authProvider.phoneOtpController.clear(),
-          child: PinCodeTextField(
-            textStyle: const TextStyle(
-              color: AppColors.kWhite,
-            ),
+          child: MaterialPinField(
             length: 4,
             obscureText: false,
-            animationType: AnimationType.scale,
-            pinTheme: PinTheme(
-              shape: PinCodeFieldShape.box,
-              borderRadius: BorderRadius.circular(10.0),
-              activeColor: AppColors.kBlack,
-              inactiveColor: AppColors.kGray,
-              inactiveFillColor: AppColors.kWhite.withOpacity(0.1),
-              activeFillColor: AppColors.kWhite.withOpacity(0.1),
-              selectedColor: Theme.of(context).colorScheme.primary,
-              selectedFillColor: AppColors.kWhite.withOpacity(0.1),
-              fieldHeight: MediaQuery.of(context).size.width * 0.12,
-              fieldWidth: MediaQuery.of(context).size.width * 0.12,
-              fieldOuterPadding: const EdgeInsets.all(16.0),
-            ),
-            controller: authProvider.phoneOtpController,
-            showCursor: false,
-            animationDuration: const Duration(milliseconds: 300),
-            enableActiveFill: true,
+            pinController: authProvider.phoneOtpController,
             keyboardType: TextInputType.phone,
             onCompleted: (v) {},
             onChanged: (value) {},
-            appContext: context,
-            autoDisposeControllers: false,
+            theme: MaterialPinTheme(
+              shape: MaterialPinShape.outlined,
+              cellSize: Size(
+                MediaQuery.of(context).size.width * 0.12,
+                MediaQuery.of(context).size.width * 0.12,
+              ),
+              spacing: 32, // was fieldOuterPadding all(16): 16 on each side
+              borderRadius: BorderRadius.circular(10.0),
+
+              // Borders: inactive = empty cell, selected = focused, active = filled
+              borderColor: AppColors.kGray,
+              focusedBorderColor: Theme.of(context).colorScheme.primary,
+              filledBorderColor: AppColors.kBlack,
+
+              // Fills (replaces enableActiveFill: true)
+              fillColor: AppColors.kWhite.withValues(alpha: 0.1),
+              focusedFillColor: AppColors.kWhite.withValues(alpha: 0.1),
+              filledFillColor: AppColors.kWhite.withValues(alpha: 0.1),
+
+              textStyle: const TextStyle(color: AppColors.kWhite),
+              showCursor: false,
+              entryAnimation: MaterialPinAnimation.scale,
+              animationDuration: const Duration(milliseconds: 300),
+            ),
           ),
         ),
         PopScope(
           canPop: true,
           onPopInvokedWithResult: (_, __) =>
               authProvider.emailOtpController.clear(),
-          child: PinCodeTextField(
-            textStyle: const TextStyle(
-              color: AppColors.kWhite,
-            ),
+          child: MaterialPinField(
             length: 4,
             obscureText: false,
-            animationType: AnimationType.scale,
-            pinTheme: PinTheme(
-              shape: PinCodeFieldShape.box,
-              borderRadius: BorderRadius.circular(10.0),
-              activeColor: AppColors.kBlack,
-              inactiveColor: AppColors.kGray,
-              inactiveFillColor: AppColors.kWhite.withOpacity(0.1),
-              activeFillColor: AppColors.kWhite.withOpacity(0.1),
-              selectedColor: Theme.of(context).colorScheme.primary,
-              selectedFillColor: AppColors.kWhite.withOpacity(0.1),
-              fieldHeight: MediaQuery.of(context).size.width * 0.12,
-              fieldWidth: MediaQuery.of(context).size.width * 0.12,
-              fieldOuterPadding: const EdgeInsets.all(16.0),
-            ),
-            controller: authProvider.emailOtpController,
-            showCursor: false,
-            animationDuration: const Duration(milliseconds: 300),
-            enableActiveFill: true,
+            pinController: authProvider.emailOtpController,
             keyboardType: TextInputType.phone,
             onCompleted: (v) {},
             onChanged: (value) {},
-            appContext: context,
-            autoDisposeControllers: false,
+            theme: MaterialPinTheme(
+              shape: MaterialPinShape.outlined,
+              cellSize: Size(
+                MediaQuery.of(context).size.width * 0.12,
+                MediaQuery.of(context).size.width * 0.12,
+              ),
+              spacing: 32, // was fieldOuterPadding all(16): 16 on each side
+              borderRadius: BorderRadius.circular(10.0),
+
+              // Borders: inactive = empty cell, selected = focused, active = filled
+              borderColor: AppColors.kGray,
+              focusedBorderColor: Theme.of(context).colorScheme.primary,
+              filledBorderColor: AppColors.kBlack,
+
+              // Fills (replaces enableActiveFill: true)
+              fillColor: AppColors.kWhite.withValues(alpha: 0.1),
+              focusedFillColor: AppColors.kWhite.withValues(alpha: 0.1),
+              filledFillColor: AppColors.kWhite.withValues(alpha: 0.1),
+
+              textStyle: const TextStyle(color: AppColors.kWhite),
+              showCursor: false,
+              entryAnimation: MaterialPinAnimation.scale,
+              animationDuration: const Duration(milliseconds: 300),
+            ),
           ),
-        )
+        ),
       ],
     );
   }
 
   //Widget 4
-  Widget _successWidget(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _successWidget(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(FluentIcons.checkmark_circle_24_regular,
-              size: 100, color: Colors.green.shade500),
+          Icon(
+            FluentIcons.checkmark_circle_24_regular,
+            size: 100,
+            color: Colors.green.shade500,
+          ),
           verticalSpaceSmall,
           authListener.selectedAuthView == AuthView.register
-              ? Text('Account Created\nSuccessfully',
+              ? Text(
+                  'Account Created\nSuccessfully',
                   textAlign: TextAlign.center,
-                  style: context.customTextTheme.text24W600
-                      .copyWith(color: AppColors.kWhite))
-              : Text('Password Reset\nSuccessfully',
+                  style: context.customTextTheme.text24W600.copyWith(
+                    color: AppColors.kWhite,
+                  ),
+                )
+              : Text(
+                  'Password Reset\nSuccessfully',
                   textAlign: TextAlign.center,
-                  style: context.customTextTheme.text24W600
-                      .copyWith(color: AppColors.kWhite)),
+                  style: context.customTextTheme.text24W600.copyWith(
+                    color: AppColors.kWhite,
+                  ),
+                ),
           verticalSpaceTiny,
           authListener.selectedAuthView == AuthView.register
               ? Text(
                   textAlign: TextAlign.center,
                   'Your Account Created Successfully. Shop Your Favourite Products',
-                  style: context.customTextTheme.text14W400
-                      .copyWith(color: AppColors.kWhite),
+                  style: context.customTextTheme.text14W400.copyWith(
+                    color: AppColors.kWhite,
+                  ),
                 )
               : const SizedBox.shrink(),
         ],
@@ -1123,8 +1167,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _inlineEmailOtpWidget(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _inlineEmailOtpWidget(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     final bool bothEnabled =
         authProvider.emailRequired && authProvider.smsRequired;
 
@@ -1138,13 +1185,17 @@ class _LoginScreenState extends State<LoginScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(FluentIcons.mail_24_regular,
-                    color: AppColors.kWhite, size: 20),
+                const Icon(
+                  FluentIcons.mail_24_regular,
+                  color: AppColors.kWhite,
+                  size: 20,
+                ),
                 horizontalSpaceSmall,
                 Text(
                   "Email Verification",
-                  style: context.customTextTheme.text16W600
-                      .copyWith(color: AppColors.kWhite),
+                  style: context.customTextTheme.text16W600.copyWith(
+                    color: AppColors.kWhite,
+                  ),
                 ),
               ],
             ),
@@ -1157,16 +1208,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         border: authProvider.isEditingEmail
                             ? Border.all(
                                 color: Theme.of(context).colorScheme.primary,
                                 width: 2,
                               )
-                            : Border.all(
-                                color: Colors.transparent,
-                              ),
+                            : Border.all(color: Colors.transparent),
                         color: AppColors.kWhite.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -1174,10 +1225,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? TextFormField(
                               controller:
                                   authProvider.registerUserEmailController,
-                              style:
-                                  context.customTextTheme.text14W400.copyWith(
-                                color: AppColors.kWhite,
-                              ),
+                              style: context.customTextTheme.text14W400
+                                  .copyWith(color: AppColors.kWhite),
                               keyboardType: TextInputType.emailAddress,
                               cursorColor: Colors.white,
                               decoration: const InputDecoration(
@@ -1187,9 +1236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 focusedBorder: InputBorder.none,
                                 contentPadding: EdgeInsets.zero,
                                 hintText: "Enter email",
-                                hintStyle: TextStyle(
-                                  color: Colors.white54,
-                                ),
+                                hintStyle: TextStyle(color: Colors.white54),
                                 // errorStyle: TextStyle(
                                 //   fontSize: 0,
                                 //   height: 0,
@@ -1206,61 +1253,41 @@ class _LoginScreenState extends State<LoginScreen> {
                             )
                           : Text(
                               authProvider.registerUserEmailController.text,
-                              style:
-                                  context.customTextTheme.text14W400.copyWith(
-                                color: AppColors.kWhite,
-                              ),
+                              style: context.customTextTheme.text14W400
+                                  .copyWith(color: AppColors.kWhite),
                             ),
                     ),
                   ),
                   horizontalSpaceSmall,
                   Container(
-                      height: 38,
-                      width: 38,
-                      padding: const EdgeInsets.all(0),
-                      decoration: BoxDecoration(
-                        color: AppColors.kWhite.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                    height: 38,
+                    width: 38,
+                    padding: const EdgeInsets.all(0),
+                    decoration: BoxDecoration(
+                      color: AppColors.kWhite.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        authProvider.enableEmailEdit();
+                      },
+                      icon: Icon(
+                        FluentIcons.edit_24_regular,
+                        color: Colors.white,
+                        size: 16,
                       ),
-                      child: IconButton(
-                          onPressed: () {
-                            authProvider.enableEmailEdit();
-                          },
-                          icon: Icon(
-                            FluentIcons.edit_24_regular,
-                            color: Colors.white,
-                            size: 16,
-                          ))),
+                    ),
+                  ),
                 ],
               ),
             ),
             verticalSpaceMedium,
             // Email OTP Field
             if (!authProvider.emailOtpVerified)
-              PinCodeTextField(
-                textStyle: const TextStyle(
-                  color: AppColors.kWhite,
-                ),
+              MaterialPinField(
                 length: 6,
                 obscureText: false,
-                animationType: AnimationType.scale,
-                pinTheme: PinTheme(
-                  shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(10.0),
-                  activeColor: AppColors.kGray,
-                  inactiveColor: AppColors.kGray,
-                  inactiveFillColor: AppColors.kWhite.withOpacity(0.1),
-                  activeFillColor: AppColors.kWhite.withOpacity(0.1),
-                  selectedColor: Theme.of(context).colorScheme.primary,
-                  selectedFillColor: AppColors.kWhite.withOpacity(0.1),
-                  fieldHeight: MediaQuery.of(context).size.width * 0.11,
-                  fieldWidth: MediaQuery.of(context).size.width * 0.11,
-                  fieldOuterPadding: const EdgeInsets.all(4.0),
-                ),
-                controller: authProvider.emailOtpController,
-                showCursor: false,
-                animationDuration: const Duration(milliseconds: 300),
-                enableActiveFill: true,
+                pinController: authProvider.emailOtpController,
                 keyboardType: TextInputType.number,
                 onCompleted: (v) async {
                   print("COMPLETED: $v");
@@ -1289,9 +1316,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       _timer?.cancel();
                       _secondsRemaining = 0;
                       _streamController.add(0);
-                      authProvider.updateCurrentRegStage(
-                        RegStage.otpCombined,
-                      );
+                      authProvider.updateCurrentRegStage(RegStage.otpCombined);
                     }
                   }
                 },
@@ -1303,8 +1328,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Reset error state via internal set
                   }
                 },
-                appContext: context,
-                autoDisposeControllers: false,
+                theme: MaterialPinTheme(
+                  shape: MaterialPinShape.outlined,
+                  cellSize: Size(
+                    MediaQuery.of(context).size.width * 0.11,
+                    MediaQuery.of(context).size.width * 0.11,
+                  ),
+                  spacing: 8, // was fieldOuterPadding all(4): 4 on each side
+                  borderRadius: BorderRadius.circular(10.0),
+
+                  // Borders: inactive = empty cell, selected = focused, active = filled
+                  borderColor: AppColors.kGray,
+                  focusedBorderColor: Theme.of(context).colorScheme.primary,
+                  filledBorderColor: AppColors.kGray,
+
+                  // Fills (replaces enableActiveFill: true)
+                  fillColor: AppColors.kWhite.withValues(alpha: 0.1),
+                  focusedFillColor: AppColors.kWhite.withValues(alpha: 0.1),
+                  filledFillColor: AppColors.kWhite.withValues(alpha: 0.1),
+
+                  textStyle: const TextStyle(color: AppColors.kWhite),
+                  showCursor: false,
+                  entryAnimation: MaterialPinAnimation.scale,
+                  animationDuration: const Duration(milliseconds: 300),
+                ),
               ),
             // Error message display
             if (authProvider.emailOtpError.isNotEmpty)
@@ -1312,8 +1359,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   authProvider.emailOtpError,
-                  style: context.customTextTheme.text14W500
-                      .copyWith(color: Colors.red.shade300),
+                  style: context.customTextTheme.text14W500.copyWith(
+                    color: Colors.red.shade300,
+                  ),
                 ),
               ),
             // Verified indicator
@@ -1323,13 +1371,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.check_circle,
-                        color: Colors.green.shade400, size: 20),
+                    Icon(
+                      Icons.check_circle,
+                      color: Colors.green.shade400,
+                      size: 20,
+                    ),
                     horizontalSpaceSmall,
                     Text(
                       " Email Verified",
-                      style: context.customTextTheme.text14W600
-                          .copyWith(color: Colors.green.shade400),
+                      style: context.customTextTheme.text14W600.copyWith(
+                        color: Colors.green.shade400,
+                      ),
                     ),
                   ],
                 ),
@@ -1338,8 +1390,9 @@ class _LoginScreenState extends State<LoginScreen> {
             if (snapshot.data! > 0 && !authProvider.emailOtpVerified)
               Text(
                 "Resend OTP in ${snapshot.data} seconds",
-                style: context.customTextTheme.text14W700
-                    .copyWith(color: AppColors.kWhite),
+                style: context.customTextTheme.text14W700.copyWith(
+                  color: AppColors.kWhite,
+                ),
               )
             else if (!authProvider.emailOtpVerified)
               TextButton.icon(
@@ -1356,19 +1409,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     : const SizedBox.shrink(),
                 label: Text(
                   'Resend OTP',
-                  style: context.customTextTheme.text14W700
-                      .copyWith(color: AppColors.kWhite),
+                  style: context.customTextTheme.text14W700.copyWith(
+                    color: AppColors.kWhite,
+                  ),
                 ),
               ),
-            verticalSpaceRegular
+            verticalSpaceRegular,
           ],
         );
       },
     );
   }
 
-  Widget _inlinePhoneOtpWidget(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _inlinePhoneOtpWidget(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     final bool bothEnabled =
         authProvider.emailRequired && authProvider.smsRequired;
     final bool onlyPhone =
@@ -1383,549 +1440,583 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Widget buildPhoneContent(int? seconds) {
       return StreamBuilder<int>(
-          stream: _streamController.stream,
-          initialData: _secondsRemaining,
-          builder: (context, snapshot) {
-            return Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        stream: _streamController.stream,
+        initialData: _secondsRemaining,
+        builder: (context, snapshot) {
+          final isLocked = bothEnabled && !authProvider.emailOtpVerified;
+          final pinFill = isLocked
+              ? AppColors.kGray.withValues(alpha: 0.3)
+              : AppColors.kWhite.withValues(alpha: 0.1);
+          return Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    FluentIcons.phone_24_regular,
+                    color: AppColors.kWhite,
+                    size: 20,
+                  ),
+                  horizontalSpaceSmall,
+                  Text(
+                    "Mobile Verification",
+                    style: context.customTextTheme.text16W600.copyWith(
+                      color: AppColors.kWhite,
+                    ),
+                  ),
+                ],
+              ),
+              verticalSpaceMedium,
+              Form(
+                key: authProvider.phoneFormKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                child: Row(
                   children: [
-                    const Icon(FluentIcons.phone_24_regular,
-                        color: AppColors.kWhite, size: 20),
+                    Expanded(
+                      child: authProvider.isEditingMobile
+                          ? Container(
+                              height: 42,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                border: authProvider.isEditingMobile
+                                    ? Border.all(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        width: 2,
+                                      )
+                                    : null,
+                                color: AppColors.kWhite.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  DropdownButtonHideUnderline(
+                                    child:
+                                        DropdownButton<
+                                          SmsAvailableCountriesData
+                                        >(
+                                          value: shopProvider.selectedCountry,
+                                          isDense: true,
+                                          dropdownColor: Colors.white
+                                              .withOpacity(0.9),
+                                          icon: const Icon(
+                                            Icons.arrow_drop_down,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                          selectedItemBuilder: (context) {
+                                            return shopProvider.smsCountries
+                                                .map((country) {
+                                                  return Row(
+                                                    children: [
+                                                      Text(
+                                                        countryCodeToEmoji(
+                                                          country.iso ?? "",
+                                                        ),
+                                                        style: const TextStyle(
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        country.code ?? "",
+                                                        style: context
+                                                            .customTextTheme
+                                                            .text14W400
+                                                            .copyWith(
+                                                              color: AppColors
+                                                                  .kWhite,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                })
+                                                .toList();
+                                          },
+                                          items: shopProvider.smsCountries.map((
+                                            country,
+                                          ) {
+                                            return DropdownMenuItem(
+                                              value: country,
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    countryCodeToEmoji(
+                                                      country.iso ?? "",
+                                                    ),
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    country.code ?? "",
+                                                    style: const TextStyle(
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            if (value != null) {
+                                              shopProvider
+                                                  .updateSelectedCountry(value);
+                                            }
+                                          },
+                                        ),
+                                  ),
+                                  horizontalSpaceSmall,
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: authProvider
+                                          .registerUserPhoneController,
+                                      keyboardType: TextInputType.phone,
+                                      cursorColor: Colors.white,
+                                      style: context.customTextTheme.text14W400
+                                          .copyWith(color: AppColors.kWhite),
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        enabledBorder: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                        isDense: true,
+                                        contentPadding: EdgeInsets.zero,
+                                        errorStyle: TextStyle(
+                                          fontSize: 0,
+                                          height: 0,
+                                        ),
+                                      ),
+                                      onChanged: (_) {
+                                        setState(() {
+                                          _phoneFieldError =
+                                              _validatePhoneField(
+                                                authProvider
+                                                    .registerUserPhoneController
+                                                    .text,
+                                                shopProvider
+                                                    .selectedCountry
+                                                    ?.code,
+                                              );
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(
+                              height: 42,
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              alignment: Alignment.centerLeft,
+                              decoration: BoxDecoration(
+                                color: AppColors.kWhite.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                "${shopProvider.selectedCountry?.code ?? ''} ${authProvider.registerUserPhoneController.text}",
+                                style: context.customTextTheme.text14W400
+                                    .copyWith(color: AppColors.kWhite),
+                              ),
+                            ),
+                    ),
                     horizontalSpaceSmall,
-                    Text(
-                      "Mobile Verification",
-                      style: context.customTextTheme.text16W600
-                          .copyWith(color: AppColors.kWhite),
+                    Container(
+                      height: 42,
+                      width: 38,
+                      padding: const EdgeInsets.all(0),
+                      decoration: BoxDecoration(
+                        color: AppColors.kWhite.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          if (authProvider.isEditingMobile) {
+                            authProvider.disableMobileEdit();
+                          } else {
+                            authProvider.enableMobileEdit();
+                          }
+                        },
+                        icon: Icon(
+                          FluentIcons.edit_24_regular,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                verticalSpaceMedium,
-                Form(
-                  key: authProvider.phoneFormKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+              ),
+
+              // Phone field error message displayed outside the container
+              if (_phoneFieldError.isNotEmpty && authProvider.isEditingMobile)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4, top: 4),
+                  child: Text(
+                    _phoneFieldError,
+                    style: context.customTextTheme.text14W500.copyWith(
+                      color: Colors.red.shade300,
+                    ),
+                  ),
+                ),
+
+              verticalSpaceSmall,
+              // if (authProvider.isEditingMobile)
+              //   SizedBox(
+              //     // width: double.infinity,
+              //     child: ElevatedButton(
+              //       style: ButtonStyle(
+              //         backgroundColor: WidgetStatePropertyAll(
+              //           Theme.of(context).colorScheme.primary,
+              //         ),
+              //         foregroundColor:
+              //             const WidgetStatePropertyAll(Colors.white),
+              //         shape: WidgetStatePropertyAll(
+              //           RoundedRectangleBorder(
+              //             borderRadius: BorderRadius.circular(10),
+              //           ),
+              //         ),
+              //       ),
+              //       onPressed: () async {
+              //         print(
+              //             "${shopProvider.selectedCountry?.code}${authProvider.registerUserPhoneController.text}");
+              //         if (!authProvider.validatePhoneForm()) {
+              //           return;
+              //         }
+              //         final available =
+              //             await authProvider.checkUserAlreadyRegistered();
+              //         if (!available) {
+              //           if (authProvider.verifyResponse?.isPartialUser ==
+              //               true) {
+              //             _showLinkDialog(context, authProvider);
+              //           } else {
+              //             AlertDialogs.showError(
+              //               authProvider.verifyResponse?.message ??
+              //                   "User already exists",
+              //             );
+              //           }
+              //           return;
+              //         }
+              //         // Send OTP
+              //         final sent = await authProvider.sendPhoneOtpForInline();
+              //         if (sent) {
+              //           AlertDialogs.showSuccess("OTP sent successfully");
+              //           authProvider.disableMobileEdit();
+              //           startTimer();
+              //         } else {
+              //           AlertDialogs.showError(
+              //             "Failed to send OTP. Please try again.",
+              //           );
+              //         }
+              //       },
+              //       child: const Text("Send OTP"),
+              //     ),
+              // ),
+              verticalSpaceRegular,
+              // Phone OTP Field - disabled until email is verified when both enabled
+              if (!authProvider.isEditingMobile &&
+                  !authProvider.phoneOtpVerified)
+                MaterialPinField(
+                  length: 6,
+                  obscureText: false,
+                  pinController: authProvider.phoneOtpController,
+                  keyboardType: TextInputType.number,
+                  readOnly: isLocked,
+                  onCompleted: (v) {},
+                  onChanged: (value) {},
+                  theme: MaterialPinTheme(
+                    shape: MaterialPinShape.outlined,
+                    cellSize: Size(
+                      MediaQuery.of(context).size.width * 0.11,
+                      MediaQuery.of(context).size.width * 0.11,
+                    ),
+                    spacing: 8, // was fieldOuterPadding all(4): 4 on each side
+                    borderRadius: BorderRadius.circular(10.0),
+
+                    // Borders: inactive = empty cell, selected = focused, active = filled
+                    borderColor: AppColors.kGray,
+                    focusedBorderColor: Theme.of(context).colorScheme.primary,
+                    filledBorderColor: AppColors.kGray,
+
+                    // Fills (replaces enableActiveFill: true)
+                    fillColor: pinFill,
+                    focusedFillColor: pinFill,
+                    filledFillColor: pinFill,
+
+                    textStyle: const TextStyle(color: AppColors.kWhite),
+                    showCursor: false,
+                    entryAnimation: MaterialPinAnimation.scale,
+                    animationDuration: const Duration(milliseconds: 300),
+                  ),
+                ),
+              // Error message display
+              if (authProvider.phoneOtpError.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    authProvider.phoneOtpError,
+                    style: context.customTextTheme.text14W500.copyWith(
+                      color: Colors.red.shade300,
+                    ),
+                  ),
+                ),
+              // Verified indicator
+              if (authProvider.phoneOtpVerified)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: authProvider.isEditingMobile
-                            ? Container(
-                                height: 42,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                decoration: BoxDecoration(
-                                  border: authProvider.isEditingMobile
-                                      ? Border.all(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          width: 2,
-                                        )
-                                      : null,
-                                  color: AppColors.kWhite.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  children: [
-                                    DropdownButtonHideUnderline(
-                                      child: DropdownButton<
-                                          SmsAvailableCountriesData>(
-                                        value: shopProvider.selectedCountry,
-                                        isDense: true,
-                                        dropdownColor:
-                                            Colors.white.withOpacity(0.9),
-                                        icon: const Icon(
-                                          Icons.arrow_drop_down,
-                                          color: Colors.white,
-                                          size: 18,
-                                        ),
-                                        selectedItemBuilder: (context) {
-                                          return shopProvider.smsCountries
-                                              .map((country) {
-                                            return Row(
-                                              children: [
-                                                Text(
-                                                  countryCodeToEmoji(
-                                                      country.iso ?? ""),
-                                                  style: const TextStyle(
-                                                      fontSize: 18),
-                                                ),
-                                                const SizedBox(width: 5),
-                                                Text(
-                                                  country.code ?? "",
-                                                  style: context.customTextTheme
-                                                      .text14W400
-                                                      .copyWith(
-                                                    color: AppColors.kWhite,
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          }).toList();
-                                        },
-                                        items: shopProvider.smsCountries
-                                            .map((country) {
-                                          return DropdownMenuItem(
-                                            value: country,
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                  countryCodeToEmoji(
-                                                      country.iso ?? ""),
-                                                  style: const TextStyle(
-                                                      fontSize: 18),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Text(
-                                                  country.code ?? "",
-                                                  style: const TextStyle(
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (value) {
-                                          if (value != null) {
-                                            shopProvider
-                                                .updateSelectedCountry(value);
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                    horizontalSpaceSmall,
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: authProvider
-                                            .registerUserPhoneController,
-                                        keyboardType: TextInputType.phone,
-                                        cursorColor: Colors.white,
-                                        style: context
-                                            .customTextTheme.text14W400
-                                            .copyWith(
-                                          color: AppColors.kWhite,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          enabledBorder: InputBorder.none,
-                                          focusedBorder: InputBorder.none,
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.zero,
-                                          errorStyle: TextStyle(
-                                            fontSize: 0,
-                                            height: 0,
-                                          ),
-                                        ),
-                                        onChanged: (_) {
-                                          setState(() {
-                                            _phoneFieldError =
-                                                _validatePhoneField(
-                                              authProvider
-                                                  .registerUserPhoneController
-                                                  .text,
-                                              shopProvider
-                                                  .selectedCountry?.code,
-                                            );
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Container(
-                                height: 42,
-                                width: double.infinity,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                alignment: Alignment.centerLeft,
-                                decoration: BoxDecoration(
-                                  color: AppColors.kWhite.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  "${shopProvider.selectedCountry?.code ?? ''} ${authProvider.registerUserPhoneController.text}",
-                                  style: context.customTextTheme.text14W400
-                                      .copyWith(
-                                    color: AppColors.kWhite,
-                                  ),
-                                ),
-                              ),
+                      Icon(
+                        Icons.check_circle,
+                        color: Colors.green.shade400,
+                        size: 20,
                       ),
                       horizontalSpaceSmall,
-                      Container(
-                          height: 42,
-                          width: 38,
-                          padding: const EdgeInsets.all(0),
-                          decoration: BoxDecoration(
-                            color: AppColors.kWhite.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: IconButton(
-                              onPressed: () {
-                                if (authProvider.isEditingMobile) {
-                                  authProvider.disableMobileEdit();
-                                } else {
-                                  authProvider.enableMobileEdit();
-                                }
-                              },
-                              icon: Icon(
-                                FluentIcons.edit_24_regular,
-                                color: Colors.white,
-                                size: 16,
-                              ))),
+                      Text(
+                        "✓ Mobile Verified",
+                        style: context.customTextTheme.text14W600.copyWith(
+                          color: Colors.green.shade400,
+                        ),
+                      ),
                     ],
                   ),
                 ),
 
-                // Phone field error message displayed outside the container
-                if (_phoneFieldError.isNotEmpty && authProvider.isEditingMobile)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4, top: 4),
-                    child: Text(
-                      _phoneFieldError,
-                      style: context.customTextTheme.text14W500
-                          .copyWith(color: Colors.red.shade300),
-                    ),
+              if (authProvider.phoneOtpSent &&
+                  snapshot.data! > 0 &&
+                  !authProvider.phoneOtpVerified)
+                Text(
+                  "Resend OTP in ${snapshot.data} seconds",
+                  style: context.customTextTheme.text14W700.copyWith(
+                    color: AppColors.kWhite,
                   ),
-
-                verticalSpaceSmall,
-                // if (authProvider.isEditingMobile)
-                //   SizedBox(
-                //     // width: double.infinity,
-                //     child: ElevatedButton(
-                //       style: ButtonStyle(
-                //         backgroundColor: WidgetStatePropertyAll(
-                //           Theme.of(context).colorScheme.primary,
-                //         ),
-                //         foregroundColor:
-                //             const WidgetStatePropertyAll(Colors.white),
-                //         shape: WidgetStatePropertyAll(
-                //           RoundedRectangleBorder(
-                //             borderRadius: BorderRadius.circular(10),
-                //           ),
-                //         ),
-                //       ),
-                //       onPressed: () async {
-                //         print(
-                //             "${shopProvider.selectedCountry?.code}${authProvider.registerUserPhoneController.text}");
-                //         if (!authProvider.validatePhoneForm()) {
-                //           return;
-                //         }
-                //         final available =
-                //             await authProvider.checkUserAlreadyRegistered();
-                //         if (!available) {
-                //           if (authProvider.verifyResponse?.isPartialUser ==
-                //               true) {
-                //             _showLinkDialog(context, authProvider);
-                //           } else {
-                //             AlertDialogs.showError(
-                //               authProvider.verifyResponse?.message ??
-                //                   "User already exists",
-                //             );
-                //           }
-                //           return;
-                //         }
-                //         // Send OTP
-                //         final sent = await authProvider.sendPhoneOtpForInline();
-                //         if (sent) {
-                //           AlertDialogs.showSuccess("OTP sent successfully");
-                //           authProvider.disableMobileEdit();
-                //           startTimer();
-                //         } else {
-                //           AlertDialogs.showError(
-                //             "Failed to send OTP. Please try again.",
-                //           );
-                //         }
-                //       },
-                //       child: const Text("Send OTP"),
-                //     ),
-                // ),
-                verticalSpaceRegular,
-                // Phone OTP Field - disabled until email is verified when both enabled
-                if (!authProvider.isEditingMobile &&
-                    !authProvider.phoneOtpVerified)
-                  PinCodeTextField(
-                    textStyle: const TextStyle(
+                )
+              else if (authProvider.phoneOtpSent &&
+                  !authProvider.phoneOtpVerified)
+                TextButton.icon(
+                  iconAlignment: IconAlignment.end,
+                  onPressed: () async {
+                    final countryCode = shopProvider.selectedCountry?.code;
+                    final result = await authProvider.sendPhoneOtpForInline(
+                      countryCode: countryCode,
+                    );
+                    if (result) {
+                      AlertDialogs.showSuccess("OTP sent successfully");
+                      startTimer();
+                    }
+                  },
+                  icon: authProvider.sendOtpLoading
+                      ? const CupertinoActivityIndicator(
+                          color: AppColors.kWhite,
+                        )
+                      : const SizedBox.shrink(),
+                  label: Text(
+                    'Resend OTP',
+                    style: context.customTextTheme.text14W700.copyWith(
                       color: AppColors.kWhite,
                     ),
-                    length: 6,
-                    obscureText: false,
-                    animationType: AnimationType.scale,
-                    pinTheme: PinTheme(
-                      shape: PinCodeFieldShape.box,
-                      borderRadius: BorderRadius.circular(10.0),
-                      activeColor: AppColors.kGray,
-                      inactiveColor: AppColors.kGray,
-                      inactiveFillColor:
-                          bothEnabled && !authProvider.emailOtpVerified
-                              ? AppColors.kGray.withOpacity(0.3)
-                              : AppColors.kWhite.withOpacity(0.1),
-                      activeFillColor:
-                          bothEnabled && !authProvider.emailOtpVerified
-                              ? AppColors.kGray.withOpacity(0.3)
-                              : AppColors.kWhite.withOpacity(0.1),
-                      selectedColor: Theme.of(context).colorScheme.primary,
-                      selectedFillColor:
-                          bothEnabled && !authProvider.emailOtpVerified
-                              ? AppColors.kGray.withOpacity(0.3)
-                              : AppColors.kWhite.withOpacity(0.1),
-                      fieldHeight: MediaQuery.of(context).size.width * 0.11,
-                      fieldWidth: MediaQuery.of(context).size.width * 0.11,
-                      fieldOuterPadding: const EdgeInsets.all(4.0),
-                    ),
-                    controller: authProvider.phoneOtpController,
-                    showCursor: false,
-                    animationDuration: const Duration(milliseconds: 300),
-                    enableActiveFill: true,
-                    keyboardType: TextInputType.number,
-                    readOnly: bothEnabled && !authProvider.emailOtpVerified,
-                    onCompleted: (v) {},
-                    onChanged: (value) {},
-                    appContext: context,
-                    autoDisposeControllers: false,
                   ),
-                // Error message display
-                if (authProvider.phoneOtpError.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      authProvider.phoneOtpError,
-                      style: context.customTextTheme.text14W500
-                          .copyWith(color: Colors.red.shade300),
-                    ),
-                  ),
-                // Verified indicator
-                if (authProvider.phoneOtpVerified)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.check_circle,
-                            color: Colors.green.shade400, size: 20),
-                        horizontalSpaceSmall,
-                        Text(
-                          "✓ Mobile Verified",
-                          style: context.customTextTheme.text14W600
-                              .copyWith(color: Colors.green.shade400),
-                        ),
-                      ],
-                    ),
-                  ),
+                ),
 
-                if (authProvider.phoneOtpSent &&
-                    snapshot.data! > 0 &&
-                    !authProvider.phoneOtpVerified)
-                  Text(
-                    "Resend OTP in ${snapshot.data} seconds",
-                    style: context.customTextTheme.text14W700
-                        .copyWith(color: AppColors.kWhite),
-                  )
-                else if (authProvider.phoneOtpSent &&
-                    !authProvider.phoneOtpVerified)
-                  TextButton.icon(
-                    iconAlignment: IconAlignment.end,
-                    onPressed: () async {
-                      final countryCode = shopProvider.selectedCountry?.code;
-                      final result = await authProvider.sendPhoneOtpForInline(
-                          countryCode: countryCode);
-                      if (result) {
-                        AlertDialogs.showSuccess("OTP sent successfully");
-                        startTimer();
-                      }
-                    },
-                    icon: authProvider.sendOtpLoading
-                        ? const CupertinoActivityIndicator(
-                            color: AppColors.kWhite)
-                        : const SizedBox.shrink(),
-                    label: Text(
-                      'Resend OTP',
-                      style: context.customTextTheme.text14W700
-                          .copyWith(color: AppColors.kWhite),
+              verticalSpaceSmall,
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      Theme.of(context).colorScheme.primary,
+                    ),
+                    foregroundColor: const WidgetStatePropertyAll(Colors.white),
+                    shape: WidgetStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
+                  // onPressed: () async {
+                  //   // Already verified → continue to the next page
+                  //   if (authProvider.phoneOtpVerified) {
+                  //     authProvider.updateCurrentRegStage(
+                  //       RegStage.register,
+                  //     );
+                  //     return;
+                  //   }
+                  //   final available =
+                  //       await authProvider.checkUserAlreadyRegistered();
+                  //   if (!available) {
+                  //     if (authProvider.verifyResponse?.isPartialUser ==
+                  //         true) {
+                  //       _showLinkDialog(context, authProvider);
+                  //     } else {
+                  //       AlertDialogs.showError(
+                  //         authProvider.verifyResponse?.message ??
+                  //             "User already exists",
+                  //       );
+                  //     }
+                  //     return;
+                  //   }
+                  //   // Send OTP
+                  //   final countryCode = shopProvider.selectedCountry?.code;
+                  //   final sent = await authProvider.sendPhoneOtpForInline(
+                  //       countryCode: countryCode);
+                  //   if (sent) {
+                  //     AlertDialogs.showSuccess("OTP sent successfully");
+                  //     authProvider.disableMobileEdit();
+                  //     startTimer();
+                  //   } else {
+                  //     AlertDialogs.showError(
+                  //       "Failed to send OTP. Please try again.",
+                  //     );
+                  //   }
+                  // },
+                  // child: Text(
+                  //   authProvider.phoneOtpVerified ? "Continue" : "Send OTP",
+                  // ),
+                  onPressed:
+                      (authProvider.sendOtpLoading ||
+                          authProvider.verifyOtpLoading)
+                      ? null
+                      : () async {
+                          if (authProvider.phoneOtpVerified) {
+                            authProvider.updateCurrentRegStage(
+                              RegStage.register,
+                            );
+                            return;
+                          }
 
-                verticalSpaceSmall,
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(
-                            Theme.of(context).colorScheme.primary),
-                        foregroundColor:
-                            const WidgetStatePropertyAll(Colors.white),
-                        shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)))),
-                    // onPressed: () async {
-                    //   // Already verified → continue to the next page
-                    //   if (authProvider.phoneOtpVerified) {
-                    //     authProvider.updateCurrentRegStage(
-                    //       RegStage.register,
-                    //     );
-                    //     return;
-                    //   }
-                    //   final available =
-                    //       await authProvider.checkUserAlreadyRegistered();
-                    //   if (!available) {
-                    //     if (authProvider.verifyResponse?.isPartialUser ==
-                    //         true) {
-                    //       _showLinkDialog(context, authProvider);
-                    //     } else {
-                    //       AlertDialogs.showError(
-                    //         authProvider.verifyResponse?.message ??
-                    //             "User already exists",
-                    //       );
-                    //     }
-                    //     return;
-                    //   }
-                    //   // Send OTP
-                    //   final countryCode = shopProvider.selectedCountry?.code;
-                    //   final sent = await authProvider.sendPhoneOtpForInline(
-                    //       countryCode: countryCode);
-                    //   if (sent) {
-                    //     AlertDialogs.showSuccess("OTP sent successfully");
-                    //     authProvider.disableMobileEdit();
-                    //     startTimer();
-                    //   } else {
-                    //     AlertDialogs.showError(
-                    //       "Failed to send OTP. Please try again.",
-                    //     );
-                    //   }
-                    // },
-                    // child: Text(
-                    //   authProvider.phoneOtpVerified ? "Continue" : "Send OTP",
-                    // ),
-                    onPressed: (authProvider.sendOtpLoading ||
-                            authProvider.verifyOtpLoading)
-                        ? null
-                        : () async {
-                            if (authProvider.phoneOtpVerified) {
+                          if (authProvider.phoneOtpSent &&
+                              !authProvider.isEditingMobile) {
+                            final otpText = authProvider.phoneOtpController.text
+                                .trim();
+                            if (otpText.isEmpty) {
+                              AlertDialogs.showError(
+                                "Please enter the phone OTP",
+                              );
+                              return;
+                            }
+                            if (otpText.length < 6) {
+                              AlertDialogs.showError(
+                                "Please enter a valid 6-digit OTP",
+                              );
+                              return;
+                            }
+                            final verified = await authProvider
+                                .verifyPhoneOtpForInline(
+                                  countryCode:
+                                      shopProvider.selectedCountry?.code,
+                                );
+                            if (verified) {
+                              AlertDialogs.showSuccess(
+                                "Phone verified successfully!",
+                              );
                               authProvider.updateCurrentRegStage(
                                 RegStage.register,
                               );
-                              return;
                             }
+                            return;
+                          }
 
-                            if (authProvider.phoneOtpSent &&
-                                !authProvider.isEditingMobile) {
-                              final otpText =
-                                  authProvider.phoneOtpController.text.trim();
-                              if (otpText.isEmpty) {
-                                AlertDialogs.showError(
-                                    "Please enter the phone OTP");
-                                return;
-                              }
-                              if (otpText.length < 6) {
-                                AlertDialogs.showError(
-                                    "Please enter a valid 6-digit OTP");
-                                return;
-                              }
-                              final verified =
-                                  await authProvider.verifyPhoneOtpForInline(
-                                      countryCode:
-                                          shopProvider.selectedCountry?.code);
-                              if (verified) {
-                                AlertDialogs.showSuccess(
-                                    "Phone verified successfully!");
-                                authProvider
-                                    .updateCurrentRegStage(RegStage.register);
-                              }
-                              return;
-                            }
-
-                            final available =
-                                await authProvider.checkUserAlreadyRegistered();
-                            if (!context.mounted) return;
-                            if (!available) {
-                              if (authProvider.verifyResponse?.isPartialUser ==
-                                  true) {
-                                _showLinkDialog(context, authProvider);
-                              } else {
-                                AlertDialogs.showError(
-                                  authProvider.verifyResponse?.message ??
-                                      "User already exists",
-                                );
-                              }
-                              return;
-                            }
-                            // Send OTP
-                            final countryCode =
-                                shopProvider.selectedCountry?.code;
-                            final sent =
-                                await authProvider.sendPhoneOtpForInline(
-                                    countryCode: countryCode);
-                            if (sent) {
-                              AlertDialogs.showSuccess("OTP sent successfully");
-                              authProvider.disableMobileEdit();
-                              startTimer();
+                          final available = await authProvider
+                              .checkUserAlreadyRegistered();
+                          if (!context.mounted) return;
+                          if (!available) {
+                            if (authProvider.verifyResponse?.isPartialUser ==
+                                true) {
+                              _showLinkDialog(context, authProvider);
                             } else {
                               AlertDialogs.showError(
-                                "Failed to send OTP. Please try again.",
+                                authProvider.verifyResponse?.message ??
+                                    "User already exists",
                               );
                             }
-                          },
-                    child: (authProvider.sendOtpLoading ||
-                            authProvider.verifyOtpLoading)
-                        ? showButtonProgress(Colors.white)
-                        : Text(
-                            (authProvider.phoneOtpVerified ||
-                                    (authProvider.phoneOtpSent &&
-                                        !authProvider.isEditingMobile))
-                                ? "Verify and Continue"
-                                : "Send OTP",
-                          ),
-                  ),
-                ),
-                verticalSpaceMedium,
-                !authProvider.phoneOtpSent
-                    ? Row(
-                        children: [
-                          const Flexible(
-                              child: Divider(
-                            thickness: 2,
-                            color: AppColors.kGray,
-                          )),
-                          horizontalSpaceMedium,
-                          Text(
-                            'OR',
-                            style: context.customTextTheme.text12W600
-                                .copyWith(color: AppColors.kGray),
-                          ),
-                          horizontalSpaceMedium,
-                          const Flexible(
-                              child: Divider(
-                            thickness: 2,
-                            color: AppColors.kGray,
-                          )),
-                        ],
-                      )
-                    : SizedBox.shrink(),
-                verticalSpaceMedium,
-                !authProvider.phoneOtpSent
-                    ? SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  const WidgetStatePropertyAll(Colors.white),
-                              foregroundColor: WidgetStatePropertyAll(
-                                  Theme.of(context).colorScheme.primary),
-                              shape: WidgetStatePropertyAll(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10)))),
-                          onPressed: () {
-                            authProvider.skipMobileVerification();
-                          },
-                          child: const Text("Verify later"),
+                            return;
+                          }
+                          // Send OTP
+                          final countryCode =
+                              shopProvider.selectedCountry?.code;
+                          final sent = await authProvider.sendPhoneOtpForInline(
+                            countryCode: countryCode,
+                          );
+                          if (sent) {
+                            AlertDialogs.showSuccess("OTP sent successfully");
+                            authProvider.disableMobileEdit();
+                            startTimer();
+                          } else {
+                            AlertDialogs.showError(
+                              "Failed to send OTP. Please try again.",
+                            );
+                          }
+                        },
+                  child:
+                      (authProvider.sendOtpLoading ||
+                          authProvider.verifyOtpLoading)
+                      ? showButtonProgress(Colors.white)
+                      : Text(
+                          (authProvider.phoneOtpVerified ||
+                                  (authProvider.phoneOtpSent &&
+                                      !authProvider.isEditingMobile))
+                              ? "Verify and Continue"
+                              : "Send OTP",
                         ),
-                      )
-                    : SizedBox.shrink()
-              ],
-            );
-          });
+                ),
+              ),
+              verticalSpaceMedium,
+              !authProvider.phoneOtpSent
+                  ? Row(
+                      children: [
+                        const Flexible(
+                          child: Divider(thickness: 2, color: AppColors.kGray),
+                        ),
+                        horizontalSpaceMedium,
+                        Text(
+                          'OR',
+                          style: context.customTextTheme.text12W600.copyWith(
+                            color: AppColors.kGray,
+                          ),
+                        ),
+                        horizontalSpaceMedium,
+                        const Flexible(
+                          child: Divider(thickness: 2, color: AppColors.kGray),
+                        ),
+                      ],
+                    )
+                  : SizedBox.shrink(),
+              verticalSpaceMedium,
+              !authProvider.phoneOtpSent
+                  ? SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: const WidgetStatePropertyAll(
+                            Colors.white,
+                          ),
+                          foregroundColor: WidgetStatePropertyAll(
+                            Theme.of(context).colorScheme.primary,
+                          ),
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          authProvider.skipMobileVerification();
+                        },
+                        child: const Text("Verify later"),
+                      ),
+                    )
+                  : SizedBox.shrink(),
+            ],
+          );
+        },
+      );
     }
 
     // For standalone phone-only flow, wrap in StreamBuilder for timer
@@ -1942,8 +2033,11 @@ class _LoginScreenState extends State<LoginScreen> {
     return buildPhoneContent(null);
   }
 
-  Widget _forgotEmailForm(AuthProvider authProvider, AuthProvider authListener,
-      BuildContext context) {
+  Widget _forgotEmailForm(
+    AuthProvider authProvider,
+    AuthProvider authListener,
+    BuildContext context,
+  ) {
     final themeListener = context.watch<ThemeProvider>();
     return FormBuilder(
       key: authListener.resetFormKey,
@@ -1957,34 +2051,45 @@ class _LoginScreenState extends State<LoginScreen> {
         style: const TextStyle(color: AppColors.kWhite),
 
         decoration: InputDecoration(
-            fillColor: Colors.white.withOpacity(0.1),
-            filled: true,
-            prefixIcon: const Icon(FluentIcons.mail_24_regular,
-                color: AppColors.kGray3),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none),
-            errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none),
-            disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none),
-            hintText: "Email",
-            hintStyle: TextStyle(color: Colors.grey)),
+          fillColor: Colors.white.withOpacity(0.1),
+          filled: true,
+          prefixIcon: const Icon(
+            FluentIcons.mail_24_regular,
+            color: AppColors.kGray3,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          hintText: "Email",
+          hintStyle: TextStyle(color: Colors.grey),
+        ),
         name: 'email-address',
       ),
     );
   }
 
-  Widget _forgotWidgetParent(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _forgotWidgetParent(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     final widgets = [
       _forgotEmailForm(authProvider, authListener, context),
       _forgotNewPasswordForm(authProvider, authListener, context),
@@ -2010,16 +2115,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
 
                   if (authListener.currentForgotForm == 1) {
-                    authProvider
-                        .onChangeSelectedAuthView(AuthView.forgotPassword);
+                    authProvider.onChangeSelectedAuthView(
+                      AuthView.forgotPassword,
+                    );
                     authProvider.updateCurrentForgotForm(
-                        (authListener.currentForgotForm - 1) % widgets.length);
+                      (authListener.currentForgotForm - 1) % widgets.length,
+                    );
                   }
                 },
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: AppColors.kGray3,
-                ),
+                icon: const Icon(Icons.arrow_back_ios, color: AppColors.kGray3),
               ),
             ),
           ),
@@ -2032,32 +2136,38 @@ class _LoginScreenState extends State<LoginScreen> {
               verticalSpaceSmall,
 
               authListener.currentForgotForm == 0
-                  ? Text('Reset Password',
+                  ? Text(
+                      'Reset Password',
                       textAlign: TextAlign.center,
-                      style: context.customTextTheme.text18W600
-                          .copyWith(color: AppColors.kWhite))
+                      style: context.customTextTheme.text18W600.copyWith(
+                        color: AppColors.kWhite,
+                      ),
+                    )
                   : const SizedBox.shrink(),
               verticalSpaceSmall,
               authListener.currentForgotForm == 0
                   ? Text(
                       textAlign: TextAlign.center,
                       'Enter Your Email Address To Reset Your Password',
-                      style: context.customTextTheme.text12W400
-                          .copyWith(color: AppColors.kWhite),
+                      style: context.customTextTheme.text12W400.copyWith(
+                        color: AppColors.kWhite,
+                      ),
                     )
                   : authListener.currentForgotForm == 1
-                      ? Text(
-                          textAlign: TextAlign.center,
-                          'Enter OTP To Reset Your Password',
-                          style: context.customTextTheme.text14W400
-                              .copyWith(color: AppColors.kWhite),
-                        )
-                      : const SizedBox.shrink(),
+                  ? Text(
+                      textAlign: TextAlign.center,
+                      'Enter OTP To Reset Your Password',
+                      style: context.customTextTheme.text14W400.copyWith(
+                        color: AppColors.kWhite,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
               verticalSpaceRegular,
               AnimatedCrossFade(
                 firstChild: widgets[authListener.currentForgotForm],
-                secondChild: widgets[
-                    (authListener.currentForgotForm + 1) % widgets.length],
+                secondChild:
+                    widgets[(authListener.currentForgotForm + 1) %
+                        widgets.length],
                 duration: const Duration(seconds: 1),
                 firstCurve: Curves.ease,
                 secondCurve: Curves.ease,
@@ -2073,8 +2183,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? null
                     : () async {
                         if (authListener.currentForgotForm == 0) {
-                          final isValidated =
-                              await authProvider.resetPassword();
+                          final isValidated = await authProvider
+                              .resetPassword();
                           if (isValidated) {
                             authProvider.resetFormKey.currentState?.save();
                             AlertDialogs.showSuccess('Otp Sent Successfully!');
@@ -2084,11 +2194,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             log('INVALIDATED', name: 'isValidated');
                           }
                         } else if (authListener.currentForgotForm == 1) {
-                          final isValidated =
-                              await authProvider.validateResetPasswordOTP();
+                          final isValidated = await authProvider
+                              .validateResetPasswordOTP();
                           if (isValidated) {
                             AlertDialogs.showSuccess(
-                                "Password Changed successfully!");
+                              "Password Changed successfully!",
+                            );
                             authProvider.updateCurrentForgotForm(2);
                             return;
                           } else {
@@ -2108,29 +2219,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                 child: Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Theme.of(context).colorScheme.primary),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   height: 50,
                   width: context.screenWidth,
                   child: Center(
-                      child: authListener.resetLoading
-                          ? const SizedBox(
-                              height: 25,
-                              width: 25,
-                              child: CircularProgressIndicator.adaptive(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    AppColors.kWhite),
-                              ))
-                          : Text(
-                              authListener.currentForgotForm == 0
-                                  ? 'Request OTP'
-                                  : authListener.currentForgotForm == 1
-                                      ? 'Submit'
-                                      : 'Done',
-                              style: context.customTextTheme.text16W400
-                                  .copyWith(color: AppColors.kWhite),
-                            )),
+                    child: authListener.resetLoading
+                        ? const SizedBox(
+                            height: 25,
+                            width: 25,
+                            child: CircularProgressIndicator.adaptive(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.kWhite,
+                              ),
+                            ),
+                          )
+                        : Text(
+                            authListener.currentForgotForm == 0
+                                ? 'Request OTP'
+                                : authListener.currentForgotForm == 1
+                                ? 'Submit'
+                                : 'Done',
+                            style: context.customTextTheme.text16W400.copyWith(
+                              color: AppColors.kWhite,
+                            ),
+                          ),
+                  ),
                 ),
               ),
             ],
@@ -2140,8 +2256,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _forgotNewPasswordForm(AuthProvider authProvider,
-      AuthProvider authListener, BuildContext context) {
+  Widget _forgotNewPasswordForm(
+    AuthProvider authProvider,
+    AuthProvider authListener,
+    BuildContext context,
+  ) {
     final themeListener = context.watch<ThemeProvider>();
     return FormBuilder(
       key: authListener.changePasswordFormKey,
@@ -2155,27 +2274,35 @@ class _LoginScreenState extends State<LoginScreen> {
             style: const TextStyle(color: AppColors.kWhite),
             autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
-                fillColor: Colors.white.withOpacity(0.1),
-                filled: true,
-                prefixIcon: const Icon(Icons.confirmation_number_outlined,
-                    color: AppColors.kGray3),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                hintText: "OTP",
-                hintStyle: TextStyle(color: Colors.grey)),
+              fillColor: Colors.white.withOpacity(0.1),
+              filled: true,
+              prefixIcon: const Icon(
+                Icons.confirmation_number_outlined,
+                color: AppColors.kGray3,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              hintText: "OTP",
+              hintStyle: TextStyle(color: Colors.grey),
+            ),
           ),
           verticalSpaceRegular,
           FormBuilderTextField(
@@ -2191,29 +2318,35 @@ class _LoginScreenState extends State<LoginScreen> {
             style: const TextStyle(color: AppColors.kWhite),
             // obscureText: authListener.resetPasswordHide,
             decoration: InputDecoration(
-                fillColor: Colors.white.withOpacity(0.1),
-                filled: true,
-                prefixIcon: const Icon(
-                  FluentIcons.password_24_regular,
-                  color: AppColors.kGray3,
-                ),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                hintText: "New Password",
-                hintStyle: TextStyle(color: Colors.grey)),
+              fillColor: Colors.white.withOpacity(0.1),
+              filled: true,
+              prefixIcon: const Icon(
+                FluentIcons.password_24_regular,
+                color: AppColors.kGray3,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              hintText: "New Password",
+              hintStyle: TextStyle(color: Colors.grey),
+            ),
             name: 'new-password',
           ),
           verticalSpaceRegular,
@@ -2234,38 +2367,46 @@ class _LoginScreenState extends State<LoginScreen> {
             obscureText: authListener.resetPasswordHide,
             style: const TextStyle(color: AppColors.kWhite),
             decoration: InputDecoration(
-                fillColor: Colors.white.withOpacity(0.1),
-                filled: true,
-                prefixIcon: const Icon(
-                  FluentIcons.password_24_regular,
+              fillColor: Colors.white.withOpacity(0.1),
+              filled: true,
+              prefixIcon: const Icon(
+                FluentIcons.password_24_regular,
+                color: AppColors.kGray3,
+              ),
+              suffixIcon: InkWell(
+                onTap: () {
+                  authProvider.toggleResetPassword();
+                },
+                child: Icon(
+                  authListener.resetPasswordHide
+                      ? FluentIcons.eye_24_regular
+                      : FluentIcons.eye_off_24_regular,
                   color: AppColors.kGray3,
                 ),
-                suffixIcon: InkWell(
-                    onTap: () {
-                      authProvider.toggleResetPassword();
-                    },
-                    child: Icon(
-                        authListener.resetPasswordHide
-                            ? FluentIcons.eye_24_regular
-                            : FluentIcons.eye_off_24_regular,
-                        color: AppColors.kGray3)),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none),
-                hintText: "Confirm Password",
-                hintStyle: TextStyle(color: Colors.grey)),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              hintText: "Confirm Password",
+              hintStyle: TextStyle(color: Colors.grey),
+            ),
             name: 'confirm-password',
           ),
           verticalSpaceSmall,
@@ -2276,15 +2417,17 @@ class _LoginScreenState extends State<LoginScreen> {
               if (snapshot.data! > 0) {
                 return Text(
                   "Resend OTP in ${snapshot.data} seconds",
-                  style: context.customTextTheme.text14W700
-                      .copyWith(color: AppColors.kWhite),
+                  style: context.customTextTheme.text14W700.copyWith(
+                    color: AppColors.kWhite,
+                  ),
                 );
               } else {
                 return TextButton.icon(
                   iconAlignment: IconAlignment.end,
                   onPressed: () async {
-                    final result =
-                        await authProvider.resetPassword(isResendOTP: true);
+                    final result = await authProvider.resetPassword(
+                      isResendOTP: true,
+                    );
 
                     if (result) {
                       AlertDialogs.showSuccess("OTP sent successfully");
@@ -2292,12 +2435,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   icon: authListener.resetLoadingSecondary
                       ? const CupertinoActivityIndicator(
-                          color: AppColors.kWhite)
+                          color: AppColors.kWhite,
+                        )
                       : const SizedBox.shrink(),
                   label: Text(
                     'Resend OTP',
-                    style: context.customTextTheme.text14W700
-                        .copyWith(color: AppColors.kWhite),
+                    style: context.customTextTheme.text14W700.copyWith(
+                      color: AppColors.kWhite,
+                    ),
                   ),
                 );
               }
@@ -2308,8 +2453,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _registerForm1(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _registerForm1(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -2322,8 +2470,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _phoneInputForm(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _phoneInputForm(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     final shopProvider = context.watch<ShopProvider>();
 
     return Form(
@@ -2337,9 +2488,7 @@ class _LoginScreenState extends State<LoginScreen> {
           controller: authProvider.registerUserPhoneController,
           hintText: "Phone Number",
           keyboardType: TextInputType.phone,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-          ],
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           textInputAction: TextInputAction.done,
           prefixIcon: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -2361,9 +2510,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(width: 8),
                         Text(
                           country.code ?? "",
-                          style: const TextStyle(
-                            color: Colors.white,
-                          ),
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ],
                     );
@@ -2376,9 +2523,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Text(
                           countryCodeToEmoji(country.iso ?? ""),
-                          style: const TextStyle(
-                            fontSize: 20,
-                          ),
+                          style: const TextStyle(fontSize: 20),
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -2422,8 +2567,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _emailInputForm(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _emailInputForm(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     return Form(
       key: authProvider.emailFormKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -2436,8 +2584,10 @@ class _LoginScreenState extends State<LoginScreen> {
           hintText: "Email Address",
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.done,
-          prefixIcon:
-              const Icon(FluentIcons.mail_24_regular, color: AppColors.kGray3),
+          prefixIcon: const Icon(
+            FluentIcons.mail_24_regular,
+            color: AppColors.kGray3,
+          ),
           validator: FormBuilderValidators.compose([
             FormBuilderValidators.required(),
             FormBuilderValidators.email(),
@@ -2447,8 +2597,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _registerForm2(AuthProvider authProvider, BuildContext context,
-      AuthProvider authListener) {
+  Widget _registerForm2(
+    AuthProvider authProvider,
+    BuildContext context,
+    AuthProvider authListener,
+  ) {
     return Form(
       key: authProvider.registerFormKey2,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -2463,8 +2616,10 @@ class _LoginScreenState extends State<LoginScreen> {
             hintText: "First Name",
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
-            prefixIcon: const Icon(FluentIcons.person_24_regular,
-                color: AppColors.kGray3),
+            prefixIcon: const Icon(
+              FluentIcons.person_24_regular,
+              color: AppColors.kGray3,
+            ),
             validator: FormBuilderValidators.compose([
               FormBuilderValidators.required(),
             ]),
@@ -2479,8 +2634,10 @@ class _LoginScreenState extends State<LoginScreen> {
             hintText: "Last Name",
             keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
-            prefixIcon: const Icon(FluentIcons.person_24_regular,
-                color: AppColors.kGray3),
+            prefixIcon: const Icon(
+              FluentIcons.person_24_regular,
+              color: AppColors.kGray3,
+            ),
             validator: FormBuilderValidators.compose([
               FormBuilderValidators.required(),
             ]),
@@ -2495,18 +2652,21 @@ class _LoginScreenState extends State<LoginScreen> {
             hintText: "Password",
             keyboardType: TextInputType.visiblePassword,
             textInputAction: TextInputAction.next,
-            prefixIcon: const Icon(FluentIcons.password_24_regular,
-                color: AppColors.kGray3),
+            prefixIcon: const Icon(
+              FluentIcons.password_24_regular,
+              color: AppColors.kGray3,
+            ),
             obscureText: authListener.registerPasswordHide,
             suffixIcon: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: authProvider.toggleRegisterPassword,
-                child: Icon(
-                  authListener.registerPasswordHide
-                      ? FluentIcons.eye_off_24_regular
-                      : FluentIcons.eye_24_regular,
-                  color: AppColors.kGray3,
-                )),
+              customBorder: const CircleBorder(),
+              onTap: authProvider.toggleRegisterPassword,
+              child: Icon(
+                authListener.registerPasswordHide
+                    ? FluentIcons.eye_off_24_regular
+                    : FluentIcons.eye_24_regular,
+                color: AppColors.kGray3,
+              ),
+            ),
             inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
             onChanged: (_) => setState(() {}),
             validator: FormBuilderValidators.compose([
@@ -2526,17 +2686,20 @@ class _LoginScreenState extends State<LoginScreen> {
             keyboardType: TextInputType.visiblePassword,
             textInputAction: TextInputAction.done,
             inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
-            prefixIcon: const Icon(FluentIcons.password_24_regular,
-                color: AppColors.kGray3),
+            prefixIcon: const Icon(
+              FluentIcons.password_24_regular,
+              color: AppColors.kGray3,
+            ),
             suffixIcon: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: authProvider.confirmRegisterPassword,
-                child: Icon(
-                  authListener.confirmPasswordHide
-                      ? FluentIcons.eye_off_24_regular
-                      : FluentIcons.eye_24_regular,
-                  color: AppColors.kGray3,
-                )),
+              customBorder: const CircleBorder(),
+              onTap: authProvider.confirmRegisterPassword,
+              child: Icon(
+                authListener.confirmPasswordHide
+                    ? FluentIcons.eye_off_24_regular
+                    : FluentIcons.eye_24_regular,
+                color: AppColors.kGray3,
+              ),
+            ),
             onChanged: (_) => setState(() {}),
             validator: FormBuilderValidators.compose([
               FormBuilderValidators.required(),
@@ -2545,7 +2708,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 authProvider.registerUserPasswordController.text,
                 checkNullOrEmpty: false,
                 errorText: 'Passwords do not match',
-              )
+              ),
             ]),
           ),
         ],

@@ -42,11 +42,18 @@ class ProductDetailsTile extends StatelessWidget {
         product.photo?.contains("dish_placeholder.png") ?? false;
     return Theme(
       data: Theme.of(context).copyWith(
-        textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+        textTheme: Theme.of(context).textTheme.apply(
+          fontFamily: GoogleFonts.quicksand().fontFamily,
           displayColor: AppColors.kBlack2,
           bodyColor: AppColors.kBlack2,
         ),
       ),
+      // data: Theme.of(context).copyWith(
+      //   textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+      //     displayColor: AppColors.kBlack2,
+      //     bodyColor: AppColors.kBlack2,
+      //   ),
+      // ),
       child: InkWell(
         onTap: onPressed,
         child: AppConfig.instance.isCategoryImageEnabled
@@ -59,8 +66,9 @@ class ProductDetailsTile extends StatelessWidget {
   Widget buildTileView2(BuildContext context, bool isPlaceHolderUrl) {
     final allergens = product.selectedAllergensList;
     final spiceLevel = product.spiceLevel;
-    final spiceLevelIcon =
-        context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
+    final spiceLevelIcon = context
+        .read<ShopProvider>()
+        .spiceLevelIcons?[spiceLevel];
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Stack(
@@ -74,8 +82,9 @@ class ProductDetailsTile extends StatelessWidget {
                   ? Padding(
                       padding: const EdgeInsets.only(top: 35.0, bottom: 45.0),
                       child: Center(
-                        child:
-                            Assets.lib.assets.images.noimage.image(height: 60),
+                        child: Assets.lib.assets.images.noimage.image(
+                          height: 60,
+                        ),
                       ),
                     )
                   : ClipRRect(
@@ -84,10 +93,13 @@ class ProductDetailsTile extends StatelessWidget {
                         fit: BoxFit.cover,
                         imageUrl: product.photo ?? '',
                         errorWidget: (context, url, error) => Padding(
-                          padding:
-                              const EdgeInsets.only(top: 35.0, bottom: 45.0),
+                          padding: const EdgeInsets.only(
+                            top: 35.0,
+                            bottom: 45.0,
+                          ),
                           child: Center(
-                              child: Assets.lib.assets.images.noimage.image()),
+                            child: Assets.lib.assets.images.noimage.image(),
+                          ),
                         ),
                       ),
                     ),
@@ -118,23 +130,29 @@ class ProductDetailsTile extends StatelessWidget {
                                 Utils.isSpiceLevelApplicable(spiceLevel)) ...[
                               Container(
                                 decoration: BoxDecoration(
-                                    boxShadow: [
-                                      // BoxShadow(
-                                      //     color: Colors.black.withOpacity(0.12),
-                                      //     blurRadius: 6)
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.10),
-                                        blurRadius: 4,
-                                        spreadRadius: 0,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                    color: Utils.spiceLevelColor(
-                                            context, spiceLevel)
-                                        .withOpacity(0.7),
-                                    borderRadius: BorderRadius.circular(10)),
+                                  boxShadow: [
+                                    // BoxShadow(
+                                    //     color: Colors.black.withOpacity(0.12),
+                                    //     blurRadius: 6)
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.10),
+                                      blurRadius: 4,
+                                      spreadRadius: 0,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                  color: Utils.spiceLevelColor(
+                                    context,
+                                    spiceLevel,
+                                  ).withOpacity(0.7),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                                 padding: EdgeInsets.only(
-                                    top: 2, left: 4, right: 4, bottom: 2),
+                                  top: 2,
+                                  left: 4,
+                                  right: 4,
+                                  bottom: 2,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -147,12 +165,17 @@ class ProductDetailsTile extends StatelessWidget {
                                       //       fontSize: 12, color: Colors.red),
                                       // ),
                                       Text(
-                                        ['Medium', 'Hot', 'Extra Hot']
-                                                .contains(spiceLevel)
+                                        [
+                                              'Medium',
+                                              'Hot',
+                                              'Extra Hot',
+                                            ].contains(spiceLevel)
                                             ? '🌶️'
                                             : spiceLevelIcon,
                                         style: TextStyle(
-                                            fontSize: 12, color: Colors.red),
+                                          fontSize: 12,
+                                          color: Colors.red,
+                                        ),
                                       ),
                                     horizontalSpaceTiny,
                                     Text(
@@ -161,13 +184,15 @@ class ProductDetailsTile extends StatelessWidget {
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                         color: Utils.spiceLevelTextColor(
-                                            context, spiceLevel),
+                                          context,
+                                          spiceLevel,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ]
+                            ],
                           ],
                         ),
                       ],
@@ -177,14 +202,17 @@ class ProductDetailsTile extends StatelessWidget {
                       spacing: 2,
                       runSpacing: 4,
                       children: [
-                        ...allergens.take(4).map(
+                        ...allergens
+                            .take(4)
+                            .map(
                               (e) => Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).brightness ==
+                                  color:
+                                      Theme.of(context).brightness ==
                                           Brightness.dark
                                       ? Colors.grey.shade800
                                       : Colors.grey.shade200,
@@ -193,9 +221,10 @@ class ProductDetailsTile extends StatelessWidget {
                                 child: Text(
                                   e,
                                   style: TextStyle(
-                                      fontSize: 8,
-                                      color: context.customTextTheme.color,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 8,
+                                    color: context.customTextTheme.color,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
@@ -206,7 +235,8 @@ class ProductDetailsTile extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).brightness ==
+                              color:
+                                  Theme.of(context).brightness ==
                                       Brightness.dark
                                   ? Colors.grey.shade800
                                   : Colors.grey.shade200,
@@ -227,8 +257,10 @@ class ProductDetailsTile extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: product.isOfferPrice == 'Yes' &&
-                                  product.offerPriceDetails
+                          child:
+                              product.isOfferPrice == 'Yes' &&
+                                  product
+                                          .offerPriceDetails
                                           ?.currentOfferPrice !=
                                       null
                               ? Column(
@@ -256,10 +288,11 @@ class ProductDetailsTile extends StatelessWidget {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 14,
-                                            decoration:
-                                                TextDecoration.lineThrough),
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -273,10 +306,11 @@ class ProductDetailsTile extends StatelessWidget {
                                       maxLines: 1,
                                       style: context.customTextTheme.text14W700
                                           .copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                        color: context.customTextTheme.color,
-                                      ),
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5,
+                                            color:
+                                                context.customTextTheme.color,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -287,61 +321,61 @@ class ProductDetailsTile extends StatelessWidget {
                             : SizedBox(
                                 height: 30,
                                 child: FilledButton(
-                                    style: FilledButton.styleFrom(
-                                        disabledBackgroundColor: Colors
-                                            .transparent,
-                                        disabledForegroundColor:
-                                            Theme.of(context).disabledColor,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0)),
-                                        fixedSize: const Size(80, 30),
-                                        side: BorderSide(
-                                            color: product.isAvailable == true
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                : Colors.grey),
-                                        backgroundColor:
-                                            product.isAvailable == true
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                : Colors.transparent),
-                                    onPressed: product.isAvailable == true
-                                        ? onPressAddBtn
-                                        : null,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        // Icon(
-                                        //   Icons.add,
-                                        //   size: 16,
-                                        // ),
-                                        // horizontalSpaceTiny,
-                                        Text(
-                                          'Add',
-                                          style: context
-                                              .customTextTheme.text14W700
-                                              .copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: product.isAvailable == true
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface
-                                                : Theme.of(context)
-                                                    .disabledColor,
-                                          ),
-                                        ),
-                                      ],
-                                    )),
+                                  style: FilledButton.styleFrom(
+                                    disabledBackgroundColor: Colors.transparent,
+                                    disabledForegroundColor: Theme.of(context)
+                                        .disabledColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    fixedSize: const Size(80, 30),
+                                    side: BorderSide(
+                                      color: product.isAvailable == true
+                                          ? Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                          : Colors.grey,
+                                    ),
+                                    backgroundColor: product.isAvailable == true
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Colors.transparent,
+                                  ),
+                                  onPressed: product.isAvailable == true
+                                      ? onPressAddBtn
+                                      : null,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Icon(
+                                      //   Icons.add,
+                                      //   size: 16,
+                                      // ),
+                                      // horizontalSpaceTiny,
+                                      Text(
+                                        'Add',
+                                        style: context
+                                            .customTextTheme
+                                            .text14W700
+                                            .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: product.isAvailable == true
+                                                  ? Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface
+                                                  : Theme.of(context)
+                                                        .disabledColor,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                       ],
                     ),
                     verticalSpaceSmall,
                   ],
                 ),
-              )
+              ),
             ],
           ),
           Visibility(
@@ -362,8 +396,9 @@ class ProductDetailsTile extends StatelessWidget {
                           ? FluentIcons.heart_24_filled
                           : FluentIcons.heart_24_regular,
                       size: 18,
-                      color:
-                          product.isFavourite ? Colors.red : AppColors.kBlack2,
+                      color: product.isFavourite
+                          ? Colors.red
+                          : AppColors.kBlack2,
                     ),
                   ),
                 ),
@@ -423,8 +458,9 @@ class ProductDetailsTile extends StatelessWidget {
   Widget buildTileView3(BuildContext context) {
     final allergens = product.selectedAllergensList;
     final spiceLevel = product.spiceLevel;
-    final spiceLevelIcon =
-        context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
+    final spiceLevelIcon = context
+        .read<ShopProvider>()
+        .spiceLevelIcons?[spiceLevel];
     return Card(
       color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -473,12 +509,12 @@ class ProductDetailsTile extends StatelessWidget {
                   verticalSpaceTiny,
                   Text(
                     Utils.removeExtraSpaces(
-                      Utils.removeHtmlTags(
-                        product.description ?? '',
-                      ),
+                      Utils.removeHtmlTags(product.description ?? ''),
                     ),
                     style: TextStyle(
-                        fontSize: 12, color: context.customTextTheme.color),
+                      fontSize: 12,
+                      color: context.customTextTheme.color,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -487,14 +523,17 @@ class ProductDetailsTile extends StatelessWidget {
                     spacing: 2,
                     runSpacing: 4,
                     children: [
-                      ...allergens.take(4).map(
+                      ...allergens
+                          .take(4)
+                          .map(
                             (e) => Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).brightness ==
+                                color:
+                                    Theme.of(context).brightness ==
                                         Brightness.dark
                                     ? Colors.grey.shade800
                                     : Colors.grey.shade200,
@@ -518,8 +557,8 @@ class ProductDetailsTile extends StatelessWidget {
                           decoration: BoxDecoration(
                             color:
                                 Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.grey.shade800
-                                    : Colors.grey.shade200,
+                                ? Colors.grey.shade800
+                                : Colors.grey.shade200,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -563,15 +602,17 @@ class ProductDetailsTile extends StatelessWidget {
                             text:
                                 "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
                             style: TextStyle(
-                                color: context.customTextTheme.color,
-                                fontSize: 15),
+                              color: context.customTextTheme.color,
+                              fontSize: 15,
+                            ),
                             children: [
                               TextSpan(
                                 text: product.price ?? '',
                                 style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
-                                    decoration: TextDecoration.lineThrough),
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
                               ),
                             ],
                           ),
@@ -587,41 +628,47 @@ class ProductDetailsTile extends StatelessWidget {
                   verticalSpaceSmall,
                   useSecondaryWidget
                       ? SizedBox(
-                          height: 50, child: Center(child: secondaryWidget))
+                          height: 50,
+                          child: Center(child: secondaryWidget),
+                        )
                       : SizedBox(
                           height: 30,
                           child: FilledButton(
                             style: FilledButton.styleFrom(
-                                disabledBackgroundColor: Colors.transparent,
-                                disabledForegroundColor:
-                                    Theme.of(context).disabledColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5.0)),
-                                fixedSize: const Size(double.infinity, 30),
-                                side: BorderSide(
-                                    color: product.isAvailable == true
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Colors.grey),
-                                backgroundColor: product.isAvailable == true
+                              disabledBackgroundColor: Colors.transparent,
+                              disabledForegroundColor: Theme.of(context)
+                                  .disabledColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              fixedSize: const Size(double.infinity, 30),
+                              side: BorderSide(
+                                color: product.isAvailable == true
                                     ? Theme.of(context).colorScheme.primary
-                                    : Colors.transparent),
+                                    : Colors.grey,
+                              ),
+                              backgroundColor: product.isAvailable == true
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.transparent,
+                            ),
                             onPressed: product.isAvailable == true
                                 ? onPressAddBtn
                                 : null,
                             child:
                                 // Icon(Icons.shopping_cart)
                                 Text(
-                              'Add to Cart',
-                              style: context.customTextTheme.text14W700
-                                  .copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: product.isAvailable == true
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                          : Theme.of(context).disabledColor,
-                                      fontSize: 12),
-                            ),
+                                  'Add to Cart',
+                                  style: context.customTextTheme.text14W700
+                                      .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: product.isAvailable == true
+                                            ? Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                            : Theme.of(context).disabledColor,
+                                        fontSize: 12,
+                                      ),
+                                ),
                           ),
                         ),
                 ],

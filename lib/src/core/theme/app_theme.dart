@@ -16,33 +16,39 @@ InputDecorationTheme buildInputDecorationTheme({
     hintStyle: const TextStyle(fontSize: 14.0),
     border: OutlineInputBorder(
       borderSide: BorderSide(color: borderColor),
-      borderRadius:
-          const BorderRadius.all(Radius.circular(defaultRoundedRadius)),
+      borderRadius: const BorderRadius.all(
+        Radius.circular(defaultRoundedRadius),
+      ),
     ),
     focusedBorder: OutlineInputBorder(
       borderSide: BorderSide(color: focusedColor),
-      borderRadius:
-          const BorderRadius.all(Radius.circular(defaultRoundedRadius)),
+      borderRadius: const BorderRadius.all(
+        Radius.circular(defaultRoundedRadius),
+      ),
     ),
     enabledBorder: OutlineInputBorder(
       borderSide: BorderSide(color: borderColor),
-      borderRadius:
-          const BorderRadius.all(Radius.circular(defaultRoundedRadius)),
+      borderRadius: const BorderRadius.all(
+        Radius.circular(defaultRoundedRadius),
+      ),
     ),
     disabledBorder: OutlineInputBorder(
       borderSide: BorderSide(color: disabledColor),
-      borderRadius:
-          const BorderRadius.all(Radius.circular(defaultRoundedRadius)),
+      borderRadius: const BorderRadius.all(
+        Radius.circular(defaultRoundedRadius),
+      ),
     ),
     errorBorder: OutlineInputBorder(
       borderSide: BorderSide(color: errorColor),
-      borderRadius:
-          const BorderRadius.all(Radius.circular(defaultRoundedRadius)),
+      borderRadius: const BorderRadius.all(
+        Radius.circular(defaultRoundedRadius),
+      ),
     ),
     focusedErrorBorder: OutlineInputBorder(
       borderSide: BorderSide(color: errorColor, width: 2.0),
-      borderRadius:
-          const BorderRadius.all(Radius.circular(defaultRoundedRadius)),
+      borderRadius: const BorderRadius.all(
+        Radius.circular(defaultRoundedRadius),
+      ),
     ),
   );
 }
@@ -50,28 +56,40 @@ InputDecorationTheme buildInputDecorationTheme({
 ThemeData quickSandTextTheme(BuildContext context) {
   final baseTextTheme = Theme.of(context).textTheme;
   return Theme.of(context).copyWith(
-      textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
-    displayColor: AppColors.kBlack2,
-    bodyColor: AppColors.kBlack2,
-  ));
+    //     textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+    //   displayColor: AppColors.kBlack2,
+    //   bodyColor: AppColors.kBlack2,
+    // )
+    textTheme: baseTextTheme.apply(
+      fontFamily: GoogleFonts.quicksand().fontFamily,
+      displayColor: AppColors.kBlack2,
+      bodyColor: AppColors.kBlack2,
+    ),
+  );
 }
 
 ThemeData poppinsTextTheme(BuildContext context) {
   final baseTextTheme = Theme.of(context).textTheme;
   return Theme.of(context).copyWith(
-      textTheme: GoogleFonts.poppinsTextTheme(baseTextTheme).apply(
-    displayColor: AppColors.kBlack2,
-    bodyColor: AppColors.kBlack2,
-  ));
+    textTheme: baseTextTheme.apply(
+      fontFamily: GoogleFonts.quicksand().fontFamily,
+      displayColor: AppColors.kBlack2,
+      bodyColor: AppColors.kBlack2,
+    ),
+    // textTheme: GoogleFonts.poppinsTextTheme(baseTextTheme)
+    //     .apply(displayColor: AppColors.kBlack2, bodyColor: AppColors.kBlack2),
+  );
 }
 
 ThemeData appLightTheme(BuildContext context) {
   final baseTextTheme = Theme.of(context).textTheme;
-  final textTheme = GoogleFonts.poppinsTextTheme(baseTextTheme).apply(
+  // final textTheme = GoogleFonts.poppinsTextTheme(baseTextTheme)
+  //     .apply(displayColor: AppColors.kBlack2, bodyColor: AppColors.kBlack2);
+  final textTheme = baseTextTheme.apply(
+    fontFamily: GoogleFonts.poppins().fontFamily,
     displayColor: AppColors.kBlack2,
     bodyColor: AppColors.kBlack2,
   );
-
   final inputTheme = buildInputDecorationTheme(
     borderColor: AppColors.kGray2,
     focusedColor: Theme.of(context).colorScheme.primary,
@@ -99,8 +117,8 @@ ThemeData appLightTheme(BuildContext context) {
       ),
     ),
     drawerTheme: DrawerThemeData(
-        backgroundColor:
-            Theme.of(context).colorScheme.primary.withOpacity(0.1)),
+      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+    ),
     iconTheme: const IconThemeData(
       color: AppColors.kGray, // light mode
     ),
@@ -113,7 +131,7 @@ ThemeData appLightTheme(BuildContext context) {
     ),
     textTheme: textTheme,
     inputDecorationTheme: inputTheme,
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: AppColors.kWhite,
       elevation: 0,
       margin: const EdgeInsets.all(8.0),
@@ -133,8 +151,9 @@ ThemeData appLightTheme(BuildContext context) {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: ButtonStyle(
-        backgroundColor:
-            WidgetStatePropertyAll(Theme.of(context).colorScheme.primary),
+        backgroundColor: WidgetStatePropertyAll(
+          Theme.of(context).colorScheme.primary,
+        ),
         foregroundColor: const WidgetStatePropertyAll(AppColors.kWhite),
       ),
     ),
@@ -143,11 +162,13 @@ ThemeData appLightTheme(BuildContext context) {
 
 ThemeData appDarkTheme(BuildContext context) {
   final baseTextTheme = Theme.of(context).textTheme;
-  final textTheme = GoogleFonts.poppinsTextTheme(baseTextTheme).apply(
+  // final textTheme = GoogleFonts.poppinsTextTheme(baseTextTheme)
+  //     .apply(displayColor: AppColors.kWhite, bodyColor: AppColors.kWhite);
+  final textTheme = baseTextTheme.apply(
+    fontFamily: GoogleFonts.poppins().fontFamily,
     displayColor: AppColors.kWhite,
     bodyColor: AppColors.kWhite,
   );
-
   final inputTheme = buildInputDecorationTheme(
     borderColor: AppColors.kGray2,
     focusedColor: Theme.of(context).colorScheme.primary,
@@ -195,7 +216,7 @@ ThemeData appDarkTheme(BuildContext context) {
         return Colors.grey; // 👈 unselected color
       }),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: const Color(0xFF1E1E1E),
       elevation: 0,
       margin: const EdgeInsets.all(8.0),
@@ -207,14 +228,14 @@ ThemeData appDarkTheme(BuildContext context) {
     disabledColor: Theme.of(context).disabledColor,
     filledButtonTheme: FilledButtonThemeData(
       style: ButtonStyle(
-        backgroundColor:
-            WidgetStatePropertyAll(Theme.of(context).colorScheme.primary),
+        backgroundColor: WidgetStatePropertyAll(
+          Theme.of(context).colorScheme.primary,
+        ),
         foregroundColor: const WidgetStatePropertyAll(AppColors.kWhite),
       ),
     ),
   );
 }
-
 
 // ThemeData appTheme(BuildContext context) {
 //   final baseTextTheme = Theme.of(context).textTheme;

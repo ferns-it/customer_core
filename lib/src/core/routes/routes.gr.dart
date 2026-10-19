@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
@@ -8,6 +9,7 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+
 import 'package:auto_route/auto_route.dart' as _i27;
 import 'package:customer_core/src/domain/user/models/user_address_list_data_model.dart'
     as _i28;
@@ -70,14 +72,14 @@ class AddNewAddressScreenRoute
     bool isFromProfieView = false,
     List<_i27.PageRouteInfo>? children,
   }) : super(
-          AddNewAddressScreenRoute.name,
-          args: AddNewAddressScreenRouteArgs(
-            address: address,
-            key: key,
-            isFromProfieView: isFromProfieView,
-          ),
-          initialChildren: children,
-        );
+         AddNewAddressScreenRoute.name,
+         args: AddNewAddressScreenRouteArgs(
+           address: address,
+           key: key,
+           isFromProfieView: isFromProfieView,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'AddNewAddressScreenRoute';
 
@@ -111,16 +113,26 @@ class AddNewAddressScreenRouteArgs {
   String toString() {
     return 'AddNewAddressScreenRouteArgs{address: $address, key: $key, isFromProfieView: $isFromProfieView}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! AddNewAddressScreenRouteArgs) return false;
+    return address == other.address &&
+        key == other.key &&
+        isFromProfieView == other.isFromProfieView;
+  }
+
+  @override
+  int get hashCode =>
+      address.hashCode ^ key.hashCode ^ isFromProfieView.hashCode;
 }
 
 /// generated route for
 /// [_i2.CartScreen]
 class CartScreenRoute extends _i27.PageRouteInfo<void> {
   const CartScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          CartScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(CartScreenRoute.name, initialChildren: children);
 
   static const String name = 'CartScreenRoute';
 
@@ -136,10 +148,7 @@ class CartScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i3.CategoriesScreen]
 class CategoriesScreenRoute extends _i27.PageRouteInfo<void> {
   const CategoriesScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          CategoriesScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(CategoriesScreenRoute.name, initialChildren: children);
 
   static const String name = 'CategoriesScreenRoute';
 
@@ -155,10 +164,7 @@ class CategoriesScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i4.CheckoutScreen]
 class CheckoutScreenRoute extends _i27.PageRouteInfo<void> {
   const CheckoutScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          CheckoutScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(CheckoutScreenRoute.name, initialChildren: children);
 
   static const String name = 'CheckoutScreenRoute';
 
@@ -174,10 +180,7 @@ class CheckoutScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i5.CoupenScreen]
 class CoupenScreenRoute extends _i27.PageRouteInfo<void> {
   const CoupenScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          CoupenScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(CoupenScreenRoute.name, initialChildren: children);
 
   static const String name = 'CoupenScreenRoute';
 
@@ -193,10 +196,7 @@ class CoupenScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i6.FavouriteProductsScreen]
 class FavouriteProductsScreenRoute extends _i27.PageRouteInfo<void> {
   const FavouriteProductsScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          FavouriteProductsScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(FavouriteProductsScreenRoute.name, initialChildren: children);
 
   static const String name = 'FavouriteProductsScreenRoute';
 
@@ -212,10 +212,7 @@ class FavouriteProductsScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i7.ForgotOtpScreen]
 class ForgotOtpScreenRoute extends _i27.PageRouteInfo<void> {
   const ForgotOtpScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          ForgotOtpScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(ForgotOtpScreenRoute.name, initialChildren: children);
 
   static const String name = 'ForgotOtpScreenRoute';
 
@@ -231,10 +228,7 @@ class ForgotOtpScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i8.ForgotPasswordScreen]
 class ForgotPasswordScreenRoute extends _i27.PageRouteInfo<void> {
   const ForgotPasswordScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          ForgotPasswordScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(ForgotPasswordScreenRoute.name, initialChildren: children);
 
   static const String name = 'ForgotPasswordScreenRoute';
 
@@ -249,14 +243,12 @@ class ForgotPasswordScreenRoute extends _i27.PageRouteInfo<void> {
 /// generated route for
 /// [_i9.HomeScreen]
 class HomeScreenRoute extends _i27.PageRouteInfo<HomeScreenRouteArgs> {
-  HomeScreenRoute({
-    _i29.Key? key,
-    List<_i27.PageRouteInfo>? children,
-  }) : super(
-          HomeScreenRoute.name,
-          args: HomeScreenRouteArgs(key: key),
-          initialChildren: children,
-        );
+  HomeScreenRoute({_i29.Key? key, List<_i27.PageRouteInfo>? children})
+    : super(
+        HomeScreenRoute.name,
+        args: HomeScreenRouteArgs(key: key),
+        initialChildren: children,
+      );
 
   static const String name = 'HomeScreenRoute';
 
@@ -264,7 +256,8 @@ class HomeScreenRoute extends _i27.PageRouteInfo<HomeScreenRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<HomeScreenRouteArgs>(
-          orElse: () => const HomeScreenRouteArgs());
+        orElse: () => const HomeScreenRouteArgs(),
+      );
       return _i9.HomeScreen(key: args.key);
     },
   );
@@ -279,6 +272,16 @@ class HomeScreenRouteArgs {
   String toString() {
     return 'HomeScreenRouteArgs{key: $key}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! HomeScreenRouteArgs) return false;
+    return key == other.key;
+  }
+
+  @override
+  int get hashCode => key.hashCode;
 }
 
 /// generated route for
@@ -290,14 +293,14 @@ class LoginScreenRoute extends _i27.PageRouteInfo<LoginScreenRouteArgs> {
     _i30.Key? key,
     List<_i27.PageRouteInfo>? children,
   }) : super(
-          LoginScreenRoute.name,
-          args: LoginScreenRouteArgs(
-            isFromProfile: isFromProfile,
-            showBackButton: showBackButton,
-            key: key,
-          ),
-          initialChildren: children,
-        );
+         LoginScreenRoute.name,
+         args: LoginScreenRouteArgs(
+           isFromProfile: isFromProfile,
+           showBackButton: showBackButton,
+           key: key,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'LoginScreenRoute';
 
@@ -305,7 +308,8 @@ class LoginScreenRoute extends _i27.PageRouteInfo<LoginScreenRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<LoginScreenRouteArgs>(
-          orElse: () => const LoginScreenRouteArgs());
+        orElse: () => const LoginScreenRouteArgs(),
+      );
       return _i10.LoginScreen(
         isFromProfile: args.isFromProfile,
         showBackButton: args.showBackButton,
@@ -332,16 +336,26 @@ class LoginScreenRouteArgs {
   String toString() {
     return 'LoginScreenRouteArgs{isFromProfile: $isFromProfile, showBackButton: $showBackButton, key: $key}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! LoginScreenRouteArgs) return false;
+    return isFromProfile == other.isFromProfile &&
+        showBackButton == other.showBackButton &&
+        key == other.key;
+  }
+
+  @override
+  int get hashCode =>
+      isFromProfile.hashCode ^ showBackButton.hashCode ^ key.hashCode;
 }
 
 /// generated route for
 /// [_i11.NotificationPreferenceScreen]
 class NotificationPreferenceScreenRoute extends _i27.PageRouteInfo<void> {
   const NotificationPreferenceScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          NotificationPreferenceScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(NotificationPreferenceScreenRoute.name, initialChildren: children);
 
   static const String name = 'NotificationPreferenceScreenRoute';
 
@@ -357,10 +371,7 @@ class NotificationPreferenceScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i12.NotificationScreen]
 class NotificationScreenRoute extends _i27.PageRouteInfo<void> {
   const NotificationScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          NotificationScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(NotificationScreenRoute.name, initialChildren: children);
 
   static const String name = 'NotificationScreenRoute';
 
@@ -381,13 +392,13 @@ class OrderHistoryScreenRoute
     _i30.Key? key,
     List<_i27.PageRouteInfo>? children,
   }) : super(
-          OrderHistoryScreenRoute.name,
-          args: OrderHistoryScreenRouteArgs(
-            isFromProfileScreen: isFromProfileScreen,
-            key: key,
-          ),
-          initialChildren: children,
-        );
+         OrderHistoryScreenRoute.name,
+         args: OrderHistoryScreenRouteArgs(
+           isFromProfileScreen: isFromProfileScreen,
+           key: key,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'OrderHistoryScreenRoute';
 
@@ -395,10 +406,7 @@ class OrderHistoryScreenRoute
     name,
     builder: (data) {
       final args = data.argsAs<OrderHistoryScreenRouteArgs>();
-      return _i13.OrderHistoryScreen(
-        args.isFromProfileScreen,
-        key: args.key,
-      );
+      return _i13.OrderHistoryScreen(args.isFromProfileScreen, key: args.key);
     },
   );
 }
@@ -417,16 +425,23 @@ class OrderHistoryScreenRouteArgs {
   String toString() {
     return 'OrderHistoryScreenRouteArgs{isFromProfileScreen: $isFromProfileScreen, key: $key}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! OrderHistoryScreenRouteArgs) return false;
+    return isFromProfileScreen == other.isFromProfileScreen && key == other.key;
+  }
+
+  @override
+  int get hashCode => isFromProfileScreen.hashCode ^ key.hashCode;
 }
 
 /// generated route for
 /// [_i14.OrderOnlineHomeScreen]
 class OrderOnlineHomeScreenRoute extends _i27.PageRouteInfo<void> {
   const OrderOnlineHomeScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          OrderOnlineHomeScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(OrderOnlineHomeScreenRoute.name, initialChildren: children);
 
   static const String name = 'OrderOnlineHomeScreenRoute';
 
@@ -442,10 +457,7 @@ class OrderOnlineHomeScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i15.OrderOnlineScreen]
 class OrderOnlineScreenRoute extends _i27.PageRouteInfo<void> {
   const OrderOnlineScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          OrderOnlineScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(OrderOnlineScreenRoute.name, initialChildren: children);
 
   static const String name = 'OrderOnlineScreenRoute';
 
@@ -461,10 +473,7 @@ class OrderOnlineScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i16.OtpScreen]
 class OtpScreenRoute extends _i27.PageRouteInfo<void> {
   const OtpScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          OtpScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(OtpScreenRoute.name, initialChildren: children);
 
   static const String name = 'OtpScreenRoute';
 
@@ -485,14 +494,14 @@ class ProfileScreenRoute extends _i27.PageRouteInfo<ProfileScreenRouteArgs> {
     _i30.Key? key,
     List<_i27.PageRouteInfo>? children,
   }) : super(
-          ProfileScreenRoute.name,
-          args: ProfileScreenRouteArgs(
-            isFromHome: isFromHome,
-            onTap: onTap,
-            key: key,
-          ),
-          initialChildren: children,
-        );
+         ProfileScreenRoute.name,
+         args: ProfileScreenRouteArgs(
+           isFromHome: isFromHome,
+           onTap: onTap,
+           key: key,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'ProfileScreenRoute';
 
@@ -500,11 +509,7 @@ class ProfileScreenRoute extends _i27.PageRouteInfo<ProfileScreenRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<ProfileScreenRouteArgs>();
-      return _i17.ProfileScreen(
-        args.isFromHome,
-        args.onTap,
-        key: args.key,
-      );
+      return _i17.ProfileScreen(args.isFromHome, args.onTap, key: args.key);
     },
   );
 }
@@ -526,16 +531,25 @@ class ProfileScreenRouteArgs {
   String toString() {
     return 'ProfileScreenRouteArgs{isFromHome: $isFromHome, onTap: $onTap, key: $key}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ProfileScreenRouteArgs) return false;
+    return isFromHome == other.isFromHome &&
+        onTap == other.onTap &&
+        key == other.key;
+  }
+
+  @override
+  int get hashCode => isFromHome.hashCode ^ onTap.hashCode ^ key.hashCode;
 }
 
 /// generated route for
 /// [_i18.RegisterScreen]
 class RegisterScreenRoute extends _i27.PageRouteInfo<void> {
   const RegisterScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          RegisterScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(RegisterScreenRoute.name, initialChildren: children);
 
   static const String name = 'RegisterScreenRoute';
 
@@ -551,10 +565,7 @@ class RegisterScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i19.SplashScreen]
 class SplashScreenRoute extends _i27.PageRouteInfo<void> {
   const SplashScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          SplashScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(SplashScreenRoute.name, initialChildren: children);
 
   static const String name = 'SplashScreenRoute';
 
@@ -570,10 +581,7 @@ class SplashScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i20.StoreScreen]
 class StoreScreenRoute extends _i27.PageRouteInfo<void> {
   const StoreScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          StoreScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(StoreScreenRoute.name, initialChildren: children);
 
   static const String name = 'StoreScreenRoute';
 
@@ -589,10 +597,7 @@ class StoreScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i21.SuccessScreen]
 class SuccessScreenRoute extends _i27.PageRouteInfo<void> {
   const SuccessScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          SuccessScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(SuccessScreenRoute.name, initialChildren: children);
 
   static const String name = 'SuccessScreenRoute';
 
@@ -608,10 +613,7 @@ class SuccessScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i22.TableReservationHistoryScreen]
 class TableReservationHistoryScreenRoute extends _i27.PageRouteInfo<void> {
   const TableReservationHistoryScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          TableReservationHistoryScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(TableReservationHistoryScreenRoute.name, initialChildren: children);
 
   static const String name = 'TableReservationHistoryScreenRoute';
 
@@ -627,10 +629,7 @@ class TableReservationHistoryScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i23.TableReservationScreen]
 class TableReservationScreenRoute extends _i27.PageRouteInfo<void> {
   const TableReservationScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          TableReservationScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(TableReservationScreenRoute.name, initialChildren: children);
 
   static const String name = 'TableReservationScreenRoute';
 
@@ -646,10 +645,7 @@ class TableReservationScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i24.UserAddressScreen]
 class UserAddressScreenRoute extends _i27.PageRouteInfo<void> {
   const UserAddressScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          UserAddressScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(UserAddressScreenRoute.name, initialChildren: children);
 
   static const String name = 'UserAddressScreenRoute';
 
@@ -665,10 +661,7 @@ class UserAddressScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i25.ViewOrderScreen]
 class ViewOrderScreenRoute extends _i27.PageRouteInfo<void> {
   const ViewOrderScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          ViewOrderScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(ViewOrderScreenRoute.name, initialChildren: children);
 
   static const String name = 'ViewOrderScreenRoute';
 
@@ -684,10 +677,7 @@ class ViewOrderScreenRoute extends _i27.PageRouteInfo<void> {
 /// [_i26.WelcomeScreen]
 class WelcomeScreenRoute extends _i27.PageRouteInfo<void> {
   const WelcomeScreenRoute({List<_i27.PageRouteInfo>? children})
-      : super(
-          WelcomeScreenRoute.name,
-          initialChildren: children,
-        );
+    : super(WelcomeScreenRoute.name, initialChildren: children);
 
   static const String name = 'WelcomeScreenRoute';
 

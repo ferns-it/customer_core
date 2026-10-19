@@ -14,6 +14,7 @@ import 'package:customer_core/src/core/constants/app_identifiers.dart';
 import 'package:customer_core/src/core/constants/enums.dart';
 import 'package:customer_core/src/domain/user/i_user_repo.dart';
 import 'package:injectable/injectable.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../core/utils/alert_dialogs.dart';
 import '../../core/utils/utils.dart';
@@ -32,7 +33,7 @@ enum RegStage {
   otpPhone, // phone OTP verification
   register,
   success,
-  otpCombined // Combined email + phone OTP on one page
+  otpCombined, // Combined email + phone OTP on one page
 }
 
 @LazySingleton()
@@ -232,9 +233,9 @@ class AuthProvider extends ChangeNotifier with BaseController {
   final registerUserPhoneController = TextEditingController();
   final registerUserPasswordController = TextEditingController();
   final registerUserConfirmPasswordController = TextEditingController();
-  final phoneOtpController = TextEditingController();
+  final phoneOtpController = PinInputController();
 
-  final emailOtpController = TextEditingController();
+  final emailOtpController = PinInputController();
   bool _smsRequired = false;
   bool _emailRequired = false;
 
@@ -456,9 +457,7 @@ class AuthProvider extends ChangeNotifier with BaseController {
             if (apnsToken != null) {
               await _firebaseMessaging.subscribeToTopic(topicID);
             } else {
-              await Future<void>.delayed(
-                const Duration(seconds: 2),
-              );
+              await Future<void>.delayed(const Duration(seconds: 2));
               apnsToken = await _firebaseMessaging.getAPNSToken();
               if (apnsToken != null) {
                 await _firebaseMessaging.subscribeToTopic(topicID);
@@ -958,14 +957,18 @@ class AuthProvider extends ChangeNotifier with BaseController {
       if (isResendOTP) {
         _resetLoadingSecondary = true;
         notifyListeners();
-        final response =
-            await userRepository.requestPasswordResetOTP(savedResetEmail);
-        return response.fold(() {
-          return true;
-        }, (error) {
-          AlertDialogs.showError(error.message);
-          return false;
-        });
+        final response = await userRepository.requestPasswordResetOTP(
+          savedResetEmail,
+        );
+        return response.fold(
+          () {
+            return true;
+          },
+          (error) {
+            AlertDialogs.showError(error.message);
+            return false;
+          },
+        );
       }
 
       if (resetFormKey.currentState == null) {
@@ -983,12 +986,15 @@ class AuthProvider extends ChangeNotifier with BaseController {
 
       final response = await userRepository.requestPasswordResetOTP(resetEmail);
 
-      return response.fold(() {
-        return true;
-      }, (error) {
-        AlertDialogs.showError(error.message);
-        return false;
-      });
+      return response.fold(
+        () {
+          return true;
+        },
+        (error) {
+          AlertDialogs.showError(error.message);
+          return false;
+        },
+      );
     } finally {
       _resetLoading = false;
       _resetLoadingSecondary = false;
@@ -1015,14 +1021,17 @@ class AuthProvider extends ChangeNotifier with BaseController {
         otp: savedForgotPasswordValidateOTP,
       );
 
-      return response.fold(() {
-        log(response.toString(), name: "validateResetPasswordOTP");
-        return true;
-      }, (error) {
-        log(error.toString(), name: "validateResetPasswordOTP");
-        AlertDialogs.showError(error.message);
-        return false;
-      });
+      return response.fold(
+        () {
+          log(response.toString(), name: "validateResetPasswordOTP");
+          return true;
+        },
+        (error) {
+          log(error.toString(), name: "validateResetPasswordOTP");
+          AlertDialogs.showError(error.message);
+          return false;
+        },
+      );
     } finally {
       _resetLoading = false;
       notifyListeners();
@@ -1044,19 +1053,22 @@ class AuthProvider extends ChangeNotifier with BaseController {
       shopID: AppIdentifiers.kShopId,
     );
     print("Response: $response");
-    return response.fold((error) {
-      // Don't show snackbar here
-      return false;
-    }, (result) {
-      if (result["error"] == true) {
-        verifyResponse = VerifyAlreadyRegisteredModel.fromMap(
-          result["errorMessage"],
-        );
+    return response.fold(
+      (error) {
+        // Don't show snackbar here
         return false;
-      }
-      verifyResponse = null;
-      return true;
-    });
+      },
+      (result) {
+        if (result["error"] == true) {
+          verifyResponse = VerifyAlreadyRegisteredModel.fromMap(
+            result["errorMessage"],
+          );
+          return false;
+        }
+        verifyResponse = null;
+        return true;
+      },
+    );
   }
 
   Future<bool> logoutUser() async {

@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:customer_core/src/domain/notification/models/notification_model.dart';
 import 'package:customer_core/src/infrastructure/notification/notification_shared_prefs_repo.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -51,7 +52,7 @@ class NotificationProvider extends ChangeNotifier with BaseController {
     );
 
     await _notificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: _onNotificationTap,
     );
 
@@ -65,9 +66,11 @@ class NotificationProvider extends ChangeNotifier with BaseController {
 
     await _notificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(channel);
   }
+
   Future<void> requestNotificationPermission() async {
     if (Platform.isAndroid) {
       final status = await Permission.notification.request();
@@ -87,10 +90,7 @@ class NotificationProvider extends ChangeNotifier with BaseController {
     }
   }
 
-  Future<void> addNotification(
-    String title,
-    String body,
-  ) async {
+  Future<void> addNotification(String title, String body) async {
     final notification = NotificationModel(
       title: title,
       body: body,
@@ -103,6 +103,7 @@ class NotificationProvider extends ChangeNotifier with BaseController {
 
     notifyListeners();
   }
+
   Future<void> clearNotifications() async {
     await NotificationSharedPrefs.clearNotification();
     _notifications.clear();
@@ -110,11 +111,7 @@ class NotificationProvider extends ChangeNotifier with BaseController {
     notifyListeners();
   }
 
-  
-  Future<void> showNotification(
-    String title,
-    String body,
-  ) async {
+  Future<void> showNotification(String title, String body) async {
     try {
       const androidDetails = AndroidNotificationDetails(
         'order_notification',
@@ -137,18 +134,15 @@ class NotificationProvider extends ChangeNotifier with BaseController {
       );
 
       await _notificationsPlugin.show(
-        createUniqueId(),
-        title,
-        body,
-        details,
+        id: createUniqueId(),
+        title: title,
+        body: body,
+        notificationDetails: details,
       );
 
       await addNotification(title, body);
     } catch (e, stackTrace) {
-      log(
-        'Error showing notification: $e',
-        stackTrace: stackTrace,
-      );
+      log('Error showing notification: $e', stackTrace: stackTrace);
     }
   }
 
@@ -157,6 +151,7 @@ class NotificationProvider extends ChangeNotifier with BaseController {
     log('Payload: ${response.payload}');
     navigateToNotificationScreen();
   }
+
   void navigateToNotificationScreen() {
     final router = GlobalVariable.router;
     if (router != null) {

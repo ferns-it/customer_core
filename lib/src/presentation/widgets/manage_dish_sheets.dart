@@ -47,18 +47,25 @@ class DishDetailBottomSheet extends StatelessWidget {
           Flexible(
             child: SingleChildScrollView(
               child: Theme(
+                // data: Theme.of(context).copyWith(
+                //   textTheme:
+                //       GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+                //     displayColor: AppColors.kBlack2,
+                //     bodyColor: AppColors.kBlack2,
+                //   ),
+                // ),
                 data: Theme.of(context).copyWith(
-                  textTheme:
-                      GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+                  textTheme: Theme.of(context).textTheme.apply(
+                    fontFamily: GoogleFonts.quicksand().fontFamily,
                     displayColor: AppColors.kBlack2,
                     bodyColor: AppColors.kBlack2,
                   ),
                 ),
                 child: Container(
                   padding: const EdgeInsetsDirectional.symmetric(
-                      // vertical: 10,
-                      // horizontal: 15,
-                      ),
+                    // vertical: 10,
+                    // horizontal: 15,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: const BorderRadius.only(
@@ -100,14 +107,17 @@ class DishDetailBottomSheet extends StatelessWidget {
                           spacing: 2,
                           runSpacing: 4,
                           children: [
-                            ...allergens.take(4).map(
+                            ...allergens
+                                .take(4)
+                                .map(
                                   (e) => Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 8,
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context).brightness ==
+                                      color:
+                                          Theme.of(context).brightness ==
                                               Brightness.dark
                                           ? Colors.grey.shade800
                                           : AppColors.kGray3.withOpacity(0.3),
@@ -129,7 +139,8 @@ class DishDetailBottomSheet extends StatelessWidget {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).brightness ==
+                                  color:
+                                      Theme.of(context).brightness ==
                                           Brightness.dark
                                       ? Colors.grey.shade800
                                       : AppColors.kGray3.withOpacity(0.3),
@@ -187,8 +198,10 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _masterAddonKeys =
-        List.generate(product.masterAddons.length, (_) => GlobalKey());
+    _masterAddonKeys = List.generate(
+      product.masterAddons.length,
+      (_) => GlobalKey(),
+    );
   }
 
   @override
@@ -269,8 +282,10 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
               .toList();
         }
         return variation.allergens
-                ?.where((allergen) =>
-                    variation.selectedallergens!.contains(allergen.id))
+                ?.where(
+                  (allergen) =>
+                      variation.selectedallergens!.contains(allergen.id),
+                )
                 .map((e) => e.name ?? '')
                 .where((e) => e.isNotEmpty)
                 .toList() ??
@@ -279,8 +294,9 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
       return [];
     }
 
-    final selectedVariationAllergens =
-        getSelectedVariationAllergens(cartListener);
+    final selectedVariationAllergens = getSelectedVariationAllergens(
+      cartListener,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -288,8 +304,15 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
         const RoundedCloseIcon(),
         verticalSpaceRegular,
         Theme(
+          // data: Theme.of(context).copyWith(
+          //   textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+          //     displayColor: AppColors.kBlack2,
+          //     bodyColor: AppColors.kBlack2,
+          //   ),
+          // ),
           data: Theme.of(context).copyWith(
-            textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+            textTheme: Theme.of(context).textTheme.apply(
+              fontFamily: GoogleFonts.quicksand().fontFamily,
               displayColor: AppColors.kBlack2,
               bodyColor: AppColors.kBlack2,
             ),
@@ -319,7 +342,8 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                     children: [
                       AppConfig.instance.isCategoryImageEnabled
                           ? Expanded(
-                              child: _ProductImageWidget(product: product))
+                              child: _ProductImageWidget(product: product),
+                            )
                           : SizedBox.shrink(),
                       AppConfig.instance.isCategoryImageEnabled
                           ? horizontalSpaceSmall
@@ -342,16 +366,17 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                                               (e) => Container(
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 4,
-                                                ),
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
                                                 decoration: BoxDecoration(
-                                                  color: Theme.of(context)
+                                                  color:
+                                                      Theme.of(context)
                                                               .brightness ==
                                                           Brightness.dark
                                                       ? Colors.grey.shade800
                                                       : AppColors.kGray3
-                                                          .withOpacity(0.3),
+                                                            .withOpacity(0.3),
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                 ),
@@ -360,7 +385,8 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                                                   style: TextStyle(
                                                     fontSize: 8,
                                                     color: context
-                                                        .customTextTheme.color,
+                                                        .customTextTheme
+                                                        .color,
                                                   ),
                                                 ),
                                               ),
@@ -388,16 +414,17 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                                               (e) => Container(
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 4,
-                                                ),
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
                                                 decoration: BoxDecoration(
-                                                  color: Theme.of(context)
+                                                  color:
+                                                      Theme.of(context)
                                                               .brightness ==
                                                           Brightness.dark
                                                       ? Colors.grey.shade800
                                                       : AppColors.kGray3
-                                                          .withOpacity(0.3),
+                                                            .withOpacity(0.3),
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                 ),
@@ -406,7 +433,8 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                                                   style: TextStyle(
                                                     fontSize: 8,
                                                     color: context
-                                                        .customTextTheme.color,
+                                                        .customTextTheme
+                                                        .color,
                                                   ),
                                                 ),
                                               ),
@@ -463,7 +491,7 @@ class _AddDishBottomSheetState extends State<AddDishBottomSheet> {
                     ),
                   ),
                   verticalSpaceTiny,
-                  SizedBox(height: bottomInset > 0 ? bottomInset : 0)
+                  SizedBox(height: bottomInset > 0 ? bottomInset : 0),
                 ],
               ),
             ),
@@ -490,10 +518,7 @@ class _ProductImageWidget extends StatelessWidget {
   final ProductDataModel product;
   final bool small;
 
-  const _ProductImageWidget({
-    required this.product,
-    this.small = false,
-  });
+  const _ProductImageWidget({required this.product, this.small = false});
 
   @override
   Widget build(BuildContext context) {
@@ -521,8 +546,9 @@ class _ProductNameWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spiceLevel = product.spiceLevel;
-    final spiceLevelIcon =
-        context.read<ShopProvider>().spiceLevelIcons?[spiceLevel];
+    final spiceLevelIcon = context
+        .read<ShopProvider>()
+        .spiceLevelIcons?[spiceLevel];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -544,19 +570,22 @@ class _ProductNameWidget extends StatelessWidget {
                 Utils.isSpiceLevelApplicable(spiceLevel)) ...[
               Container(
                 decoration: BoxDecoration(
-                    boxShadow: [
-                      // BoxShadow(
-                      //     color: Colors.black.withOpacity(0.12), blurRadius: 6)
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.10),
-                        blurRadius: 4,
-                        spreadRadius: 0,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                    color: Utils.spiceLevelColor(context, spiceLevel)
-                        .withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(10)),
+                  boxShadow: [
+                    // BoxShadow(
+                    //     color: Colors.black.withOpacity(0.12), blurRadius: 6)
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.10),
+                      blurRadius: 4,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                  color: Utils.spiceLevelColor(
+                    context,
+                    spiceLevel,
+                  ).withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 padding: EdgeInsets.all(4),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -567,10 +596,7 @@ class _ProductNameWidget extends StatelessWidget {
                         ['Medium', 'Hot', 'Extra Hot'].contains(spiceLevel)
                             ? '🌶️'
                             : spiceLevelIcon,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.red,
-                        ),
+                        style: const TextStyle(fontSize: 12, color: Colors.red),
                       ),
                     // Text(
                     //   spiceLevelIcon,
@@ -580,15 +606,15 @@ class _ProductNameWidget extends StatelessWidget {
                     Text(
                       spiceLevel,
                       style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color:
-                              Utils.spiceLevelTextColor(context, spiceLevel)),
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Utils.spiceLevelTextColor(context, spiceLevel),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ]
+            ],
           ],
         ),
       ],
@@ -654,9 +680,10 @@ class _DescriptionWidget extends StatelessWidget {
                   Utils.removeHtmlTags(product.description ?? ''),
                 ),
                 style: context.customTextTheme.text14W400.copyWith(
-                    fontWeight: FontWeight.normal,
-                    color: context.customTextTheme.color,
-                    fontSize: 15),
+                  fontWeight: FontWeight.normal,
+                  color: context.customTextTheme.color,
+                  fontSize: 15,
+                ),
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.justify,
                 maxLines: 3,
@@ -690,7 +717,7 @@ class _IngredientsWidget extends StatelessWidget {
                   Text(
                     Utils.removeHtmlTags(product.ingredients ?? 'N/A'),
                     style: const TextStyle(fontSize: 13, height: 1.4),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -735,8 +762,9 @@ class _OrderSectionWidget extends StatelessWidget {
               child: Center(
                 child: Text(
                   product.isAvailable == false ? 'Not Available' : 'Order Now',
-                  style: context.customTextTheme.text14W600
-                      .copyWith(color: AppColors.kWhite),
+                  style: context.customTextTheme.text14W600.copyWith(
+                    color: AppColors.kWhite,
+                  ),
                 ),
               ),
             ),
@@ -748,9 +776,7 @@ class _OrderSectionWidget extends StatelessWidget {
 }
 
 class _ProductPriceWidget extends StatelessWidget {
-  const _ProductPriceWidget({
-    required this.product,
-  });
+  const _ProductPriceWidget({required this.product});
 
   final ProductDataModel product;
 
@@ -763,17 +789,19 @@ class _ProductPriceWidget extends StatelessWidget {
               text:
                   "${product.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
               style: TextStyle(
-                  color: context.customTextTheme.color,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
+                color: context.customTextTheme.color,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
               children: [
                 TextSpan(
                   text: product.price ?? '',
                   style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 17,
-                      fontWeight: FontWeight.normal,
-                      decoration: TextDecoration.lineThrough),
+                    color: Colors.grey,
+                    fontSize: 17,
+                    fontWeight: FontWeight.normal,
+                    decoration: TextDecoration.lineThrough,
+                  ),
                 ),
               ],
             ),
@@ -832,7 +860,7 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
         ...item.variations.mapIndexed((index, variation) {
@@ -845,21 +873,25 @@ class _FoodVariationSection extends GetProviderView<CartProvider> {
                 color: context.customTextTheme.color,
               ),
             ),
-            subtitle: variation.offerPriceEnabled == 'Yes' &&
+            subtitle:
+                variation.offerPriceEnabled == 'Yes' &&
                     variation.offerPriceDetails?.currentOfferPrice != null
                 ? RichText(
                     text: TextSpan(
                       text:
                           "${variation.offerPriceDetails?.currentOfferPrice?.offerPriceFormatted} ",
                       style: TextStyle(
-                          color: context.customTextTheme.color, fontSize: 15),
+                        color: context.customTextTheme.color,
+                        fontSize: 15,
+                      ),
                       children: [
                         TextSpan(
                           text: variation.displayPrice ?? '',
                           style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
-                              decoration: TextDecoration.lineThrough),
+                            color: Colors.grey,
+                            fontSize: 14,
+                            decoration: TextDecoration.lineThrough,
+                          ),
                         ),
                       ],
                     ),
@@ -923,8 +955,9 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
                         children: <Widget>[
                           Text(
                             "${modifier.minimumRequired == "0" ? '' : 'Min ${modifier.minimumRequired}'}${modifier.minimumRequired != "0" && modifier.maximumRequired != "0" ? ', ' : ''}${modifier.maximumRequired == "0" ? '' : 'Max ${modifier.maximumRequired}'}",
-                            style: textTheme.labelSmall!
-                                .copyWith(color: context.customTextTheme.color),
+                            style: textTheme.labelSmall!.copyWith(
+                              color: context.customTextTheme.color,
+                            ),
                           ),
                           Visibility(
                             child: Container(
@@ -941,12 +974,12 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
                                   "REQUIRED",
                                   style: context.customTextTheme.text12W600
                                       .copyWith(
-                                    color: context.customTextTheme.color,
-                                  ),
+                                        color: context.customTextTheme.color,
+                                      ),
                                 ),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                 verticalSpaceSmall,
@@ -954,11 +987,14 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
                   return CheckboxListTile(
                     checkColor: Theme.of(context).colorScheme.onSurface,
                     value: cartProvider.checkMasterOptionsIsSelected(
-                        modifier, option),
+                      modifier,
+                      option,
+                    ),
                     title: Text(
                       (option.text ?? "").capitalize(),
-                      style: context.customTextTheme.text14W600
-                          .copyWith(color: context.customTextTheme.color),
+                      style: context.customTextTheme.text14W600.copyWith(
+                        color: context.customTextTheme.color,
+                      ),
                     ),
                     subtitle: Text(
                       '${AppConfig.instance.country.symbol} ${option.price}',
@@ -988,8 +1024,10 @@ class _FoodAddonsSection extends GetProviderView<CartProvider> {
                 ),
                 ...modifier.options.map((option) {
                   return CheckboxListTile(
-                    value:
-                        cartProvider.checkOptionsIsSelected(modifier, option),
+                    value: cartProvider.checkOptionsIsSelected(
+                      modifier,
+                      option,
+                    ),
                     title: Text(
                       (option.text ?? "").capitalize(),
                       style: context.customTextTheme.text14W600.copyWith(
@@ -1052,8 +1090,9 @@ class AddToCartButton extends GetProviderView<CartProvider> {
                   cartProvider.onChangeGuestID(randomID);
                 }
               }
-              final validationResult =
-                  cartProvider.validateRequiredModifiers(product);
+              final validationResult = cartProvider.validateRequiredModifiers(
+                product,
+              );
               final hasInvalidSection = onValidationFailed?.call() ?? false;
               if (validationResult && !hasInvalidSection) {
                 cartProvider.addItemToCart(isGuest: !isLogged).then((added) {

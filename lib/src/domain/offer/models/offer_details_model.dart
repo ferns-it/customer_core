@@ -4,7 +4,7 @@ part 'offer_details_model.freezed.dart';
 part 'offer_details_model.g.dart';
 
 @freezed
-class OfferDetailsModel with _$OfferDetailsModel {
+abstract class OfferDetailsModel with _$OfferDetailsModel {
   const factory OfferDetailsModel({
     String? id,
     String? shopID,

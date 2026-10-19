@@ -16,7 +16,8 @@ import 'package:customer_core/src/presentation/widgets/shimmer_product_details_t
 import 'package:auto_route/annotations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
@@ -82,8 +83,9 @@ class _CategoriesScreenState extends State<CategoriesScreen>
       vsync: this,
     );
 
-    _categoryTabController
-        ?.animateTo(productProvider.selectedCategoryIndex ?? 0);
+    _categoryTabController?.animateTo(
+      productProvider.selectedCategoryIndex ?? 0,
+    );
   }
 
   void _onScroll() {
@@ -135,7 +137,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
     final homeProvider = context.read<HomeProvider>();
     final userProvider = context.read<UserProvider>();
     // final products = productProvider.productsList;
-    final subCategories = productListener.selectedCategory?.childrens
+    final subCategories =
+        productListener.selectedCategory?.childrens
             ?.where((category) => (category.productsCount?.online ?? 0) > 0)
             .toList() ??
         [];
@@ -183,10 +186,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                 tabs: productListener.categories.map((e) {
                   final measured = textWidth(
                     e.name ?? '',
-                    const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
+                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                   );
 
                   return Tab(
@@ -208,7 +208,11 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                           fit: BoxFit.cover,
                                           errorWidget: (context, url, error) {
                                             return Image.asset(
-                                              Assets.lib.assets.images.noimage
+                                              Assets
+                                                  .lib
+                                                  .assets
+                                                  .images
+                                                  .noimage
                                                   .path,
                                               fit: BoxFit.cover,
                                               package: 'customer_core',
@@ -255,8 +259,9 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                             )
                           : Center(
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                ),
                                 child: Text(
                                   e.name ?? '',
                                   maxLines: 2,
@@ -399,17 +404,13 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                         style: TextStyle(color: Colors.white),
                       ),
                       selected: false,
-                      avatar: Icon(
-                        Icons.close,
-                        color: Colors.white,
-                      ),
+                      avatar: Icon(Icons.close, color: Colors.white),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       labelStyle: const TextStyle(color: AppColors.kBlack),
                       side: BorderSide(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.3)),
+                        color: Theme.of(context).colorScheme.primary
+                            .withOpacity(0.3),
+                      ),
                       onSelected: (selected) async {
                         productProvider.onChangeSelectedSubCategory(null);
                         productProvider.onChangeHasMoreProducts(true);
@@ -433,24 +434,27 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                       controller: _subCategoryScrollController,
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children: subCategories.mapIndexed((index, category) {
+                        children:
+                            subCategories.mapIndexed((index, category) {
                               final isSelected =
                                   productListener.selectedSubCategory?.cID ==
-                                      category.cID;
+                                  category.cID;
 
                               return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4.0,
+                                ),
                                 child: ChoiceChip(
                                   checkmarkColor:
                                       Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : AppColors.kCardBackground2,
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : AppColors.kCardBackground2,
                                   label: Text(
                                     category.name ?? '',
                                     style: TextStyle(
-                                      color: Theme.of(context).brightness ==
+                                      color:
+                                          Theme.of(context).brightness ==
                                               Brightness.dark
                                           ? Colors.white
                                           : AppColors.kCardBackground2,
@@ -459,19 +463,15 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                   selected: isSelected,
                                   backgroundColor:
                                       Theme.of(context).brightness ==
-                                              Brightness.light
-                                          ? Colors.white
-                                          : AppColors.kCardBackground2,
+                                          Brightness.light
+                                      ? Colors.white
+                                      : AppColors.kCardBackground2,
                                   side: BorderSide(
                                     color: isSelected
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.3)
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.3),
+                                        ? Theme.of(context).colorScheme.primary
+                                              .withOpacity(0.3)
+                                        : Theme.of(context).colorScheme.primary
+                                              .withOpacity(0.3),
                                   ),
                                   selectedColor: Theme.of(context)
                                       .colorScheme
@@ -481,29 +481,35 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                     if (selected) {
                                       productProvider
                                           .onChangeSelectedSubCategory(
-                                              category);
+                                            category,
+                                          );
                                       _subCategoryScrollController.animateTo(
                                         index * 150.0,
-                                        duration:
-                                            const Duration(milliseconds: 300),
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
                                         curve: Curves.easeOut,
                                       );
-                                      await productProvider
-                                          .getAllProducts(category.cID ?? '0');
+                                      await productProvider.getAllProducts(
+                                        category.cID ?? '0',
+                                      );
                                     } else {
                                       productProvider
                                           .onChangeSelectedSubCategory(null);
-                                      productProvider
-                                          .onChangeHasMoreProducts(true);
+                                      productProvider.onChangeHasMoreProducts(
+                                        true,
+                                      );
 
                                       await productProvider
                                           .getAllProductsByPagination(
-                                        categoryID: productListener
-                                                .selectedCategory?.cID ??
-                                            '0',
-                                        isRandom: false,
-                                        isRefresh: true,
-                                      );
+                                            categoryID:
+                                                productListener
+                                                    .selectedCategory
+                                                    ?.cID ??
+                                                '0',
+                                            isRandom: false,
+                                            isRefresh: true,
+                                          );
                                     }
                                   },
                                 ),
@@ -537,102 +543,107 @@ class _CategoriesScreenState extends State<CategoriesScreen>
               //     : const SizedBox.shrink(),
 
               Expanded(
-                child: productListener.productsListAPIResponse.status ==
+                child:
+                    productListener.productsListAPIResponse.status ==
                         APIResponseStatus.loading
                     ? const ShimmerProductDetailsTile()
                     : productListener.productsList.isEmpty
-                        ? const Text("No Products Found")
-                        : AlignedGridView.count(
-                            padding: const EdgeInsets.only(bottom: 200),
-                            controller: _scrollController,
-                            crossAxisCount: 2,
-                            itemCount: productListener.productsList.length +
-                                (productListener
-                                        .isFetchingProductsFromPagination
-                                    ? 1
-                                    : 0),
-                            cacheExtent: 200,
-                            itemBuilder: (context, index) {
-                              if (index >=
-                                  productListener.productsList.length) {
-                                return SizedBox(
-                                  width: double.infinity,
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Assets
-                                          .lib.assets.lottie.infiniteLoading
-                                          .lottie(),
-                                      // Or CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
-                                    ),
-                                  ),
+                    ? const Text("No Products Found")
+                    : AlignedGridView.count(
+                        padding: const EdgeInsets.only(bottom: 200),
+                        controller: _scrollController,
+                        crossAxisCount: 2,
+                        itemCount:
+                            productListener.productsList.length +
+                            (productListener.isFetchingProductsFromPagination
+                                ? 1
+                                : 0),
+                        cacheExtent: 200,
+                        itemBuilder: (context, index) {
+                          if (index >= productListener.productsList.length) {
+                            return SizedBox(
+                              width: double.infinity,
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Assets
+                                      .lib
+                                      .assets
+                                      .lottie
+                                      .infiniteLoading
+                                      .lottie(),
+                                  // Or CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
+                                ),
+                              ),
+                            );
+                          }
+                          final product = productListener.productsList
+                              .elementAt(index);
+                          final isExist = cartProvider.isProductExist(
+                            product.pID,
+                          );
+                          final productQtyUpdated = cartProvider
+                              .getProductQuantity(product.pID);
+                          final cartIndex = cartProvider.getProductCartIndex(
+                            product.pID,
+                          );
+                          return ProductDetailsTile(
+                            showFavIcon: cartListener.isUserLoggedIn,
+                            product,
+                            secondaryWidget: QtyCounterButton2(
+                              qty: productQtyUpdated,
+                              onDecrementQty: () {
+                                cartProvider.decrementCartItemQty(cartIndex);
+                                cartProvider.clearSelectedAddressSecondary();
+                                cartProvider.clearSelectedAddress();
+                                setState(() {});
+                              },
+                              onIncrementQty: () {
+                                cartProvider.incrementCartItemQty(cartIndex);
+                                cartProvider.clearSelectedAddressSecondary();
+                                cartProvider.clearSelectedAddress();
+                                setState(() {});
+                              },
+                            ),
+                            useSecondaryWidget: isExist,
+                            onPressed: () {
+                              showItemDetailsBottomSheet(context, product);
+                            },
+                            onPressFavouriteBtn: () async {
+                              if (product.isFavourite) {
+                                await context
+                                    .read<ProductsProvider>()
+                                    .removeFavourite(
+                                      product.favouriteID!,
+                                      context.read<SearchProvider>(),
+                                    );
+                              } else {
+                                await context
+                                    .read<ProductsProvider>()
+                                    .addFavourite(
+                                      product.pID!,
+                                      context.read<SearchProvider>(),
+                                    );
+                              }
+                            },
+                            onPressAddBtn: () {
+                              if (product.pID == null) return;
+                              if (product.variations.isNotEmpty) {
+                                cartProvider.onChangeVariation(
+                                  product.variations.first,
                                 );
                               }
-                              final product =
-                                  productListener.productsList.elementAt(index);
-                              final isExist =
-                                  cartProvider.isProductExist(product.pID);
-                              final productQtyUpdated =
-                                  cartProvider.getProductQuantity(product.pID);
-                              final cartIndex =
-                                  cartProvider.getProductCartIndex(product.pID);
-                              return ProductDetailsTile(
-                                showFavIcon: cartListener.isUserLoggedIn,
-                                product,
-                                secondaryWidget: QtyCounterButton2(
-                                    qty: productQtyUpdated,
-                                    onDecrementQty: () {
-                                      cartProvider
-                                          .decrementCartItemQty(cartIndex);
-                                      cartProvider
-                                          .clearSelectedAddressSecondary();
-                                      cartProvider.clearSelectedAddress();
-                                      setState(() {});
-                                    },
-                                    onIncrementQty: () {
-                                      cartProvider
-                                          .incrementCartItemQty(cartIndex);
-                                      cartProvider
-                                          .clearSelectedAddressSecondary();
-                                      cartProvider.clearSelectedAddress();
-                                      setState(() {});
-                                    }),
-                                useSecondaryWidget: isExist,
-                                onPressed: () {
-                                  showItemDetailsBottomSheet(context, product);
-                                },
-                                onPressFavouriteBtn: () async {
-                                  if (product.isFavourite) {
-                                    await context
-                                        .read<ProductsProvider>()
-                                        .removeFavourite(product.favouriteID!,
-                                            context.read<SearchProvider>());
-                                  } else {
-                                    await context
-                                        .read<ProductsProvider>()
-                                        .addFavourite(product.pID!,
-                                            context.read<SearchProvider>());
-                                  }
-                                },
-                                onPressAddBtn: () {
-                                  if (product.pID == null) return;
-                                  if (product.variations.isNotEmpty) {
-                                    cartProvider.onChangeVariation(
-                                      product.variations.first,
-                                    );
-                                  }
-                                  cartProvider
-                                      .updateSelectedItemId(product.pID!);
-                                  // cartProvider.addItemToCart().then((added) {
-                                  //   if (added) {
-                                  //     cartProvider.resetValues();
-                                  //   }
-                                  // });
-                                  showAddItemBottomSheet(context, product);
-                                },
-                              );
+                              cartProvider.updateSelectedItemId(product.pID!);
+                              // cartProvider.addItemToCart().then((added) {
+                              //   if (added) {
+                              //     cartProvider.resetValues();
+                              //   }
+                              // });
+                              showAddItemBottomSheet(context, product);
                             },
-                          ),
+                          );
+                        },
+                      ),
               ),
 
               // if (!productListner.isFetchingProductsFromPagination)
@@ -653,13 +664,16 @@ class _CategoriesScreenState extends State<CategoriesScreen>
     final productListner = context.watch<ProductsProvider>();
     final productProvider = context.read<ProductsProvider>();
 
-    List<CategoryData> subCategories =
-        List.from(productListner.selectedCategory?.childrens ?? []);
+    List<CategoryData> subCategories = List.from(
+      productListner.selectedCategory?.childrens ?? [],
+    );
 
     // final parentCategory = productListner.selectedCategory;
 
-    CategoryData all =
-        CategoryData(name: 'All', cID: productListner.selectedCategory?.cID);
+    CategoryData all = CategoryData(
+      name: 'All',
+      cID: productListner.selectedCategory?.cID,
+    );
 
     subCategories.insert(0, all);
 
@@ -685,33 +699,34 @@ class _CategoriesScreenState extends State<CategoriesScreen>
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: subCategories.mapIndexed((index, e) {
-                    return ListTile(
-                      title: Text(e.name ?? ''),
-                      // dense: true,
-                      visualDensity: VisualDensity.compact,
-                      onTap: () {
-                        if (e.name == 'All') {
-                          Navigator.pop(context);
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: subCategories.mapIndexed((index, e) {
+                  return ListTile(
+                    title: Text(e.name ?? ''),
+                    // dense: true,
+                    visualDensity: VisualDensity.compact,
+                    onTap: () {
+                      if (e.name == 'All') {
+                        Navigator.pop(context);
 
-                          productProvider.onChangeSelectedSubCategory(null);
+                        productProvider.onChangeSelectedSubCategory(null);
 
-                          productProvider.getAllProductsByPagination(
-                            categoryID:
-                                productListner.selectedCategory?.cID ?? '0',
-                            isRandom: false,
-                            isRefresh: true,
-                          );
-                        } else {
-                          Navigator.pop(context);
-                          productProvider.onChangeSelectedSubCategory(e);
-                          // productProvider.onChangeSelectedCategory(e);
-                          productProvider.getAllProducts(e.cID ?? '0');
-                        }
-                      },
-                    );
-                  }).toList()),
+                        productProvider.getAllProductsByPagination(
+                          categoryID:
+                              productListner.selectedCategory?.cID ?? '0',
+                          isRandom: false,
+                          isRefresh: true,
+                        );
+                      } else {
+                        Navigator.pop(context);
+                        productProvider.onChangeSelectedSubCategory(e);
+                        // productProvider.onChangeSelectedCategory(e);
+                        productProvider.getAllProducts(e.cID ?? '0');
+                      }
+                    },
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ),
@@ -723,32 +738,36 @@ class _CategoriesScreenState extends State<CategoriesScreen>
     return Container(
       margin: const EdgeInsets.only(right: 10),
       decoration: BoxDecoration(
-          color: AppColors.kWhite,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(
-              color: Theme.of(context).colorScheme.primary, width: 1.5)),
+        color: AppColors.kWhite,
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary,
+          width: 1.5,
+        ),
+      ),
       child: TextField(
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
-          prefixIcon: const Icon(FluentIcons.search_12_regular,
-              color: AppColors.kGray2),
+          prefixIcon: const Icon(
+            FluentIcons.search_12_regular,
+            color: AppColors.kGray2,
+          ),
           suffixIcon: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                height: 20,
-                width: 1,
-                color: AppColors.kGray2,
-              ),
+              Container(height: 20, width: 1, color: AppColors.kGray2),
               horizontalSpaceSmall,
-              Icon(Icons.tune_rounded,
-                  color: Theme.of(context).colorScheme.primary),
+              Icon(
+                Icons.tune_rounded,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ],
           ),
           border: InputBorder.none,
           hintText: 'Search...',
-          hintStyle: context.customTextTheme.text14W500
-              .copyWith(color: AppColors.kGray2),
+          hintStyle: context.customTextTheme.text14W500.copyWith(
+            color: AppColors.kGray2,
+          ),
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
         ),
@@ -757,52 +776,55 @@ class _CategoriesScreenState extends State<CategoriesScreen>
   }
 
   void showItemDetailsBottomSheet(
-      BuildContext context, ProductDataModel product) {
+    BuildContext context,
+    ProductDataModel product,
+  ) {
     showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
         ),
-        builder: (context) {
-          return DishDetailBottomSheet(
-            product: product,
-            onRequestOrderDish: () {
-              if (product.pID == null) return;
+      ),
+      builder: (context) {
+        return DishDetailBottomSheet(
+          product: product,
+          onRequestOrderDish: () {
+            if (product.pID == null) return;
 
-              if (product.variations.isNotEmpty) {
-                context.read<CartProvider>().onChangeVariation(
-                      product.variations.first,
-                    );
-              }
+            if (product.variations.isNotEmpty) {
+              context.read<CartProvider>().onChangeVariation(
+                product.variations.first,
+              );
+            }
 
-              context.read<CartProvider>().updateSelectedItemId(product.pID!);
+            context.read<CartProvider>().updateSelectedItemId(product.pID!);
 
-              showAddItemBottomSheet(context, product);
-            },
-          );
-        });
+            showAddItemBottomSheet(context, product);
+          },
+        );
+      },
+    );
   }
 
   void showAddItemBottomSheet(BuildContext context, ProductDataModel product) {
     final sheetFuture = showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
-        )),
-        builder: (context) {
-          return AddDishBottomSheet(
-            product: product,
-          );
-        });
+        ),
+      ),
+      builder: (context) {
+        return AddDishBottomSheet(product: product);
+      },
+    );
 
     sheetFuture.whenComplete(() {
       context.read<CartProvider>().resetValues();

@@ -7,8 +7,8 @@ import 'package:customer_core/src/presentation/order_online/address/add_new_addr
 import 'package:customer_core/src/presentation/widgets/get_provider_view.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 

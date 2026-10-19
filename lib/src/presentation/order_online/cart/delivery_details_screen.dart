@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/gen/assets.gen.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/application/theme/theme_provider.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';

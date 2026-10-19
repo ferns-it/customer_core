@@ -8,7 +8,7 @@ import 'package:customer_core/src/domain/store/models/store_settings_data_model.
 import 'package:customer_core/src/domain/user/models/user_login_response.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:customer_core/src/core/constants/app_identifiers.dart';
 import 'package:customer_core/src/core/constants/enums.dart';

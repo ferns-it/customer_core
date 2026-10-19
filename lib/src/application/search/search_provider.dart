@@ -1,7 +1,7 @@
 import 'package:customer_core/src/application/core/base_controller.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:customer_core/src/domain/store/models/product_details_model.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../domain/search/i_search_repo.dart';

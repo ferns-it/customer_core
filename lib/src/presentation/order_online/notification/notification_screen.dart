@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:customer_core/src/application/notification/notification_provider.dart';
 import 'package:customer_core/src/application/theme/theme_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:customer_core/src/domain/notification/models/notification_model.dart';

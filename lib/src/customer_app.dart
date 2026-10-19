@@ -5,7 +5,7 @@ import 'package:customer_core/src/core/theme/app_theme.dart';
 import 'package:customer_core/src/domain/firebase/remote_config_service.dart';
 import 'package:customer_core/src/presentation/widgets/connectivity_wrapper.dart';
 import 'package:customer_core/theme/customer_theme_override.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';

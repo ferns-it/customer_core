@@ -1,6 +1,6 @@
 import 'package:customer_core/src/domain/store/models/product_details_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:customer_core/src/core/utils/ui_utils.dart';
 import 'package:google_fonts/google_fonts.dart';

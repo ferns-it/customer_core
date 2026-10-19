@@ -1,5 +1,5 @@
 import 'package:customer_core/customer_core.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:injectable/injectable.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
 import 'package:customer_core/src/infrastructure/theme/theme_shared_prefs_repo.dart';

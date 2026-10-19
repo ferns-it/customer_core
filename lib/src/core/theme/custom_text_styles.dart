@@ -1,6 +1,6 @@
 // custom_text_styles.dart
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 
 double get defaultScreenPadding => 20.0;

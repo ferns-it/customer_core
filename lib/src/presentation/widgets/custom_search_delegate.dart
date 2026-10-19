@@ -1,6 +1,6 @@
 import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:customer_core/src/domain/store/models/product_details_model.dart';
 import 'package:customer_core/src/presentation/widgets/manage_dish_sheets.dart';

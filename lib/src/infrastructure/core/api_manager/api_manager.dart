@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:customer_core/customer_core.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/infrastructure/user/user_shared_prefs_repo.dart';
 
 import '../end_points/end_points.dart';

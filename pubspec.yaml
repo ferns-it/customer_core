@@ -57,6 +57,10 @@ dependencies:
   webview_flutter: ^4.14.1
   country_code_picker: ^3.4.1
   material_ui: ^1.7.0
+  async: any
+  intl: any
+  cupertino_ui: any
+  collection: any
 dependency_overrides:
   intl: ^0.20.3
 

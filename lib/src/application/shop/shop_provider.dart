@@ -2,7 +2,7 @@ import 'package:customer_core/customer_core.dart';
 import 'package:customer_core/src/core/constants/enums.dart';
 import 'package:customer_core/src/core/utils/alert_dialogs.dart';
 import 'package:customer_core/src/domain/store/models/store_delivery_slot_model.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/application/core/api_response.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
 import 'package:customer_core/src/domain/store/i_store_repo.dart';

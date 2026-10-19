@@ -1,8 +1,9 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart' as sdk show ThemeMode;
 import 'package:customer_core/customer_core.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
 import 'package:customer_core/src/core/constants/app_identifiers.dart';
@@ -32,12 +33,11 @@ class PaymentProvider extends ChangeNotifier with BaseController {
   String? get transactionId => paymentIntentDetails?.paymentIntent?.id;
 
   Future<void> createPaymentIntent(
-    
     double discountAmount,
     double deliveryCharges, {
-    required  String deliveryType ,
-    required  String postCode,
-    required  String pickupTime,
+    required String deliveryType,
+    required String postCode,
+    required String pickupTime,
     required void Function(String transactionId) onPaymentSuccess,
   }) async {
     try {
@@ -48,19 +48,24 @@ class PaymentProvider extends ChangeNotifier with BaseController {
         deliveryType: deliveryType,
         postCode: postCode,
         pickupTime: pickupTime,
-        discountAmount: (discountAmount *  AppConfig.instance.country.currencyDivisor).toStringAsFixed(AppConfig.instance.country.decimalPlaces),
-        deliveryCharges: (deliveryCharges * AppConfig.instance.country.currencyDivisor).toStringAsFixed(AppConfig.instance.country.decimalPlaces),
+        discountAmount:
+            (discountAmount * AppConfig.instance.country.currencyDivisor)
+                .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
+        deliveryCharges:
+            (deliveryCharges * AppConfig.instance.country.currencyDivisor)
+                .toStringAsFixed(AppConfig.instance.country.decimalPlaces),
       );
 
-      response.fold((exception) {
-        AlertDialogs.showError(exception.message);
-      }, (result) {
-        _paymentIntentDetails = result;
-        notifyListeners();
-        _doPaymentWithStripe(
-          onPaymentSuccess: onPaymentSuccess,
-        );
-      });
+      response.fold(
+        (exception) {
+          AlertDialogs.showError(exception.message);
+        },
+        (result) {
+          _paymentIntentDetails = result;
+          notifyListeners();
+          _doPaymentWithStripe(onPaymentSuccess: onPaymentSuccess);
+        },
+      );
     } finally {
       _creatingPaymentIntent = false;
       notifyListeners();
@@ -71,17 +76,20 @@ class PaymentProvider extends ChangeNotifier with BaseController {
     required void Function(String transactionId) onPaymentSuccess,
   }) async {
     if (Stripe.publishableKey.isEmpty) {
-      log("Stripe Error: Stripe.publishableKey is empty!", name: "STRIPE-ERROR");
+      log(
+        "Stripe Error: Stripe.publishableKey is empty!",
+        name: "STRIPE-ERROR",
+      );
       AlertDialogs.showError(
-          "Stripe key is missing. Please configure keyConfig.stripeKey properly.");
+        "Stripe key is missing. Please configure keyConfig.stripeKey properly.",
+      );
       return;
     }
 
     if (_clientSecret != null && transactionId != null) {
       await Stripe.instance.initPaymentSheet(
-
         paymentSheetParameters: SetupPaymentSheetParameters(
-          style: ThemeMode.light,
+          style: sdk.ThemeMode.light,
           paymentIntentClientSecret: _clientSecret!,
           merchantDisplayName: AppIdentifiers.kApplicationName,
         ),
@@ -90,31 +98,38 @@ class PaymentProvider extends ChangeNotifier with BaseController {
           .presentPaymentSheet()
           .then((_) => onPaymentSuccess(transactionId!))
           .catchError((exception) async {
-        if (exception is StripeException) {
-          if (exception.error.code == FailureCode.Canceled ||
-              exception.error.code == FailureCode.Failed ||
-              exception.error.code == FailureCode.Timeout) {
-            // exception.error.code == FailureCode.Unknown)
+            if (exception is StripeException) {
+              if (exception.error.code == FailureCode.Canceled ||
+                  exception.error.code == FailureCode.Failed ||
+                  exception.error.code == FailureCode.Timeout) {
+                // exception.error.code == FailureCode.Unknown)
 
-            final response = await checkoutRepo.cancelPaymentIntent(
-              transactionId!,
-            );
+                final response = await checkoutRepo.cancelPaymentIntent(
+                  transactionId!,
+                );
 
-            response.fold(() {
-              if (exception.error.code == FailureCode.Failed) {
-                AlertDialogs.showError("Stripe Payment Failed!");
+                response.fold(
+                  () {
+                    if (exception.error.code == FailureCode.Failed) {
+                      AlertDialogs.showError("Stripe Payment Failed!");
+                    }
+
+                    if (exception.error.code == FailureCode.Timeout) {
+                      AlertDialogs.showError(
+                        "Internet Connection is seems to be slow.",
+                      );
+                    }
+                  },
+                  (exception) {
+                    log(
+                      (exception as AppExceptions).message,
+                      name: "STRIPE-ERROR",
+                    );
+                  },
+                );
               }
-
-              if (exception.error.code == FailureCode.Timeout) {
-                AlertDialogs.showError(
-                    "Internet Connection is seems to be slow.");
-              }
-            }, (exception) {
-              log((exception as AppExceptions).message, name: "STRIPE-ERROR");
-            });
-          }
-        }
-      });
+            }
+          });
     }
   }
 }

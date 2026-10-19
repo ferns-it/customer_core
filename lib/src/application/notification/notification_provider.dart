@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:customer_core/src/domain/notification/models/notification_model.dart';
 import 'package:customer_core/src/infrastructure/notification/notification_shared_prefs_repo.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
 import 'package:customer_core/src/core/global/global_variable.dart';
 import 'package:customer_core/src/core/routes/routes.dart';

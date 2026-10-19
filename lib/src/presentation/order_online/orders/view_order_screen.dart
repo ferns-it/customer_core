@@ -5,7 +5,7 @@ import 'package:customer_core/src/application/cart/cart_provider.dart';
 import 'package:customer_core/src/application/core/dependency_registrar.dart';
 import 'package:customer_core/src/application/user/user_provider.dart';
 import 'package:customer_core/src/domain/cart/models/cart_details_model.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/application/order/order_provider.dart';
 import 'package:customer_core/src/core/theme/app_theme.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';

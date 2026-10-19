@@ -8,7 +8,7 @@ import 'package:customer_core/src/application/home/home_provider.dart';
 import 'package:customer_core/src/application/products/products_provider.dart';
 import 'package:customer_core/src/presentation/order_online/categories/categories_screen.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/application/order/order_provider.dart';
 import 'package:customer_core/src/presentation/order_online/home/order_online_home_screen.dart';
 import 'package:customer_core/src/presentation/order_online/orders/order_history_screens.dart';

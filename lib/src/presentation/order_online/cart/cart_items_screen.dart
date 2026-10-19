@@ -6,7 +6,7 @@ import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:dartx/dartx.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../../application/cart/cart_provider.dart';

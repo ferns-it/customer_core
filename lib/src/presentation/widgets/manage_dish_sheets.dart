@@ -4,7 +4,7 @@ import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:dartx/dartx.dart';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/application/auth/auth_provider.dart';
 import 'package:customer_core/src/application/theme/theme_provider.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';

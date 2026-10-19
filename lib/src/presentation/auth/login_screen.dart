@@ -11,7 +11,7 @@ import 'package:customer_core/src/application/shop/shop_provider.dart';
 import 'package:customer_core/src/core/utils/country_flag.dart';
 import 'package:customer_core/src/domain/store/models/store_settings_data_model.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/gestures.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';

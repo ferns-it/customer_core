@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:customer_core/src/domain/firebase/models/remote_config_model.dart';
 import 'package:customer_core/src/domain/firebase/remote_config_service.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,5 +1,5 @@
 import 'package:customer_core/src/domain/user/models/basic_profile_data_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:customer_core/src/application/core/base_controller.dart';
 import 'package:customer_core/src/core/constants/app_identifiers.dart';
 import 'package:customer_core/src/core/utils/alert_dialogs.dart';

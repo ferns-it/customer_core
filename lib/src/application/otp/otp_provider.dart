@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:customer_core/src/domain/otp/models/send_otp_response_model.dart';
 import 'package:customer_core/src/domain/otp/otp_purpose.dart';
 import 'package:customer_core/src/infrastructure/core/failures/app_exceptions.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 

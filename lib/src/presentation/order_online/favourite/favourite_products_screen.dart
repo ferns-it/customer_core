@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:customer_core/src/application/cart/cart_provider.dart';

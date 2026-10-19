@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 
 class BottomSheetDragHandler extends StatelessWidget {

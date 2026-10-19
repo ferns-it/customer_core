@@ -4,7 +4,7 @@ import 'package:customer_core/gen/assets.gen.dart';
 import 'package:customer_core/src/core/constants/app_identifiers.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/core/theme/app_colors.dart';
 import 'package:customer_core/src/core/theme/custom_text_styles.dart';
 import 'package:customer_core/src/core/utils/contact_utils.dart';

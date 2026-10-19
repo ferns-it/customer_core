@@ -4,7 +4,7 @@ import 'package:customer_core/src/application/otp/otp_provider.dart';
 import 'package:customer_core/src/application/promotion/promotions_provider.dart';
 import 'package:customer_core/src/application/search/search_provider.dart';
 import 'package:customer_core/src/application/settings/app_update_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:customer_core/src/application/auth/auth_provider.dart';
 import 'package:customer_core/src/application/core/time_dropdown_provider.dart';
 import 'package:customer_core/src/application/shop/shop_provider.dart';

@@ -53,21 +53,29 @@ InputDecorationTheme buildInputDecorationTheme({
   );
 }
 
+// ThemeData quickSandTextTheme(BuildContext context) {
+//   final baseTextTheme = Theme.of(context).textTheme;
+//   return Theme.of(context).copyWith(
+//     //     textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
+//     //   displayColor: AppColors.kBlack2,
+//     //   bodyColor: AppColors.kBlack2,
+//     // )
+//     textTheme: baseTextTheme.apply(
+//       fontFamily: GoogleFonts.quicksand().fontFamily,
+//       displayColor: AppColors.kBlack2,
+//       bodyColor: AppColors.kBlack2,
+//     ),
+//   );
+// }
 ThemeData quickSandTextTheme(BuildContext context) {
-  final baseTextTheme = Theme.of(context).textTheme;
-  return Theme.of(context).copyWith(
-    //     textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
-    //   displayColor: AppColors.kBlack2,
-    //   bodyColor: AppColors.kBlack2,
-    // )
-    textTheme: baseTextTheme.apply(
-      fontFamily: GoogleFonts.quicksand().fontFamily,
+  final theme = Theme.of(context);
+  return theme.copyWith(
+    textTheme: GoogleFonts.quicksandTextTheme(theme.textTheme).apply(
       displayColor: AppColors.kBlack2,
       bodyColor: AppColors.kBlack2,
     ),
   );
 }
-
 ThemeData poppinsTextTheme(BuildContext context) {
   final baseTextTheme = Theme.of(context).textTheme;
   return Theme.of(context).copyWith(

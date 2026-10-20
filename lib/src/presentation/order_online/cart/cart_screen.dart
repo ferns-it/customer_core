@@ -112,8 +112,7 @@ class _CartScreenState extends State<CartScreen>
                       child: Column(
                         children: [
                           Visibility(
-                            visible:
-                                cartListener.cartDeleteLoading ||
+                            visible: cartListener.cartDeleteLoading ||
                                 cartListener.isClearCartProgress,
                             child: LinearProgressIndicator(
                               color: Theme.of(context).colorScheme.primary,
@@ -130,8 +129,8 @@ class _CartScreenState extends State<CartScreen>
                             child: Container(
                               color: isDark
                                   ? Theme.of(context)
-                                        .appBarTheme
-                                        .backgroundColor
+                                      .appBarTheme
+                                      .backgroundColor
                                   : Colors.white,
                               child: TabBar(
                                 onTap: (value) {
@@ -154,16 +153,14 @@ class _CartScreenState extends State<CartScreen>
                                   cartProvider.onchangeCartTabbarIndex(value);
                                 },
                                 controller: cartProvider.tabController,
-                                labelColor: Theme.of(context)
-                                    .colorScheme
-                                    .primary,
+                                labelColor:
+                                    Theme.of(context).colorScheme.primary,
                                 labelStyle: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                 ),
                                 unselectedLabelColor: Colors.grey.shade400,
-                                indicatorColor: Theme.of(context)
-                                    .colorScheme
-                                    .primary,
+                                indicatorColor:
+                                    Theme.of(context).colorScheme.primary,
                                 dividerColor: Colors.transparent,
 
                                 // isScrollable: true,
@@ -196,8 +193,7 @@ class _CartScreenState extends State<CartScreen>
                     ),
                     Consumer2<CartProvider, UserProvider>(
                       builder: (context, value, value2, child) => Visibility(
-                        visible:
-                            value.cartTransferring ||
+                        visible: value.cartTransferring ||
                             value2.isUserAddressListLoading ||
                             value.deliveryOrTakeAwayChargeCalculating,
                         child: Positioned.fill(
@@ -212,19 +208,17 @@ class _CartScreenState extends State<CartScreen>
                             ),
                             child: Center(
                               child: Shimmer.fromColors(
-                                baseColor: Theme.of(context)
-                                    .colorScheme
-                                    .primary,
+                                baseColor:
+                                    Theme.of(context).colorScheme.primary,
                                 highlightColor: Colors.grey,
                                 child: Text(
                                   value.cartTransferring
                                       ? "Almost there… syncing your cart…"
                                       : value2.isUserAddressListLoading
-                                      ? 'Loading your saved addresses…'
-                                      : value
-                                            .deliveryOrTakeAwayChargeCalculating
-                                      ? 'Calculating charges…'
-                                      : 'Loading…',
+                                          ? 'Loading your saved addresses…'
+                                          : value.deliveryOrTakeAwayChargeCalculating
+                                              ? 'Calculating charges…'
+                                              : 'Loading…',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     color: Colors.black,
@@ -337,16 +331,14 @@ class _CartScreenState extends State<CartScreen>
 
     final isTakeAwayTempEnabled =
         storeSettings?.deliveryInfo?.takeAway_temp_off != null &&
-        storeSettings?.deliveryInfo?.takeAway_temp_off == 'No';
+            storeSettings?.deliveryInfo?.takeAway_temp_off == 'No';
     final isHomeDeliveryTempEnabled =
         storeSettings?.deliveryInfo?.homeDelivery_temp_off != null &&
-        storeSettings?.deliveryInfo?.homeDelivery_temp_off == 'No';
-    final isHomeDeliveryEnabled =
-        isHomeDeliveryTempEnabled &&
+            storeSettings?.deliveryInfo?.homeDelivery_temp_off == 'No';
+    final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
         storeSettings?.deliveryInfo?.homeDelivery != null &&
         storeSettings?.deliveryInfo?.homeDelivery == '1';
-    final isTakeAwayEnabled =
-        isTakeAwayTempEnabled &&
+    final isTakeAwayEnabled = isTakeAwayTempEnabled &&
         storeSettings?.deliveryInfo?.takeAway != null &&
         storeSettings?.deliveryInfo?.takeAway == '1';
     final isShopTempClosed =
@@ -357,8 +349,7 @@ class _CartScreenState extends State<CartScreen>
         (isShopClosed && !cartListener.isCartEmpty) || isShopTempClosed;
 
     return Visibility(
-      visible:
-          !cartListener.isCartEmpty &&
+      visible: !cartListener.isCartEmpty &&
           !(cartListener.cartTransferring ||
               cartListener.deliveryOrTakeAwayChargeCalculating ||
               userListener.isUserAddressListLoading),
@@ -400,8 +391,8 @@ class _CartScreenState extends State<CartScreen>
                             );
                             return;
                           }
-                          final isLogged = await cartProvider
-                              .checkUserIsLogged();
+                          final isLogged =
+                              await cartProvider.checkUserIsLogged();
                           if (!isLogged) {
                             // context.router.push(LoginScreenRoute());
                             final result = await Navigator.push(
@@ -417,28 +408,26 @@ class _CartScreenState extends State<CartScreen>
                                   .read<UserProvider>()
                                   .getAddressList()
                                   .then((_) {
-                                    final addressList =
-                                        Provider.of<UserProvider>(
-                                          context,
-                                          listen: false,
-                                        ).userAddressList;
-                                    if (addressList.isNotEmpty) {
-                                      final address = addressList.first;
+                                final addressList = Provider.of<UserProvider>(
+                                  context,
+                                  listen: false,
+                                ).userAddressList;
+                                if (addressList.isNotEmpty) {
+                                  final address = addressList.first;
 
-                                      cartProvider.onChangeAddress(address);
-                                      cartProvider.onChangeOrderType(
-                                        OrderType.delivery,
-                                      );
+                                  cartProvider.onChangeAddress(address);
+                                  cartProvider.onChangeOrderType(
+                                    OrderType.delivery,
+                                  );
 
-                                      // cartProvider
-                                      //     .calculateDeliveryCharge();
-                                      cartProvider.jumpToPage(1);
-                                      return;
-                                    }
-                                  })
-                                  .catchError((e) {
-                                    setState(() {});
-                                  });
+                                  // cartProvider
+                                  //     .calculateDeliveryCharge();
+                                  cartProvider.jumpToPage(1);
+                                  return;
+                                }
+                              }).catchError((e) {
+                                setState(() {});
+                              });
                             }
                             return;
                           }
@@ -448,34 +437,32 @@ class _CartScreenState extends State<CartScreen>
                               .read<UserProvider>()
                               .getAddressList()
                               .then((_) {
-                                final addressList = Provider.of<UserProvider>(
-                                  context,
-                                  listen: false,
-                                ).userAddressList;
-                                if (addressList.isNotEmpty) {
-                                  final address = addressList.firstWhere(
-                                    (element) => element.dDefault == '1',
-                                    orElse: () => addressList.first,
-                                  );
+                            final addressList = Provider.of<UserProvider>(
+                              context,
+                              listen: false,
+                            ).userAddressList;
+                            if (addressList.isNotEmpty) {
+                              final address = addressList.firstWhere(
+                                (element) => element.dDefault == '1',
+                                orElse: () => addressList.first,
+                              );
 
-                                  cartProvider.onChangeAddress(address);
-                                  if (!isHomeDeliveryEnabled &&
-                                      isTakeAwayEnabled) {
-                                    cartProvider.onChangeOrderType(
-                                      OrderType.takeaway,
-                                    );
-                                  } else {
-                                    cartProvider.onChangeOrderType(
-                                      OrderType.delivery,
-                                    );
-                                  }
-                                  cartProvider.jumpToPage(1);
-                                  return;
-                                }
-                              })
-                              .catchError((e) {
-                                setState(() {});
-                              });
+                              cartProvider.onChangeAddress(address);
+                              if (!isHomeDeliveryEnabled && isTakeAwayEnabled) {
+                                cartProvider.onChangeOrderType(
+                                  OrderType.takeaway,
+                                );
+                              } else {
+                                cartProvider.onChangeOrderType(
+                                  OrderType.delivery,
+                                );
+                              }
+                              cartProvider.jumpToPage(1);
+                              return;
+                            }
+                          }).catchError((e) {
+                            setState(() {});
+                          });
                         },
                         child: Container(
                           height: 40,
@@ -493,12 +480,11 @@ class _CartScreenState extends State<CartScreen>
                               horizontalSpaceSmall,
                               Text(
                                 "Checkout",
-                                style: context.customTextTheme.text14W700
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
+                                style:
+                                    context.customTextTheme.text14W700.copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
                               ),
                             ],
                           ),
@@ -509,171 +495,179 @@ class _CartScreenState extends State<CartScreen>
                   ],
                 )
               : cartListener.tabController.index == 1
-              ? Row(
-                  children: [
-                    Expanded(
-                      child: _buildTotalAmountWidget(
-                        "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
-                      ),
-                    ),
-                    Expanded(
-                      child: InkWell(
-                        onTap: cartProvider.createOrderPending
-                            ? null
-                            : () async {
-                                // Validate address / delivery charges first
-                                if (cartListener.selectedOrderType ==
-                                    OrderType.delivery) {
-                                  final validated = await cartProvider
-                                      .validateAddress();
-                                  if (!validated) return;
-                                } else {
-                                  if (cartListener.selectedPickUpTime == null) {
-                                    AlertDialogs.showError(
-                                      "Please select pickup time",
-                                      context: context,
-                                    );
-                                    return;
-                                  }
-                                  // ensure takeaway calculations present
-                                  final ok = cartProvider.validateInputData();
-                                  if (!ok) return;
-                                }
-
-                                if (cartListener.selectedPaymentMethod ==
-                                        PaymentMethod.card &&
-                                    cartListener.totalAmount <
-                                        shopListener.onlinePaymentMinAmount) {
-                                  AlertDialogs.showError(
-                                    "Minimum amount for the card payment is ￡${shopListener.onlinePaymentMinAmount}, Please choose another payment option",
-                                    context: context,
-                                  );
-                                  return;
-                                }
-
-                                // Skip mobile verification for card payments
-                                if (cartListener.selectedPaymentMethod !=
-                                    PaymentMethod.card) {
-                                  final user = userProvider.userData?.user;
-
-                                  // SMS verification disabled but no phone number
-                                  if (!smsRequired &&
-                                      (user?.userMobile == '0' ||
-                                          user!.userMobile!.trim().isEmpty)) {
-                                    final phoneAdded = await mobileNumberDialog(
-                                      context,
-                                    );
-
-                                    if (!phoneAdded) return;
-
-                                    cartProvider.jumpToPage(2);
-                                    return;
-                                  }
-
-                                  // SMS verification enabled
-                                  if (smsRequired &&
-                                      user?.isMobileVerified != "Yes") {
-                                    final verified =
-                                        await mobileVerificationDialog(context);
-
-                                    if (!verified) return;
-
-                                    cartProvider.jumpToPage(2);
-                                    return;
-                                  }
-                                }
-
-                                cartProvider.jumpToPage(2);
-                              },
-                        child: Container(
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
-                            borderRadius: BorderRadius.circular(10.0),
+                  ? Row(
+                      children: [
+                        Expanded(
+                          child: _buildTotalAmountWidget(
+                            "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                FluentIcons.check_24_regular,
-                                color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: cartProvider.createOrderPending
+                                ? null
+                                : () async {
+                                    // Validate address / delivery charges first
+                                    if (cartListener.selectedOrderType ==
+                                        OrderType.delivery) {
+                                      final validated =
+                                          await cartProvider.validateAddress();
+                                      if (!validated) return;
+                                    } else {
+                                      if (cartListener.selectedPickUpTime ==
+                                          null) {
+                                        AlertDialogs.showError(
+                                          "Please select pickup time",
+                                          context: context,
+                                        );
+                                        return;
+                                      }
+                                      // ensure takeaway calculations present
+                                      final ok =
+                                          cartProvider.validateInputData();
+                                      if (!ok) return;
+                                    }
+
+                                    if (cartListener.selectedPaymentMethod ==
+                                            PaymentMethod.card &&
+                                        cartListener.totalAmount <
+                                            shopListener
+                                                .onlinePaymentMinAmount) {
+                                      AlertDialogs.showError(
+                                        "Minimum amount for the card payment is ￡${shopListener.onlinePaymentMinAmount}, Please choose another payment option",
+                                        context: context,
+                                      );
+                                      return;
+                                    }
+
+                                    // Skip mobile verification for card payments
+                                    if (cartListener.selectedPaymentMethod !=
+                                        PaymentMethod.card) {
+                                      final user = userProvider.userData?.user;
+
+                                      // SMS verification disabled but no phone number
+                                      if (!smsRequired &&
+                                          (user?.userMobile == '0' ||
+                                              user!.userMobile!
+                                                  .trim()
+                                                  .isEmpty)) {
+                                        final phoneAdded =
+                                            await mobileNumberDialog(
+                                          context,
+                                        );
+
+                                        if (!phoneAdded) return;
+
+                                        cartProvider.jumpToPage(2);
+                                        return;
+                                      }
+
+                                      // SMS verification enabled
+                                      if (smsRequired &&
+                                          user?.isMobileVerified != "Yes") {
+                                        final verified =
+                                            await mobileVerificationDialog(
+                                                context);
+
+                                        if (!verified) return;
+
+                                        cartProvider.jumpToPage(2);
+                                        return;
+                                      }
+                                    }
+
+                                    cartProvider.jumpToPage(2);
+                                  },
+                            child: Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
-                              horizontalSpaceSmall,
-                              Text(
-                                "Confirm",
-                                style: context.customTextTheme.text14W700
-                                    .copyWith(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    FluentIcons.check_24_regular,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                  horizontalSpaceSmall,
+                                  Text(
+                                    "Confirm",
+                                    style: context.customTextTheme.text14W700
+                                        .copyWith(
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onSurface,
                                     ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    horizontalSpaceSmall,
-                  ],
-                )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: _buildTotalAmountWidget(
-                        "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
-                      ),
-                    ),
-                    Expanded(
-                      child: InkWell(
-                        onTap: cartListener.createOrderPending
-                            ? null
-                            : () async {
-                                // Validate address / delivery charges before payment
-                                if (cartProvider.selectedOrderType ==
-                                    OrderType.delivery) {
-                                  final validated = await cartProvider
-                                      .validateAddress();
-                                  if (!validated) return;
-                                } else {
-                                  final ok = cartProvider.validateInputData();
-                                  if (!ok) return;
-                                }
+                        horizontalSpaceSmall,
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: _buildTotalAmountWidget(
+                            "${AppConfig.instance.country.symbol} ${cartListener.totalAmount.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}",
+                          ),
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: cartListener.createOrderPending
+                                ? null
+                                : () async {
+                                    // Validate address / delivery charges before payment
+                                    if (cartProvider.selectedOrderType ==
+                                        OrderType.delivery) {
+                                      final validated =
+                                          await cartProvider.validateAddress();
+                                      if (!validated) return;
+                                    } else {
+                                      final ok =
+                                          cartProvider.validateInputData();
+                                      if (!ok) return;
+                                    }
 
-                                if (cartProvider.selectedPaymentMethod ==
-                                    PaymentMethod.card) {
-                                  paymentProvider.createPaymentIntent(
-                                    deliveryType:
-                                        cartProvider.selectedOrderType ==
-                                            OrderType.delivery
-                                        ? "door_delivery"
-                                        : "store_pickup",
-                                    postCode:
-                                        cartProvider.selectedOrderType ==
-                                            OrderType.delivery
-                                        ? cartProvider
-                                                  .selectedAddress
-                                                  ?.postcode ??
-                                              ""
-                                        : "",
-                                    pickupTime:
-                                        cartProvider.selectedOrderType ==
-                                            OrderType.takeaway
-                                        ? cartProvider.selectedPickUpTime
-                                                  ?.toIso8601String() ??
-                                              ''
-                                        : '',
-                                    cartProvider.calculatedDiscount,
-                                    cartProvider.calculatedDeliveryFee,
-                                    onPaymentSuccess: (transactionId) {
-                                      cartProvider
-                                          .createOrder(
+                                    if (cartProvider.selectedPaymentMethod ==
+                                        PaymentMethod.card) {
+                                      paymentProvider.createPaymentIntent(
+                                        deliveryType:
+                                            cartProvider.selectedOrderType ==
+                                                    OrderType.delivery
+                                                ? "door_delivery"
+                                                : "store_pickup",
+                                        postCode:
+                                            cartProvider.selectedOrderType ==
+                                                    OrderType.delivery
+                                                ? cartProvider.selectedAddress
+                                                        ?.postcode ??
+                                                    ""
+                                                : "",
+                                        pickupTime: cartProvider
+                                                    .selectedOrderType ==
+                                                OrderType.takeaway
+                                            ? cartProvider.selectedPickUpTime
+                                                    ?.toIso8601String() ??
+                                                ''
+                                            : '',
+                                        cartProvider.calculatedDiscount,
+                                        cartProvider.calculatedDeliveryFee,
+                                        onPaymentSuccess: (transactionId) {
+                                          cartProvider
+                                              .createOrder(
                                             tID: transactionId,
                                             deliveryDate: shopListener
                                                 .formattedSelectedDate,
                                             deliverySlot:
                                                 "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}",
                                           )
-                                          .then((created) {
+                                              .then((created) {
                                             if (created) {
                                               Future.delayed(
                                                 const Duration(seconds: 2),
@@ -687,19 +681,19 @@ class _CartScreenState extends State<CartScreen>
                                               );
                                             }
                                           });
-                                    },
-                                  );
-                                  return;
-                                }
+                                        },
+                                      );
+                                      return;
+                                    }
 
-                                cartProvider
-                                    .createOrder(
+                                    cartProvider
+                                        .createOrder(
                                       deliveryDate: shopListener
                                           .formattedSelectedDateForPayload,
                                       deliverySlot:
                                           "${shopListener.selectedDeliverySlot?.openingTime}--${shopListener.selectedDeliverySlot?.closingTime}",
                                     )
-                                    .then((created) {
+                                        .then((created) {
                                       if (created) {
                                         context.replaceRoute(
                                           const SuccessScreenRoute(),
@@ -712,67 +706,69 @@ class _CartScreenState extends State<CartScreen>
                                         cartProvider.clearSelectedAddress();
                                       }
                                     });
-                                await orderProvider.fetchAllOrders();
-                              },
-                        child: Container(
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary,
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: cartListener.createOrderPending
-                              ? Center(
-                                  child: SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                  ),
-                                )
-                              : paymentListener.creatingPaymentIntent
-                              ? Center(
-                                  child: SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                  ),
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      FluentIcons.check_24_regular,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                    horizontalSpaceSmall,
-                                    Text(
-                                      "Pay",
-                                      style: context.customTextTheme.text14W700
-                                          .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
+                                    await orderProvider.fetchAllOrders();
+                                  },
+                            child: Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: cartListener.createOrderPending
+                                  ? Center(
+                                      child: SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                        ),
+                                      ),
+                                    )
+                                  : paymentListener.creatingPaymentIntent
+                                      ? Center(
+                                          child: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
                                           ),
-                                    ),
-                                  ],
-                                ),
+                                        )
+                                      : Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              FluentIcons.check_24_regular,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
+                                            horizontalSpaceSmall,
+                                            Text(
+                                              "Pay",
+                                              style: context
+                                                  .customTextTheme.text14W700
+                                                  .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                            ),
+                          ),
                         ),
-                      ),
+                        horizontalSpaceSmall,
+                      ],
                     ),
-                    horizontalSpaceSmall,
-                  ],
-                ),
         ),
       ),
     );
@@ -1002,16 +998,14 @@ class _CartScreenState extends State<CartScreen>
 
         final isTakeAwayTempEnabled =
             storeSettings?.deliveryInfo?.takeAway_temp_off != null &&
-            storeSettings?.deliveryInfo?.takeAway_temp_off == 'No';
+                storeSettings?.deliveryInfo?.takeAway_temp_off == 'No';
         final isHomeDeliveryTempEnabled =
             storeSettings?.deliveryInfo?.homeDelivery_temp_off != null &&
-            storeSettings?.deliveryInfo?.homeDelivery_temp_off == 'No';
-        final isHomeDeliveryEnabled =
-            isHomeDeliveryTempEnabled &&
+                storeSettings?.deliveryInfo?.homeDelivery_temp_off == 'No';
+        final isHomeDeliveryEnabled = isHomeDeliveryTempEnabled &&
             storeSettings?.deliveryInfo?.homeDelivery != null &&
             storeSettings?.deliveryInfo?.homeDelivery == '1';
-        final isTakeAwayEnabled =
-            isTakeAwayTempEnabled &&
+        final isTakeAwayEnabled = isTakeAwayTempEnabled &&
             storeSettings?.deliveryInfo?.takeAway != null &&
             storeSettings?.deliveryInfo?.takeAway == '1';
         return Theme(
@@ -1153,11 +1147,10 @@ class _CartScreenState extends State<CartScreen>
                                                     .capitalize(),
                                               ),
                                               style: context
-                                                  .customTextTheme
-                                                  .text16W400
+                                                  .customTextTheme.text16W400
                                                   .copyWith(
-                                                    color: AppColors.kGray,
-                                                  ),
+                                                color: AppColors.kGray,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -1180,10 +1173,7 @@ class _CartScreenState extends State<CartScreen>
                                                 right: 20.0,
                                               ),
                                               child: Assets
-                                                  .lib
-                                                  .assets
-                                                  .icons
-                                                  .editIcon
+                                                  .lib.assets.icons.editIcon
                                                   .svg(),
                                             ),
                                           ),
@@ -1202,19 +1192,17 @@ class _CartScreenState extends State<CartScreen>
                                                         .customTextTheme
                                                         .text18W600
                                                         .copyWith(
-                                                          color:
-                                                              AppColors.kBlack,
-                                                        ),
+                                                      color: AppColors.kBlack,
+                                                    ),
                                                   ),
                                                 ),
                                                 content: Text(
                                                   'Are you sure you want to delete this address?',
-                                                  style: context
-                                                      .customTextTheme
+                                                  style: context.customTextTheme
                                                       .text16W400
                                                       .copyWith(
-                                                        color: AppColors.kBlack,
-                                                      ),
+                                                    color: AppColors.kBlack,
+                                                  ),
                                                 ),
                                                 actions: <Widget>[
                                                   Center(
@@ -1237,33 +1225,32 @@ class _CartScreenState extends State<CartScreen>
                                                           width: 10,
                                                         ),
                                                         ElevatedButton(
-                                                          style: const ButtonStyle(
+                                                          style:
+                                                              const ButtonStyle(
                                                             backgroundColor:
                                                                 WidgetStatePropertyAll(
-                                                                  AppColors
-                                                                      .kBlack,
-                                                                ),
+                                                              AppColors.kBlack,
+                                                            ),
                                                           ),
                                                           onPressed: () {
                                                             userListener
                                                                 .deleteUserAddress(
-                                                                  address.uaID
-                                                                      .toString(),
-                                                                )
+                                                              address.uaID
+                                                                  .toString(),
+                                                            )
                                                                 .then((
-                                                                  success,
-                                                                ) {
-                                                                  if (success) {
-                                                                    Navigator.of(
-                                                                      context,
-                                                                    ).pop();
-                                                                    context
-                                                                        .read<
-                                                                          UserProvider
-                                                                        >()
-                                                                        .getAddressList();
-                                                                  }
-                                                                });
+                                                              success,
+                                                            ) {
+                                                              if (success) {
+                                                                Navigator.of(
+                                                                  context,
+                                                                ).pop();
+                                                                context
+                                                                    .read<
+                                                                        UserProvider>()
+                                                                    .getAddressList();
+                                                              }
+                                                            });
                                                           },
                                                           child: const Text(
                                                             'Delete',
@@ -1307,8 +1294,8 @@ class _CartScreenState extends State<CartScreen>
                               },
                               separatorBuilder:
                                   (BuildContext context, int index) {
-                                    return verticalSpaceRegular;
-                                  },
+                                return verticalSpaceRegular;
+                              },
                             ),
                           )
                         : Center(
@@ -1352,10 +1339,10 @@ class _CartScreenState extends State<CartScreen>
                                     .read<CartProvider>()
                                     .validateAddress()
                                     .then((validated) {
-                                      if (validated) {
-                                        Navigator.pop(context);
-                                      }
-                                    });
+                                  if (validated) {
+                                    Navigator.pop(context);
+                                  }
+                                });
                               },
                               child: Container(
                                 height: 50,
@@ -1363,19 +1350,17 @@ class _CartScreenState extends State<CartScreen>
                                   borderRadius: BorderRadius.circular(10),
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
-                                child:
-                                    cartListener
+                                child: cartListener
                                         .deliveryOrTakeAwayChargeCalculating
                                     ? showButtonProgress()
                                     : Center(
                                         child: Text(
                                           'Apply',
                                           style: context
-                                              .customTextTheme
-                                              .text14W600
+                                              .customTextTheme.text14W600
                                               .copyWith(
-                                                color: AppColors.kWhite,
-                                              ),
+                                            color: AppColors.kWhite,
+                                          ),
                                         ),
                                       ),
                               ),
@@ -1436,8 +1421,7 @@ class _CartScreenState extends State<CartScreen>
                       ),
                     )
                   : Wrap(
-                      children:
-                          shopListener.slotForSelectedDate
+                      children: shopListener.slotForSelectedDate
                               ?.map(
                                 (slot) => Padding(
                                   padding: const EdgeInsets.only(right: 10.0),
@@ -1446,13 +1430,13 @@ class _CartScreenState extends State<CartScreen>
                                       if (value) {
                                         shopProvider
                                             .onChangeOnSelectedDeliverySlot(
-                                              slot,
-                                            );
+                                          slot,
+                                        );
                                       } else {
                                         shopProvider
                                             .onChangeOnSelectedDeliverySlot(
-                                              null,
-                                            );
+                                          null,
+                                        );
                                       }
                                     },
                                     label: Text(
@@ -1460,7 +1444,7 @@ class _CartScreenState extends State<CartScreen>
                                     ),
                                     selected:
                                         shopListener.selectedDeliverySlot ==
-                                        slot,
+                                            slot,
                                   ),
                                 ),
                               )
@@ -1522,38 +1506,40 @@ class _CartScreenState extends State<CartScreen>
                   data: Theme.of(context).copyWith(
                     dialogBackgroundColor: AppColors.kWhite,
                     textTheme: poppinsTextTheme(context).textTheme,
-                    timePickerTheme: TimePickerThemeData(
-                      backgroundColor: AppColors.kLightWhite2,
-                      dialBackgroundColor: AppColors.kLightGray2,
-                      dayPeriodColor: WidgetStateColor.resolveWith((states) {
-                        if (states.contains(WidgetState.selected)) {
-                          return AppColors.kBlack2;
-                        }
-                        return AppColors.kLightWhite2;
-                      }),
-                      hourMinuteColor: WidgetStateColor.resolveWith((states) {
-                        if (states.contains(WidgetState.selected)) {
-                          return AppColors.kBlack2;
-                        }
-                        return AppColors.kLightWhite2;
-                      }),
-                      hourMinuteTextColor: WidgetStateColor.resolveWith((
-                        states,
-                      ) {
-                        if (states.contains(WidgetState.selected)) {
-                          return AppColors.kWhite;
-                        }
-                        return AppColors.kGray;
-                      }),
-                      dayPeriodTextColor: WidgetStateColor.resolveWith((
-                        states,
-                      ) {
-                        if (states.contains(WidgetState.selected)) {
-                          return AppColors.kWhite;
-                        }
-                        return AppColors.kGray;
-                      }),
-                    ),
+                    timePickerTheme: Theme.of(context).timePickerTheme.copyWith(
+                          backgroundColor: AppColors.kLightWhite2,
+                          dialBackgroundColor: AppColors.kLightGray2,
+                          dayPeriodColor:
+                              WidgetStateColor.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return AppColors.kBlack2;
+                            }
+                            return AppColors.kLightWhite2;
+                          }),
+                          hourMinuteColor:
+                              WidgetStateColor.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return AppColors.kBlack2;
+                            }
+                            return AppColors.kLightWhite2;
+                          }),
+                          hourMinuteTextColor: WidgetStateColor.resolveWith((
+                            states,
+                          ) {
+                            if (states.contains(WidgetState.selected)) {
+                              return AppColors.kWhite;
+                            }
+                            return AppColors.kGray;
+                          }),
+                          dayPeriodTextColor: WidgetStateColor.resolveWith((
+                            states,
+                          ) {
+                            if (states.contains(WidgetState.selected)) {
+                              return AppColors.kWhite;
+                            }
+                            return AppColors.kGray;
+                          }),
+                        ),
                   ),
                   child: child!,
                 );
@@ -1659,8 +1645,8 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                     Text(
                       "A mobile number is required to place your order.",
                       style: context.customTextTheme.text14W500.copyWith(
-                        // color: AppColors.kGray3,
-                      ),
+                          // color: AppColors.kGray3,
+                          ),
                     ),
                   ],
                 ),
@@ -1849,8 +1835,7 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                                 if (value != null) {
                                   shopProvider.updateSelectedCountry(value);
                                   setDialogState(() {
-                                    countryCode =
-                                        value.code ??
+                                    countryCode = value.code ??
                                         AppConfig.instance.country.dialCode;
                                   });
                                 }
@@ -1917,44 +1902,35 @@ Future<bool> mobileNumberDialog(BuildContext context) async {
                             }
                             setDialogState(() => isLoading = true);
 
-                            final success = await userProvider
-                                .updateBasicProfile(
-                                  firstName:
-                                      userProvider
-                                          .userData
-                                          ?.user
-                                          .userFirstName ??
+                            final success =
+                                await userProvider.updateBasicProfile(
+                              firstName:
+                                  userProvider.userData?.user.userFirstName ??
                                       "",
-                                  lastName:
-                                      userProvider
-                                          .userData
-                                          ?.user
-                                          .userLastName ??
+                              lastName:
+                                  userProvider.userData?.user.userLastName ??
                                       "",
-                                  mobile: authProvider
-                                      .registerUserPhoneController
-                                      .text
-                                      .trim(),
-                                );
+                              mobile: authProvider
+                                  .registerUserPhoneController.text
+                                  .trim(),
+                            );
 
                             if (success && context.mounted) {
                               // Update local user data with the new mobile number
                               if (userProvider.userData != null) {
                                 final phone = authProvider
-                                    .registerUserPhoneController
-                                    .text
+                                    .registerUserPhoneController.text
                                     .trim();
                                 final countryCode =
                                     userProvider.userData!.user.countryCode ??
-                                    AppConfig.instance.country.dialCode;
-                                final updatedUserData = userProvider.userData!
-                                    .copyWith(
-                                      user: userProvider.userData!.user
-                                          .copyWith(
-                                            userMobile: "$countryCode$phone",
-                                            userMobileActual: phone,
-                                          ),
-                                    );
+                                        AppConfig.instance.country.dialCode;
+                                final updatedUserData =
+                                    userProvider.userData!.copyWith(
+                                  user: userProvider.userData!.user.copyWith(
+                                    userMobile: "$countryCode$phone",
+                                    userMobileActual: phone,
+                                  ),
+                                );
                                 await userProvider.sharedPrefsRepository
                                     .saveUserData(updatedUserData);
                                 await userProvider.getUserData();
@@ -2018,31 +1994,26 @@ class _MobileVerificationDialogContentState
     // Use the country code from the login response if available, or infer from user profile / selected country
     final rawCountryCode = user?.countryCode?.trim() ?? '';
     final formattedCode = user?.formattedCountryCode.trim() ?? '';
-    final mobile =
-        (user?.userMobileActual?.trim().isNotEmpty == true
-                ? user!.userMobileActual!
-                : user?.userMobile?.trim() ?? '')
-            .trim();
+    final mobile = (user?.userMobileActual?.trim().isNotEmpty == true
+            ? user!.userMobileActual!
+            : user?.userMobile?.trim() ?? '')
+        .trim();
 
     SmsAvailableCountriesData? matchingCountry;
 
     // 1. Try matching using countryCode or formattedCountryCode
-    final targetCode = rawCountryCode.isNotEmpty
-        ? rawCountryCode
-        : formattedCode;
+    final targetCode =
+        rawCountryCode.isNotEmpty ? rawCountryCode : formattedCode;
     if (targetCode.isNotEmpty) {
       final cleanTarget = targetCode.replaceAll('+', '').toLowerCase();
       matchingCountry = shopProvider.smsCountries
           .cast<SmsAvailableCountriesData?>()
           .firstWhere((c) {
-            if (c == null) return false;
-            final cCode = (c.code ?? '')
-                .replaceAll('+', '')
-                .toLowerCase()
-                .trim();
-            final cIso = (c.iso ?? '').toLowerCase().trim();
-            return cCode == cleanTarget || cIso == cleanTarget;
-          }, orElse: () => null);
+        if (c == null) return false;
+        final cCode = (c.code ?? '').replaceAll('+', '').toLowerCase().trim();
+        final cIso = (c.iso ?? '').toLowerCase().trim();
+        return cCode == cleanTarget || cIso == cleanTarget;
+      }, orElse: () => null);
     }
 
     // 2. If no match yet, try matching against mobile number prefix
@@ -2051,21 +2022,17 @@ class _MobileVerificationDialogContentState
       matchingCountry = shopProvider.smsCountries
           .cast<SmsAvailableCountriesData?>()
           .firstWhere((c) {
-            if (c == null) return false;
-            final cCode = (c.code ?? '')
-                .replaceAll('+', '')
-                .toLowerCase()
-                .trim();
-            return cCode.isNotEmpty && cleanMobile.startsWith(cCode);
-          }, orElse: () => null);
+        if (c == null) return false;
+        final cCode = (c.code ?? '').replaceAll('+', '').toLowerCase().trim();
+        return cCode.isNotEmpty && cleanMobile.startsWith(cCode);
+      }, orElse: () => null);
     }
 
     if (matchingCountry != null) {
       shopProvider.updateSelectedCountry(matchingCountry);
       countryCode = matchingCountry.code ?? AppConfig.instance.country.dialCode;
     } else {
-      countryCode =
-          shopProvider.selectedCountry?.code ??
+      countryCode = shopProvider.selectedCountry?.code ??
           AppConfig.instance.country.dialCode;
     }
   }
@@ -2206,8 +2173,7 @@ class _MobileVerificationDialogContentState
                           if (value != null) {
                             shopProvider.updateSelectedCountry(value);
                             setState(() {
-                              countryCode =
-                                  value.code ??
+                              countryCode = value.code ??
                                   AppConfig.instance.country.dialCode;
                             });
                           }

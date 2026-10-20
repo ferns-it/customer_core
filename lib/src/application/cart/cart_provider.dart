@@ -759,7 +759,6 @@ class CartProvider extends ChangeNotifier with BaseController {
           return false;
         },
         (result) async {
-      
           await listCartItems();
           return true;
         },

@@ -75,17 +75,36 @@ class _CategoriesScreenState extends State<CategoriesScreen>
     }
   }
 
+  // void _initTabController(ProductsProvider productProvider) {
+  //   _categoryTabController?.dispose();
+
+  //   _categoryTabController = TabController(
+  //     length: productProvider.categories.length,
+  //     vsync: this,
+  //   );
+
+  //   _categoryTabController?.animateTo(
+  //     productProvider.selectedCategoryIndex ?? 0,
+  //   );
+  // }
+
   void _initTabController(ProductsProvider productProvider) {
+    final length = productProvider.categories.length;
+
+    if (!mounted || length == 0) return;
+
+    final selectedIndex = productProvider.selectedCategoryIndex ?? 0;
+    final initialIndex = selectedIndex.clamp(0, length - 1);
+
     _categoryTabController?.dispose();
 
-    _categoryTabController = TabController(
-      length: productProvider.categories.length,
-      vsync: this,
-    );
-
-    _categoryTabController?.animateTo(
-      productProvider.selectedCategoryIndex ?? 0,
-    );
+    setState(() {
+      _categoryTabController = TabController(
+        length: length,
+        initialIndex: initialIndex,
+        vsync: this,
+      );
+    });
   }
 
   void _onScroll() {
@@ -149,136 +168,148 @@ class _CategoriesScreenState extends State<CategoriesScreen>
           padding: const EdgeInsets.all(0.0),
           child: Column(
             children: [
-              TabBar(
-                controller: _categoryTabController,
-                onTap: (index) async {
-                  final category = productListener.categories[index];
-                  final cID = category.cID;
+              if (productListener.categories.isNotEmpty &&
+                  _categoryTabController != null &&
+                  _categoryTabController!.length ==
+                      productListener.categories.length)
+                TabBar(
+                  controller: _categoryTabController,
+                  onTap: (index) async {
+                    final category = productListener.categories[index];
+                    final cID = category.cID;
 
-                  if (cID == productListener.selectedCategory?.cID) {
-                    return;
-                  }
+                    if (cID == productListener.selectedCategory?.cID) {
+                      return;
+                    }
 
-                  productProvider.onChangeHasMoreProducts(true);
-                  productProvider.onChangeSelectedCategory(category);
-                  productProvider.onChangeSelectedCategoryIndex(index);
-                  productProvider.onChangeSelectedSubCategory(null);
+                    productProvider.onChangeHasMoreProducts(true);
+                    productProvider.onChangeSelectedCategory(category);
+                    productProvider.onChangeSelectedCategoryIndex(index);
+                    productProvider.onChangeSelectedSubCategory(null);
 
-                  homeProvider.showNavBar();
+                    homeProvider.showNavBar();
 
-                  if (cID != null) {
-                    await productProvider.getAllProductsByPagination(
-                      categoryID: cID,
-                      isRandom: false,
-                      isRefresh: true,
-                    );
-                  }
-                },
-                tabAlignment: TabAlignment.start,
-                isScrollable: true,
-                dividerColor: Colors.transparent,
-                indicatorColor: Theme.of(context).colorScheme.primary,
-                indicatorWeight: 3,
-                indicatorSize: TabBarIndicatorSize.label,
-                indicatorPadding: EdgeInsets.all(0.1),
-                labelPadding: const EdgeInsets.only(right: 10),
-                padding: EdgeInsets.zero,
-                tabs: productListener.categories.map((e) {
-                  final measured = textWidth(
-                    e.name ?? '',
-                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-                  );
-
-                  return Tab(
-                    child: Container(
-                      height: 40,
-                      width: measured + 24,
-                      margin: const EdgeInsets.only(bottom: 5),
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
+                    if (cID != null) {
+                      await productProvider.getAllProductsByPagination(
+                        categoryID: cID,
+                        isRandom: false,
+                        isRefresh: true,
+                      );
+                    }
+                  },
+                  tabAlignment: TabAlignment.start,
+                  isScrollable: true,
+                  dividerColor: Colors.transparent,
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  indicatorWeight: 3,
+                  indicatorSize: TabBarIndicatorSize.label,
+                  indicatorPadding: EdgeInsets.all(0.1),
+                  labelPadding: const EdgeInsets.only(right: 10),
+                  padding: EdgeInsets.zero,
+                  tabs: productListener.categories.map((e) {
+                    final measured = textWidth(
+                      e.name ?? '',
+                      const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
                       ),
-                      child: AppConfig.instance.isCategoryImageEnabled == true
-                          ? Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: e.image != null
-                                      ? CachedNetworkImage(
-                                          imageUrl: e.image!,
-                                          fit: BoxFit.cover,
-                                          errorWidget: (context, url, error) {
-                                            return Image.asset(
-                                              Assets
-                                                  .lib
-                                                  .assets
-                                                  .images
-                                                  .noimage
-                                                  .path,
-                                              fit: BoxFit.cover,
-                                              package: 'customer_core',
-                                            );
-                                          },
-                                        )
-                                      : Image.asset(
-                                          Assets.lib.assets.images.noimage.path,
-                                          fit: BoxFit.cover,
-                                          package: 'customer_core',
-                                        ),
-                                ),
-                                Positioned.fill(
-                                  child: Container(
-                                    color: Colors.black.withOpacity(0.3),
-                                  ),
-                                ),
-                                Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                    ),
-                                    child: Text(
-                                      e.name ?? '',
-                                      maxLines: 2,
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
-                                        shadows: [
-                                          Shadow(
-                                            color: Colors.black,
-                                            offset: Offset(0, 1),
-                                            blurRadius: 4,
+                    );
+
+                    return Tab(
+                      child: Container(
+                        height: 40,
+                        width: measured + 24,
+                        margin: const EdgeInsets.only(bottom: 5),
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: AppConfig.instance.isCategoryImageEnabled == true
+                            ? Stack(
+                                children: [
+                                  Positioned.fill(
+                                    child: e.image != null
+                                        ? CachedNetworkImage(
+                                            imageUrl: e.image!,
+                                            fit: BoxFit.cover,
+                                            errorWidget: (context, url, error) {
+                                              return Image.asset(
+                                                Assets
+                                                    .lib
+                                                    .assets
+                                                    .images
+                                                    .noimage
+                                                    .path,
+                                                fit: BoxFit.cover,
+                                                package: 'customer_core',
+                                              );
+                                            },
+                                          )
+                                        : Image.asset(
+                                            Assets
+                                                .lib
+                                                .assets
+                                                .images
+                                                .noimage
+                                                .path,
+                                            fit: BoxFit.cover,
+                                            package: 'customer_core',
                                           ),
-                                        ],
+                                  ),
+                                  Positioned.fill(
+                                    child: Container(
+                                      color: Colors.black.withOpacity(0.3),
+                                    ),
+                                  ),
+                                  Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                      ),
+                                      child: Text(
+                                        e.name ?? '',
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black,
+                                              offset: Offset(0, 1),
+                                              blurRadius: 4,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            )
-                          : Center(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                ),
-                                child: Text(
-                                  e.name ?? '',
-                                  maxLines: 2,
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: context.customTextTheme.color,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
+                                ],
+                              )
+                            : Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                  ),
+                                  child: Text(
+                                    e.name ?? '',
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: context.customTextTheme.color,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                    ),
-                  );
-                }).toList(),
-              ),
+                      ),
+                    );
+                  }).toList(),
+                ),
               // _categoryTabController == null
               //     ? const SizedBox.shrink()
               //     : TabBar(

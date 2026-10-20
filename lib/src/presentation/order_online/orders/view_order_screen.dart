@@ -61,8 +61,9 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                               //     .copyWith(top: 5, bottom: 5),
                               padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  color: Colors.red.shade400.withOpacity(0.2)),
+                                borderRadius: BorderRadius.circular(14),
+                                color: Colors.red.shade400.withOpacity(0.2),
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -76,23 +77,22 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                                       Text(
                                         " Rejected ",
                                         style: TextStyle(
-                                            color: Colors.red.shade500,
-                                            fontWeight: FontWeight.w600),
+                                          color: Colors.red.shade500,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ],
                                   ),
                                   Text(
                                     orderDetails.status ?? '',
                                     style: TextStyle(
-                                        color: context.customTextTheme.color),
+                                      color: context.customTextTheme.color,
+                                    ),
                                   ),
                                 ],
                               ),
                             )
-                          : builderOrderStatusDetails(
-                              orderDetails,
-                              context,
-                            ),
+                          : builderOrderStatusDetails(orderDetails, context),
                     ),
                     verticalSpaceRegular,
                     buildOrderSummaryContainer(context, orderDetails),
@@ -125,57 +125,62 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
             spreadRadius: 0,
             blurRadius: 8.0,
             offset: Offset(0, 3),
-          )
+          ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 22.0,
-        vertical: 20.0,
-      ),
-      child: LayoutBuilder(builder: (context, constraints) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              children: [
-                Assets.lib.assets.icons.deliveryAddress.svg(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.kWhite
-                      : null,
-                ),
-                horizontalSpaceSmall,
-                Text(
-                  orderDetails.isTakeaway ? "Bill address" : "Delivery address",
-                  style: context.customTextTheme.text16W600.copyWith(
+      padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 20.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: [
+                  Assets.lib.assets.icons.deliveryAddress.svg(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.kWhite
+                        : null,
+                  ),
+                  horizontalSpaceSmall,
+                  Text(
+                    orderDetails.isTakeaway
+                        ? "Bill address"
+                        : "Delivery address",
+                    style: context.customTextTheme.text16W600.copyWith(
                       fontWeight: FontWeight.w800,
                       decoration: TextDecoration.underline,
-                      color: context.customTextTheme.color),
-                ),
-              ],
-            ),
-            verticalSpaceSmall,
-            SizedBox(
-              width: constraints.maxWidth * 0.8,
-              child: Text(
-                orderDetails.deliveryAddress?.customerName ?? "",
-                style: context.customTextTheme.text16W500
-                    .copyWith(color: context.customTextTheme.color),
+                      color: context.customTextTheme.color,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            Text(
-              '${userListener.userData?.user.formattedCountryCode} ${userListener.userData?.user.userMobileActual}' ??
-                  "",
-              style: context.customTextTheme.text16W500
-                  .copyWith(color: context.customTextTheme.color),
-            ),
-            Text(
-              orderDetails.deliveryAddress?.customerFullAddress ?? "",
-              style: context.customTextTheme.text16W500
-                  .copyWith(color: context.customTextTheme.color),
-            ),
-          ],
-        );
-      }),
+              verticalSpaceSmall,
+              SizedBox(
+                width: constraints.maxWidth * 0.8,
+                child: Text(
+                  orderDetails.deliveryAddress?.customerName ?? "",
+                  style: context.customTextTheme.text16W500.copyWith(
+                    color: context.customTextTheme.color,
+                  ),
+                ),
+              ),
+              Text(
+                '${userListener.userData?.user.formattedCountryCode} ${userListener.userData?.user.userMobileActual}' ??
+                    "",
+                style: context.customTextTheme.text16W500.copyWith(
+                  color: context.customTextTheme.color,
+                ),
+              ),
+              Text(
+                orderDetails.deliveryAddress?.customerFullAddress ?? "",
+                style: context.customTextTheme.text16W500.copyWith(
+                  color: context.customTextTheme.color,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -184,39 +189,64 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
     OrderDetailsModel orderDetails,
   ) {
     final isTaxApplicable = orderDetails.isTaxApplicablebool;
-    final taxItems = orderDetails.orderDishes
-            ?.where((dish) => dish.taxLabel != null && dish.taxAmount != "0")
+    // final taxItems = orderDetails.orderDishes
+    //         ?.where((dish) => dish.taxLabel != null && dish.taxAmount != "0")
+    //         .toList() ??
+    //     [];
+    // final Map<String, double> taxDetailsGroup = {};
+
+    // for (final item in taxItems) {
+    //   if (item.isTaxApplied == "Yes" &&
+    //       item.taxLabel != null &&
+    //       item.taxAmount != null) {
+    //     final amount = double.tryParse(
+    //           item.taxAmount!
+    //               .replaceAll(AppConfig.instance.country.symbol, "")
+    //               .replaceAll(",", "")
+    //               .trim(),
+    //         ) ??
+    //         0.0;
+
+    //     taxDetailsGroup.update(
+    //       item.taxLabel!,
+    //       (value) => value + amount,
+    //       ifAbsent: () => amount,
+    //     );
+
+    final taxItems =
+        orderDetails.orderDishes
+            ?.where(
+              (dish) =>
+                  dish.isTaxApplied == 'Yes' &&
+                  dish.taxLabel != null &&
+                  dish.taxAmount != null,
+            )
             .toList() ??
         [];
+
     final Map<String, double> taxDetailsGroup = {};
 
     for (final item in taxItems) {
-      if (item.isTaxApplied == "Yes" &&
-          item.taxLabel != null &&
-          item.taxAmount != null) {
-        final amount = double.tryParse(
-              item.taxAmount!
-                  .replaceAll(AppConfig.instance.country.symbol, "")
-                  .replaceAll(",", "")
-                  .trim(),
-            ) ??
-            0.0;
+      final amount =
+          double.tryParse(
+            item.taxAmount!
+                .replaceAll(',', '')
+                .replaceAll(RegExp(r'[^0-9.\-]'), '')
+                .trim(),
+          ) ??
+          0.0;
 
-        taxDetailsGroup.update(
-          item.taxLabel!,
-          (value) => value + amount,
-          ifAbsent: () => amount,
-        );
-      }
+      taxDetailsGroup.update(
+        item.taxLabel!,
+        (value) => value + amount,
+        ifAbsent: () => amount,
+      );
     }
     return ClipPath(
       clipper: RPSCustomClipper(),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 30.0,
-          vertical: 20.0,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
         margin: const EdgeInsets.symmetric(horizontal: 18.0),
         decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark
@@ -228,24 +258,26 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
               spreadRadius: 0,
               blurRadius: 10.0,
               offset: Offset(0, 5),
-            )
+            ),
           ],
         ),
         child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Order Summary',
-                style: context.customTextTheme.text16W700.copyWith(
-                    decoration: TextDecoration.underline,
-                    color: context.customTextTheme.color),
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Order Summary',
+              style: context.customTextTheme.text16W700.copyWith(
+                decoration: TextDecoration.underline,
+                color: context.customTextTheme.color,
               ),
-              verticalSpaceTiny,
-              ...orderDetails.orderDishes?.map((dish) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                      child: LayoutBuilder(builder: (context, constraints) {
+            ),
+            verticalSpaceTiny,
+            ...orderDetails.orderDishes?.map((dish) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,8 +291,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                                     "${dish.quantity} x ${dish.name}",
                                     style: context.customTextTheme.text16W700
                                         .copyWith(
-                                            color:
-                                                context.customTextTheme.color),
+                                          color: context.customTextTheme.color,
+                                        ),
                                     softWrap: true,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -273,8 +305,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                                     "${dish.totalNormalPrice}",
                                     style: context.customTextTheme.text16W700
                                         .copyWith(
-                                      color: context.customTextTheme.color,
-                                    ),
+                                          color: context.customTextTheme.color,
+                                        ),
                                   ),
                                 ),
                               ],
@@ -287,8 +319,8 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                                     "(${dish.variationName})",
                                     style: context.customTextTheme.text14W500
                                         .copyWith(
-                                      color: context.customTextTheme.color,
-                                    ),
+                                          color: context.customTextTheme.color,
+                                        ),
                                   ),
                                 if (dish.addons != null)
                                   ...dish.addons!.map(
@@ -300,28 +332,32 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                                             child: Text(
                                               "+ ${addon.name}",
                                               style: context
-                                                  .customTextTheme.text14W500
+                                                  .customTextTheme
+                                                  .text14W500
                                                   .copyWith(
-                                                color: context
-                                                    .customTextTheme.color,
-                                              ),
+                                                    color: context
+                                                        .customTextTheme
+                                                        .color,
+                                                  ),
                                             ),
                                           ),
                                           Text(
                                             " ${addon.price}",
                                             style: context
-                                                .customTextTheme.text14W500
+                                                .customTextTheme
+                                                .text14W500
                                                 .copyWith(
-                                              color:
-                                                  context.customTextTheme.color,
-                                            ),
+                                                  color: context
+                                                      .customTextTheme
+                                                      .color,
+                                                ),
                                           ),
                                         ],
                                       ),
                                     ),
                                   ),
                               ],
-                            )
+                            ),
                             // Row(
                             //   children: <Widget>[
                             //     Flexible(
@@ -341,183 +377,191 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
                             // ),
                           ],
                         );
-                      }),
-                    );
-                  }).toList() ??
-                  [],
-              verticalSpaceRegular,
-              Assets.lib.assets.icons.zigzag.svg(),
-              verticalSpaceLarge,
-              _SummaryRow(
-                label: "Order Type",
-                value: orderDetails.formattedDeliveryType,
-                style: context.customTextTheme.text14W600
-                    .copyWith(color: context.customTextTheme.color),
+                      },
+                    ),
+                  );
+                }).toList() ??
+                [],
+            verticalSpaceRegular,
+            Assets.lib.assets.icons.zigzag.svg(),
+            verticalSpaceLarge,
+            _SummaryRow(
+              label: "Order Type",
+              value: orderDetails.formattedDeliveryType,
+              style: context.customTextTheme.text14W600.copyWith(
+                color: context.customTextTheme.color,
               ),
-              if (orderDetails.isTakeaway) ...[
-                verticalSpaceTiny,
-                _SummaryRow(
-                  label: "Pickup Time",
-                  value: orderDetails.takeawayTime ?? "",
-                  style: context.customTextTheme.text14W600
-                      .copyWith(color: context.customTextTheme.color),
-                ),
-              ],
+            ),
+            if (orderDetails.isTakeaway) ...[
               verticalSpaceTiny,
               _SummaryRow(
-                label: "Payment",
-                value: orderDetails.paymentGatway ?? "",
-                style: context.customTextTheme.text14W600
-                    .copyWith(color: context.customTextTheme.color),
+                label: "Pickup Time",
+                value: orderDetails.takeawayTime ?? "",
+                style: context.customTextTheme.text14W600.copyWith(
+                  color: context.customTextTheme.color,
+                ),
               ),
-              verticalSpaceRegular,
-              Text(
-                "Bill Details",
+            ],
+            verticalSpaceTiny,
+            _SummaryRow(
+              label: "Payment",
+              value: orderDetails.paymentGatway ?? "",
+              style: context.customTextTheme.text14W600.copyWith(
+                color: context.customTextTheme.color,
+              ),
+            ),
+            verticalSpaceRegular,
+            Text(
+              "Bill Details",
+              style: context.customTextTheme.text16W600.copyWith(
+                decoration: TextDecoration.underline,
+                color: context.customTextTheme.color,
+              ),
+            ),
+            verticalSpaceSmall,
+            _SummaryRow(
+              label: "Sub Total",
+              value: "${orderDetails.grossAmount}",
+              style: context.customTextTheme.text16W600.copyWith(
+                color: context.customTextTheme.color,
+              ),
+            ),
+            if (!orderDetails.isTakeaway) ...[
+              verticalSpaceTiny,
+              _SummaryRow(
+                label: "Delivery Charge",
+                value:
+                    orderDetails.deliveryCharge ==
+                        '${AppConfig.instance.country.symbol} ${0.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                    ? 'Free'
+                    : orderDetails.deliveryCharge ?? "0.00",
                 style: context.customTextTheme.text16W600.copyWith(
-                    decoration: TextDecoration.underline,
-                    color: context.customTextTheme.color),
-              ),
-              verticalSpaceSmall,
-              _SummaryRow(
-                label: "Sub Total",
-                value: "${orderDetails.grossAmount}",
-                style: context.customTextTheme.text16W600
-                    .copyWith(color: context.customTextTheme.color),
-              ),
-              if (!orderDetails.isTakeaway) ...[
-                verticalSpaceTiny,
-                _SummaryRow(
-                  label: "Delivery Charge",
-                  value: orderDetails.deliveryCharge ==
-                          '${AppConfig.instance.country.symbol} ${0.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
-                      ? 'Free'
-                      : orderDetails.deliveryCharge ?? "0.00",
-                  style: context.customTextTheme.text16W600
-                      .copyWith(color: context.customTextTheme.color),
+                  color: context.customTextTheme.color,
                 ),
-              ],
+              ),
+            ],
+            verticalSpaceTiny,
+            _SummaryRow(
+              label: "Discount",
+              value: " ${orderDetails.totalDiscount}",
+              style: context.customTextTheme.text16W600.copyWith(
+                color: context.customTextTheme.color,
+              ),
+              infoWidget:
+                  orderDetails.totalDiscount !=
+                      '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                  ? Tooltip(
+                      decoration: BoxDecoration(
+                        color: context.customTextTheme.color,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                      showDuration: Duration(seconds: 8),
+                      triggerMode: TooltipTriggerMode.tap,
+                      richMessage: TextSpan(
+                        children: [
+                          TextSpan(
+                            text:
+                                'Cart Discount :  ${orderDetails.productDiscountAmount}\n',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          TextSpan(
+                            text: orderDetails?.deliveryType == "door_delivery"
+                                ? 'Delivery Discount : ${orderDetails.deliveryDiscount}'
+                                : 'Takeaway Discount : ${orderDetails.deliveryDiscount}',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.info_outline, size: 18),
+                    )
+                  : SizedBox.shrink(),
+            ),
+            if (isTaxApplicable
+            // && orderDetails.taxTotalAmount !=
+            // '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+            ) ...[
               verticalSpaceTiny,
               _SummaryRow(
-                  label: "Discount",
-                  value: " ${orderDetails.totalDiscount}",
-                  style: context.customTextTheme.text16W600
-                      .copyWith(color: context.customTextTheme.color),
-                  infoWidget: orderDetails.totalDiscount !=
-                          '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
-                      ? Tooltip(
-                          decoration: BoxDecoration(
-                            color: context.customTextTheme.color,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 12,
-                          ),
-                          showDuration: Duration(seconds: 8),
-                          triggerMode: TooltipTriggerMode.tap,
-                          richMessage: TextSpan(
-                            children: [
+                label: 'VAT ',
+                value: orderDetails.taxTotalAmount ?? '0.00',
+                style: context.customTextTheme.text16W600.copyWith(
+                  color: context.customTextTheme.color,
+                ),
+                infoWidget:
+                    orderDetails.taxTotalAmount !=
+                        '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
+                    ? Tooltip(
+                        decoration: BoxDecoration(
+                          color: context.customTextTheme.color,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                        showDuration: Duration(seconds: 8),
+                        triggerMode: TooltipTriggerMode.tap,
+                        richMessage: TextSpan(
+                          children: [
+                            for (
+                              int i = 0;
+                              i < taxDetailsGroup.entries.length;
+                              i++
+                            ) ...[
                               TextSpan(
                                 text:
-                                    'Cart Discount :  ${orderDetails.productDiscountAmount}\n',
+                                    '${taxDetailsGroup.entries.elementAt(i).key} : ',
                                 style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 13,
                                 ),
                               ),
                               TextSpan(
-                                text: orderDetails?.deliveryType ==
-                                        "door_delivery"
-                                    ? 'Delivery Discount : ${orderDetails.deliveryDiscount}'
-                                    : 'Takeaway Discount : ${orderDetails.deliveryDiscount}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                ),
+                                text:
+                                    '${AppConfig.instance.country.symbol} ${taxDetailsGroup.entries.elementAt(i).value.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
+                                style: const TextStyle(fontSize: 13),
                               ),
+                              if (i != taxDetailsGroup.length - 1)
+                                const TextSpan(text: '\n'),
                             ],
-                          ),
-                          child: const Icon(
-                            Icons.info_outline,
-                            size: 18,
-                          ),
-                        )
-                      : SizedBox.shrink()),
-              if (isTaxApplicable
-                  // && orderDetails.taxTotalAmount !=
-                  // '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
-                  ) ...[
-                verticalSpaceTiny,
-                _SummaryRow(
-                    label: 'VAT ',
-                    value: orderDetails.taxTotalAmount ?? '0.00',
-                    style: context.customTextTheme.text16W600.copyWith(
-                      color: context.customTextTheme.color,
-                    ),
-                    infoWidget: orderDetails.taxTotalAmount !=
-                            '${AppConfig.instance.country.symbol} ${0.00.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}'
-                        ? Tooltip(
-                            decoration: BoxDecoration(
-                              color: context.customTextTheme.color,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            showDuration: Duration(seconds: 8),
-                            triggerMode: TooltipTriggerMode.tap,
-                            richMessage: TextSpan(
-                              children: [
-                                for (int i = 0;
-                                    i < taxDetailsGroup.entries.length;
-                                    i++) ...[
-                                  TextSpan(
-                                    text:
-                                        '${taxDetailsGroup.entries.elementAt(i).key} : ',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text:
-                                        '${AppConfig.instance.country.symbol} ${taxDetailsGroup.entries.elementAt(i).value.toStringAsFixed(AppConfig.instance.country.decimalPlaces)}',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  if (i != taxDetailsGroup.length - 1)
-                                    const TextSpan(text: '\n'),
-                                ],
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.info_outline,
-                              size: 18,
-                            ),
-                          )
-                        : SizedBox.shrink()),
-              ],
-              const Divider(height: 20.0),
-              _SummaryRow(
-                label: "Total",
-                value: orderDetails.netAmount_IncludingDelivery ??
-                    "${AppConfig.instance.country.symbol}0.00",
-                style: context.customTextTheme.text18W600
-                    .copyWith(color: context.customTextTheme.color),
+                          ],
+                        ),
+                        child: const Icon(Icons.info_outline, size: 18),
+                      )
+                    : SizedBox.shrink(),
               ),
-            ]),
+            ],
+            const Divider(height: 20.0),
+            _SummaryRow(
+              label: "Total",
+              value:
+                  orderDetails.netAmount_IncludingDelivery ??
+                  "${AppConfig.instance.country.symbol}0.00",
+              style: context.customTextTheme.text18W600.copyWith(
+                color: context.customTextTheme.color,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget builderOrderStatusDetails(
-      OrderDetailsModel order, BuildContext context) {
+    OrderDetailsModel order,
+    BuildContext context,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         buildStatusWidget(
           "Pending",
-          completed: order.orderPending ||
+          completed:
+              order.orderPending ||
               order.orderAccepted ||
               order.orderDispatched,
         ),
@@ -552,34 +596,33 @@ class ViewOrderScreen extends GetProviderView<OrderProvider> {
     );
   }
 
-  Widget buildStatusWidget(
-    String data, {
-    bool completed = false,
-  }) {
-    return Builder(builder: (context) {
-      return Column(
-        children: <Widget>[
-          Icon(
-            Icons.adjust_rounded,
-            color: completed
-                ? Theme.of(context).colorScheme.primary
-                : AppColors.kGray7,
-            size: 22,
-          ),
-          verticalSpaceTiny,
-          Text(
-            data,
-            style: context.customTextTheme.text12W400.copyWith(
+  Widget buildStatusWidget(String data, {bool completed = false}) {
+    return Builder(
+      builder: (context) {
+        return Column(
+          children: <Widget>[
+            Icon(
+              Icons.adjust_rounded,
               color: completed
-                  ? Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Theme.of(context).colorScheme.primary
+                  ? Theme.of(context).colorScheme.primary
                   : AppColors.kGray7,
+              size: 22,
             ),
-          )
-        ],
-      );
-    });
+            verticalSpaceTiny,
+            Text(
+              data,
+              style: context.customTextTheme.text12W400.copyWith(
+                color: completed
+                    ? Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Theme.of(context).colorScheme.primary
+                    : AppColors.kGray7,
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -601,20 +644,14 @@ class _SummaryRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: style ?? context.customTextTheme.text14W500,
-        ),
+        Text(label, style: style ?? context.customTextTheme.text14W500),
         horizontalSpaceTiny,
         Visibility(
           visible: infoWidget != null,
           child: infoWidget ?? SizedBox.shrink(),
         ),
         Spacer(),
-        Text(
-          value,
-          style: style ?? context.customTextTheme.text14W500,
-        ),
+        Text(value, style: style ?? context.customTextTheme.text14W500),
       ],
     );
   }

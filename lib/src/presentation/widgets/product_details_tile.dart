@@ -297,23 +297,21 @@ class ProductDetailsTile extends StatelessWidget {
                                     ),
                                   ],
                                 )
-                              : Flexible(
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      product.price ?? '',
-                                      maxLines: 1,
-                                      style: context.customTextTheme.text14W700
-                                          .copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.5,
-                                            color:
-                                                context.customTextTheme.color,
-                                          ),
-                                    ),
-                                  ),
+                              : FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  product.price ?? '',
+                                  maxLines: 1,
+                                  style: context.customTextTheme.text14W700
+                                      .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                        color:
+                                            context.customTextTheme.color,
+                                      ),
                                 ),
+                              ),
                         ),
                         horizontalSpaceSmall,
                         useSecondaryWidget
